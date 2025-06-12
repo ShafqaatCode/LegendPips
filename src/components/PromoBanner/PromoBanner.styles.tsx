@@ -214,6 +214,15 @@ export const CompareButton = styled(ButtonBase)`
   color: ${({ theme }) => theme.colors.gold};
   border-color: ${({ theme }) => theme.colors.gold};
 
+  display:flex;
+  align-item:center;
+  justify-content: center;
+  gap: .4rem;
+
+  img{
+  color: red;
+  }
+
   &:hover {
     background-color: ${({ theme }) => theme.colors.gold};
     color: ${({ theme }) => theme.colors.primary};

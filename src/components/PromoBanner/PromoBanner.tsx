@@ -18,6 +18,7 @@ import {
 import mathIcon from "../../assets/icons/all-svgrepo-com 1.svg";
 import brokersImg from "../../assets/icons/Group 19.svg";
 import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
+import ArrowIcon2 from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 2.svg";
 
 const PromoBanner = () => {
   return (
@@ -50,7 +51,9 @@ const PromoBanner = () => {
           <JoinButton>Join Free 
             <img src={ArrowIcon} alt="Arrow" />
           </JoinButton>
-          <CompareButton>Compare Brokers ➝</CompareButton>
+          <CompareButton>Compare Brokers 
+            <img src={ArrowIcon2} alt="Arrow" />
+          </CompareButton>
         </ActionButtons>
       </HeroContent>
     </BannerWrapper>
