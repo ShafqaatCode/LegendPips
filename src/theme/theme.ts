@@ -11,6 +11,7 @@ export const theme: DefaultTheme = {
     text: '#132E58', // DARK BLUE
     muted: '#6b7280',
     Gold: "linear-gradient(90deg, #FAFC15 0%, #FBBF24 100%)",
+    gold: "#Fbbf24"
   },
   font: {
     family:` 'Poppins', sans-serif`,

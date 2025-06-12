@@ -13,6 +13,7 @@ declare module 'styled-components' {
       text: string;
       muted: string;
       Gold: string;
+      gold: string;
     };
     font: {
       family: string;

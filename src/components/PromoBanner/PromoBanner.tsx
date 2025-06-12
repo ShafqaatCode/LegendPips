@@ -3,8 +3,10 @@ import {
   HeroContent,
   HeroTitle,
   HeroSubTitle,
-  Overlay,
   BannerWrapper,
+  ActionButtons,
+  JoinButton,
+  CompareButton
 } from "./PromoBanner.styles";
 import MathIcon from "../../assets/icons/all-svgrepo-com 1.svg";
 import styled from "styled-components";
@@ -83,6 +85,11 @@ const PromoBanner: React.FC = () => {
             </p>
           </div>
         </BrokersContainer>
+
+        <ActionButtons>
+          <JoinButton>Join Free ➝</JoinButton>
+          <CompareButton>Compare Brokers ➝</CompareButton>
+        </ActionButtons>
       </HeroContent>
     </BannerWrapper>
   );
