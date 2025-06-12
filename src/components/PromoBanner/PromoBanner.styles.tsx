@@ -1,51 +1,80 @@
 import styled from 'styled-components';
+import bgImage from '../../assets/banner/BannerBg.jpg';
+
+
 
 export const BannerWrapper = styled.section`
-  background: #031b49;
-  color: white;
-  padding: 4rem 2rem;
-  text-align: left;
-`;
-
-export const Title = styled.h1`
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-`;
-
-export const Highlight = styled.span`
-  color: #ffcb05;
-`;
-
-export const Description = styled.p`
-  font-size: 1rem;
-  color: #ccc;
-  margin-top: 0.5rem;
-`;
-
-export const BrokersRow = styled.div`
+  position: relative;
+  background-image: url('${bgImage}');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  color: red;
   display: flex;
-  gap: 1rem;
   align-items: center;
-  margin: 2rem 0;
-`;
+  padding: 0 2rem;
 
-export const ActionButtons = styled.div`
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color:rgba(19, 45, 88, 0.8); // Your overlay
+    z-index: 1;
+  }
+
+  > * {
+    position: relative;
+    z-index: 2; // So the content sits above the overlay
+  }
+`;// your image path
+
+export const HeroWrapper = styled.section`
+  position: relative;
+  height: 640px;
+  background-image: url(${bgImage});
+  background-size: cover;
+  background-position: center;
   display: flex;
-  gap: 1rem;
+  align-items: center;
+  padding: 0 4rem;
+  z-index: 1;
+  overflow: hidden;
 `;
 
-export const JoinButton = styled.button`
-  background: transparent;
-  border: 2px solid white;
-  color: white;
-  padding: 0.75rem 2rem;
-  border-radius: 40px;
-  cursor: pointer;
-  font-weight: bold;
+export const Overlay = styled.div`
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5); // for opacity
+  z-index: 1;
 `;
 
-export const CompareButton = styled(JoinButton)`
-  border-color: #ffcb05;
-  color: #ffcb05;
+export const HeroContent = styled.div`
+  position: relative;
+  z-index: 2;
+  width: 45%;
+  // border: 2px solid red;
+  color: ${({ theme }) => theme.colors.WHITE};
+`;
+
+export const HeroTitle = styled.h1`
+  font-size: 48px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  text-transform: capitalize;
+  line-height: 70px;
+  letter-spacing: -0.6%;
+
+
+  span {
+    color:#fbbf24;
+  }
+`;
+
+export const HeroSubTitle = styled.p`
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 30px;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.6%;
+  color: #fbbf24;
 `;

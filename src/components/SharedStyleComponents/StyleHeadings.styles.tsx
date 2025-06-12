@@ -5,7 +5,7 @@ export const SectionHeading = styled.h1`
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
   font-size: 64px;
-//   line-height: 120px;
+  line-height: 120px;
   letter-spacing: -0.6%;
   text-align: center;
   text-transform: uppercase;
