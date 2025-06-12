@@ -201,7 +201,7 @@ export const JoinButton = styled(ButtonBase)`
   color: ${({ theme }) => theme.colors.WHITE};
   border-color: ${({ theme }) => theme.colors.WHITE};
   display:flex;
-  align-item:center;
+  align-items:center;
   justify-content: center;
   gap: .4rem;
 
@@ -215,7 +215,7 @@ export const CompareButton = styled(ButtonBase)`
   border-color: ${({ theme }) => theme.colors.gold};
 
   display:flex;
-  align-item:center;
+  align-items:center;
   justify-content: center;
   gap: .4rem;
 

@@ -30,6 +30,7 @@ declare module 'styled-components' {
     breakpoints: {
       tablet: string;
       mobile: string;
+      laptop: string;
     }
     
   }
