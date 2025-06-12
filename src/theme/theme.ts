@@ -2,15 +2,15 @@ import type { DefaultTheme } from 'styled-components';
 
 export const theme: DefaultTheme = {
   colors: {
-    primary: '#4f46e5',
-    secondary: '#06b6d4',
-    background: '#f9fafb',
-    surface: '#ffffff',
-    text: '#1f2937',
+    primary: '#132E58', // DARK BLUE
+    secondary: '#1D4ED8', // ROYAL BLUE
+    background: '#FFFFFF', // WHITE
+    surface: '#F3F4F7', // LIGHT PINK
+    text: '#132E58', // DARK BLUE
     muted: '#6b7280',
   },
   font: {
-    family: `'Inter', sans-serif`,
+    family:` 'Poppins', sans-serif`,
     size: '16px',
     weight: {
       regular: 400,
@@ -18,5 +18,7 @@ export const theme: DefaultTheme = {
       bold: 700,
     },
   },
-  
+  images: {
+    background: './Assets/banner/BannerBg.jpg',
+  },
 };

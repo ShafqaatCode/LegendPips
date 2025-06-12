@@ -20,6 +20,9 @@ declare module 'styled-components' {
         bold: number;
       };
     };
+    images: {
+      background: string;
+    };
     
   }
 }
