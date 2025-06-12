@@ -5,6 +5,8 @@ export const theme: DefaultTheme = {
     primary: '#132E58', // DARK BLUE
     secondary: '#1D4ED8', // ROYAL BLUE
     background: '#FFFFFF', // WHITE
+    WHITE: '#FFFFFF', // WHITE
+    BLACK: '#000000', // BLACK
     surface: '#F3F4F7', // LIGHT PINK
     text: '#132E58', // DARK BLUE
     muted: '#6b7280',
