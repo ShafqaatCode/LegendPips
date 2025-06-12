@@ -7,9 +7,13 @@ declare module 'styled-components' {
       primary: string;
       secondary: string;
       background: string;
+      WHITE: string;
+      BLACK: string;
       surface: string;
       text: string;
       muted: string;
+      Gold: string;
+      gold: string;
     };
     font: {
       family: string;
@@ -20,6 +24,13 @@ declare module 'styled-components' {
         bold: number;
       };
     };
+    images: {
+      background: string;
+    };
+    breakpoints: {
+      tablet: string;
+      mobile: string;
+    }
     
   }
 }
