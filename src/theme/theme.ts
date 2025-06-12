@@ -25,4 +25,8 @@ export const theme: DefaultTheme = {
   images: {
     background: './Assets/banner/BannerBg.jpg',
   },
+  breakpoints: {
+    tablet: "992px",
+    mobile: "768px"
+  }
 };

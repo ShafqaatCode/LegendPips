@@ -27,6 +27,10 @@ declare module 'styled-components' {
     images: {
       background: string;
     };
+    breakpoints: {
+      tablet: string;
+      mobile: string;
+    }
     
   }
 }
