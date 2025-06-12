@@ -12,6 +12,7 @@ declare module 'styled-components' {
       surface: string;
       text: string;
       muted: string;
+      Gold: string;
     };
     font: {
       family: string;

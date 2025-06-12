@@ -10,6 +10,7 @@ export const theme: DefaultTheme = {
     surface: '#F3F4F7', // LIGHT PINK
     text: '#132E58', // DARK BLUE
     muted: '#6b7280',
+    Gold: "linear-gradient(90deg, #FAFC15 0%, #FBBF24 100%)",
   },
   font: {
     family:` 'Poppins', sans-serif`,
