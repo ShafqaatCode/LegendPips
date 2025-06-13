@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   SliderWrapper,
   CardsContainer,
@@ -21,9 +21,7 @@ const features = [
   { icon: TradingIcon, label: "Trading Signals" },
   { icon: ContestIcon, label: "Contests & Rewards" },
   { icon: ScamIcon, label: "Scam Protection" },
-  { icon: ScamIcon, label: "Scam Protection" },
-  { icon: ScamIcon, label: "Scam Protection" },
-];
+]
 
 const FeaturesSlider = () => {
   const [startIndex, setStartIndex] = useState(0);
