@@ -103,7 +103,7 @@ export const BrokersContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 1.5rem;
+  margin-top: 1.2rem;
   gap: 1.5rem;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
@@ -162,9 +162,10 @@ export const BrokerRightSection = styled.div`
 
 export const ActionButtons = styled.div`
   display: flex;
-  gap: 1rem;
+  gap: 0.4rem;
   margin-top: 2.5rem;
-  flex-wrap: wrap;
+  white-space: nowrap;
+  /* flex-wrap: wrap; */
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     flex-direction: column;
@@ -177,12 +178,12 @@ export const ActionButtons = styled.div`
 const ButtonBase = styled.button`
   padding: 0.75rem 2rem;
   font-size: 1.2rem;
-  line-height: 35px;
-  font-weight: 550;
+  /* line-height: 35px; */
+  font-weight: 500;
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
-  width: 270px;
+  width: 268px;
   border: 1px solid transparent;
   font-family: ${({theme})=> theme.font.family};
 
