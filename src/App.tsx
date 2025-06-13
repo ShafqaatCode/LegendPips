@@ -8,6 +8,7 @@ import {
 import TopHeader from "./components/Header/TopHeader";
 import { BrowserRouter } from "react-router-dom";
 import FeaturesSlider from "./components/FeatureSection/FeaturesSlider";
+import Signals from "./components/Signals/Signals";
 
 function App() {
   return (
@@ -15,11 +16,7 @@ function App() {
       <TopHeader />
       <PromoBanner />
       <FeaturesSlider />
-      <div>
-        <UpperHeading>Your one-stop solution for trading</UpperHeading>
-        <SectionHeading>Welcome to LegendPips</SectionHeading>
-        <SubHeading>Join us and start your trading journey today!</SubHeading> 
-      </div>
+      <Signals />
     </BrowserRouter>
   );
 }

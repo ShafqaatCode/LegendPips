@@ -9,7 +9,7 @@ export const BannerWrapper = styled.section`
   align-items: center;
   justify-content: flex-start;
   height: 100vh;
-  min-height: 600px;
+  min-height: 650px;
   padding: 0 3rem;
   background-image: url("${bgImage}");
   background-size: cover;
