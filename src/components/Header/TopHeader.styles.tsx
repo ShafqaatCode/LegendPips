@@ -2,12 +2,6 @@
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 
-// export const GradientText = styled.h1`
-//   background: ${({ theme }) => theme.colors.Gold};
-//   -webkit-background-clip: text;
-//   -webkit-text-fill-color: transparent;
-//   display: inline-block;
-// `;
 
 export const TopContainer = styled.header`
   height: 4.2rem;
