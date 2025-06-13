@@ -16,7 +16,7 @@ function App() {
       <div>
         <UpperHeading>Your one-stop solution for trading</UpperHeading>
         <SectionHeading>Welcome to LegendPips</SectionHeading>
-        <SubHeading>Join us and start your trading journey today!</SubHeading>
+        <SubHeading>Join us and start your trading journey today!</SubHeading> 
       </div>
     </BrowserRouter>
   );
