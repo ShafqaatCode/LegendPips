@@ -7,12 +7,14 @@ import {
 } from "./components/SharedStyleComponents/StyleHeadings.styles";
 import TopHeader from "./components/Header/TopHeader";
 import { BrowserRouter } from "react-router-dom";
+import FeaturesSlider from "./components/FeatureSection/FeaturesSlider";
 
 function App() {
   return (
     <BrowserRouter>
       <TopHeader />
       <PromoBanner />
+      <FeaturesSlider />
       <div>
         <UpperHeading>Your one-stop solution for trading</UpperHeading>
         <SectionHeading>Welcome to LegendPips</SectionHeading>
