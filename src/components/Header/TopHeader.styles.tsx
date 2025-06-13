@@ -1,6 +1,6 @@
 // src/components/layout/TopHeader/TopHeader.styles.ts
-import styled from 'styled-components';
-import { NavLink } from 'react-router-dom';
+import styled from "styled-components";
+import { NavLink } from "react-router-dom";
 
 // export const GradientText = styled.h1`
 //   background: ${({ theme }) => theme.colors.Gold};
@@ -19,6 +19,13 @@ export const TopContainer = styled.header`
   justify-content: space-between;
   color: ${({ theme }) => theme.colors.WHITE};
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  
+  @media (max-width: 768px)
+  {
+   padding: 0 1rem;
+  
+  }
 `;
 
 export const Logo = styled.img`
@@ -42,8 +49,18 @@ export const HeaderItem = styled.div`
   align-items: center;
   gap: 0.4rem;
 
+  img {
+    height: 20px;
+    width: 20px;
+  }
   span {
     font-size: 14px;
+  }
+
+  @media (max-width: 768px) {
+    span {
+      display: none;
+    }
   }
 `;
 
@@ -54,8 +71,9 @@ export const SignInButton = styled.button`
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
+  white-space: nowrap;
   background-color: ${({ theme }) => theme.colors.WHITE};
-//   color: ${({ theme }) => theme.colors.primary};
+  //   color: ${({ theme }) => theme.colors.primary};
   transition: background-color 0.3s;
 
   &:hover {
