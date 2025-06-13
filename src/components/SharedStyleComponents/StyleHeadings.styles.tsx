@@ -20,6 +20,7 @@ export const UpperHeading = styled.h2`
   letter-spacing: -0.6%;
   text-align: center;
   text-transform: uppercase;
+  color: ${({theme}) => theme.colors.secondary}
   
 `;
 
@@ -30,6 +31,9 @@ export const SubHeading = styled.h2`
   line-height: 30px;
   letter-spacing: -0.6%;
   text-align: center;
+  width:850px;
+  margin:auto;
+  // border: 2px solid red;
    
 `;
 
