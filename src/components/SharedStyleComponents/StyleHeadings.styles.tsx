@@ -9,6 +9,12 @@ export const SectionHeading = styled.h1`
   letter-spacing: -0.6%;
   text-align: center;
   text-transform: uppercase;
+
+
+  @media (max-width: 768px)
+  {
+    font-size: 48px;
+  }
   `;
   
   export const UpperHeading = styled.h2`
@@ -19,7 +25,14 @@ export const SectionHeading = styled.h1`
   letter-spacing: -0.6%;
   text-align: center;
   text-transform: uppercase;
-  color: ${({theme}) => theme.colors.secondary}
+  color: ${({theme}) => theme.colors.secondary};
+
+
+  
+  @media (max-width: 768px)
+  {
+    font-size: 18px;
+  }
   
 `;
 
@@ -30,10 +43,18 @@ export const SubHeading = styled.h2`
   line-height: 30px;
   letter-spacing: -0.6%;
   text-align: center;
-  width:850px;
+  max-width:850px;
   margin:auto;
   // border: 2px solid red;
   margin-bottom: 2rem;
+
+
+  
+  @media (max-width: 768px)
+  {
+    font-size: 18px;
+
+  }
    
 `;
 
