@@ -5,7 +5,7 @@ import {
   UpperHeading,
   SubHeading,
 } from "../SharedStyleComponents/StyleHeadings.styles";
-import SignalBoxImg from "../../assets/Frame 157.svg";
+// import SignalBoxImg from "../../assets/Frame 157.svg";
 import MathImg from "../../assets/icons/all-svgrepo-com 1.svg";
 import SignalBox from "./SignalBox";
 

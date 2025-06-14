@@ -41,7 +41,7 @@ export const SignalTopbar = styled.div`
   }
 
   img {
-    height: 18px;
+    max-height: 24px;
   }
 
   p {
@@ -62,7 +62,7 @@ export const StatusWrapper = styled.div`
   gap: 6px;
 
   img {
-    height: 13px;
+    max-height: 13px;
   }
 
   p {
@@ -103,13 +103,13 @@ export const SignalValueRow = styled.div`
 `;
 
 export const SignalLabel = styled.span`
-  font-size: 14px;
+  font-size: 12px;
   color: #666;
 `;
 
 export const SignalValue = styled.span`
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 500;
   color: ${({ theme }) => theme.colors.primary};
 `;
 
