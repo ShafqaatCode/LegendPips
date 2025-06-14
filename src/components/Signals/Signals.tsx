@@ -16,7 +16,7 @@ const SignalsSection = styled.section`
   flex-direction: column;
   min-height: 700px;
 
-  margin: 2rem 1rem;
+  // margin: 0rem 1rem;
 `;
 
 const SignalImgContainer = styled.div`

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const SignalBoxContainer = styled.div`
-  width: 100%;
+  // width: 100%;
   max-width: 400px;
   min-width: 320px;
   border-radius: 8px;
@@ -40,8 +40,8 @@ export const SignalTopbar = styled.div`
   }
 
   img {
-    height: 1.5rem; /* 24px */
-    width: 1.5rem;
+    max-height: 1.5rem; /* 24px */
+    max-width: 1.5rem;
     display: inline-block;
   }
 
@@ -63,8 +63,8 @@ export const StatusWrapper = styled.div`
   gap: 6px;
 
   img {
-    height: 0.8125rem; /* 13px */
-    width: auto;
+    max-height: 0.8125rem; /* 13px */
+    max-width: auto;
   }
 
   p {
