@@ -6,7 +6,8 @@ import {
   SubHeading,
 } from "../SharedStyleComponents/StyleHeadings.styles";
 import SignalBoxImg from "../../assets/Frame 157.svg";
-import MathImg from "../../assets/icons/all-svgrepo-com 1.svg"
+import MathImg from "../../assets/icons/all-svgrepo-com 1.svg";
+import SignalBox from "./SignalBox";
 
 const SignalsSection = styled.section`
   display: flex;
@@ -14,8 +15,8 @@ const SignalsSection = styled.section`
   justify-content: center;
   flex-direction: column;
   min-height: 700px;
-  border: 2px solid red;
-  margin:1rem;
+
+  margin: 2rem 1rem;
 `;
 
 const SignalImgContainer = styled.div`
@@ -42,7 +43,7 @@ const Signals: React.FC = () => {
     <SignalsSection>
       <div>
         <UpperHeadingDiv>
-            <img src={MathImg} alt="" />
+          <img src={MathImg} alt="" />
           <UpperHeading>All IN ONE TRADING PlATEFORM</UpperHeading>
         </UpperHeadingDiv>
         <SectionHeading>LIVE SIGNALS</SectionHeading>
@@ -52,9 +53,41 @@ const Signals: React.FC = () => {
         </SubHeading>
       </div>
       <SignalImgContainer>
-        <img src={SignalBoxImg} alt="Signal Image" />
-        <img src={SignalBoxImg} alt="Signal Image" />
-        <img src={SignalBoxImg} alt="Signal Image" />
+        <SignalBox
+          pair="EUR/USD"
+          type="BUY"
+          timeAgo="2h ago"
+          entry="1.0843"
+          current="1.0902"
+          takeProfit="1.1000"
+          stopLoss="1.0780"
+          status="Active"
+          pips="+63 Pips"
+        />
+        <SignalBox
+          pair="EUR/USD"
+          type="BUY"
+          timeAgo="2h ago"
+          entry="1.0843"
+          current="1.0902"
+          takeProfit="1.1000"
+          stopLoss="1.0780"
+          status="Active"
+          pips="+63 Pips"
+        />
+        <SignalBox
+          pair="EUR/USD"
+          type="BUY"
+          timeAgo="2h ago"
+          entry="1.0843"
+          current="1.0902"
+          takeProfit="1.1000"
+          stopLoss="1.0780"
+          status="Closed"
+          pips="+63 Pips"
+        />
+
+        
       </SignalImgContainer>
     </SignalsSection>
   );
