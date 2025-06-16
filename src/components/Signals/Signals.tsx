@@ -26,12 +26,7 @@ const SignalImgContainer = styled.div`
   }
 `;
 
-const UpperHeadingDiv = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-`;
+
 
 const Signals: React.FC = () => {
   return (

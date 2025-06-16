@@ -10,13 +10,14 @@ const BrokerSectionWrapper = styled.section`
 display: flex;
 flex-direction: column;
 gap: 2rem;
-  padding: 1rem 0;
+padding: 1rem 0;
+margin: 3rem 1rem;
 `;
 
 const BrokerWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 `;
 
 // Example array of broker data
