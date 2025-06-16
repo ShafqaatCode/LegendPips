@@ -6,10 +6,10 @@ import ButtonBase from "../SharedComponents/Button";
 import { FaArrowAltCircleUp } from "react-icons/fa";
 
 const WorkSectionWrapper = styled.section`
-  padding: 4rem 1rem;
+  padding: 0rem 2rem;
   width: 100%;
   background-color: white;
-  height: 720px;
+  padding-top: 3rem;
   overflow: hidden;
 `;
 
