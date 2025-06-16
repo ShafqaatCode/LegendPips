@@ -9,6 +9,8 @@ import ButtonBase from "../SharedComponents/Button";
 
 const WorkSectionWrapper = styled.section`
   padding: 3rem 1rem;
+  background-color: #fff;
+
 `;
 
 const WorksWrapper = styled.div`
