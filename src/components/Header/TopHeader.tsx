@@ -1,56 +1,68 @@
-// src/components/layout/TopHeader/TopHeader.tsx
-import React from 'react';
+import React from "react";
 import {
   TopContainer,
-  HeaderLink,
   Logo,
-  LinkGroup,
+  HeaderLink,
+  SignInButton,
+  DesktopGroup,
+  MobileBar,
   HeaderItem,
-  SignInButton
-} from './TopHeader.styles';
+} from "./TopHeader.styles";
 
-import LogoImg from '../../assets/icons/Logo.png';
-import SupportIcon from '../../assets/icons/SupportIcon.svg';
-import CalculatorIcon from '../../assets/icons/calculator-svgrepo-com (1) 1.svg';
-import LocationIcon from '../../assets/icons/Location marker.svg';
+import LogoImg from "../../assets/icons/Logo_Svg.svg";
+import SupportIcon from "../../assets/icons/SupportIcon.svg";
+import CalculatorIcon from "../../assets/icons/calculator-svgrepo-com (1) 1.svg";
+import LocationIcon from "../../assets/icons/Location marker.svg";
+import { FaBars } from "react-icons/fa";
+
 
 const TopHeader: React.FC = () => {
   return (
-    <TopContainer>
-      <HeaderLink to="/">
-        <Logo src={LogoImg} alt="LegendPips Logo" />
-      </HeaderLink>
-
-      <LinkGroup>
-        <HeaderLink to="/live-chat">
-          <HeaderItem>
-            <img src={SupportIcon} alt="Live Chat Icon" />
-            
-            <span>Live Chat</span>
-          </HeaderItem>
+    <>
+      {/* Desktop TopBar */}
+      <TopContainer className="desktop-only">
+        <HeaderLink to="/">
+          <Logo src={LogoImg} alt="LegendPips Logo" />
         </HeaderLink>
 
-        <HeaderLink to="/calculator">
-          <HeaderItem>
-            <img src={CalculatorIcon} alt="Calculator Icon" />
-            <span>Rebate Calculator</span>
-          </HeaderItem>
-        </HeaderLink>
-
-        <HeaderLink to="/location">
-          <HeaderItem>
-            <img src={LocationIcon} alt="Location Icon" />
-            <span>United States</span>
-          </HeaderItem>
-        </HeaderLink>
-
-        <HeaderLink to="/signin">
-          <HeaderItem>
+        <DesktopGroup>
+          <HeaderLink to="/live-chat">
+            <HeaderItem>
+              <img src={SupportIcon} alt="Live Chat" />
+              <span>Live Chat</span>
+            </HeaderItem>
+          </HeaderLink>
+          <HeaderLink to="/calculator">
+            <HeaderItem>
+              <img src={CalculatorIcon} alt="Calculator" />
+              <span>Rebate Calculator</span>
+            </HeaderItem>
+          </HeaderLink>
+          <HeaderLink to="/location">
+            <HeaderItem>
+              <img src={LocationIcon} alt="Location" />
+              <span>United States</span>
+            </HeaderItem>
+          </HeaderLink>
+          <HeaderLink to="/signin">
             <SignInButton>Sign In</SignInButton>
-          </HeaderItem>
+          </HeaderLink>
+        </DesktopGroup>
+      </TopContainer>
+
+      {/* Mobile TopBar */}
+      <MobileBar className="mobile-only">
+        <HeaderLink to="/">
+          <Logo src={LogoImg} alt="Logo" />
         </HeaderLink>
-      </LinkGroup>
-    </TopContainer>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <HeaderLink to="/signin">
+            <SignInButton>Sign In</SignInButton>
+          </HeaderLink>
+           <FaBars size={24} color="#fff" style={{ cursor: "pointer" }} />
+        </div>
+      </MobileBar>
+    </>
   );
 };
 

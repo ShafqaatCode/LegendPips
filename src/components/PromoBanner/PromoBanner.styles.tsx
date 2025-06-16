@@ -1,19 +1,19 @@
-
-
 import styled from "styled-components";
-import bgImage from "../../assets/banner/BannerBg.jpg"
+import bgImage from "../../assets/banner/BannerBg.jpg";
 
 export const BannerWrapper = styled.section`
   position: relative;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  height: 100vh;
+  // height: 100vh;
   min-height: 650px;
+  // border: 2px solid red;
   padding: 0 3rem;
   background-image: url("${bgImage}");
   background-size: cover;
   background-position: center;
+  margin-top: 50px;
   color: ${({ theme }) => theme.colors.WHITE};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
@@ -142,7 +142,7 @@ export const BrokerLeftSection = styled.div`
 
 export const BrokerRightSection = styled.div`
   flex: 2;
-  
+
   p {
     max-width: 320px;
     font-size: 13px;
@@ -155,7 +155,6 @@ export const BrokerRightSection = styled.div`
       text-align: center;
       max-width: 100%;
       font-size: 15px;
-    
     }
   }
 `;
@@ -185,7 +184,7 @@ const ButtonBase = styled.button`
   transition: all 0.3s ease;
   width: 268px;
   border: 1px solid transparent;
-  font-family: ${({theme})=> theme.font.family};
+  font-family: ${({ theme }) => theme.font.family};
 
   &:hover {
     opacity: 0.9;
@@ -201,13 +200,10 @@ export const JoinButton = styled(ButtonBase)`
   background-color: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.WHITE};
   border-color: ${({ theme }) => theme.colors.WHITE};
-  display:flex;
-  align-items:center;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  gap: .4rem;
-
-  
-
+  gap: 0.4rem;
 `;
 
 export const CompareButton = styled(ButtonBase)`
@@ -215,13 +211,13 @@ export const CompareButton = styled(ButtonBase)`
   color: ${({ theme }) => theme.colors.gold};
   border-color: ${({ theme }) => theme.colors.gold};
 
-  display:flex;
-  align-items:center;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  gap: .4rem;
+  gap: 0.4rem;
 
-  img{
-  color: red;
+  img {
+    color: red;
   }
 
   &:hover {

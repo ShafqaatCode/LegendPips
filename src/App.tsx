@@ -1,17 +1,13 @@
 import "./App.css";
-import PromoBanner from "./components/PromoBanner/PromoBanner";
-import TopHeader from "./components/Header/TopHeader";
+
 import { BrowserRouter } from "react-router-dom";
-import FeaturesSlider from "./components/FeatureSection/FeaturesSlider";
-import Signals from "./components/Signals/Signals";
+
+import AppRoutes from "./routes/AppRoutes";
 
 function App() {
   return (
     <BrowserRouter>
-      <TopHeader />
-      <PromoBanner />
-      <FeaturesSlider />
-      <Signals />
+      <AppRoutes />
     </BrowserRouter>
   );
 }

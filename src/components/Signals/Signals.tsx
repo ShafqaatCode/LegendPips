@@ -1,12 +1,6 @@
 import type React from "react";
 import styled from "styled-components";
-import {
-  SectionHeading,
-  UpperHeading,
-  SubHeading,
-} from "../SharedStyleComponents/StyleHeadings.styles";
-// import SignalBoxImg from "../../assets/Frame 157.svg";
-import MathImg from "../../assets/icons/all-svgrepo-com 1.svg";
+import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import SignalBox from "./SignalBox";
 
 const SignalsSection = styled.section`
@@ -14,9 +8,10 @@ const SignalsSection = styled.section`
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  min-height: 700px;
+  min-height: 650px;
+  // border: 2px solid red;
 
-  margin: 2rem 1rem;
+  margin: 1rem 1rem;
 `;
 
 const SignalImgContainer = styled.div`
@@ -41,17 +36,11 @@ const UpperHeadingDiv = styled.div`
 const Signals: React.FC = () => {
   return (
     <SignalsSection>
-      <div>
-        <UpperHeadingDiv>
-          <img src={MathImg} alt="" />
-          <UpperHeading>All IN ONE TRADING PlATEFORM</UpperHeading>
-        </UpperHeadingDiv>
-        <SectionHeading>LIVE SIGNALS</SectionHeading>
-        <SubHeading>
-          Trade, earn, repeat. With rebates, expert tools, and a strong
-          community, Legend Pips makes every trade more rewarding.
-        </SubHeading>
-      </div>
+      <SectionHeadingSet
+        upperText="ALL IN ONE TRADING PLATFORM"
+        mainHeading="LIVE SIGNALS"
+        subText="Trade, earn, repeat. With rebates, expert tools, and a strong community, Legend Pips makes every trade more rewarding."
+      />
       <SignalImgContainer>
         <SignalBox
           pair="EUR/USD"
@@ -86,8 +75,6 @@ const Signals: React.FC = () => {
           status="Closed"
           pips="+63 Pips"
         />
-
-        
       </SignalImgContainer>
     </SignalsSection>
   );
