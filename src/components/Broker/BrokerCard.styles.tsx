@@ -1,31 +1,45 @@
 import styled from "styled-components";
+
 export const CardContainer = styled.div`
   position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 3rem;
-  padding: 1.8rem 1.8rem 1.8rem 6rem; /* Extra left padding */
+  padding: 1.8rem 1.8rem 1.8rem 6rem;
   background-color: #fefefe;
-  // border: 3px solid transparent;
   border-radius: 12px;
   background-clip: padding-box;
-  // box-shadow: 0 0 0 3px #fbc113;
   flex-wrap: wrap;
   width: 85%;
   margin: auto;
-  // overflow:hidden;
+  // box-shadow: 0 0 0 3px #fbc113;
+
+  @media (max-width: 1024px) {
+    gap: 2rem;
+    padding-left: 5rem;
+    width: 90%;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1.5rem;
+    width: 95%;
+    gap: 1.5rem;
+    margin: 1rem auto;
+  }
 `;
 
 export const TopIndex = styled.span`
-background-color: ${({ theme }) => theme.colors.primary};
-position: absolute;
-color: white;
-top:-20px;
-left: 20px;
-text-align: center;
-
-padding: 5px 12px;
+  background-color: ${({ theme }) => theme.colors.primary};
+  position: absolute;
+  color: white;
+  top: -20px;
+  left: 20px;
+  text-align: center;
+  padding: 5px 12px;
+  border-radius: 5px;
 `;
 
 export const FeaturedRibbon = styled.div`
@@ -37,9 +51,9 @@ export const FeaturedRibbon = styled.div`
   padding: 6px 14px;
   font-weight: bold;
   font-size: 12px;
-  // clip-path: polygon(100% 0, 100% 100%, 80% 100%, 0 100%, 20% 0);
-  border-radius: 5px;
+  border-radius: 0 12px 0 5px;
 `;
+
 export const LogoSection = styled.div`
   position: absolute;
   left: 0;
@@ -48,6 +62,14 @@ export const LogoSection = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  @media (max-width: 768px) {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    margin-bottom: 1rem;
+  }
 `;
 
 export const LogoImg = styled.img`
@@ -55,14 +77,24 @@ export const LogoImg = styled.img`
   width: 140px;
   border-radius: 50%;
   background-color: #fff;
-  // box-shadow: 0 0 0 4px #fbc113;
   object-fit: cover;
-`;
+  // box-shadow: 0 0 0 4px #fbc113;
 
+  @media (max-width: 768px) {
+    height: 100px;
+    width: 100px;
+  }
+`;
 
 export const InfoSection = styled.div`
   flex: 2;
   min-width: 250px;
+
+  @media (max-width: 768px) {
+    min-width: unset;
+    width: 100%;
+    text-align: center;
+  }
 `;
 
 export const TitleRow = styled.div`
@@ -75,6 +107,15 @@ export const TitleRow = styled.div`
     font-size: 36px;
     margin: 0;
     color: #0f1c46;
+
+    @media (max-width: 768px) {
+      font-size: 28px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    justify-content: center;
+    flex-wrap: wrap;
   }
 `;
 
@@ -91,25 +132,26 @@ export const Description = styled.p`
   font-size: 16px;
   color: rgba(15, 23, 42, 0.8);
   margin: 0;
+
+  @media (max-width: 768px) {
+    text-align: center;
+  }
 `;
 
 export const RatingBox = styled.div`
   display: flex;
   flex-direction: column;
-
   align-items: center;
   padding: 2rem;
-  // justify-content: space-between;
   min-width: 120px;
-  // width: 180px;
-  // height: 140px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 5px;
   text-align: center;
 
   @media (max-width: 768px) {
-    align-self: stretch;
-    text-align: left;
+    align-self: center;
+    width: 80%;
+    max-width: 300px;
   }
 `;
 
@@ -142,7 +184,8 @@ export const ActionSection = styled.div`
   gap: 0.6rem;
 
   @media (max-width: 768px) {
-    align-items: flex-start;
+    align-items: center;
+    width: 100%;
   }
 `;
 
@@ -163,6 +206,9 @@ export const PrimaryButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
+  width: 100%;
+  max-width: 200px;
+  justify-content: center;
 
   &:hover {
     background-color: #1a2c60;

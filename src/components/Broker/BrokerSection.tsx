@@ -3,9 +3,14 @@ import BrokerCard from "./BrokerCard";
 import ICLogo from "../../assets/icons/Ellipse 2.png";
 import styled from "styled-components";
 import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
+import ButtonBase from "../SharedComponents/Button";
+import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 2.svg"
 
 const BrokerSectionWrapper = styled.section`
-  padding: 3rem 0;
+display: flex;
+flex-direction: column;
+gap: 2rem;
+  padding: 1rem 0;
 `;
 
 const BrokerWrapper = styled.div`
@@ -49,6 +54,13 @@ const brokers = [
   // Add as many cards as needed here
 ];
 
+const ButtonContainer = styled.div`
+display:flex;
+justify-content: center;
+
+
+`
+
 const BrokerSection: React.FC = () => {
   return (
     <BrokerSectionWrapper>
@@ -62,6 +74,13 @@ const BrokerSection: React.FC = () => {
           <BrokerCard key={idx} {...broker} />
         ))}
       </BrokerWrapper>
+      <ButtonContainer>
+        <ButtonBase  bgColor="transparent"
+        color="#132E58"
+        borderColor="#132E58"
+        padding="1rem 2.5rem"
+        fontSize="1.1rem" >View All Brokers <img src={ArrowIcon} alt="icon" /></ButtonBase>
+      </ButtonContainer>
     </BrokerSectionWrapper>
   );
 };
