@@ -2,7 +2,6 @@
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 
-
 export const TopContainer = styled.header`
   height: 4.2rem;
   background-color: ${({ theme }) => theme.colors.primary};
@@ -14,11 +13,8 @@ export const TopContainer = styled.header`
   color: ${({ theme }) => theme.colors.WHITE};
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-  
-  @media (max-width: 768px)
-  {
-   padding: 0 1rem;
-  
+  @media (max-width: 768px) {
+    padding: 0 1rem;
   }
 `;
 
@@ -53,6 +49,9 @@ export const HeaderItem = styled.div`
 
   @media (max-width: 768px) {
     span {
+      display: none;
+    }
+    img {
       display: none;
     }
   }

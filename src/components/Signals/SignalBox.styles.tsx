@@ -105,12 +105,12 @@ export const SignalValueRow = styled.div`
 `;
 
 export const SignalLabel = styled.span`
-  font-size: 0.875rem;
+  font-size: 12px;
   color: #666666;
 `;
 
 export const SignalValue = styled.span`
-  font-size: 0.875rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: ${({ theme }) => theme?.colors?.primary || "#1e3a8a"};
 `;
