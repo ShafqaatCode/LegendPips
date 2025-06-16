@@ -7,58 +7,73 @@ import {
   TitleRow,
   VerifiedBadge,
   Description,
-//   Badge,s
+  FeaturedRibbon,
   RatingBox,
   StarRow,
-  ReviewCount,
+  ReviewText,
   ActionSection,
   PrimaryButton,
-  SecondaryLink,
-  TopRibbon,
-} from "../Broker/Broker.styles";
+  SecondaryButton,
+  TermsText,
+  TopIndex,
+} from "./BrokerCard.styles";
+import { FaStar } from "react-icons/fa";
+import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 
-import Logo from "../../assets/icons/icmarkets-logo.png"; // Replace with actual logo
-import { FaArrowRight, FaStar } from "react-icons/fa";
+interface BrokerCardProps {
+  index: number;
+  featured?: boolean;
+  title: string;
+  description: string;
+  logoSrc: string;
+  rating: number; 
+  reviewsCount: string;
+}
 
-const BrokerCard = () => {
+const BrokerCard: React.FC<BrokerCardProps> = ({
+  index,
+  featured,
+  title,
+  description,
+  logoSrc,
+  rating,
+  reviewsCount,
+}) => {
   return (
     <CardContainer>
-      <TopRibbon>Featured</TopRibbon>
+      {featured && <FeaturedRibbon>Featured</FeaturedRibbon>}
+      <TopIndex>{index}</TopIndex>
 
       <LogoSection>
-        <LogoImg src={Logo} alt="IC Markets Logo" />
+        <LogoImg src={logoSrc} alt={`${title} Logo`} />
       </LogoSection>
 
       <InfoSection>
         <TitleRow>
-          <h2>IC Market</h2>
+          <h2>{title}</h2>
           <VerifiedBadge>✔ Verified Broker</VerifiedBadge>
         </TitleRow>
-
-        <Description>
-          Connect with thousands of traders worldwide. Share insights, learn
-          strategies, and grow together inside our thriving Forex community.
-        </Description>
+        <Description>{description}</Description>
       </InfoSection>
 
       <RatingBox>
         <StarRow>
-          {[...Array(4)].map((_, i) => (
-            <FaStar key={i} color="#FFA500" />
+          {[...Array(5)].map((_, i) => (
+            <FaStar key={i} color={i < rating ? "#FBAF00" : "#ccc"} />
           ))}
-          <FaStar color="#ccc" />
         </StarRow>
-        <ReviewCount>45k+ <br /> <span>Customer Reviews</span></ReviewCount>
+        <ReviewText>
+          <strong>{reviewsCount}</strong>
+          <span>Customer Reviews</span>
+        </ReviewText>
       </RatingBox>
 
       <ActionSection>
-        <span className="terms">Terms & Conditions Apply</span>
+        <TermsText>Terms & Conditions Apply</TermsText>
         <PrimaryButton>
-          View Details <FaArrowRight />
+          View Details <img src={ArrowIcon} alt="Arrow" />
         </PrimaryButton>
-        <SecondaryLink>
-          Broker Reviews <FaArrowRight />
-        </SecondaryLink>
+        <SecondaryButton>Broker Reviews</SecondaryButton>
       </ActionSection>
     </CardContainer>
   );
