@@ -14,6 +14,8 @@ export const SectionHeading = styled.h1`
   @media (max-width: 768px)
   {
     font-size: 48px;
+    // border: 2px solid red;
+    line-height: 60px;
   }
   `;
   
