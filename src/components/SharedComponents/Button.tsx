@@ -7,15 +7,16 @@ const ButtonBase = styled.button<{
   width?: string;
   padding?: string;
   fontSize?: string;
+  fontWeight?: string;
 }>`
   padding: ${({ padding }) => padding || "0.75rem 2rem"};
   font-size: ${({ fontSize }) => fontSize || "1.2rem"};
-  font-weight: 500;
+  font-weight: ${({fontWeight}) => fontWeight || "500"};
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
   width: ${({ width }) => width || "268px"};
-  border: 1px solid ${({ borderColor, theme }) => borderColor || "transparent"};
+  border: 1px solid ${({ borderColor}) => borderColor || "transparent"};
   background-color: ${({ bgColor, theme }) => bgColor || theme.colors.primary};
   color: ${({ color, theme }) => color || theme.colors.WHITE};
   font-family: ${({ theme }) => theme.font.family};

@@ -20,17 +20,18 @@ const WorksWrapper = styled.div`
   gap: 4rem;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    flex-direction: column;
+    // flex-direction: column;
     align-items: center;
+    gap: 2rem;
   }
 `;
 
 const SignUpAction = styled.div`
   display: flex;
-  margin: 2rem auto;
+  margin: 3rem auto;
   align-items: center;
   justify-content: space-between;
-  width: 80%;
+  width: 70%;
   border: 1px solid #1d4ed8;
   padding: 1rem 1.5rem;
   text-align: center;
@@ -51,6 +52,13 @@ const SignUpAction = styled.div`
   img {
     width: 40px;
     height: 40px;
+  }
+
+  @media (max-width: 768px) {
+    //  flex-wrap: wrap;
+    gap: 1rem;
+    width: 80%;
+    flex-direction: column;
   }
 `;
 

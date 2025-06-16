@@ -5,6 +5,7 @@ import FeaturesSlider from "../../components/FeatureSection/FeaturesSlider";
 
 import BrokerSection from "../../components/Broker/BrokerSection";
 import HowItWorks from "../../components/HItWorks/WorksSection";
+import ChoosUs from "../../components/WhyChooseUs/WChooseUs";
 
 const HomePage: React.FC = () => {
     return (
@@ -15,6 +16,7 @@ const HomePage: React.FC = () => {
         <BrokerSection />
         <Signals />
         <HowItWorks />
+        <ChoosUs />
         </>
 
     )

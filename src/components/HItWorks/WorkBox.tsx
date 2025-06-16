@@ -10,13 +10,14 @@ interface WorkBoxProps {
 
 const CardContainer = styled.div`
   position: relative;
-  width: 300px;
+  width: 315px;
+  height: 178px;
   padding: 20px;
   border-radius: 10px;
   background: white;
   color: ${({ theme }) => theme.colors.primary};
   box-shadow: 0 0px 10px rgba(0, 0, 0, 0.2);
-  font-family: 'Arial', sans-serif;
+//   font-family: 'Arial', sans-serif;
 
   @media (max-width: 768px) {
     width: 100%;
