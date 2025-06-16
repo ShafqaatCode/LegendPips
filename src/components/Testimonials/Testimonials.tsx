@@ -10,14 +10,14 @@ const reviews = [
     role: "Medical Assistant",
     rating: 5,
     description:
-      "LegendPips has completely transformed the way I trade. The signals are incredibly accurate, and I've seen a noticeable increase in my  profits. Highly recommended! ",
+      "LegendPips has completely transformed the way I trade. The signals are incredibly accurate, and I've seen a noticeable increase in my  profits. Highly recommended!",
   },
   {
     name: "Robert Fox",
     role: "Developer",
     rating: 4,
     description:
-      "Our Satisfied clients have experienced succcess with our services and loan recommendations. Here are some of their testimonials highlighting their positive experiences and the value they received",
+      "Our Satisfied clients have experienced success with our services and loan recommendations. Here are some of their testimonials highlighting their positive experiences and the value they received.",
   },
   {
     name: "Jenny Wilson",
@@ -30,24 +30,33 @@ const reviews = [
 
 const TestimonialContainer = styled.section`
   display: flex;
-  align-items: center;
   flex-direction: column;
   padding: 2rem 1rem;
   overflow: hidden;
+  margin-top: 2rem;
 `;
 
 const SliderWrapper = styled.div`
   width: 100%;
-  max-width: 1200px;
-//   overflow: hidden;
+//   border: 2px solid red;
+  max-width: 1000px;
+  overflow: hidden;
   position: relative;
+  margin: 0 auto;
 `;
 
-const SlideTrack = styled.div<{ currentIndex: number; visibleCount: number }>`
+const SlideTrack = styled.div<{ currentIndex: number }>`
   display: flex;
   transition: transform 0.5s ease-in-out;
-  transform: ${({ currentIndex, visibleCount }) =>
-    `translateX(-${(currentIndex / visibleCount) * 100}%)`};
+  transform: ${({ currentIndex }) => `translateX(-${currentIndex * 100}%)`};
+`;
+
+const Slide = styled.div<{ visibleCount: number }>`
+  flex: 0 0 ${({ visibleCount }) => 100 / visibleCount}%;
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
 `;
 
 const SlideButtons = styled.div`
@@ -57,16 +66,16 @@ const SlideButtons = styled.div`
   margin-top: 2rem;
 
   button {
-    padding: 0.5rem 1rem;
-    // background-color: #fba500;
+    padding: 1rem 1rem;
     border: 1px solid black;
-    border-radius: 8px;
+    border-radius: 50%;
     color: black;
     font-weight: bold;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    background-color: transparent;
 
     &:hover {
       background-color: #e49c00;
@@ -80,10 +89,10 @@ const Testimonials: React.FC = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      setVisibleCount(window.innerWidth > 768 ? 2 : 1);
+      setVisibleCount(window.innerWidth > 1024 ? 2 : 1);
     };
 
-    handleResize(); // initial check
+    handleResize(); // initial
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -106,24 +115,25 @@ const Testimonials: React.FC = () => {
         subText="Discover why traders worldwide trust us as their top choice. With a focus on delivering consistent profits, exceptional service, cutting-edge technology."
       />
       <SliderWrapper>
-        <SlideTrack currentIndex={currentIndex} visibleCount={visibleCount}>
+        <SlideTrack currentIndex={currentIndex}>
           {reviews.map((review, index) => (
-            <ReviewBox
-              key={index}
-              rating={review.rating}
-              name={review.name}
-              role={review.role}
-              description={review.description}
-            />
+            <Slide key={index} visibleCount={visibleCount}>
+              <ReviewBox
+                name={review.name}
+                role={review.role}
+                rating={review.rating}
+                description={review.description}
+              />
+            </Slide>
           ))}
         </SlideTrack>
       </SliderWrapper>
       <SlideButtons>
         <button onClick={goPrev}>
-          <FaArrowLeft /> Prev
+          <FaArrowLeft />
         </button>
         <button onClick={goNext}>
-          Next <FaArrowRight />
+          <FaArrowRight />
         </button>
       </SlideButtons>
     </TestimonialContainer>

@@ -4,19 +4,22 @@ import styled from "styled-components";
 import HolderImg from "../../assets/Man.png";
 
 const ReviewContainer = styled.div`
-
-  max-width: 200px;
-width: 200px;
-  padding: 1.5rem;
-  margin: 0 0.5rem;
-//   border: 2px solid red;
+  width: 100%;
+  max-width: 550px;
+  padding: 2rem;
+  margin: 0 auto;
   background: #fff;
-  border-radius: 13px;
-  font-family: Inter;
+  border-radius: 10px;
+  font-family: Inter, sans-serif;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
 
   @media (min-width: 768px) {
-    min-width: 50%;
+    margin: 0 1rem;
+  }
+
+  @media (min-width: 1024px) {
+    max-width: 550px;
   }
 `;
 
@@ -30,11 +33,6 @@ const Description = styled.p`
   font-size: 15px;
   color: #a3a8ae;
   margin-bottom: 1rem;
-  width: 500px;
-
-  @media (max-width: 768px) {
-    text-align: center;
-  }
 `;
 
 const ProfileInfo = styled.div`
@@ -51,6 +49,13 @@ const ProfileInfo = styled.div`
     font-size: 13px;
     font-weight: 400;
     color: #abaeb4;
+  }
+
+  img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 50%;
   }
 `;
 
@@ -76,7 +81,7 @@ const ReviewBox: React.FC<ReviewBoxProps> = ({
       </StarRow>
       <Description>{description}</Description>
       <ProfileInfo>
-        <img src={HolderImg} alt="Reviewer" />
+        <img src={HolderImg} alt={name} />
         <div>
           <h3>{name}</h3>
           <p>{role}</p>
