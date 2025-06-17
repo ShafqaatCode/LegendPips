@@ -89,10 +89,14 @@ export const SignInButton = styled.button`
 // Navbar
 export const Navbar = styled.nav`
   background: transparent;
+ 
+  // background: ${({theme}) => theme.colors.primary};
+  
   padding: 1.3rem 0;
 
   display: flex;
   justify-content: center;
+
 
   @media (max-width: 768px) {
     display: none;

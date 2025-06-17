@@ -38,10 +38,10 @@ const Header: React.FC = () => {
 
   return (
     <HeaderWrapper>
-      {/* Backdrop when menu is open */}
+     
       {menuOpen && <Backdrop onClick={() => setMenuOpen(false)} />}
 
-      {/* Topbar (Desktop) */}
+      
       <Topbar>
         <NavLink to="/">
           <Logo src={LogoImg} alt="LegendPips Logo" />
