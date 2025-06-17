@@ -78,6 +78,8 @@ const SignalDetails = styled.div`
   font-size: 14px;
   color: #838384;
   font-weight: 300;
+  text-align: left;
+  /* border: 2px solid red; */
 
   span {
     display: block;
