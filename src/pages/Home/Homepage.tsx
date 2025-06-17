@@ -8,19 +8,25 @@ import HowItWorks from "../../components/HItWorks/WorksSection";
 import ChoosUs from "../../components/WhyChooseUs/WChooseUs";
 import Testimonials from "../../components/Testimonials/Testimonials";
 import FAQ from "../../components/Faqs/Faqs";
+import Tabs from "../../components/Signals/Tabs/Tabs";
+
+
 
 const HomePage: React.FC = () => {
+
+
     return (
         <>
-        
-        <PromoBanner />
-        <FeaturesSlider />
-        <BrokerSection />
-        <HowItWorks />
-        <Signals />
-        <ChoosUs />
-        <Testimonials />
-        <FAQ />
+
+            <PromoBanner />
+            <FeaturesSlider />
+            <BrokerSection />
+            <HowItWorks />
+
+            <Tabs />
+            <ChoosUs />
+            <Testimonials />
+            <FAQ />
         </>
 
     )
