@@ -11,12 +11,12 @@ import {
   ToggleIcon,
   Answer,
   ContentWrapper,
-  Divider
+  Divider,
 } from "./Faqs.styles";
 import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import ButtonBase from "../SharedComponents/Button";
 import styled from "styled-components";
-import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg"
+import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 
 type CategoryKey =
   | "Forex & Stock Basics"
@@ -25,7 +25,9 @@ type CategoryKey =
   | "Education and Tutorials";
 
 const ContactWrapper = styled.div`
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
+  box-sizing: border-box;
 
   p {
     font-size: 11px;
@@ -142,7 +144,10 @@ const Faqs: React.FC = () => {
                 We've compiled a list of frequently asked questions to provide
                 you with quick and helpful answers.
               </p>
-              <ButtonBase fontSize="11px" width="150px">Contact Us <img style={{width:"16px"}} src={ArrowIcon} alt="arrowicon" /></ButtonBase>
+              <ButtonBase fontSize="11px" width="150px">
+                Contact Us{" "}
+                <img style={{ width: "16px" }} src={ArrowIcon} alt="arrowicon" />
+              </ButtonBase>
             </ContactWrapper>
           </LeftPanel>
 

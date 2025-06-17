@@ -14,16 +14,18 @@ const Section = styled.section`
 const Container = styled.div`
   max-width: 1280px;
   margin: 0 auto;
-
 `;
 
 const Grid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
+//   border: 2px solid red;
+  text-align: center;
 
   @media (min-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
+    text-align: left;
   }
 
   @media (min-width: 1024px) {
@@ -32,8 +34,12 @@ const Grid = styled.div`
 `;
 
 const LogoContainer = styled.div`
-// border: 2px solid red;
-width: 350px;
+  // border: 2px solid red;
+  width: 350px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const LogoImage = styled.img`
@@ -44,12 +50,12 @@ const LogoImage = styled.img`
 const Description = styled.p`
   margin-top: 1.25rem;
   font-size: 1rem;
-  color: #ffffff; 
+  color: #ffffff;
   line-height: 1.6;
 `;
 
 const LinkContainer = styled.div`
-// border: 2px solid red;
+  // border: 2px solid red;
 `;
 
 const LinkHeading = styled.h4`
@@ -66,10 +72,8 @@ const LinkList = styled.ul`
   flex-direction: column;
   gap: 1.5rem;
 
-  @media (max-width: 800px)
-  {
+  @media (max-width: 800px) {
     gap: 0.8rem;
-    
   }
 `;
 
@@ -81,7 +85,7 @@ const Link = styled(NavLink)`
   transition: color 0.2s ease;
 
   &:hover {
-    color: #de992f; 
+    color: #de992f;
   }
 `;
 
@@ -115,6 +119,10 @@ const NewsletterInput = styled.input`
     outline: none;
     box-shadow: 0 0 0 2px #de992f33;
   }
+
+  @media (max-width: 768px) {
+    max-width: 300px;
+  }
 `;
 
 const NewsletterButton = styled.button`
@@ -132,6 +140,10 @@ const NewsletterButton = styled.button`
   &:hover {
     background-color: #cc872b;
   }
+
+  @media (max-width: 768px) {
+    max-width: 300px;
+  }
 `;
 
 const Divider = styled.hr`
@@ -144,8 +156,7 @@ const FooterText = styled.p`
   text-align: center;
   font-size: 0.875rem;
   color: #ffffff;
-//   border: 2px solid red;
-  
+  //   border: 2px solid red;
 `;
 
 const Footer2: React.FC = () => {
