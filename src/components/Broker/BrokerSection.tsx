@@ -4,7 +4,7 @@ import ICLogo from "../../assets/icons/Ellipse 2.png";
 import styled from "styled-components";
 import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import ButtonBase from "../SharedComponents/Button";
-import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 2.svg"
+import ArrowIcon from "../../assets/arrow-narrow-circle-broken-up-right-blue.png"
 
 const BrokerSectionWrapper = styled.section`
 display: flex;
@@ -80,7 +80,8 @@ const BrokerSection: React.FC = () => {
         color="#132E58"
         borderColor="#132E58"
         padding="1rem 2.5rem"
-        fontSize="1.1rem" >View All Brokers <img src={ArrowIcon} alt="icon" /></ButtonBase>
+        fontSize="1.2rem" 
+        fontWeight="600">View All Brokers <img src={ArrowIcon} alt="icon" /></ButtonBase>
       </ButtonContainer>
     </BrokerSectionWrapper>
   );

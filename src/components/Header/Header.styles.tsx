@@ -6,7 +6,6 @@ const activeColor = "#fbc113";
 // Wrapper
 export const HeaderWrapper = styled.header`
   width: 100%;
-//   margin-bottom: 800px;
   position: fixed;
   top: 0;
   z-index: 999;
@@ -19,14 +18,12 @@ export const Backdrop = styled.div`
   @media (max-width: 768px) {
     display: none;
   }
-
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
   z-index: 998;
   cursor: pointer;
 `;
-
 
 // Topbar
 export const Topbar = styled.div`
@@ -35,8 +32,13 @@ export const Topbar = styled.div`
   align-items: center;
   background: ${({ theme }) => theme.colors.primary};
   padding: 0 3rem;
-//   height: 4.2rem;
+  height: 4.2rem;
   border-bottom: 1px solid ${({ theme }) => theme.colors.secondary};
+  transition: transform 0.3s ease;
+
+  &.hidden {
+    transform: translateY(-100%);
+  }
 
   @media (max-width: 768px) {
     display: none;
@@ -88,15 +90,15 @@ export const SignInButton = styled.button`
 
 // Navbar
 export const Navbar = styled.nav`
-  background: transparent;
- 
-  // background: ${({theme}) => theme.colors.primary};
-  
+  background: ${({ theme }) => theme.colors.primary};
   padding: 1.3rem 0;
-
   display: flex;
   justify-content: center;
+  transition: transform 0.3s ease;
 
+  &.shifted {
+    transform: translateY(-4.2rem);
+  }
 
   @media (max-width: 768px) {
     display: none;
@@ -153,4 +155,23 @@ export const MobileMenu = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+`;
+export const StickyBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: ${({ theme }) => theme.colors.primary};
+  padding: 0.7rem 3rem;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 999;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+
+  ${NavList} {
+    gap: 1.5rem;
+  }
 `;

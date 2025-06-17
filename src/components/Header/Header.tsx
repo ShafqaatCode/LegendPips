@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   HeaderWrapper,
   Topbar,
+  StickyBar,
   Navbar,
   Logo,
   NavList,
@@ -35,60 +36,96 @@ const navLinks = [
 
 const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 60);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <HeaderWrapper>
-     
       {menuOpen && <Backdrop onClick={() => setMenuOpen(false)} />}
 
-      
-      <Topbar>
-        <NavLink to="/">
-          <Logo src={LogoImg} alt="LegendPips Logo" />
-        </NavLink>
+      {/* Topbar shows only when not scrolled */}
+      {!isScrolled && (
+        <Topbar>
+          <NavLink to="/">
+            <Logo src={LogoImg} alt="LegendPips Logo" />
+          </NavLink>
 
-        <LinkGroup>
-          <NavLink to="/live-chat">
-            <HeaderItem>
-              <img src={SupportIcon} alt="Live Chat" />
-              <span>Live Chat</span>
-            </HeaderItem>
+          <LinkGroup>
+            <NavLink to="/live-chat">
+              <HeaderItem>
+                <img src={SupportIcon} alt="Live Chat" />
+                <span>Live Chat</span>
+              </HeaderItem>
+            </NavLink>
+            <NavLink to="/calculator">
+              <HeaderItem>
+                <img src={CalculatorIcon} alt="Calculator" />
+                <span>Rebate Calculator</span>
+              </HeaderItem>
+            </NavLink>
+            <NavLink to="/location">
+              <HeaderItem>
+                <img src={LocationIcon} alt="Location" />
+                <span>United States</span>
+              </HeaderItem>
+            </NavLink>
+            <NavLink to="/signin">
+              <SignInButton>Sign In</SignInButton>
+            </NavLink>
+          </LinkGroup>
+        </Topbar>
+      )}
+
+      {/* Standard Navbar below Topbar (only when not scrolled) */}
+      {!isScrolled && (
+        <Navbar>
+          <NavList>
+            {navLinks.map((link) => (
+              <NavItem
+                to={link.to}
+                key={link.to}
+                end={link.end || false}
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </NavItem>
+            ))}
+          </NavList>
+        </Navbar>
+      )}
+
+      {/* Sticky bar appears after scrolling */}
+      {isScrolled && (
+        <StickyBar>
+          <NavLink to="/">
+            <Logo src={LogoImg} alt="LegendPips Logo" />
           </NavLink>
-          <NavLink to="/calculator">
-            <HeaderItem>
-              <img src={CalculatorIcon} alt="Calculator" />
-              <span>Rebate Calculator</span>
-            </HeaderItem>
-          </NavLink>
-          <NavLink to="/location">
-            <HeaderItem>
-              <img src={LocationIcon} alt="Location" />
-              <span>United States</span>
-            </HeaderItem>
-          </NavLink>
+          <NavList>
+            {navLinks.map((link) => (
+              <NavItem
+                to={link.to}
+                key={link.to}
+                end={link.end || false}
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </NavItem>
+            ))}
+          </NavList>
           <NavLink to="/signin">
             <SignInButton>Sign In</SignInButton>
           </NavLink>
-        </LinkGroup>
-      </Topbar>
+        </StickyBar>
+      )}
 
-      {/* Navbar (Desktop) */}
-      <Navbar>
-        <NavList>
-          {navLinks.map((link) => (
-            <NavItem
-              to={link.to}
-              key={link.to}
-              end={link.end || false}
-              onClick={() => setMenuOpen(false)}
-            >
-              {link.label}
-            </NavItem>
-          ))}
-        </NavList>
-      </Navbar>
-
-      {/* Mobile Topbar */}
+      {/* Mobile Header */}
       <MobileBar>
         <NavLink to="/">
           <Logo src={LogoImg} alt="LegendPips Logo" />
@@ -106,7 +143,6 @@ const Header: React.FC = () => {
         </div>
       </MobileBar>
 
-      {/* Mobile Menu */}
       {menuOpen && (
         <MobileMenu>
           {navLinks.map((link) => (
