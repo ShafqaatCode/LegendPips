@@ -59,7 +59,7 @@ export const TabButton = styled.button<{ selected?: boolean }>`
   color: ${({ selected }) => (selected ? "#fff" : "#1e293b")};
   cursor: pointer;
   transition: 0.3s;
-  text-align: left;
+  text-align: center;
 
   &:hover {
     background-color: ${({ selected }) => (selected ? "#1e3a8a" : "#e2e8f0")};
@@ -93,6 +93,7 @@ export const QuestionItem = styled.div`
   width: 100%;
   max-width: 650px;
   box-sizing: border-box;
+  
 `;
 
 export const QuestionHeader = styled.div`
