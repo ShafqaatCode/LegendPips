@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import bgImage from "../../assets/banner/BannerBg.jpg";
+import bgImage from "../../assets/banner/hero-bg3.png";
 
 export const BannerWrapper = styled.section`
   position: relative;
@@ -25,7 +25,7 @@ export const BannerWrapper = styled.section`
     content: "";
     position: absolute;
     inset: 0;
-    background-color: rgba(19, 45, 88, 0.7);
+    /* background-color: rgba(19, 45, 88, 0.7); */
     z-index: 1;
   }
 

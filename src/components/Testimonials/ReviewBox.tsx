@@ -6,7 +6,7 @@ import HolderImg from "../../assets/Man.png";
 const ReviewContainer = styled.div`
 
   max-width: 200px;
-width: 200px;
+  width: 200px;
   padding: 1.5rem;
   margin: 0 0.5rem;
 //   border: 2px solid red;
