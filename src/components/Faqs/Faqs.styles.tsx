@@ -12,7 +12,7 @@ export const Container = styled.div`
 `;
 
 export const ContentWrapper = styled.div`
-    // border: 2px solid red;
+  // border: 2px solid red;
   width: 85%;
   display: flex;
   gap: 2rem;
@@ -33,7 +33,11 @@ export const LeftPanel = styled.div`
   gap: 1rem;
   min-width: 220px;
   max-width: 320px;
-  
+
+  @media (max-width: 768px) {
+    //   align-items:center;
+    margin: auto;
+  }
 `;
 
 import type { DefaultTheme } from "styled-components";
@@ -44,8 +48,13 @@ export const TabButton = styled.button<{ selected?: boolean }>`
   font-weight: 500;
   border-radius: 999px;
   border: none;
-  background-color: ${({ selected, theme }: { selected?: boolean; theme: DefaultTheme }) =>
-    selected ? theme.colors.primary : "#f1f5f9"};
+  background-color: ${({
+    selected,
+    theme,
+  }: {
+    selected?: boolean;
+    theme: DefaultTheme;
+  }) => (selected ? theme.colors.primary : "#f1f5f9")};
   color: ${({ selected }) => (selected ? "#fff" : "#1e293b")};
   cursor: pointer;
   transition: 0.3s;
