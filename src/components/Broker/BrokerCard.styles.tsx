@@ -1,5 +1,15 @@
 import styled from "styled-components";
 
+
+export const Container = styled.section`
+  margin-left: 60px;
+  @media (max-width: 1000px)
+  {
+    margin: 0;
+  }
+  
+`
+
 export const CardContainer = styled.div`
   position: relative;
   display: flex;
@@ -11,7 +21,7 @@ export const CardContainer = styled.div`
   border-radius: 12px;
   background-clip: padding-box;
   flex-wrap: wrap;
-  width: 85%;
+  width:85%;
   margin: auto;
   // box-shadow: 0 0 0 3px #fbc113;
 

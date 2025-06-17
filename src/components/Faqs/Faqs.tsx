@@ -49,7 +49,7 @@ const faqsData = {
     {
       question: "What is Forex trading?",
       answer:
-        "Our platform provides realtime Forex signals based on expert analysis. You can access these signals directly through your Tradexy account. Tradexy partners with reliable brokers to ensure secure trading.",
+        "Our platform provides realtime Forex signals based on expert analysis. You can access these signals directly through your LegendPips account. LegendPips partners with reliable brokers to ensure secure trading.",
     },
     {
       question: "How do I start trading with LegendPips?",
