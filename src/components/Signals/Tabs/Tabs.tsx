@@ -16,27 +16,39 @@ const TabsWrapper = styled.div`
   display: flex;
   justify-content: center;
   margin-bottom: 32px;
+  overflow-x: auto;
 `;
 
 const Tabs = styled.div`
   display: flex;
-  gap: 32px;
-  border-bottom: 1px solid #ccc;
+  gap: 24px;
   padding-bottom: 8px;
+
+  @media (max-width: 600px) {
+    gap: 16px;
+  }
 `;
+
 const Tab = styled.button<{ active: boolean }>`
   background: none;
   border: none;
   padding: 12px 16px;
   font-size: 16px;
-  /* border: 2px solid red; */
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
+
   color: ${({ active }) => (active ? '#132E58' : '#444')};
-  border-bottom: ${({ active }) => (active ? '2px solid #132E58' : '2px solid transparent')};
+  border-bottom: ${({ active }) =>
+    active ? '2px solid #132E58' : '2px solid transparent'};
 
   &:hover {
     color: #132E58;
+  }
+
+  @media (max-width: 600px) {
+    font-size: 14px;
+    padding: 10px 8px;
   }
 `;
 
@@ -45,58 +57,75 @@ const CardsWrapper = styled.div`
   flex-wrap: wrap;
   justify-content: center;
   gap: 32px;
+
+  @media (max-width: 768px) {
+    gap: 16px;
+  }
 `;
 
 const RewardsAndBenefits: React.FC = () => {
-    const [activeTab, setActiveTab] = useState('Gift Rewards');
+  const [activeTab, setActiveTab] = useState('Signals');
 
-    const tabs = ['Gift Rewards', 'Cash Rewards', 'National Tours', 'International Tours'];
+  const tabs = ['Signals', 'Rewards', 'Stats', 'Performance'];
 
-    return (
-        <Container>
-            <SectionHeadingSet
-                upperText="ALL IN ONE TRADING PLATFORM"
-                mainHeading="LIVE SIGNALS"
-                subText="Trade, earn, repeat. With rebates, expert tools, and a strong community, Legend Pips makes every trade more rewarding."
-            />
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'Signals':
+        return (
+          <CardsWrapper>
+            <RecentSignals />
+            <SignalPerformance />
+          </CardsWrapper>
+        );
+      case 'Rewards':
+        return (
+          <CardsWrapper>
+            <RecentSignals />
+          </CardsWrapper>
+        );
+      case 'Stats':
+        return (
+          <CardsWrapper>
+            <SignalPerformance />
+          </CardsWrapper>
+        );
+      case 'Performance':
+        return (
+          <CardsWrapper>
+            <RecentSignals />
+            <SignalPerformance />
+          </CardsWrapper>
+        );
+      default:
+        return null;
+    }
+  };
 
-            <TabsWrapper>
-                <Tabs>
-                    {tabs.map((tab) => (
-                        <Tab key={tab} active={activeTab === tab} onClick={() => setActiveTab(tab)}>
-                            {tab}
-                        </Tab>
-                    ))}
-                </Tabs>
-            </TabsWrapper>
+  return (
+    <Container>
+      <SectionHeadingSet
+        upperText="ALL IN ONE TRADING PLATFORM"
+        mainHeading="LIVE SIGNALS"
+        subText="Trade, earn, repeat. With rebates, expert tools, and a strong community, Legend Pips makes every trade more rewarding."
+      />
 
-            {activeTab === 'Gift Rewards' && (
-                <CardsWrapper>
-                    <RecentSignals />
-                    <SignalPerformance />
-                </CardsWrapper>
-            )}
-            {activeTab === 'Cash Rewards' && (
-                <CardsWrapper>
-                    <RecentSignals />
-                    <SignalPerformance />
-                </CardsWrapper>
-            )}
-            {activeTab === 'National Tours' && (
-                <CardsWrapper>
-                    <RecentSignals />
+      <TabsWrapper>
+        <Tabs>
+          {tabs.map((tab) => (
+            <Tab
+              key={tab}
+              active={activeTab === tab}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+            </Tab>
+          ))}
+        </Tabs>
+      </TabsWrapper>
 
-                </CardsWrapper>
-            )}
-            {activeTab === 'International Tours' && (
-                <CardsWrapper>
-                    <RecentSignals />
-                    <SignalPerformance />
-                </CardsWrapper>
-            )}
-
-        </Container>
-    );
+      {renderTabContent()}
+    </Container>
+  );
 };
 
 export default RewardsAndBenefits;
