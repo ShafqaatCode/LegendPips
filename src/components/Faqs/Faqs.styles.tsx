@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { theme } from "../../theme/theme";
 
 export const Section = styled.section`
   padding: 4rem 2rem;
@@ -10,49 +11,32 @@ export const Container = styled.div`
   margin: 0 auto;
 `;
 
-export const Heading = styled.div`
-  text-align: center;
-
-  span {
-    color: #2563eb;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-size: 0.9rem;
-  }
-
-  h1 {
-    font-size: 3rem;
-    font-weight: 800;
-    margin: 0.5rem 0;
-    color: #0f172a;
-  }
-`;
-
-export const SubHeading = styled.p`
-  font-size: 1.1rem;
-  max-width: 600px;
-  margin: 0 auto;
-  color: #475569;
-`;
-
 export const ContentWrapper = styled.div`
-  border: 2px solid red;
-width: 90%;
+    // border: 2px solid red;
+  width: 85%;
   display: flex;
   gap: 2rem;
   margin-top: 3rem;
   flex-wrap: wrap;
   margin-left: auto;
   margin-right: auto;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 export const LeftPanel = styled.div`
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   min-width: 220px;
+  max-width: 320px;
+  
 `;
+
+import type { DefaultTheme } from "styled-components";
 
 export const TabButton = styled.button<{ selected?: boolean }>`
   padding: 0.9rem 1.5rem;
@@ -60,7 +44,8 @@ export const TabButton = styled.button<{ selected?: boolean }>`
   font-weight: 500;
   border-radius: 999px;
   border: none;
-  background-color: ${({ selected }) => (selected ? "#1e3a8a" : "#f1f5f9")};
+  background-color: ${({ selected, theme }: { selected?: boolean; theme: DefaultTheme }) =>
+    selected ? theme.colors.primary : "#f1f5f9"};
   color: ${({ selected }) => (selected ? "#fff" : "#1e293b")};
   cursor: pointer;
   transition: 0.3s;
@@ -71,18 +56,29 @@ export const TabButton = styled.button<{ selected?: boolean }>`
 `;
 
 export const RightPanel = styled.div`
-  flex: 1;
+  flex: 2;
   display: flex;
   flex-direction: column;
+  align-items: end;
   gap: 1rem;
-  border: 2px solid red;
+  //   border: 2px solid green;
   width: 550px;
+
+  @media (max-width: 868px) {
+    align-items: center;
+  }
 `;
 
 export const QuestionItem = styled.div`
-  background-color: #f8fafc;
+  background-color: #f3f4f7;
   border-radius: 0.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #dfe0e4;
+  //   border: 2px solid pink;
+  width: 650px;
+
+  @media (max-width: 768px) {
+    width: 380px;
+  }
 `;
 
 export const QuestionHeader = styled.div`
@@ -99,11 +95,6 @@ export const QuestionTitle = styled.div`
   color: #0f172a;
 `;
 
-export const ToggleIcon = styled.div`
-  font-size: 1.25rem;
-  color: #1e3a8a;
-`;
-
 export const Answer = styled.div`
   padding: 1rem;
   font-size: 0.95rem;
@@ -111,28 +102,22 @@ export const Answer = styled.div`
   line-height: 1.5;
 `;
 
-export const ContactSection = styled.div`
-  margin-top: 4rem;
-  text-align: center;
-`;
-
-export const ContactText = styled.p`
-  font-size: 1rem;
-  color: #334155;
-  margin-bottom: 1rem;
-`;
-
-export const ContactButton = styled.button`
-  background-color: #1e3a8a;
+export const ToggleIcon = styled.div<{ isOpen?: boolean }>`
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: ${({ isOpen }) =>
+    isOpen ? "#fbbf24" : "#1e3a8a"}; // Golden for open, primary for closed
   color: #fff;
-  font-size: 1rem;
-  padding: 0.8rem 1.5rem;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+`;
 
-  &:hover {
-    background-color: #172554;
-  }
+export const Divider = styled.div`
+  height: 1px;
+  background-color: #e2e8f0;
+  margin: 0 1rem;
 `;

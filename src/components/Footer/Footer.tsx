@@ -14,6 +14,7 @@ const Section = styled.section`
 const Container = styled.div`
   max-width: 1280px;
   margin: 0 auto;
+
 `;
 
 const Grid = styled.div`
@@ -36,8 +37,8 @@ width: 350px;
 `;
 
 const LogoImage = styled.img`
-  height: 60px;
-  width: auto;
+  width: 150px;
+  height: auto;
 `;
 
 const Description = styled.p`
@@ -63,7 +64,13 @@ const LinkList = styled.ul`
   margin-top: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1.5rem;
+
+  @media (max-width: 800px)
+  {
+    gap: 0.8rem;
+    
+  }
 `;
 
 const LinkItem = styled.li``;
@@ -128,7 +135,7 @@ const NewsletterButton = styled.button`
 `;
 
 const Divider = styled.hr`
-  margin: 2.5rem 0;
+  margin: 2rem 0;
   border: none;
   border-top: 1px solid #334155; // soft divider color
 `;
@@ -137,6 +144,8 @@ const FooterText = styled.p`
   text-align: center;
   font-size: 0.875rem;
   color: #ffffff;
+//   border: 2px solid red;
+  
 `;
 
 const Footer2: React.FC = () => {
