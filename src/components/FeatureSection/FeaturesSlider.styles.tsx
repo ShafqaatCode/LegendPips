@@ -68,7 +68,7 @@ export const Card = styled.div`
     position: relative;
   }
 
-  .hover-bg {
+  /* .hover-bg {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -80,8 +80,8 @@ export const Card = styled.div`
     border-radius: 50%;
     z-index: 0;
     transition: width 0.4s ease, height 0.4s ease;
-  }
-
+  } */
+/* 
   &:hover .hover-bg {
     width: 200%;
     height: 200%;
@@ -89,7 +89,7 @@ export const Card = styled.div`
 
   &:hover {
     transform: translateY(-3px);
-  }
+  } */
 `;
 
 export const ArrowsWrapper = styled.div`
