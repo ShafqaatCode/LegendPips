@@ -13,44 +13,51 @@ import {
   MobileBar,
   MobileMenu,
   Backdrop,
+  SubmenuWrapper,
+  SubmenuToggle,
+  Submenu,
+  SubmenuItem,
 } from "./Header.styles";
 import { NavLink } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
-
+import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import LogoImg from "../../assets/icons/image 2.svg";
 import SupportIcon from "../../assets/icons/SupportIcon.svg";
 import CalculatorIcon from "../../assets/icons/calculator-svgrepo-com (1) 1.svg";
 import LocationIcon from "../../assets/icons/Location marker.svg";
 
-const navLinks = [
-  { to: "/", label: "Home", end: true },
-  { to: "/how-it-works", label: "How It Works?" },
-  { to: "/rebates", label: "Rebates Brokers" },
-  { to: "/contests", label: "Contests" },
-  { to: "/brokers", label: "Brokers" },
-  { to: "/tools", label: "Tools" },
-  { to: "/signals", label: "Signals" },
-  { to: "/analysis", label: "Analysis" },
-  { to: "/forum", label: "Forum" },
-];
-
 const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [submenuOpen, setSubmenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const toggleSubmenu = () => {
+    setSubmenuOpen(!submenuOpen);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 60);
+      setIsScrolled(window.scrollY > 30);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const navLinks = [
+    { to: "/", label: "Home", end: true },
+    { to: "/how-it-works", label: "How It Works?" },
+    { to: "/rebates", label: "Rebates Brokers" },
+    { to: "/contests", label: "Contests" },
+    { to: "/brokers", label: "Brokers" },
+    { to: "/signals", label: "Signals" },
+    { to: "/analysis", label: "Analysis" },
+    { to: "/forum", label: "Forum" },
+  ];
+
   return (
     <HeaderWrapper>
       {menuOpen && <Backdrop onClick={() => setMenuOpen(false)} />}
 
-      {/* Topbar shows only when not scrolled */}
       {!isScrolled && (
         <Topbar>
           <NavLink to="/">
@@ -83,7 +90,6 @@ const Header: React.FC = () => {
         </Topbar>
       )}
 
-      {/* Standard Navbar below Topbar (only when not scrolled) */}
       {!isScrolled && (
         <Navbar>
           <NavList>
@@ -97,11 +103,26 @@ const Header: React.FC = () => {
                 {link.label}
               </NavItem>
             ))}
+
+            {/* TOOLS Dropdown */}
+            <SubmenuWrapper
+              onMouseEnter={() => window.innerWidth > 768 && setSubmenuOpen(true)}
+              onMouseLeave={() => window.innerWidth > 768 && setSubmenuOpen(false)}
+            >
+              <SubmenuToggle onClick={toggleSubmenu}>
+                Tools {submenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+              </SubmenuToggle>
+              {submenuOpen && (
+                <Submenu>
+                  <SubmenuItem to="/calculator">Calculator</SubmenuItem>
+                  <SubmenuItem to="/timer">Timer</SubmenuItem>
+                </Submenu>
+              )}
+            </SubmenuWrapper>
           </NavList>
         </Navbar>
       )}
 
-      {/* Sticky bar appears after scrolling */}
       {isScrolled && (
         <StickyBar>
           <NavLink to="/">
@@ -109,15 +130,30 @@ const Header: React.FC = () => {
           </NavLink>
           <NavList>
             {navLinks.map((link) => (
-              <NavItem
-                to={link.to}
-                key={link.to}
-                end={link.end || false}
-                onClick={() => setMenuOpen(false)}
-              >
+              <NavItem to={link.to} key={link.to} end={link.end || false}>
                 {link.label}
               </NavItem>
             ))}
+            <SubmenuWrapper
+              onMouseEnter={() => window.innerWidth > 768 && setSubmenuOpen(true)}
+              onMouseLeave={() => window.innerWidth > 768 && setSubmenuOpen(false)}
+            >
+              {<SubmenuToggle onClick={() => {
+                if (window.innerWidth <= 768) {
+                  setSubmenuOpen(!submenuOpen); // ✅ Only toggle on mobile
+                }
+              }}>
+                Tools {submenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+              </SubmenuToggle>
+              }
+              {submenuOpen && (
+                <Submenu>
+                  <SubmenuItem to="/calculator">Calculator</SubmenuItem>
+                  <SubmenuItem to="/timer">Timer</SubmenuItem>
+                </Submenu>
+              )}
+            </SubmenuWrapper>
+
           </NavList>
           <NavLink to="/signin">
             <SignInButton>Sign In</SignInButton>
@@ -125,7 +161,7 @@ const Header: React.FC = () => {
         </StickyBar>
       )}
 
-      {/* Mobile Header */}
+      {/* Mobile header */}
       <MobileBar>
         <NavLink to="/">
           <Logo src={LogoImg} alt="LegendPips Logo" />
@@ -145,18 +181,36 @@ const Header: React.FC = () => {
 
       {menuOpen && (
         <MobileMenu>
-          {navLinks.map((link) => (
-            <NavItem
-              to={link.to}
-              key={link.to}
-              end={link.end || false}
-              onClick={() => setMenuOpen(false)}
-            >
-              {link.label}
-            </NavItem>
-          ))}
+          {navLinks.map((link) =>
+            link.label === "Tools" ? (
+              <div key={link.label}>
+                <SubmenuToggle
+                  onClick={() => setSubmenuOpen(!submenuOpen)}
+                >
+                  {link.label} {submenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+                </SubmenuToggle>
+
+                {submenuOpen && (
+                  <div style={{ paddingLeft: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "0.75rem" }}>
+                    <NavItem to="/calculator" onClick={() => setMenuOpen(false)}>Calculator</NavItem>
+                    <NavItem to="/timer" onClick={() => setMenuOpen(false)}>Timer</NavItem>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <NavItem
+                to={link.to}
+                key={link.to}
+                end={link.end || false}
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </NavItem>
+            )
+          )}
         </MobileMenu>
       )}
+
     </HeaderWrapper>
   );
 };

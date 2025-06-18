@@ -3,17 +3,14 @@ import { NavLink } from "react-router-dom";
 
 const activeColor = "#fbc113";
 
-// Wrapper
 export const HeaderWrapper = styled.header`
   width: 100%;
   position: fixed;
   top: 0;
   z-index: 999;
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
 `;
 
-// Backdrop
 export const Backdrop = styled.div`
   @media (max-width: 768px) {
     display: none;
@@ -25,7 +22,6 @@ export const Backdrop = styled.div`
   cursor: pointer;
 `;
 
-// Topbar
 export const Topbar = styled.div`
   display: flex;
   justify-content: space-between;
@@ -34,11 +30,6 @@ export const Topbar = styled.div`
   padding: 0 3rem;
   height: 4.2rem;
   border-bottom: 1px solid ${({ theme }) => theme.colors.secondary};
-  transition: transform 0.3s ease;
-
-  &.hidden {
-    transform: translateY(-100%);
-  }
 
   @media (max-width: 768px) {
     display: none;
@@ -80,7 +71,6 @@ export const SignInButton = styled.button`
   border: none;
   cursor: pointer;
   transition: all 0.3s;
-  white-space: nowrap;
 
   &:hover {
     background-color: ${activeColor};
@@ -88,17 +78,10 @@ export const SignInButton = styled.button`
   }
 `;
 
-// Navbar
 export const Navbar = styled.nav`
-  /* background: ${({ theme }) => theme.colors.primary}; */
   padding: 1.3rem 0;
   display: flex;
   justify-content: center;
-  transition: transform 0.3s ease;
-
-  &.shifted {
-    transform: translateY(-4.2rem);
-  }
 
   @media (max-width: 768px) {
     display: none;
@@ -109,6 +92,7 @@ export const NavList = styled.ul`
   display: flex;
   list-style: none;
   gap: 2rem;
+  position: relative;
 `;
 
 export const NavItem = styled(NavLink)`
@@ -131,7 +115,76 @@ export const NavItem = styled(NavLink)`
   }
 `;
 
-// Mobile Topbar
+export const SubmenuWrapper = styled.div`
+  position: relative;
+  &:hover > ul {
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+
+export const SubmenuToggle = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+
+  &:hover {
+    color: ${activeColor};
+  }
+
+  @media (min-width: 769px) {
+    border-bottom: 2px solid transparent;
+  }
+`;
+
+export const Submenu = styled.ul`
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #132e58;
+  padding: 1rem;
+  border-radius: 6px;
+  list-style: none;
+  gap: 1rem;
+  min-width: 220px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background-color: transparent;
+    box-shadow: none;
+    padding: 0;
+    margin-top: 0.5rem;
+  }
+`;
+
+export const SubmenuItem = styled(NavLink)`
+  color: white;
+  font-size: 14px;
+  text-decoration: none;
+  padding: 8px 0;
+  display: block;
+
+  &:hover {
+    color: ${activeColor};
+  }
+
+  &.active {
+    font-weight: 600;
+    color: ${activeColor};
+  }
+`;
+
 export const MobileBar = styled.div`
   display: none;
 
@@ -144,7 +197,6 @@ export const MobileBar = styled.div`
   }
 `;
 
-// Mobile Dropdown
 export const MobileMenu = styled.div`
   @media (min-width: 769px) {
     display: none;
@@ -156,12 +208,12 @@ export const MobileMenu = styled.div`
   flex-direction: column;
   gap: 1rem;
 `;
+
 export const StickyBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* border: 2px solid red; */
- background-color: #132d58cf; 
+  background-color: #132d58cf;
   padding: 0.3rem 3rem;
   position: fixed;
   top: 0;
