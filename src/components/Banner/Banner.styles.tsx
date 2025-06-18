@@ -15,7 +15,7 @@ export const BannerWrapper = styled.section`
     z-index: 2;
     color: white;
   }
-  margin-top: 70px;
+  margin-top: 60px;
 
   @media (max-width: 768px) {
     height: 200px;
