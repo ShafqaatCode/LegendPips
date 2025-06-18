@@ -4,7 +4,7 @@ export const BannerWrapper = styled.section`
   position: relative;
   background-size: cover;
   background-position: center;
-  height: 440px;
+  height: 450px;
   display: flex;
   align-items: center;
   justify-content: center;
