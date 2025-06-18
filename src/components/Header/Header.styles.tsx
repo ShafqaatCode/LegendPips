@@ -160,8 +160,9 @@ export const StickyBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: ${({ theme }) => theme.colors.primary};
-  padding: 0.7rem 3rem;
+  /* border: 2px solid red; */
+ background-color: #132d58cf; 
+  padding: 0.3rem 3rem;
   position: fixed;
   top: 0;
   width: 100%;
