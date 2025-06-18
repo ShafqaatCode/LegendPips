@@ -8,12 +8,12 @@ export const BannerWrapper = styled.section`
   justify-content: flex-start;
   // height: 100vh;
   min-height: 650px;
-  // border: 2px solid red;
+//   border: 2px solid red;
   padding: 0 3rem;
   background-image: url("${bgImage}");
   background-size: cover;
   background-position: center;
-  margin-top: 50px;
+  margin-top: 70px;
   color: ${({ theme }) => theme.colors.WHITE};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
@@ -36,7 +36,7 @@ export const BannerWrapper = styled.section`
 `;
 
 export const HeroContent = styled.div`
-  width: 45%;
+  width: 50%;
   max-width: 700px;
   display: flex;
   flex-direction: column;

@@ -4,7 +4,7 @@ export const BannerWrapper = styled.section`
   position: relative;
   background-size: cover;
   background-position: center;
-  height: 420px;
+  height: 440px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,7 +15,7 @@ export const BannerWrapper = styled.section`
     z-index: 2;
     color: white;
   }
-  margin-top: 100px;
+  margin-top: 75px;
 
   @media (max-width: 768px) {
     height: 200px;
