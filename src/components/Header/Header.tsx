@@ -1,3 +1,4 @@
+// Header.tsx
 import React, { useEffect, useState } from "react";
 import {
   HeaderWrapper,
@@ -26,6 +27,22 @@ import SupportIcon from "../../assets/icons/SupportIcon.svg";
 import CalculatorIcon from "../../assets/icons/calculator-svgrepo-com (1) 1.svg";
 import LocationIcon from "../../assets/icons/Location marker.svg";
 
+const navLinks = [
+  { to: "/", label: "Home", end: true },
+  { to: "/how-it-works", label: "How It Works?" },
+  { to: "/rebates", label: "Rebates Brokers" },
+  { to: "/contests", label: "Contests" },
+  { to: "/brokers", label: "Brokers" },
+  { to: "/signals", label: "Signals" },
+  { to: "/analysis", label: "Analysis" },
+  { to: "/forum", label: "Forum" },
+];
+
+const toolsSubmenu = [
+  { to: "/calculator", label: "Calculator" },
+  { to: "/timer", label: "Timer" },
+];
+
 const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [submenuOpen, setSubmenuOpen] = useState(false);
@@ -42,17 +59,6 @@ const Header: React.FC = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const navLinks = [
-    { to: "/", label: "Home", end: true },
-    { to: "/how-it-works", label: "How It Works?" },
-    { to: "/rebates", label: "Rebates Brokers" },
-    { to: "/contests", label: "Contests" },
-    { to: "/brokers", label: "Brokers" },
-    { to: "/signals", label: "Signals" },
-    { to: "/analysis", label: "Analysis" },
-    { to: "/forum", label: "Forum" },
-  ];
 
   return (
     <HeaderWrapper>
@@ -104,7 +110,6 @@ const Header: React.FC = () => {
               </NavItem>
             ))}
 
-            {/* TOOLS Dropdown */}
             <SubmenuWrapper
               onMouseEnter={() => window.innerWidth > 768 && setSubmenuOpen(true)}
               onMouseLeave={() => window.innerWidth > 768 && setSubmenuOpen(false)}
@@ -114,8 +119,9 @@ const Header: React.FC = () => {
               </SubmenuToggle>
               {submenuOpen && (
                 <Submenu>
-                  <SubmenuItem to="/calculator">Calculator</SubmenuItem>
-                  <SubmenuItem to="/timer">Timer</SubmenuItem>
+                  {toolsSubmenu.map((tool) => (
+                    <SubmenuItem to={tool.to} key={tool.to}>{tool.label}</SubmenuItem>
+                  ))}
                 </Submenu>
               )}
             </SubmenuWrapper>
@@ -138,22 +144,21 @@ const Header: React.FC = () => {
               onMouseEnter={() => window.innerWidth > 768 && setSubmenuOpen(true)}
               onMouseLeave={() => window.innerWidth > 768 && setSubmenuOpen(false)}
             >
-              {<SubmenuToggle onClick={() => {
+              <SubmenuToggle onClick={() => {
                 if (window.innerWidth <= 768) {
-                  setSubmenuOpen(!submenuOpen); // ✅ Only toggle on mobile
+                  setSubmenuOpen(!submenuOpen);
                 }
               }}>
                 Tools {submenuOpen ? <FiChevronUp /> : <FiChevronDown />}
               </SubmenuToggle>
-              }
               {submenuOpen && (
                 <Submenu>
-                  <SubmenuItem to="/calculator">Calculator</SubmenuItem>
-                  <SubmenuItem to="/timer">Timer</SubmenuItem>
+                  {toolsSubmenu.map((tool) => (
+                    <SubmenuItem to={tool.to} key={tool.to}>{tool.label}</SubmenuItem>
+                  ))}
                 </Submenu>
               )}
             </SubmenuWrapper>
-
           </NavList>
           <NavLink to="/signin">
             <SignInButton>Sign In</SignInButton>
@@ -161,7 +166,6 @@ const Header: React.FC = () => {
         </StickyBar>
       )}
 
-      {/* Mobile header */}
       <MobileBar>
         <NavLink to="/">
           <Logo src={LogoImg} alt="LegendPips Logo" />
@@ -181,36 +185,44 @@ const Header: React.FC = () => {
 
       {menuOpen && (
         <MobileMenu>
-          {navLinks.map((link) =>
+          {[...navLinks, { label: "Tools" }].map((link) =>
             link.label === "Tools" ? (
-              <div key={link.label}>
+              <div key="Tools">
                 <SubmenuToggle
                   onClick={() => setSubmenuOpen(!submenuOpen)}
                 >
-                  {link.label} {submenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+                  Tools {submenuOpen ? <FiChevronUp /> : <FiChevronDown />}
                 </SubmenuToggle>
 
                 {submenuOpen && (
                   <div style={{ paddingLeft: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "0.75rem" }}>
-                    <NavItem to="/calculator" onClick={() => setMenuOpen(false)}>Calculator</NavItem>
-                    <NavItem to="/timer" onClick={() => setMenuOpen(false)}>Timer</NavItem>
+                    {toolsSubmenu.map((tool) => (
+                      <NavItem
+                        to={tool.to}
+                        key={tool.to}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        {tool.label}
+                      </NavItem>
+                    ))}
                   </div>
                 )}
               </div>
             ) : (
-              <NavItem
-                to={link.to}
-                key={link.to}
-                end={link.end || false}
-                onClick={() => setMenuOpen(false)}
-              >
-                {link.label}
-              </NavItem>
+              "to" in link ? (
+                <NavItem
+                  to={link.to}
+                  key={link.to}
+                  end={link.end || false}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {link.label}
+                </NavItem>
+              ) : null
             )
           )}
         </MobileMenu>
       )}
-
     </HeaderWrapper>
   );
 };

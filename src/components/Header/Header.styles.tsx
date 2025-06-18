@@ -1,3 +1,4 @@
+// Header.styles.ts
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 
@@ -9,6 +10,7 @@ export const HeaderWrapper = styled.header`
   top: 0;
   z-index: 999;
   backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
 `;
 
 export const Backdrop = styled.div`
@@ -71,6 +73,7 @@ export const SignInButton = styled.button`
   border: none;
   cursor: pointer;
   transition: all 0.3s;
+  white-space: nowrap;
 
   &:hover {
     background-color: ${activeColor};
@@ -219,6 +222,7 @@ export const StickyBar = styled.div`
   top: 0;
   width: 100%;
   z-index: 999;
+  transition: all 0.3s ease;
 
   @media (max-width: 768px) {
     display: none;
