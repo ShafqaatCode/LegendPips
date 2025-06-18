@@ -17,7 +17,7 @@ import {
 import { NavLink } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 
-import LogoImg from "../../assets/icons/Logo.png";
+import LogoImg from "../../assets/icons/image 2.svg";
 import SupportIcon from "../../assets/icons/SupportIcon.svg";
 import CalculatorIcon from "../../assets/icons/calculator-svgrepo-com (1) 1.svg";
 import LocationIcon from "../../assets/icons/Location marker.svg";
