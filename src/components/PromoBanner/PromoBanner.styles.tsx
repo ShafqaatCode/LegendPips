@@ -13,7 +13,7 @@ export const BannerWrapper = styled.section`
   background-image: url("${bgImage}");
   background-size: cover;
   background-position: center;
-  margin-top: 70px;
+  margin-top: 50px;
   color: ${({ theme }) => theme.colors.WHITE};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
