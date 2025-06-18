@@ -90,7 +90,7 @@ export const SignInButton = styled.button`
 
 // Navbar
 export const Navbar = styled.nav`
-  background: ${({ theme }) => theme.colors.primary};
+  /* background: ${({ theme }) => theme.colors.primary}; */
   padding: 1.3rem 0;
   display: flex;
   justify-content: center;
