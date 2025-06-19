@@ -1,19 +1,29 @@
 import React from "react";
-import { BannerWrapper, Overlay, Title, Breadcrumb } from "./Banner.styles";
+import { BannerWrapper, Overlay } from "./Banner.styles";
+import BannerHeadingSet from "../SharedComponents/BannerHeadingSet";
 
 interface BannerProps {
-  backgroundImage: string;
-  title: string;
-  breadcrumb: string;
+  backgroundImage?: string;
+  upperText: string;
+  bannerHeading: string;
+  subText: string;
 }
 
-const Banner: React.FC<BannerProps> = ({ backgroundImage, title, breadcrumb }) => {
+const Banner: React.FC<BannerProps> = ({
+  backgroundImage,
+  bannerHeading,
+  upperText,
+  subText,
+}) => {
   return (
     <BannerWrapper style={{ backgroundImage: `url(${backgroundImage})` }}>
       <Overlay />
       <div className="content">
-        <Title>{title}</Title>
-        <Breadcrumb>{breadcrumb}</Breadcrumb>
+        <BannerHeadingSet
+          mainHeading={bannerHeading}
+          upperText={upperText}
+          subText={subText}
+        />
       </div>
     </BannerWrapper>
   );

@@ -1,9 +1,9 @@
-// Header.styles.ts
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 
 const activeColor = "#fbc113";
 
+// Header Container
 export const HeaderWrapper = styled.header`
   width: 100%;
   position: fixed;
@@ -13,17 +13,20 @@ export const HeaderWrapper = styled.header`
   transition: all 0.3s ease;
 `;
 
+// Dark background overlay (used when mobile menu is open)
 export const Backdrop = styled.div`
-  @media (max-width: 768px) {
-    display: none;
-  }
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
   z-index: 998;
   cursor: pointer;
+
+  @media (max-width: 1100px) {
+    display: none;
+  }
 `;
 
+// Top Bar
 export const Topbar = styled.div`
   display: flex;
   justify-content: space-between;
@@ -33,22 +36,25 @@ export const Topbar = styled.div`
   height: 4.2rem;
   border-bottom: 1px solid ${({ theme }) => theme.colors.secondary};
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     display: none;
   }
 `;
 
+// Logo
 export const Logo = styled.img`
   min-width: 150px;
   height: 56px;
 `;
 
+// Link Section in Topbar
 export const LinkGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 1.5rem;
 `;
 
+// Each Topbar Item
 export const HeaderItem = styled.div`
   display: flex;
   align-items: center;
@@ -65,6 +71,7 @@ export const HeaderItem = styled.div`
   }
 `;
 
+// Sign In Button
 export const SignInButton = styled.button`
   background-color: ${({ theme }) => theme.colors.WHITE};
   padding: 8px 20px;
@@ -81,16 +88,18 @@ export const SignInButton = styled.button`
   }
 `;
 
+// Desktop Navbar
 export const Navbar = styled.nav`
   padding: 1.3rem 0;
   display: flex;
   justify-content: center;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     display: none;
   }
 `;
 
+// Nav List Container
 export const NavList = styled.ul`
   display: flex;
   list-style: none;
@@ -98,6 +107,7 @@ export const NavList = styled.ul`
   position: relative;
 `;
 
+// Individual Nav Item
 export const NavItem = styled(NavLink)`
   color: white;
   font-size: 14px;
@@ -118,17 +128,20 @@ export const NavItem = styled(NavLink)`
   }
 `;
 
+// Submenu Wrapper (for hover or toggle logic)
 export const SubmenuWrapper = styled.div`
   position: relative;
+
   &:hover > ul {
     display: block;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     width: 100%;
   }
 `;
 
+// Submenu Toggle (e.g., Tools ▼)
 export const SubmenuToggle = styled.div`
   display: flex;
   align-items: center;
@@ -142,11 +155,12 @@ export const SubmenuToggle = styled.div`
     color: ${activeColor};
   }
 
-  @media (min-width: 769px) {
+  @media (min-width: 1101px) {
     border-bottom: 2px solid transparent;
   }
 `;
 
+// Dropdown Menu
 export const Submenu = styled.ul`
   display: none;
   position: absolute;
@@ -156,11 +170,10 @@ export const Submenu = styled.ul`
   padding: 1rem;
   border-radius: 6px;
   list-style: none;
-  gap: 1rem;
   min-width: 220px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     display: flex;
     flex-direction: column;
     position: relative;
@@ -171,6 +184,7 @@ export const Submenu = styled.ul`
   }
 `;
 
+// Dropdown Item
 export const SubmenuItem = styled(NavLink)`
   color: white;
   font-size: 14px;
@@ -188,10 +202,11 @@ export const SubmenuItem = styled(NavLink)`
   }
 `;
 
+// Mobile Topbar (hamburger)
 export const MobileBar = styled.div`
   display: none;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     background-color: ${({ theme }) => theme.colors.primary};
     display: flex;
     justify-content: space-between;
@@ -200,8 +215,9 @@ export const MobileBar = styled.div`
   }
 `;
 
+// Mobile Menu Dropdown
 export const MobileMenu = styled.div`
-  @media (min-width: 769px) {
+  @media (min-width: 1101px) {
     display: none;
   }
 
@@ -212,11 +228,12 @@ export const MobileMenu = styled.div`
   gap: 1rem;
 `;
 
+// Sticky Navbar after scroll
 export const StickyBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #132d58cf;
+  background-color: #132d58;
   padding: 0.3rem 3rem;
   position: fixed;
   top: 0;
@@ -224,7 +241,7 @@ export const StickyBar = styled.div`
   z-index: 999;
   transition: all 0.3s ease;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     display: none;
   }
 
@@ -232,3 +249,4 @@ export const StickyBar = styled.div`
     gap: 1.5rem;
   }
 `;
+
