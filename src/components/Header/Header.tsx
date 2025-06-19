@@ -195,7 +195,7 @@ const Header: React.FC = () => {
                 </SubmenuToggle>
 
                 {submenuOpen && (
-                  <div style={{ paddingLeft: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "0.75rem" }}>
+                  <div style={{ paddingLeft: "1rem", display: "flex", flexDirection: "column", gap: "0.4rem", marginTop: "0.75rem" }}>
                     {toolsSubmenu.map((tool) => (
                       <NavItem
                         to={tool.to}
