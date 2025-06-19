@@ -12,6 +12,7 @@ import Tabs from "../../components/Signals/Tabs/Tabs";
 
 
 
+
 const HomePage: React.FC = () => {
 
 
@@ -27,6 +28,7 @@ const HomePage: React.FC = () => {
             <ChoosUs />
             <Testimonials />
             <FAQ />
+            
         </>
 
     )

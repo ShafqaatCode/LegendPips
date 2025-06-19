@@ -34,7 +34,7 @@ const fadeInDown: Variants = {
     y: 0,
     transition: {
       delay: i * 0.3,
-      duration: 0.6,
+      duration: 0.7,
       ease: [0.42, 0, 0.58, 1],
     },
   }),
@@ -46,8 +46,8 @@ const fadeInUp: Variants = {
     opacity: 1,
     y: 0,
     transition: {
-      delay: i * 0.2,
-      duration: 0.6,
+      delay: i * 0.3,
+      duration: 0.7,
       ease: [0.42, 0, 0.58, 1],
     },
   }),
@@ -90,7 +90,7 @@ const SectionHeadingSet: React.FC<SectionHeadingSetProps> = ({
       </motion.div>
 
       <motion.div
-        custom={2}
+        custom={3}
         variants={fadeInDown}
         initial="hidden"
         whileInView="visible"
