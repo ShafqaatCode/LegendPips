@@ -19,6 +19,7 @@ export const BannerWrapper = styled.section`
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     padding: 0 1.5rem;
     justify-content: center;
+    margin-top: 70px;
   }
 
   &::before {
