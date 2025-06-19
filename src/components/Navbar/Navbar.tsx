@@ -1,63 +1,178 @@
-// src/components/layout/Navbar/Navbar.tsx
-import React, { useState } from "react";
+// Header.tsx
+import React, { useEffect, useState } from "react";
 import {
-  NavbarWrapper,
+  HeaderWrapper,
+  Topbar,
+  StickyBar,
+  Navbar,
+  Logo,
   NavList,
   NavItem,
-  MobileWrapper,
-  Logo,
+  LinkGroup,
+  HeaderItem,
   SignInButton,
-  HamburgerButton,
+  MobileBar,
   MobileMenu,
-} from "../Navbar/Navbar.styles";
-// import { NavLink } from "react-router-dom";
+  Backdrop,
+  SubmenuWrapper,
+  SubmenuToggle,
+  Submenu,
+  SubmenuItem,
+} from "../Header/Header.styles";
+import { NavLink } from "react-router-dom";
+import { FaBars } from "react-icons/fa";
+import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import LogoImg from "../../assets/icons/image 2.svg";
+import SupportIcon from "../../assets/icons/SupportIcon.svg";
+import CalculatorIcon from "../../assets/icons/calculator-svgrepo-com (1) 1.svg";
+import LocationIcon from "../../assets/icons/Location marker.svg";
 
-import LogoImg from "../../assets/icons/Logo_Svg.svg"
-import { FaBars } from "react-icons/fa"; // install react-icons if needed
+const navLinks = [
+  { to: "/", label: "Home", end: true },
+  { to: "/how-it-works", label: "How It Works?" },
+  { to: "/rebates", label: "Rebates Brokers" },
+  { to: "/contests", label: "Contests" },
+  { to: "/brokers", label: "Brokers" },
+  { to: "/signals", label: "Signals" },
+  { to: "/analysis", label: "Analysis" },
+  { to: "/forum", label: "Forum" },
+  {
+    label: "Tools",
+    submenu: [
+      { to: "/calculator", label: "Calculator" },
+      { to: "/timer", label: "Timer" },
+    ],
+  },
+  {
+    label: "Resources",
+    submenu: [
+      { to: "/blogs", label: "Blogs" },
+      { to: "/news", label: "News" },
+    ],
+  },
+];
 
-const Navbar: React.FC = () => {
-  const [open, setOpen] = useState(false);
+const NavbarComp: React.FC = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [submenuOpen, setSubmenuOpen] = useState<string | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const toggleSubmenu = (label: string) => {
+    setSubmenuOpen((prev) => (prev === label ? null : label));
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 30);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const renderLinks = (isMobile = false) => (
+    navLinks.map((link) =>
+      link.submenu ? (
+        <SubmenuWrapper
+          key={link.label}
+          onMouseEnter={() => !isMobile && setSubmenuOpen(link.label)}
+          onMouseLeave={() => !isMobile && setSubmenuOpen(null)}
+        >
+          <SubmenuToggle onClick={() => toggleSubmenu(link.label)}>
+            {link.label} {submenuOpen === link.label ? <FiChevronUp /> : <FiChevronDown />}
+          </SubmenuToggle>
+          {submenuOpen === link.label && (
+            <Submenu>
+              {link.submenu.map((sub) => (
+                <SubmenuItem to={sub.to} key={sub.to} onClick={() => setMenuOpen(false)}>
+                  {sub.label}
+                </SubmenuItem>
+              ))}
+            </Submenu>
+          )}
+        </SubmenuWrapper>
+      ) : (
+        <NavItem
+          to={link.to!}
+          key={link.to}
+          end={link.end || false}
+          onClick={() => setMenuOpen(false)}
+        >
+          {link.label}
+        </NavItem>
+      )
+    )
+  );
 
   return (
-    <NavbarWrapper>
-      <MobileWrapper>
-        <Logo src={LogoImg} alt="Logo" />
-        <div>
-          <SignInButton to="/signin">Sign In</SignInButton>
-          <HamburgerButton onClick={() => setOpen(!open)}>
-            <FaBars />
-          </HamburgerButton>
-        </div>
-      </MobileWrapper>
+    <HeaderWrapper>
+      {menuOpen && <Backdrop onClick={() => setMenuOpen(false)} />}
 
-      <NavList className={open ? "open" : ""}>
-        <NavItem to="/" end>Home</NavItem>
-        <NavItem to="/how-it-works">How It Works?</NavItem>
-        <NavItem to="/rebates">Rebates Brokers</NavItem>
-        <NavItem to="/contests">Contests</NavItem>
-        <NavItem to="/brokers">Brokers</NavItem>
-        <NavItem to="/tools">Tools</NavItem>
-        <NavItem to="/signals">Signals</NavItem>
-        <NavItem to="/analysis">Analysis</NavItem>
-        <NavItem to="/forum">Forum</NavItem>
-      </NavList>
+      {!isScrolled && (
+        <Topbar>
+          <NavLink to="/">
+            <Logo src={LogoImg} alt="LegendPips Logo" />
+          </NavLink>
 
-      {/* Optional mobile dropdown menu */}
-      {open && (
-        <MobileMenu>
-          <NavItem to="/" onClick={() => setOpen(false)}>Home</NavItem>
-          <NavItem to="/how-it-works" onClick={() => setOpen(false)}>How It Works?</NavItem>
-          <NavItem to="/rebates" onClick={() => setOpen(false)}>Rebates Brokers</NavItem>
-          <NavItem to="/contests" onClick={() => setOpen(false)}>Contests</NavItem>
-          <NavItem to="/brokers" onClick={() => setOpen(false)}>Brokers</NavItem>
-          <NavItem to="/tools" onClick={() => setOpen(false)}>Tools</NavItem>
-          <NavItem to="/signals" onClick={() => setOpen(false)}>Signals</NavItem>
-          <NavItem to="/analysis" onClick={() => setOpen(false)}>Analysis</NavItem>
-          <NavItem to="/forum" onClick={() => setOpen(false)}>Forum</NavItem>
-        </MobileMenu>
+          <LinkGroup>
+            <NavLink to="/live-chat">
+              <HeaderItem>
+                <img src={SupportIcon} alt="Live Chat" />
+                <span>Live Chat</span>
+              </HeaderItem>
+            </NavLink>
+            <NavLink to="/calculator">
+              <HeaderItem>
+                <img src={CalculatorIcon} alt="Calculator" />
+                <span>Rebate Calculator</span>
+              </HeaderItem>
+            </NavLink>
+            <NavLink to="/location">
+              <HeaderItem>
+                <img src={LocationIcon} alt="Location" />
+                <span>United States</span>
+              </HeaderItem>
+            </NavLink>
+            <NavLink to="/signin">
+              <SignInButton>Sign In</SignInButton>
+            </NavLink>
+          </LinkGroup>
+        </Topbar>
       )}
-    </NavbarWrapper>
+
+      {!isScrolled && <Navbar><NavList>{renderLinks()}</NavList></Navbar>}
+
+      {isScrolled && (
+        <StickyBar>
+          <NavLink to="/">
+            <Logo src={LogoImg} alt="LegendPips Logo" />
+          </NavLink>
+          <NavList>{renderLinks()}</NavList>
+          <NavLink to="/signin">
+            <SignInButton>Sign In</SignInButton>
+          </NavLink>
+        </StickyBar>
+      )}
+
+      <MobileBar>
+        <NavLink to="/">
+          <Logo src={LogoImg} alt="LegendPips Logo" />
+        </NavLink>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <NavLink to="/signin">
+            <SignInButton>Sign In</SignInButton>
+          </NavLink>
+          <FaBars
+            size={22}
+            color="white"
+            onClick={() => setMenuOpen(!menuOpen)}
+            style={{ cursor: "pointer" }}
+          />
+        </div>
+      </MobileBar>
+
+      {menuOpen && <MobileMenu>{renderLinks(true)}</MobileMenu>}
+    </HeaderWrapper>
   );
 };
 
-export default Navbar;
+export default NavbarComp;

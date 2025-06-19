@@ -216,7 +216,7 @@ export const StickyBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #132d58cf;
+  background-color: #132d58;
   padding: 0.3rem 3rem;
   position: fixed;
   top: 0;

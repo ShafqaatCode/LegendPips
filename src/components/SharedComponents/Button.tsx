@@ -20,7 +20,7 @@ const ButtonBase = styled.button<{
   background-color: ${({ bgColor, theme }) => bgColor || theme.colors.primary};
   color: ${({ color, theme }) => color || theme.colors.WHITE};
   font-family: ${({ theme }) => theme.font.family};
-  text-wrap:nowrap;
+  white-space: nowrap;
 
   display: flex;
   align-items: center;
