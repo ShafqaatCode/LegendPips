@@ -14,6 +14,8 @@ const UpperHeadingDiv = styled.div`
   justify-content: center;
   gap: 0.4rem;
   color: #fbbf24;
+  white-space: nowrap;
+  margin: 0.5rem 0;
 
   img {
     height: 24px;
@@ -63,7 +65,7 @@ const SubHeading = styled.h2`
   @media (max-width: 768px) {
     font-size: 14px;
     line-height: 24px;
-    padding: 0 1rem;
+    padding: 0 0.5rem;
   }
 `;
 
