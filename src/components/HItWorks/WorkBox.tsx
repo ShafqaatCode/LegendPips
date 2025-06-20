@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import type { Variants } from 'framer-motion';
+import { motion } from "framer-motion"
 
 interface WorkBoxProps {
   index: number;
@@ -8,7 +10,13 @@ interface WorkBoxProps {
   description: string;
 }
 
-const CardContainer = styled.div`
+
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.3, duration: 0.7, ease: "easeOut" } })
+};
+
+const CardContainer = styled(motion.div)`
   position: relative;
   width: 315px;
   height: 178px;
@@ -64,7 +72,7 @@ const Description = styled.p`
 
 const WorkBox: React.FC<WorkBoxProps> = ({ index, icon, title, description }) => {
   return (
-    <CardContainer>
+    <CardContainer custom={index} variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{once: true}} >
       <TopIndex>{index}</TopIndex>
       <IconImage src={icon} alt="Work Icon" />
       <Title>{title}</Title>

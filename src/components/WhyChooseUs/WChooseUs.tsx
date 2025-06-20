@@ -4,6 +4,8 @@ import ThumsUpIcon from "../../assets/icons/Image-1.svg";
 import GrothImg from "../../assets/icons/GrothImg.svg";
 import ButtonBase from "../SharedComponents/Button";
 import { FaArrowAltCircleUp } from "react-icons/fa";
+import { motion } from "framer-motion";
+import type { Variants } from "framer-motion"
 
 const WorkSectionWrapper = styled.section`
   padding: 0rem 2rem;
@@ -40,7 +42,7 @@ const ContentContainer = styled.div`
   }
 `;
 
-const PointBox = styled.div`
+const PointBox = styled(motion.div)`
   display: flex;
   color: #303030;
   gap: 10px;
@@ -94,6 +96,19 @@ const ImageContainer = styled.div`
   }
 `;
 
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.3,
+      duration: 0.6,
+      ease: [0.42, 0, 0.58, 1],
+    },
+  }),
+}
+
 const ChoosUs: React.FC = () => {
   return (
     <WorkSectionWrapper>
@@ -106,7 +121,7 @@ const ChoosUs: React.FC = () => {
 
       <Wrapper>
         <ContentContainer>
-          <PointBox>
+          <PointBox custom={0} variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }} >
             <img src={ThumsUpIcon} alt="Icon" />
             <div>
               <h2>Excellent customer service</h2>
@@ -116,7 +131,7 @@ const ChoosUs: React.FC = () => {
               </p>
             </div>
           </PointBox>
-          <PointBox>
+          <PointBox custom={1} variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }} >
             <img src={ThumsUpIcon} alt="Icon" />
             <div>
               <h2>Fast Withdrawal Process</h2>
@@ -126,7 +141,7 @@ const ChoosUs: React.FC = () => {
               </p>
             </div>
           </PointBox>
-          <PointBox>
+          <PointBox custom={2} variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <img src={ThumsUpIcon} alt="Icon" />
             <div>
               <h2>Trusted by Traders</h2>

@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { motion } from "framer-motion"
 
 export const SliderWrapper = styled.div`
   position: relative;
@@ -39,7 +40,7 @@ export const CardsSlider = styled.div<{ translateX: number }>`
   transform: translateX(${(props) => props.translateX}%);
 `;
 
-export const Card = styled.div`
+export const Card = styled(motion.div)`
   flex: 0 0 auto;
   width: 170px;
   height: 155px;
@@ -66,6 +67,7 @@ export const Card = styled.div`
     color: ${({ theme }) => theme.colors.primary};
     z-index: 2;
     position: relative;
+    white-space: nowrap;
   }
 
   /* .hover-bg {

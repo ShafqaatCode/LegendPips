@@ -14,6 +14,24 @@ import VerifiedIcon from "../../assets/icons/verified.svg";
 import TradingIcon from "../../assets/icons/trading.svg";
 import ContestIcon from "../../assets/icons/contest.svg";
 import ScamIcon from "../../assets/icons/scam.svg";
+import type { Variants } from "framer-motion";
+
+
+
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.3,
+      duration: 0.8,
+      ease: [0.42, 0, 0.58, 1],
+    },
+  }),
+}
+
+
 
 const features = [
   { icon: CashbackIcon, label: "Cashback Rebates" },
@@ -71,7 +89,7 @@ const FeaturesSlider = () => {
       <CardsContainer>
         <CardsSlider translateX={translateX}>
           {visibleCards.map((card, idx) => (
-            <Card key={idx}>
+            <Card key={idx} custom={idx} initial="hidden" whileInView="visible" variants={fadeInUp} viewport={{once: true}}>
               <div className="hover-bg" />
               <img src={card.icon} alt={card.label} />
               <p>{card.label}</p>

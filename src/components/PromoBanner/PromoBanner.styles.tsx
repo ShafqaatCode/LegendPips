@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import bgImage from "../../assets/banner/hero-bg3.png";
+import { motion } from "framer-motion";
 
 export const BannerWrapper = styled.section`
   position: relative;
@@ -53,7 +54,7 @@ export const HeroContent = styled.div`
   }
 `;
 
-export const SubheadingWrapper = styled.div`
+export const SubheadingWrapper = styled(motion.div)`
   display: flex;
   align-items: center;
   gap: 8px;
@@ -62,6 +63,7 @@ export const SubheadingWrapper = styled.div`
     height: 30px;
     width: 30px;
   }
+  
 `;
 
 export const HeroSubTitle = styled.p`
@@ -77,7 +79,7 @@ export const HeroSubTitle = styled.p`
   }
 `;
 
-export const HeroTitle = styled.h1`
+export const HeroTitle = styled(motion.div)`
   font-family: ${({ theme }) => theme.font.family};
   font-size: 48px;
   font-weight: 600;
@@ -85,6 +87,7 @@ export const HeroTitle = styled.h1`
   letter-spacing: -0.6%;
   margin: 0.5rem 0;
   text-transform: capitalize;
+  /* border: 2px solid red; */
 
   span {
     color: ${({ theme }) => theme.colors.gold};
@@ -100,11 +103,12 @@ export const HeroTitle = styled.h1`
   }
 `;
 
-export const BrokersContainer = styled.div`
+export const BrokersContainer = styled(motion.div)`
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: 1.2rem;
+  /* border: 2px solid red; */
   gap: 1.5rem;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
@@ -160,7 +164,7 @@ export const BrokerRightSection = styled.div`
   }
 `;
 
-export const ActionButtons = styled.div`
+export const ActionButtons = styled(motion.div)`
   display: flex;
   gap: 0.4rem;
   margin-top: 2.5rem;

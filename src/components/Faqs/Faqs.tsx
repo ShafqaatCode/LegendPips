@@ -17,6 +17,37 @@ import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import ButtonBase from "../SharedComponents/Button";
 import styled from "styled-components";
 import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
+import type { Variants } from "framer-motion";
+import { motion } from "framer-motion"
+
+
+
+export const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.3,
+      duration: 0.6,
+      ease: [0.42, 0, 0.58, 1],
+    },
+  }),
+}
+
+export const fadeInDown: Variants = {
+  hidden: { opacity: 0, y: -30 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.3,
+      duration: 0.6,
+      ease: [0.42, 0, 0.58, 1]
+    }
+  })
+}
+
 
 type CategoryKey =
   | "Forex & Stock Basics"
@@ -127,7 +158,7 @@ const Faqs: React.FC = () => {
         <ContentWrapper>
           <LeftPanel>
             {categories.map((cat, i) => (
-              <TabButton
+              <TabButton custom={i} variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
                 key={i}
                 selected={selectedCategory === i}
                 onClick={() => {
@@ -153,7 +184,7 @@ const Faqs: React.FC = () => {
 
           <RightPanel>
             {selectedQuestions.map((q, i) => (
-              <QuestionItem key={i}>
+              <QuestionItem key={i} custom={i} variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
                 <QuestionHeader onClick={() => handleToggle(i)}>
                   <QuestionTitle>{q.question}</QuestionTitle>
                   <ToggleIcon isOpen={openQuestion === i}>

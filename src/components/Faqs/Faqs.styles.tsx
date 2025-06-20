@@ -1,7 +1,7 @@
 // Faqs.styles.ts
 import styled from "styled-components";
 import type { DefaultTheme } from "styled-components";
-
+import { motion } from "framer-motion";
 export const Section = styled.section`
   padding: 4rem 2rem;
   background-color: #fff;
@@ -43,7 +43,7 @@ export const LeftPanel = styled.div`
   }
 `;
 
-export const TabButton = styled.button<{ selected?: boolean }>`
+export const TabButton = styled(motion.button)<{ selected?: boolean }>`
   padding: 0.9rem 1.5rem;
   font-size: 1rem;
   font-weight: 500;
@@ -86,13 +86,14 @@ export const RightPanel = styled.div`
   }
 `;
 
-export const QuestionItem = styled.div`
+export const QuestionItem = styled(motion.div)`
   background-color: #f3f4f7;
   border-radius: 0.5rem;
   border: 1px solid #dfe0e4;
   width: 100%;
   max-width: 650px;
   box-sizing: border-box;
+  /* border: 2px solid red; */
   
 `;
 
