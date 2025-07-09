@@ -99,6 +99,7 @@ export const LogoImg = styled.img`
 export const InfoSection = styled.div`
   flex: 2;
   min-width: 250px;
+ 
 
   @media (max-width: 768px) {
     min-width: unset;
@@ -112,6 +113,7 @@ export const TitleRow = styled.div`
   align-items: center;
   gap: 1rem;
   margin-bottom: 0.5rem;
+
 
   h2 {
     font-size: 36px;
@@ -142,6 +144,7 @@ export const Description = styled.p`
   font-size: 16px;
   color: rgba(15, 23, 42, 0.8);
   margin: 0;
+ 
 
   @media (max-width: 768px) {
     text-align: center;

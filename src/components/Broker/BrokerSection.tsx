@@ -6,18 +6,25 @@ import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import ButtonBase from "../SharedComponents/Button";
 import ArrowIcon from "../../assets/arrow-narrow-circle-broken-up-right-blue.png"
 
+import XtremeLogo from "../../assets/TradeMarketBrands/Ellipse 2.png";
+
+import ExnessLogo from "../../assets/TradeMarketBrands/Ellipse 2-2.png";
+
+import XmLogo from "../../assets/TradeMarketBrands/Ellipse 2-1.png";
+
 const BrokerSectionWrapper = styled.section`
 display: flex;
 flex-direction: column;
 gap: 2rem;
 padding: 1rem 0;
 margin: 3rem 1rem;
+/* border: 2px solid red; */
 `;
 
 const BrokerWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
 `;
 
 // Example array of broker data
@@ -25,7 +32,7 @@ const brokers = [
   {
     index: 1,
     featured: true,
-    title: "IC Markets",
+    title: "IC Market",
     description:
       "Connect with thousands of traders worldwide. Share insights, learn strategies, and grow together inside our thriving Forex community.",
     logoSrc: ICLogo,
@@ -35,20 +42,30 @@ const brokers = [
   {
     index: 2,
     featured: true,
-    title: "IC Markets",
+    title: "XTREAME Market",
     description:
       "Connect with thousands of traders worldwide. Share insights, learn strategies, and grow together inside our thriving Forex community.",
-    logoSrc: ICLogo,
+    logoSrc: XtremeLogo,
     rating: 3,
     reviewsCount: "45k+",
   },
   {
     index: 3,
     featured: true,
-    title: "IC Markets",
+    title: "XM Market",
     description:
       "Connect with thousands of traders worldwide. Share insights, learn strategies, and grow together inside our thriving Forex community.",
-    logoSrc: ICLogo,
+    logoSrc: XmLogo,
+    rating: 4,
+    reviewsCount: "45k+",
+  },
+  {
+    index: 4,
+    featured: true,
+    title: "EXNESS Market",
+    description:
+      "Connect with thousands of traders worldwide. Share insights, learn strategies, and grow together inside our thriving Forex community.",
+    logoSrc: ExnessLogo,
     rating: 4,
     reviewsCount: "45k+",
   },

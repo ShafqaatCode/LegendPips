@@ -20,7 +20,6 @@ import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-sv
 import ArrowIcon2 from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 2.svg";
 
 import type { Variants } from "framer-motion";
-import { motion } from "framer-motion";
 
 
 export const fadeInUp: Variants = {
