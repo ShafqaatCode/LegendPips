@@ -12,10 +12,10 @@ import headsetIcon from "../../assets/FeaturesIcon/headset.png";
 import complaintIcon from "../../assets/FeaturesIcon/complain.png";
 
 const FeaturesWrapper = styled.section`
-  border: 2px solid red;
-  padding: 30px 20px;
+  
+  padding: 30px 30px;
   background-color: #fff;
-  margin: auto;
+  margin: 2rem auto;
   max-width: 1280px;
 `;
 
@@ -28,20 +28,28 @@ const Title = styled.h2`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 60px;
 `;
 
 const Card = styled.div`
   // text-align: center;
-  border: 2px solid green;
+  // border: 2px solid green;
+  padding: 10px;
+  
+
+  @media (max-width: 768px) {
+    margin: 0 auto;
+    width: 100%;
+    text-align: center;
+  }
 `;
 
 const IconWrapper = styled.div`
   margin-bottom: 0.2rem;
   text-align: center;
   img {
-    width: 100px;
+    width: 110px;
   }
 `;
 
@@ -56,7 +64,14 @@ const Heading = styled.h3`
 const Description = styled.p`
   font-size: 13px;
   font-weight: 300;
+  // max-width: 225px;
   color: #{({ theme }) => theme.colors.primary};
+
+  @media (max-width: 768px) {
+    margin: 0 auto;
+    width: 100%;
+    text-align: center;
+  }
 `;
 
 const LegendPipsFeatures: React.FC = () => {
