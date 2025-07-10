@@ -17,7 +17,10 @@ const HitWorksPage: React.FC = () => {
     //   breadcrumb="Home > Pages > How-It-works"
     // />
     <>
-    <Banner upperText='PLATEFORM FOR TRADERS' subText='How it works' bannerHeading='How it works' />
+    {/* <Banner upperText='PLATEFORM FOR TRADERS' subText='How it works' bannerHeading='How it works' /> */}
+    <div style={{ height: " 110px" }}>
+
+    </div>
     <HowItWorks />
     <LegendPipsFeatures />
 
