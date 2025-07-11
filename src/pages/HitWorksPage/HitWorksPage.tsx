@@ -3,6 +3,7 @@ import Banner from '../../components/Banner/Banner'
 import bannerImg from "../../assets/banner/BannerBg.jpg";
 import LegendPipsFeatures from '../../components/PipsFeatures/PipsFeatureSection';
 import HowItWorks from '../../components/HItWorks/WorksSection';
+import RegisterModal from '../Register/Register';
 
 
 
@@ -26,6 +27,7 @@ const HitWorksPage: React.FC = () => {
         bannerHeading="Earning from every trade has never been this simple." upperText="all in one Trading plateform" subText="Legend Pips gives you cashback for your trades without changing your broker. Plus, you get tools, signals, and protection—built to help you grow."
       />
     <HowItWorks />
+    <RegisterModal />
     <LegendPipsFeatures />
 
     </>

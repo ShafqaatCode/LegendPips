@@ -22,7 +22,7 @@ const FeaturesWrapper = styled.section`
 const Title = styled.h2`
   text-align: center;
   font-size: 3rem;
-  color: {({theme}) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primary};
   margin-bottom: 50px;
 `;
 
@@ -55,7 +55,7 @@ const IconWrapper = styled.div`
 
 const Heading = styled.h3`
   font-size: 1rem;
-  color: {({theme}) => theme.colors.primary};
+  color: ${({theme}) => theme.colors.primary};
   font-weight: 500;
   // line-height: 30px;
   // margin-bottom: 10px;
@@ -65,7 +65,7 @@ const Description = styled.p`
   font-size: 13px;
   font-weight: 300;
   // max-width: 225px;
-  color: #{({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primary};
 
   @media (max-width: 768px) {
     margin: 0 auto;
