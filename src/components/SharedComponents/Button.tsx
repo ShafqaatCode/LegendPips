@@ -14,13 +14,15 @@ const ButtonBase = styled.button<{
   font-weight: ${({fontWeight}) => fontWeight || "500"};
   border-radius: 30px;
   cursor: pointer;
+  border: 2px solid;
   transition: all 0.3s ease;
   width: ${({ width }) => width || "268px"};
-  border: 1px solid ${({ borderColor}) => borderColor || "transparent"};
+  border: 2px solid ${({ borderColor}) => borderColor || "transparent"};
   background-color: ${({ bgColor, theme }) => bgColor || theme.colors.primary};
   color: ${({ color, theme }) => color || theme.colors.WHITE};
   font-family: ${({ theme }) => theme.font.family};
   white-space: nowrap;
+
 
   display: flex;
   align-items: center;
@@ -31,7 +33,7 @@ const ButtonBase = styled.button<{
     opacity: 0.9;
   }
 
-  border: 2px solid;
+  
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     width: 100%;

@@ -17,7 +17,7 @@ const WorksWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: auto;
+  margin: auto;     
   flex-wrap: wrap;
   gap: 4rem;
 
