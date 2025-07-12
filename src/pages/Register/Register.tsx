@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const RegisterModal = () => {
+  const [phone, setPhone] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -25,11 +28,22 @@ const RegisterModal = () => {
       <Input type="text" placeholder="Full Name" />
 
       <PhoneRow>
-        <Select>
-          <option value="+1">🇺🇸 +1</option>
-          <option value="+92">🇵🇰 +92</option>
-        </Select>
-        <Input type="text" placeholder="Mobile Number" />
+        <PhoneInputStyled
+          country={"us"}
+          value={phone}
+          onChange={setPhone}
+          inputStyle={{
+            width: "100%",
+            height: "44px",
+            borderRadius: "8px",
+            border: "1px solid #bfbfd4",
+          }}
+          buttonStyle={{
+            border: "1px solid #bfbfd4",
+            borderRadius: "8px 0 0 8px",
+          }}
+          dropdownStyle={{ zIndex: 10 }}
+        />
       </PhoneRow>
 
       <Input type="email" placeholder="Enter Email Address" />
@@ -150,18 +164,14 @@ const Input = styled.input`
   margin-bottom: 1rem;
 `;
 
-const Select = styled.select`
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #bfbfd4;
-  font-size: 14px;
-  background: white;
+const PhoneRow = styled.div`
+  margin-bottom: 1rem;
 `;
 
-const PhoneRow = styled.div`
-  display: flex;
-  gap: 10px;
-  margin-bottom: 1rem;
+const PhoneInputStyled = styled(PhoneInput)`
+  .form-control {
+    width: 100% !important;
+  }
 `;
 
 const VerifyRow = styled.div`
