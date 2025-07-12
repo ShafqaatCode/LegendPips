@@ -11,7 +11,7 @@ import {
   GoogleIcon,
   Divider,
   Line,
-  SectionTitle,
+  Or,
   Input,
   ErrorMsg,
   PhoneRow,
@@ -47,13 +47,15 @@ const RegisterForm = () => {
         Continue with Google <GoogleIcon src={GLogo} alt="G" />
       </GoogleButton>
 
+      <Or>or</Or>
+      
       <Divider>
         <Line />
-        <span>Or</span>
+        <span>Register with Email</span>
         <Line />
       </Divider>
 
-      <SectionTitle>Register With Email </SectionTitle>
+      
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Input
@@ -70,7 +72,8 @@ const RegisterForm = () => {
             onChange={setPhone}
             inputStyle={{
               width: "100%",
-              height: "44px",
+              height: "50px",
+              padding: "",
               borderRadius: "8px",
               border: "1px solid #bfbfd4",
               fontSize: "14px",
