@@ -1,20 +1,50 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import PhoneInput from "react-phone-input-2";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+import GLogo from "../../assets/icons/Google.png";
 import "react-phone-input-2/lib/style.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import {
+  Container,
+  Heading,
+  GoogleButton,
+  GoogleIcon,
+  Divider,
+  Line,
+  SectionTitle,
+  Input,
+  ErrorMsg,
+  PhoneRow,
+  PhoneInputStyled,
+  VerifyRow,
+  Retake,
+  PasswordRow,
+  Icon,
+  Terms,
+  Highlight,
+  RegisterButton
+} from "./Register.styles";
 
-const RegisterModal = () => {
+const RegisterForm = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const [phone, setPhone] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const onSubmit = (data: any) => {
+    console.log({ ...data, phone });
+  };
 
   return (
     <Container>
       <Heading>Register</Heading>
 
-      <GoogleButton>
-        Continue with Google <GoogleIcon>G</GoogleIcon>
+      <GoogleButton type="button">
+        Continue with Google <GoogleIcon src={GLogo} alt="G" />
       </GoogleButton>
 
       <Divider>
@@ -23,213 +53,90 @@ const RegisterModal = () => {
         <Line />
       </Divider>
 
-      <SectionTitle>Register With Email</SectionTitle>
+      <SectionTitle>Register With Email </SectionTitle>
 
-      <Input type="text" placeholder="Full Name" />
-
-      <PhoneRow>
-        <PhoneInputStyled
-          country={"us"}
-          value={phone}
-          onChange={setPhone}
-          inputStyle={{
-            width: "100%",
-            height: "44px",
-            borderRadius: "8px",
-            border: "1px solid #bfbfd4",
-          }}
-          buttonStyle={{
-            border: "1px solid #bfbfd4",
-            borderRadius: "8px 0 0 8px",
-          }}
-          dropdownStyle={{ zIndex: 10 }}
-        />
-      </PhoneRow>
-
-      <Input type="email" placeholder="Enter Email Address" />
-
-      <VerifyRow>
-        <Input type="text" placeholder="Verification Code" />
-        <Retake>Retake</Retake>
-      </VerifyRow>
-
-      <PasswordRow>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <Input
-          type={showPassword ? "text" : "password"}
-          placeholder="Password"
+          type="text"
+          placeholder="Full Name"
+          {...register("fullName", { required: true })}
         />
-        <Icon onClick={() => setShowPassword(!showPassword)}>
-          {showPassword ? <FaEyeSlash /> : <FaEye />}
-        </Icon>
-      </PasswordRow>
+        {errors.fullName && <ErrorMsg>Full Name is required</ErrorMsg>}
 
-      <PasswordRow>
+        <PhoneRow>
+          <PhoneInputStyled
+            country={"us"}
+            value={phone}
+            onChange={setPhone}
+            inputStyle={{
+              width: "100%",
+              height: "44px",
+              borderRadius: "8px",
+              border: "1px solid #bfbfd4",
+              fontSize: "14px",
+            }}
+            buttonStyle={{
+              border: "1px solid #bfbfd4",
+              borderRadius: "8px 0 0 8px",
+            }}
+            dropdownStyle={{ zIndex: 10 }}
+          />
+        </PhoneRow>
+
         <Input
-          type={showConfirmPassword ? "text" : "password"}
-          placeholder="Confirm Password"
+          type="email"
+          placeholder="Enter Email Address"
+          {...register("email", { required: true })}
         />
-        <Icon onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-          {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-        </Icon>
-      </PasswordRow>
+        {errors.email && <ErrorMsg>Email is required</ErrorMsg>}
 
-      <Terms>
-        <input type="checkbox" />
-        <label>
-          I Understand And Accept The{" "}
-          <Highlight>Terms And Disclaimer</Highlight> Set Forth By Legend Pips.
-        </label>
-      </Terms>
+        <VerifyRow>
+          <Input
+            type="text"
+            placeholder="Verification Code"
+            {...register("verification", { required: true })}
+          />
+          <Retake type="button">Retake</Retake>
+        </VerifyRow>
+        {errors.verification && <ErrorMsg>Verification code is required</ErrorMsg>}
 
-      <RegisterButton>Register</RegisterButton>
+        <PasswordRow>
+          <Input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            {...register("password", { required: true })}
+          />
+          <Icon onClick={() => setShowPassword(!showPassword)}>
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </Icon>
+        </PasswordRow>
+        {errors.password && <ErrorMsg>Password is required</ErrorMsg>}
+
+        <PasswordRow>
+          <Input
+            type={showConfirmPassword ? "text" : "password"}
+            placeholder="Confirm Password"
+            {...register("confirmPassword", { required: true })}
+          />
+          <Icon onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+          </Icon>
+        </PasswordRow>
+        {errors.confirmPassword && <ErrorMsg>Confirm your password</ErrorMsg>}
+
+        <Terms>
+          <input type="checkbox" {...register("terms", { required: true })} />
+          <label>
+            I Understand And Accept The{" "}
+            <Highlight>Terms And Disclaimer</Highlight> Set Forth By Legend Pips.
+          </label>
+        </Terms>
+        {errors.terms && <ErrorMsg>You must accept the terms</ErrorMsg>}
+
+        <RegisterButton type="submit">Register</RegisterButton>
+      </form>
     </Container>
   );
 };
 
-export default RegisterModal;
-
-// Styled Components
-
-const Container = styled.div`
-  max-width: 420px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  font-family: "Segoe UI", sans-serif;
-`;
-
-const Heading = styled.h2`
-  font-size: 32px;
-  font-weight: bold;
-  color: #1f2a48;
-  margin-bottom: 1.5rem;
-`;
-
-const GoogleButton = styled.button`
-  width: 100%;
-  background-color: #1f3b8c;
-  color: white;
-  padding: 12px;
-  border: none;
-  font-size: 16px;
-  border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  cursor: pointer;
-`;
-
-const GoogleIcon = styled.span`
-  font-size: 18px;
-  font-weight: bold;
-  color: #fbbc05;
-`;
-
-const Divider = styled.div`
-  display: flex;
-  align-items: center;
-  text-align: center;
-  margin: 1rem 0;
-  span {
-    margin: 0 8px;
-    color: #333;
-    font-weight: 600;
-  }
-`;
-
-const Line = styled.hr`
-  flex: 1;
-  height: 1px;
-  background: #ccc;
-  border: none;
-`;
-
-const SectionTitle = styled.div`
-  text-align: center;
-  color: #1f3b8c;
-  font-weight: 700;
-  margin: 1rem 0;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #bfbfd4;
-  font-size: 14px;
-  margin-bottom: 1rem;
-`;
-
-const PhoneRow = styled.div`
-  margin-bottom: 1rem;
-`;
-
-const PhoneInputStyled = styled(PhoneInput)`
-  .form-control {
-    width: 100% !important;
-  }
-`;
-
-const VerifyRow = styled.div`
-  position: relative;
-`;
-
-const Retake = styled.span`
-  position: absolute;
-  right: 14px;
-  top: 14px;
-  color: #1f3b8c;
-  font-size: 14px;
-  cursor: pointer;
-`;
-
-const PasswordRow = styled.div`
-  position: relative;
-`;
-
-const Icon = styled.span`
-  position: absolute;
-  right: 14px;
-  top: 14px;
-  color: #999;
-  font-size: 16px;
-  cursor: pointer;
-`;
-
-const Terms = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 13px;
-  margin: 1rem 0;
-
-  input {
-    margin-top: 5px;
-  }
-
-  label {
-    line-height: 1.5;
-  }
-`;
-
-const Highlight = styled.span`
-  color: #e87511;
-  font-style: italic;
-  font-weight: 600;
-`;
-
-const RegisterButton = styled.button`
-  width: 100%;
-  background-color: #1f3b8c;
-  color: white;
-  padding: 12px;
-  font-size: 16px;
-  border: none;
-  border-radius: 10px;
-  font-weight: bold;
-  cursor: pointer;
-`;
+export default RegisterForm;
