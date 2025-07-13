@@ -8,18 +8,16 @@ interface Props {
 }
 
 const SignupModal: React.FC<Props> = ({ isOpen, onClose }) => {
-
   useEffect(() => {
-    if(isOpen) {
+    if (isOpen) {
       document.body.style.overflow = "hidden";
-    }
-    else {
+    } else {
       document.body.style.overflow = "auto";
     }
 
     return () => {
       document.body.style.overflow = "auto";
-    }
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -27,8 +25,7 @@ const SignupModal: React.FC<Props> = ({ isOpen, onClose }) => {
   return (
     <Backdrop onClick={onClose}>
       <ModalWrapper onClick={(e) => e.stopPropagation()}>
-        <CloseBtn onClick={onClose}>×</CloseBtn>
-        <RegisterForm />
+        <RegisterForm onClose={onClose} />
       </ModalWrapper>
     </Backdrop>
   );
@@ -71,5 +68,4 @@ const CloseBtn = styled.button`
   color: #333;
   cursor: pointer;
   line-height: 1;
- 
 `;

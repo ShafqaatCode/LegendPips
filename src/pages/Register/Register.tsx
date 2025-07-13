@@ -21,11 +21,17 @@ import {
   PasswordRow,
   Icon,
   Terms,
+  CloseBtn,
   Highlight,
   RegisterButton
 } from "./Register.styles";
 
-const RegisterForm = () => {
+interface Props {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+const RegisterForm: React.FC<Props> = ({onClose }) => {
   const {
     register,
     handleSubmit,
@@ -41,6 +47,7 @@ const RegisterForm = () => {
 
   return (
     <Container>
+      <CloseBtn onClick={onClose} >x</CloseBtn>
       <Heading>Register</Heading>
 
       <GoogleButton type="button">

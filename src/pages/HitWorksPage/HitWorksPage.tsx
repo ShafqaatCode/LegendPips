@@ -4,6 +4,7 @@ import bannerImg from "../../assets/banner/BannerBg.jpg";
 import LegendPipsFeatures from '../../components/PipsFeatures/PipsFeatureSection';
 import HowItWorks from '../../components/HItWorks/WorksSection';
 import RegisterModal from '../Register/Register';
+import LoginForm from '../Login/Login';
 
 
 
@@ -29,6 +30,7 @@ const HitWorksPage: React.FC = () => {
     <HowItWorks />
     <RegisterModal />
     <LegendPipsFeatures />
+    <LoginForm />
 
     </>
   )
