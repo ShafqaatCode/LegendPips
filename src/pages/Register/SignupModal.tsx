@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import RegisterForm from "./Register";
 
@@ -8,6 +8,20 @@ interface Props {
 }
 
 const SignupModal: React.FC<Props> = ({ isOpen, onClose }) => {
+
+  useEffect(() => {
+    if(isOpen) {
+      document.body.style.overflow = "hidden";
+    }
+    else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
