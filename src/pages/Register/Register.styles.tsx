@@ -4,8 +4,8 @@ import PhoneInput from "react-phone-input-2";
 
 
 export const Container = styled.div`
-  max-width: 700px;
-  margin: 2rem auto;
+  max-width: 650px;
+  margin: 4rem auto;
   padding: 3rem 4rem;
   background: white;
   border-radius: 16px;
@@ -15,6 +15,7 @@ export const Container = styled.div`
 
   @media (max-width: 768px) {
     padding: 2rem;
+    width: 90%;
     // margin: 1rem;
   }
 `;

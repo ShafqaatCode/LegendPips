@@ -1,13 +1,19 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-  max-width: 700px;
-  margin: 2rem auto;
+  max-width: 650px;
+  margin: 4rem auto;
   padding: 3rem 4rem;
   background: white;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   font-family: "Segoe UI", sans-serif;
+
+  @media(max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    padding: 2rem 2rem;
+    width: 90%;
+
+  }
 `;
 
 export const Heading = styled.h2`

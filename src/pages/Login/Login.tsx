@@ -16,7 +16,7 @@ import {
   RegisterButton,
   ForgetPassword,
 } from "./Login.styles";
-import RegisterForm from "../Register/Register";
+
 
 const LoginForm: React.FC = () => {
   const {
