@@ -27,6 +27,7 @@ import SupportIcon from "../../assets/icons/SupportIcon.svg";
 import CalculatorIcon from "../../assets/icons/calculator-svgrepo-com (1) 1.svg";
 import LocationIcon from "../../assets/icons/Location marker.svg";
 import SignupModal from "../../pages/Register/SignupModal";
+import LoginModal from "../../pages/Login/LoginModal";
 
 const navLinks = [
   { to: "/", label: "Home", end: true },
@@ -48,7 +49,8 @@ const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [submenuOpen, setSubmenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [signupOpen, setSignupOpen] = useState(true);
+  const [signupOpen, setSignupOpen] = useState(false);
+  const [signinOpen, setSigninOpen] = useState(false);
 
 
   const toggleSubmenu = () => {
@@ -64,7 +66,8 @@ const Header: React.FC = () => {
   }, []);
 
   return (
-    <><HeaderWrapper>
+    <>
+    <HeaderWrapper>
       {menuOpen && <Backdrop onClick={() => setMenuOpen(false)} />}
 
       {!isScrolled && (
@@ -229,8 +232,9 @@ const Header: React.FC = () => {
 
 
     </HeaderWrapper>
-      <SignupModal isOpen={signupOpen} onClose={() => setSignupOpen(false)} /></>
-
+      <SignupModal isOpen={signupOpen} onClose={() => setSignupOpen(false)} />
+      <LoginModal isOpen={signinOpen} onClose={() => setSigninOpen(false)} />
+    </>
   );
 };
 
