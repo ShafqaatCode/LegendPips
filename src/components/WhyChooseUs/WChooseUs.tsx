@@ -34,7 +34,7 @@ const ContentContainer = styled.div`
   flex-direction: column;
   gap: 2rem;
   max-width: 600px;
-
+  border: 2px solid red;
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     align-items: center;
     text-align: center;
@@ -138,6 +138,16 @@ const ChoosUs: React.FC = () => {
               <p>
                 Enjoy quick and secure withdrawals with no hassle — your money,
                 when you need it.
+              </p>
+            </div>
+          </PointBox>
+          <PointBox custom={2} variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+            <img src={ThumsUpIcon} alt="Icon" />
+            <div>
+              <h2>Trusted by Traders</h2>
+              <p>
+                Join thousands of satisfied traders who benefit from our tools,
+                services, and support.
               </p>
             </div>
           </PointBox>
