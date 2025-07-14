@@ -9,7 +9,8 @@ export const HeaderWrapper = styled.header`
   position: fixed;
   top: 0;
   z-index: 999;
-  backdrop-filter: blur(8px);
+  // backdrop-filter: blur(8px);
+  background-color: ${({theme}) => theme.colors.primary};
   transition: all 0.3s ease;
 `;
 

@@ -69,13 +69,17 @@ const SignUpAction = styled.div`
 const InstructionList = styled.div`
   width: 80%;
   margin: 3rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 16px;
   font-weight: 300;
   // text-align: center;
   ul {
    display: flex;
+   max-width: 800px;
    flex-direction: column;
-   align-items: center;
+   justify-content: center;
    gap:0.5rem;
   }
 `;
@@ -96,20 +100,16 @@ const HowItWorks: React.FC = () => {
             of our partnered brokers.
           </li>
           <li>
-            Register for free and connect your existing tradinga ccount with one
-            of our partnered brokers.
+           Keep trading as you normally do  we’ll return a portion of the spread or commission on every trade.
           </li>
           <li>
-            Register for free and connect your existing tradinga ccount with one
-            of our partnered brokers.
+           Check your rewards in real-time  stay up to date with live statistics and see your cashback grow.
           </li>
           <li>
-            Register for free and connect your existing tradinga ccount with one
-            of our partnered brokers.
+           Take part in exciting competitions, leverage premium trading tools and signals, and benefit from daily market analysis.
           </li>
           <li>
-            Register for free and connect your existing tradinga ccount with one
-            of our partnered brokers.
+           Participate in our active forum  share tips, ask questions, and learn alongside other traders.
           </li>
         </ul>
       </InstructionList>

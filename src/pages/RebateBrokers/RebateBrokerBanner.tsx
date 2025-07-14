@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import GirlImage from "../../assets/images/girl-pointing.png"; // Replace with your image path
+import GirlImage from "../../assets/bannerGirl.png";
 import { FaPen } from "react-icons/fa";
 
 const RebatesBrokersSection = () => {
@@ -56,6 +56,8 @@ export default RebatesBrokersSection;
 
 const Wrapper = styled.section`
   padding: 4rem 2rem;
+  margin-top: 120px;
+  position: relative;
   background-color: #f9fafb;
 `;
 
@@ -88,16 +90,18 @@ const Title = styled.h2`
 `;
 
 const Tabs = styled.div`
-  display: flex;
+  display: inline-flex;
   gap: 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
   margin-bottom: 2rem;
 `;
 
 const Tab = styled.button<{ active?: boolean }>`
-  background-color: ${({ active }) => (active ? "#fcd34d" : "#ffffff")};
-  border: 1px solid #e2e8f0;
+  border-color:2px solid ${({ active }) => (active ? "#fcd34d" : "#ffffff")};
+//   border: 1px solid black;
   padding: 0.8rem 1.5rem;
-  border-radius: 8px;
+//   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   color: #1f3b8c;
@@ -109,11 +113,16 @@ const FeatureBox = styled.div`
   background-color: #1f3b8c;
   color: white;
   padding: 1rem 2rem;
-  border-radius: 14px;
-  font-size: 18px;
+  border-radius: 24px 24px 0 24px ;
+  font-size: 24px;
   max-width: 500px;
   margin-bottom: 2rem;
-  font-weight: 400;
+  font-weight: 500;
+  letter-spacing: 9%;
+  position: absolute;
+  top: 70px;
+  left: 50%;
+transform: translateX(-20%);
 `;
 
 const Highlight = styled.span`
