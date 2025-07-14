@@ -28,8 +28,8 @@ const WorkSectionWrapper = styled.section`
   width: 100%;
   background-color: white;
   padding-top: 3rem;
-  max-width: 1280px;
-  
+//   max-width: 1280px;
+  margin: auto;
   overflow: hidden;
 `;
 
