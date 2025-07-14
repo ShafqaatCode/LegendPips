@@ -11,6 +11,7 @@ import XtremeLogo from "../../assets/TradeMarketBrands/Ellipse 2.png";
 import ExnessLogo from "../../assets/TradeMarketBrands/Ellipse 2-2.png";
 
 import XmLogo from "../../assets/TradeMarketBrands/Ellipse 2-1.png";
+import { Link } from "react-router-dom";
 
 const BrokerSectionWrapper = styled.section`
   display: flex;
@@ -115,19 +116,22 @@ const BrokerSection: React.FC<props> = ({ showAll = false }) => {
           <BrokerCard key={idx} {...broker} />
         ))}
       </BrokerWrapper>
-      {!showAll &&
-      <ButtonContainer>
-        <ButtonBase
-          bgColor="transparent"
-          color="#132E58"
-          borderColor="#132E58"
-          padding="1rem 2.5rem"
-          fontSize="1.2rem"
-          fontWeight="600"
-        >
-          View All Brokers <img src={ArrowIcon} alt="icon" />
-        </ButtonBase>
-      </ButtonContainer>}
+      {!showAll && (
+        <ButtonContainer>
+          <Link to={"/rebates"} style={{ textDecoration: "none" }}>
+            <ButtonBase
+              bgColor="transparent"
+              color="#132E58"
+              borderColor="#132E58"
+              padding="1rem 2.5rem"
+              fontSize="1.2rem"
+              fontWeight="600"
+            >
+              View All Brokers <img src={ArrowIcon} alt="icon" />
+            </ButtonBase>
+          </Link>
+        </ButtonContainer>
+      )}
     </BrokerSectionWrapper>
   );
 };

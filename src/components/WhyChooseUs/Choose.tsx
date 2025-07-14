@@ -9,7 +9,6 @@ import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { FaCircleArrowDown, FaCircleArrowUp } from "react-icons/fa6";
 
-
 import Icon1 from "../../assets/New folder/Image.png";
 import Icon2 from "../../assets/New folder/Image 3.png";
 import Icon3 from "../../assets/New folder/Image-1.png";
@@ -28,7 +27,7 @@ const WorkSectionWrapper = styled.section`
   width: 100%;
   background-color: white;
   padding-top: 3rem;
-//   max-width: 1280px;
+  //   max-width: 1280px;
   margin: auto;
   overflow: hidden;
 `;
@@ -38,10 +37,8 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 85%;
-  margin:auto;
+  margin: auto;
   margin-top: 3rem;
-  
-  
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     flex-direction: column-reverse;
@@ -54,7 +51,6 @@ const ContentContainer = styled.div`
   flex-direction: column;
   gap: 2rem;
   max-width: 600px;
- 
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     align-items: center;
@@ -66,7 +62,7 @@ const ContentContainer = styled.div`
 const PointBox = styled(motion.div)`
   display: flex;
   color: #303030;
-  
+
   gap: 10px;
   min-width: 500px;
 
@@ -103,7 +99,6 @@ const PointBox = styled(motion.div)`
 `;
 
 const ImageContainer = styled.div`
-
   img {
     height: auto;
     width: 450px;
@@ -231,7 +226,6 @@ const UnderPoints = [
   },
 ];
 
-
 const ChoosUs: React.FC = () => {
   const [showMore, setShowMore] = useState(false);
 
@@ -267,7 +261,7 @@ const ChoosUs: React.FC = () => {
               >
                 {showMore ? (
                   <>
-                    Less More <FaCircleArrowUp />
+                    Show Less <FaCircleArrowUp />
                   </>
                 ) : (
                   <>
@@ -303,11 +297,11 @@ const ChoosUs: React.FC = () => {
             >
               {showMore ? (
                 <>
-                  Less More <FaCircleArrowUp />
+                  Show Less <FaCircleArrowUp />
                 </>
               ) : (
                 <>
-                  Read More  <FaCircleArrowDown />
+                  Read More <FaCircleArrowDown />
                 </>
               )}
             </ButtonBase>
