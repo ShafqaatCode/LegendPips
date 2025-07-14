@@ -34,7 +34,7 @@ const ContentContainer = styled.div`
   flex-direction: column;
   gap: 2rem;
   max-width: 600px;
-
+  border: 2px solid red;
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     align-items: center;
     text-align: center;
