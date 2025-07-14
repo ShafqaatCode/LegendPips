@@ -28,7 +28,7 @@ const WorkSectionWrapper = styled.section`
   width: 100%;
   background-color: white;
   padding-top: 3rem;
-  
+  max-width: 1280px;
   
   overflow: hidden;
 `;
@@ -37,9 +37,10 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 80%;
+  width: 85%;
   margin:auto;
-  gap: 2rem;
+  margin-top: 3rem;
+  
   
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
@@ -53,6 +54,7 @@ const ContentContainer = styled.div`
   flex-direction: column;
   gap: 2rem;
   max-width: 600px;
+ 
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     align-items: center;
@@ -64,6 +66,7 @@ const ContentContainer = styled.div`
 const PointBox = styled(motion.div)`
   display: flex;
   color: #303030;
+  
   gap: 10px;
   min-width: 500px;
 
@@ -121,7 +124,7 @@ const UnderContent = styled.div`
   justify-content: space-between;
   //   flex-direction: column;
   gap: 2rem 0;
-  width: 80%;
+  width: 85%;
 
   margin: 2rem auto;
   flex-wrap: wrap;
