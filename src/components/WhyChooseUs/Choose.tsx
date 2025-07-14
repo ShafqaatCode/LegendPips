@@ -4,10 +4,24 @@ import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import ThumsUpIcon from "../../assets/icons/Image-1.svg";
 import GrothImg from "../../assets/icons/GrothImg.svg";
 import ButtonBase from "../SharedComponents/Button";
-import { FaArrowAltCircleDown, FaArrowAltCircleUp, FaGreaterThan } from "react-icons/fa";
+
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { FaCircleArrowDown, FaCircleArrowUp } from "react-icons/fa6";
+
+
+import Icon1 from "../../assets/New folder/Image.png";
+import Icon2 from "../../assets/New folder/Image 3.png";
+import Icon3 from "../../assets/New folder/Image-1.png";
+import Icon4 from "../../assets/New folder/Image-2.png";
+import Icon5 from "../../assets/New folder/5736412 1.png";
+import Icon6 from "../../assets/New folder/image 3-1.png";
+import Icon7 from "../../assets/New folder/image 3-2.png";
+import Icon8 from "../../assets/New folder/image 3-3.png";
+import Icon9 from "../../assets/New folder/image 3-4.png";
+import Icon10 from "../../assets/New folder/img1.png";
+import Icon11 from "../../assets/New folder/img3.png";
+import Icon12 from "../../assets/New folder/img2.png";
 
 const WorkSectionWrapper = styled.section`
   padding: 1rem 2rem;
@@ -148,60 +162,72 @@ const fadeInUp: Variants = {
     },
   }),
 };
-
-let POINTS = [
+const POINTS = [
+  {
+    title: "Broker causing problems? Submit a complaint now.",
+    desc: "Facing issues like delayed withdrawals, trade manipulation, or poor support? We’re here to help resolve it.",
+    icon: Icon1,
+  },
+  {
+    title: "AI-Powered Broker Finder",
+    desc: "Whether you trade in forex, crypto, or stocks our AI helps you find the perfect trading partner fast.",
+    icon: Icon2,
+  },
   {
     title: "Excellent customer service",
     desc: "We prioritize your satisfaction and profit. Our professional customer service team is always here to help you.",
+    icon: Icon3,
   },
   {
-    title: "Fast Withdrawal Process",
-    desc: "Enjoy quick and secure withdrawals with no hassle — your money, when you need it.",
+    title: "Top technical analysis",
+    desc: "We have a very robust trading system, AI intelligence, technical analysis, big data and strategic cooperation with the world’s top trading analysts.",
+    icon: Icon4,
   },
   {
-    title: "Trusted by Traders",
-    desc: "Join thousands of satisfied traders who benefit from our tools, services, and support.",
+    title: "Exciting Lucky Draws with Real Prizes",
+    desc: "Spend just $1 and get a chance to spin the wheel for exciting prizes! The more you spend, the more chances you get to win big.",
+    icon: Icon5,
   },
   {
-    title: "Fast Withdrawal Process",
-    desc: "Enjoy quick and secure withdrawals with no hassle — your money, when you need it.",
-  },
-  {
-    title: "Fast Withdrawal Process",
-    desc: "Enjoy quick and secure withdrawals with no hassle — your money, when you need it.",
-  },
-  {
-    title: "Fast Withdrawal Process",
-    desc: "Enjoy quick and secure withdrawals with no hassle — your money, when you need it.",
+    title: "Delivering tools that elevate your trading game",
+    desc: "Gain access to a suite of powerful trading tools designed to enhance every aspect of your trading journey.",
+    icon: Icon6,
   },
 ];
 
 const UnderPoints = [
   {
-    title: "Advanced Scam Detection and Prevention",
-    desc: "Our intelligent system verifies brokers using advanced AI checks and ensures fast complaint resolution.",
-  },
-  {
-    title: "Copy Top Traders, Earn Like a Pro",
-    desc: "Choose from a list of verified expert traders and mirror their trades for consistent results.",
-  },
-  {
-    title: "Trading signal tracking is simple and reliable",
-    desc: "Real-time trading live broadcast and signal sync ensures you’re always informed.",
-  },
-  {
     title: "Stay Informed with Daily Economic Insights",
     desc: "Keep track of upcoming economic events, news releases, and data that can impact your trades.",
+    icon: Icon7,
   },
   {
     title: "Become an Affiliate Partner & Start Earning",
-    desc: "Whether you're a content creator or trader, our affiliate program offers unlimited earning potential.",
+    desc: "Whether you’re a content creator or a trading pro, our affiliate program offers unlimited earning potential.",
+    icon: Icon8,
   },
   {
     title: "Education That Elevates Your Trading",
-    desc: "Unlock powerful insights with structured learning—monthly webinars, psychology classes, and analysis.",
+    desc: "Unlock powerful insights with structured learning from beginner to expert featuring monthly webinars, psychology classes, and advanced trading lessons.",
+    icon: Icon9,
+  },
+  {
+    title: "Advanced Scam Detection and Prevention",
+    desc: "Our intelligent system verifies brokers using advanced AI checks and ensures fast, transparent complaint resolution.",
+    icon: Icon10,
+  },
+  {
+    title: "Copy Top Traders, Earn Like a Pro",
+    desc: "Choose from a list of verified expert traders and mirror their trades in real time for consistent results.",
+    icon: Icon11,
+  },
+  {
+    title: "Trading signal tracking is simple and reliable",
+    desc: "Our trading signals are pushed live to VIP customers through the system, social network and email. Real-time trading broadcasts provide better clarity.",
+    icon: Icon12,
   },
 ];
+
 
 const ChoosUs: React.FC = () => {
   const [showMore, setShowMore] = useState(false);
@@ -219,9 +245,9 @@ const ChoosUs: React.FC = () => {
       <Wrapper>
         <UpperContentContainer>
           <ContentContainer>
-            {POINTS_SHOW.map((point) => (
-              <PointBox>
-                <img src={ThumsUpIcon} alt="Icon" />
+            {POINTS_SHOW.map((point, i) => (
+              <PointBox key={i}>
+                <img src={point.icon} alt="Icon" />
                 <div>
                   <h2>{point.title}</h2>
                   <p>{point.desc}</p>
@@ -259,7 +285,7 @@ const ChoosUs: React.FC = () => {
         <UnderContent>
           {UnderPoints.map((point, index) => (
             <PointBox key={index}>
-              <img src={ThumsUpIcon} alt="Icon" />
+              <img src={point.icon} alt="Icon" />
               <div>
                 <h3>{point.title}</h3>
                 <p>{point.desc}</p>
