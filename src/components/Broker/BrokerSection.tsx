@@ -4,7 +4,7 @@ import ICLogo from "../../assets/icons/Ellipse 2.png";
 import styled from "styled-components";
 import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import ButtonBase from "../SharedComponents/Button";
-import ArrowIcon from "../../assets/arrow-narrow-circle-broken-up-right-blue.png"
+import ArrowIcon from "../../assets/arrow-narrow-circle-broken-up-right-blue.png";
 
 import XtremeLogo from "../../assets/TradeMarketBrands/Ellipse 2.png";
 
@@ -13,12 +13,12 @@ import ExnessLogo from "../../assets/TradeMarketBrands/Ellipse 2-2.png";
 import XmLogo from "../../assets/TradeMarketBrands/Ellipse 2-1.png";
 
 const BrokerSectionWrapper = styled.section`
-display: flex;
-flex-direction: column;
-gap: 2rem;
-padding: 1rem 0;
-margin: 3rem 1rem;
-/* border: 2px solid red; */
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem 0;
+  margin: 3rem 1rem;
+  /* border: 2px solid red; */
 `;
 
 const BrokerWrapper = styled.div`
@@ -69,17 +69,40 @@ const brokers = [
     rating: 4,
     reviewsCount: "45k+",
   },
+  {
+    index: 4,
+    featured: true,
+    title: "EXNESS Market",
+    description:
+      "Connect with thousands of traders worldwide. Share insights, learn strategies, and grow together inside our thriving Forex community.",
+    logoSrc: ExnessLogo,
+    rating: 4,
+    reviewsCount: "45k+",
+  },
+  {
+    index: 4,
+    featured: true,
+    title: "EXNESS Market",
+    description:
+      "Connect with thousands of traders worldwide. Share insights, learn strategies, and grow together inside our thriving Forex community.",
+    logoSrc: ExnessLogo,
+    rating: 4,
+    reviewsCount: "45k+",
+  },
   // Add as many cards as needed here
 ];
 
 const ButtonContainer = styled.div`
-display:flex;
-justify-content: center;
+  display: flex;
+  justify-content: center;
+`;
 
+interface props {
+  showAll?: boolean;
+}
 
-`
-
-const BrokerSection: React.FC = () => {
+const BrokerSection: React.FC<props> = ({ showAll = false }) => {
+  const visiableBrokers = showAll ? brokers : brokers.slice(0, 4);
   return (
     <BrokerSectionWrapper>
       <SectionHeadingSet
@@ -88,18 +111,23 @@ const BrokerSection: React.FC = () => {
         subText="Find the best brokers carefully compared & reviewed for your trading needs. Trade confidently with secure platforms."
       />
       <BrokerWrapper>
-        {brokers.map((broker, idx) => (
+        {visiableBrokers.map((broker, idx) => (
           <BrokerCard key={idx} {...broker} />
         ))}
       </BrokerWrapper>
+      {!showAll &&
       <ButtonContainer>
-        <ButtonBase  bgColor="transparent"
-        color="#132E58"
-        borderColor="#132E58"
-        padding="1rem 2.5rem"
-        fontSize="1.2rem" 
-        fontWeight="600">View All Brokers <img src={ArrowIcon} alt="icon" /></ButtonBase>
-      </ButtonContainer>
+        <ButtonBase
+          bgColor="transparent"
+          color="#132E58"
+          borderColor="#132E58"
+          padding="1rem 2.5rem"
+          fontSize="1.2rem"
+          fontWeight="600"
+        >
+          View All Brokers <img src={ArrowIcon} alt="icon" />
+        </ButtonBase>
+      </ButtonContainer>}
     </BrokerSectionWrapper>
   );
 };

@@ -6,10 +6,11 @@ import DBIcon from "../../assets/icons/earn-money-svgrepo-com 1.png";
 import WoletCard from "../../assets/icons/cards-svgrepo-com 1.png";
 import ManIcon from "../../assets/icons/trading-svgrepo-com 1.png";
 import ButtonBase from "../SharedComponents/Button";
+import ArrowUp from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg"
 
 const WorkSectionWrapper = styled.section`
   padding: 3rem 1rem;
-  background-color: #fff;
+  // background-color: #fff;
 
 `;
 
@@ -17,7 +18,7 @@ const WorksWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: auto;     
+  margin: auto;
   flex-wrap: wrap;
   gap: 4rem;
 
@@ -37,7 +38,9 @@ const SignUpAction = styled.div`
   border: 1px solid #1d4ed8;
   padding: 1rem 1.5rem;
   text-align: center;
+  color: #1d4ed8;
   border-radius: 5px;
+  background: #1d4fd811;
 
   div {
     display: flex;
@@ -63,6 +66,19 @@ const SignUpAction = styled.div`
     flex-direction: column;
   }
 `;
+const InstructionList = styled.div`
+  width: 80%;
+  margin: 3rem auto;
+  font-size: 16px;
+  font-weight: 300;
+  // text-align: center;
+  ul {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   gap:0.5rem;
+  }
+`;
 
 const HowItWorks: React.FC = () => {
   return (
@@ -72,6 +88,31 @@ const HowItWorks: React.FC = () => {
         mainHeading="How it works"
         subText="Trade, earn, repeat. With rebates, expert tools, and a strong community, Legend Pips makes every trade more rewarding."
       />
+
+      <InstructionList>
+        <ul>
+          <li>
+            Register for free and connect your existing tradinga ccount with one
+            of our partnered brokers.
+          </li>
+          <li>
+            Register for free and connect your existing tradinga ccount with one
+            of our partnered brokers.
+          </li>
+          <li>
+            Register for free and connect your existing tradinga ccount with one
+            of our partnered brokers.
+          </li>
+          <li>
+            Register for free and connect your existing tradinga ccount with one
+            of our partnered brokers.
+          </li>
+          <li>
+            Register for free and connect your existing tradinga ccount with one
+            of our partnered brokers.
+          </li>
+        </ul>
+      </InstructionList>
 
       <WorksWrapper>
         <WorkBox
@@ -100,6 +141,7 @@ const HowItWorks: React.FC = () => {
         </div>
         <ButtonBase bgColor="#1D4ED8" fontSize="20px">
           Signup For Free{" "}
+          <img style={{width: "24px"}} src={ArrowUp} alt="Arrow" />
         </ButtonBase>
       </SignUpAction>
     </WorkSectionWrapper>
