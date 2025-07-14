@@ -151,16 +151,6 @@ const ChoosUs: React.FC = () => {
               </p>
             </div>
           </PointBox>
-          <PointBox custom={2} variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <img src={ThumsUpIcon} alt="Icon" />
-            <div>
-              <h2>Trusted by Traders</h2>
-              <p>
-                Join thousands of satisfied traders who benefit from our tools,
-                services, and support.
-              </p>
-            </div>
-          </PointBox>
           <ButtonBase width="200px" fontSize="16px">
             Read More <FaArrowAltCircleUp />
           </ButtonBase>
