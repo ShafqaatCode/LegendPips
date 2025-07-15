@@ -1,10 +1,31 @@
 import styled from "styled-components";
 import logo_white from "../../assets/icons/Logo_Svg.svg";
 import { NavLink } from "react-router-dom";
+import { FaChevronUp } from "react-icons/fa";
+
+const GotoStart = styled.a`
+  display: block;
+  margin-top: 1.5rem;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #102443;
+  border: none;
+  text-align: center;
+  
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #102443ee;
+  }
+`;
 
 const Section = styled.section`
   padding: 3rem 5rem;
   background-color: ${({ theme }) => theme.colors.primary};
+ 
 
   @media (max-width: 768px) {
     padding: 3rem 2rem;
@@ -14,6 +35,7 @@ const Section = styled.section`
 const Container = styled.div`
   max-width: 1280px;
   margin: 0 auto;
+ 
 `;
 
 const Grid = styled.div`
@@ -161,7 +183,10 @@ const FooterText = styled.p`
 
 const Footer2: React.FC = () => {
   return (
+    <>
+    <GotoStart href="#top"><FaChevronUp size="1.3rem" /></GotoStart>
     <Section>
+      
       <Container>
         <Grid>
           <LogoContainer>
@@ -228,6 +253,7 @@ const Footer2: React.FC = () => {
         </FooterText>
       </Container>
     </Section>
+    </>
   );
 };
 

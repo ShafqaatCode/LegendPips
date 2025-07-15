@@ -14,6 +14,7 @@ import '@fontsource/inter/700.css'; // Bold
 export const GlobalStyles = createGlobalStyle`
   *, *::before, *::after {
     box-sizing: border-box;
+    scroll-behavior: smooth;
     
   }
 
@@ -21,6 +22,7 @@ export const GlobalStyles = createGlobalStyle`
     margin: 0;
     padding: 0;
     font-family: 'Poppins', sans-serif;
+    
     background-color: ${({ theme }) => theme.colors.surface};
     color: ${({ theme }) => theme.colors.text};
   }

@@ -4,7 +4,7 @@ import HomePage from "../pages/Home/Homepage";
 import Tools from "../pages/Tools/Tools";
 import Brokers from "../pages/Brokers/BrokersPage";
 import Contests from "../pages/Contests/Contests";
-import RebateBrokers from "../pages/RebateBrokers/RebateBrokers";
+import RebateBrokers from "../pages/RebateBrokers/RebateBrokersPage";
 import Analysis from "../pages/Analysis/Analysis";
 import HitWorksPage from "../pages/HitWorksPage/HitWorksPage";
 import SignalsPage from "../pages/SignalsPage/SignalsPage";
