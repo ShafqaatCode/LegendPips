@@ -3,13 +3,14 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { FaUpload } from 'react-icons/fa';
 import ContestTable from '../../components/ContestTable/ContestsTable';
+import AddImg from '../../assets/Advertisement/image 4.png';
 
 
 const MainContainer = styled.main`
 
-margin-top: 135px;
-  height: 700px;
-  border: 2px solid red;
+  margin-top: 135px;
+  
+  
   margin:135px auto;
 @media (max-width: ${({ theme }) => theme.breakpoints.laptop})
 {
@@ -38,28 +39,19 @@ const BroadCrumbRow = styled.div`
 
 const AdvertisementBar = styled.div`
   width: 80%;
-  margin: auto;
+  margin: 2rem auto 0rem;
   height: 100px;
-  border: 2px solid red;
-  text-align: center;
+  
   display: flex;
   align-items: center;
   justify-content: center;
-`
-
-const ContestsSection = styled.section`
-background-color: ${({ theme }) => theme.colors.primary};
-display: grid;
-grid-template-columns: repeat(10, 1fr);
-color: white;
-align-items: center;
-font-size: 16px;
-  
-  div{
-    border: 2px solid green;
-    text-align: center;
+  img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 `
+
 const Contests: React.FC = () => {
   return (
     <MainContainer>
@@ -91,10 +83,10 @@ const Contests: React.FC = () => {
         </FeedbackLinks>
       </ToplinksBar>
       <AdvertisementBar>
-        Advertisement
+        <img src={AddImg} alt="" />
       </AdvertisementBar>
 
-      
+
       <ContestTable />
 
     </MainContainer>

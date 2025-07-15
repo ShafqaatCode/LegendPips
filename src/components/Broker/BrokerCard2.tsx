@@ -10,10 +10,10 @@ import {
   RatingBox,
   StarRow,
   ReviewText,
-//   ActionSection,
-//   PrimaryButton,
-//   SecondaryButton,
-//   TermsText,
+  ActionSection,
+  PrimaryButton,
+  SecondaryButton,
+  TermsText,
   TopIndex,
   Container,
 } from "./BrokerCard.styles";
@@ -21,7 +21,7 @@ import { FaStar } from "react-icons/fa";
 import { motion } from "framer-motion";
 // import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 import styled from "styled-components";
-
+import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 export const Description = styled.p`
   font-size: 16px;
   color: rgba(15, 23, 42, 0.8);
@@ -113,20 +113,20 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
               <VerifiedBadge>✔ Verified Broker</VerifiedBadge>
             </TitleRow>
             <Description>
-              
-                <div>
-                  <h4>Standard Account</h4>
-                  <p>Up to 0.5 pips</p>
-                </div>
-                <div>
-                  <h4>Raw Account</h4>
-                  <p>Up to 0.3 pips</p>
-                </div>
-                <div>
-                  <h4>CTrader</h4>
-                  <p>Up to 0.2 pips</p>
-                </div>
-              
+
+              <div>
+                <h4>Standard Account</h4>
+                <p>Up to 0.5 pips</p>
+              </div>
+              <div>
+                <h4>Raw Account</h4>
+                <p>Up to 0.3 pips</p>
+              </div>
+              <div>
+                <h4>CTrader</h4>
+                <p>Up to 0.2 pips</p>
+              </div>
+
             </Description>
           </InfoSection>
 
@@ -141,8 +141,15 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
               <span>Customer Reviews</span>
             </ReviewText>
           </RatingBox>
+          <ActionSection>
+            <TermsText>Terms & Conditions Apply</TermsText>
+            <PrimaryButton>
+              View Details <img src={ArrowIcon} alt="Arrow" />
+            </PrimaryButton>
+            <SecondaryButton>Broker Reviews</SecondaryButton>
+          </ActionSection>
 
-          
+
         </CardContainer>
       </SlideFadeSection>
     </Container>
