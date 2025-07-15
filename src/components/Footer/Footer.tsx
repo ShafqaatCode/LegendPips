@@ -1,9 +1,7 @@
 import styled from "styled-components";
 import logo_white from "../../assets/icons/Logo_Svg.svg";
 import { NavLink } from "react-router-dom";
-import { FaUpLong } from "react-icons/fa6";
 import { FaChevronUp } from "react-icons/fa";
-import { BiFontSize } from "react-icons/bi";
 
 const GotoStart = styled.a`
   display: block;

@@ -1,5 +1,5 @@
 // src/components/ScrollToTop.js (or wherever you prefer)
-import { useEffect, useLayoutEffect } from 'react';
+import {  useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 function ScrollToTop() {

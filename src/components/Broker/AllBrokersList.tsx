@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import BrokerCard from "./BrokerCard";
+
 import styled from "styled-components";
 import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import ButtonBase from "../SharedComponents/Button";
@@ -9,6 +9,7 @@ import { brokers_data } from "../../data/brokers_data";
 
 
 import { Link } from "react-router-dom";
+import BrokerCard2 from "./BrokerCard2";
 
 const BrokerSectionWrapper = styled.section`
   display: flex;
@@ -34,20 +35,20 @@ interface props {
   showAll?: boolean;
 }
 
-const BrokerSection: React.FC<props> = ({ showAll = false }) => {
+const AllBrokersList: React.FC<props> = ({ showAll = false }) => {
   const visiableBrokers = showAll ? brokers_data : brokers_data.slice(0, 5);
 
   
   return (
     <BrokerSectionWrapper>
-      <SectionHeadingSet
+      {/* <SectionHeadingSet
         upperText="All in one Trading Platform"
         mainHeading="Top Forex Brokers"
         subText="Find the best brokers carefully compared & reviewed for your trading needs. Trade confidently with secure platforms."
-      />
+      /> */}
       <BrokerWrapper>
         {visiableBrokers.map((broker, idx) => (
-          <BrokerCard key={idx} {...broker} />
+          <BrokerCard2 key={idx} {...broker} />
         ))}
       </BrokerWrapper>
       {!showAll && (
@@ -71,4 +72,4 @@ const BrokerSection: React.FC<props> = ({ showAll = false }) => {
   );
 };
 
-export default BrokerSection;
+export default AllBrokersList;
