@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { FaUpload } from 'react-icons/fa';
+import ContestTable from '../../components/ContestTable/ContestsTable';
 
 
 const MainContainer = styled.main`
@@ -93,20 +94,8 @@ const Contests: React.FC = () => {
         Advertisement
       </AdvertisementBar>
 
-      <ContestsSection>
-        <div>Contest Description</div>
-        <div>Requirements</div>
-        <div>Prize</div>
-        <div>Contestents</div>
-        <div>Start Date</div>
-        <div>End Date</div>
-        <div>Post</div>
-        <div>Registration Ends</div>
-        <div>Status</div>
-        <div>Registration</div>
-        
-
-      </ContestsSection>
+      
+      <ContestTable />
 
     </MainContainer>
   )
