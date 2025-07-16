@@ -10,10 +10,10 @@ import {
   RatingBox,
   StarRow,
   ReviewText,
-//   ActionSection,
-//   PrimaryButton,
-//   SecondaryButton,
-//   TermsText,
+  ActionSection,
+  PrimaryButton,
+  SecondaryButton,
+  TermsText,
   TopIndex,
   Container,
 } from "./BrokerCard.styles";
@@ -21,6 +21,8 @@ import { FaStar } from "react-icons/fa";
 import { motion } from "framer-motion";
 // import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 import styled from "styled-components";
+import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
+
 
 export const Description = styled.p`
   font-size: 16px;
@@ -141,6 +143,13 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
               <span>Customer Reviews</span>
             </ReviewText>
           </RatingBox>
+           <ActionSection>
+            <TermsText>Terms & Conditions Apply</TermsText>
+            <PrimaryButton>
+              View Details <img src={ArrowIcon} alt="Arrow" />
+            </PrimaryButton>
+            <SecondaryButton>Broker Reviews</SecondaryButton>
+          </ActionSection>
 
           
         </CardContainer>
