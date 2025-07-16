@@ -1,205 +1,71 @@
 import styled from 'styled-components';
-import Brandimg1 from '../../assets/Contest_Images/wmug5dukcys 1-1.png';
-import Brandimg2 from '../../assets/Contest_Images/wmug5dukcys 1.png';
+import { contests } from '../../data/global_data';
+import { FaGreaterThan } from 'react-icons/fa';
 
-const contests = [
-  {
-    title: 'Q2 Special The Major’s Mix II',
-    sponsor: 'ATC Trading',
-    prize: '$9,000–100 Winners',
-    startDate: 'Jul 7, 2025, 01:00 PM',
-    endDate: 'Jul 19, 2025, 12:00 AM',
-    registrationEnds: 'Jul 18, 2025, 01:00 PM',
-    status: 'Started',
-    registration: 'Join Now',
-    contestants: 1391,
-    post: 0,
-    requirements: 'Live account (no funding required)',
-    ended: false,
-    logo: Brandimg1 // Replace with actual logos
-  },
-  {
-    title: 'Stars, Strips & Pips: The Forex Showdown',
-    sponsor: 'FDMX',
-    prize: '$2,000–20 Winners',
-    startDate: 'Jun 30, 2025, 01:00 PM',
-    endDate: 'Jul 12, 2025, 12:00 AM',
-    registrationEnds: 'Jul 11, 2025, 01:00 PM',
-    status: 'Started',
-    registration: 'Join Now',
-    contestants: 3820,
-    post: 0,
-    requirements: 'Live account (no funding required)',
-    ended: false,
-    logo: Brandimg2
-  },
-  {
-    title: 'The Index Ninjas I',
-    sponsor: 'ATC Trading',
-    prize: '$3,000–50 Winners',
-    startDate: 'Jun 23, 2025, 01:00 PM',
-    endDate: 'Jul 2, 2025, 12:00 AM',
-    registrationEnds: 'Jul 1, 2025, 01:00 PM',
-    status: 'Ended',
-    registration: 'Closed',
-    contestants: 1544,
-    post: 71,
-    requirements: 'Live account (no funding required)',
-    ended: true,
-    logo: Brandimg1
-  },
-  {
-    title: 'The Index Ninjas I',
-    sponsor: 'ATC Trading',
-    prize: '$3,000–50 Winners',
-    startDate: 'Jun 23, 2025, 01:00 PM',
-    endDate: 'Jul 2, 2025, 12:00 AM',
-    registrationEnds: 'Jul 1, 2025, 01:00 PM',
-    status: 'Ended',
-    registration: 'Closed',
-    contestants: 1544,
-    post: 71,
-    requirements: 'Live account (no funding required)',
-    ended: true,
-    logo: Brandimg1
-  },
-  
-  {
-    title: 'The Index Ninjas I',
-    sponsor: 'ATC Trading',
-    prize: '$3,000–50 Winners',
-    startDate: 'Jun 23, 2025, 01:00 PM',
-    endDate: 'Jul 2, 2025, 12:00 AM',
-    registrationEnds: 'Jul 1, 2025, 01:00 PM',
-    status: 'Ended',
-    registration: 'Closed',
-    contestants: 1544,
-    post: 71,
-    requirements: 'Live account (no funding required)',
-    ended: true,
-    logo: Brandimg2
-  },
-  {
-    title: 'The Index Ninjas I',
-    sponsor: 'ATC Trading',
-    prize: '$3,000–50 Winners',
-    startDate: 'Jun 23, 2025, 01:00 PM',
-    endDate: 'Jul 2, 2025, 12:00 AM',
-    registrationEnds: 'Jul 1, 2025, 01:00 PM',
-    status: 'Ended',
-    registration: 'Closed',
-    contestants: 1544,
-    post: 71,
-    requirements: 'Live account (no funding required)',
-    ended: true,
-    logo: Brandimg2
-  },
-  {
-    title: 'The Index Ninjas I',
-    sponsor: 'ATC Trading',
-    prize: '$3,000–50 Winners',
-    startDate: 'Jun 23, 2025, 01:00 PM',
-    endDate: 'Jul 2, 2025, 12:00 AM',
-    registrationEnds: 'Jul 1, 2025, 01:00 PM',
-    status: 'Ended',
-    registration: 'Closed',
-    contestants: 1544,
-    post: 71,
-    requirements: 'Live account (no funding required)',
-    ended: true,
-    logo: Brandimg2
-  },
-  {
-    title: 'The Index Ninjas I',
-    sponsor: 'ATC Trading',
-    prize: '$3,000–50 Winners',
-    startDate: 'Jun 23, 2025, 01:00 PM',
-    endDate: 'Jul 2, 2025, 12:00 AM',
-    registrationEnds: 'Jul 1, 2025, 01:00 PM',
-    status: 'Ended',
-    registration: 'Closed',
-    contestants: 1544,
-    post: 71,
-    requirements: 'Live account (no funding required)',
-    ended: true,
-    logo: Brandimg2
-  },
-  {
-    title: 'The Index Ninjas I',
-    sponsor: 'ATC Trading',
-    prize: '$3,000–50 Winners',
-    startDate: 'Jun 23, 2025, 01:00 PM',
-    endDate: 'Jul 2, 2025, 12:00 AM',
-    registrationEnds: 'Jul 1, 2025, 01:00 PM',
-    status: 'Ended',
-    registration: 'Closed',
-    contestants: 1544,
-    post: 71,
-    requirements: 'Live account (no funding required)',
-    ended: true,
-    logo: Brandimg2
-  },
-  // Add more rows if needed...
-];
+
+
 
 const ContestTable = () => {
-  return (
-    <Container>
-      <Heading>Elite Skills Contest on the Web We Never Ask for Real Money!</Heading>
-      <Table>
-        <thead>
-          <TrHeader>
-            <Th>Contest Description</Th>
-            <Th>Requirements</Th>
-            <Th>Prize</Th>
-            <Th>Contestants</Th>
-            <Th>Start Date</Th>
-            <Th>End Date</Th>
-            <Th>Post</Th>
-            <Th>Registration Ends</Th>
-            <Th>Status</Th>
-            <Th>Registration</Th>
-          </TrHeader>
-        </thead>
-        <tbody>
-          {contests.map((contest, idx) => (
-            <Tr key={idx} ended={contest.ended}>
-              <Td>
-                <Flex>
-                  <Logo src={contest.logo} />
-                  <div>
-                    <Bold>{contest.title}</Bold>
-                    <Small>{contest.sponsor}</Small>
-                  </div>
-                </Flex>
-              </Td>
-              <Td>{contest.requirements}</Td>
-              <Td>{contest.prize}</Td>
-              <Td>{contest.contestants}</Td>
-              <Td>{contest.startDate}</Td>
-              <Td>{contest.endDate}</Td>
-              <Td>{contest.post}</Td>
-              <Td>{contest.registrationEnds}</Td>
-              <Td>
-                <Status started={!contest.ended}>{contest.status}</Status>
-              </Td>
-              <Td>
-                <Button disabled={contest.ended}>{contest.registration}</Button>
-              </Td>
-            </Tr>
-          ))}
-        </tbody>
-      </Table>
-      <Pagination>
-        <PageBtn active>1</PageBtn>
-        <PageBtn>2</PageBtn>
-        <PageBtn>3</PageBtn>
-        <PageBtn>4</PageBtn>
-        <PageBtn>5</PageBtn>
-        <PageBtn>6</PageBtn>
-      </Pagination>
-    </Container>
-  );
+
+
+    return (
+        <Container>
+            <Heading>Elite Skills Contest on the Web We Never Ask for Real Money!</Heading>
+            <Table>
+                <thead>
+                    <TrHeader>
+                        <Th>Contest Description</Th>
+                        <Th>Requirements</Th>
+                        <Th>Prize</Th>
+                        <Th>Contestants</Th>
+                        <Th>Start Date</Th>
+                        <Th>End Date</Th>
+                        <Th>Post</Th>
+                        <Th>Registration Ends</Th>
+                        <Th>Status</Th>
+                        <Th>Registration</Th>
+                    </TrHeader>
+                </thead>
+                <tbody>
+                    {contests.map((contest, idx) => (
+                        <Tr key={idx} ended={contest.ended}>
+                            <Td>
+                                <Flex>
+                                    <Logo src={contest.logo} />
+                                    <div>
+                                        <Bold>{contest.title}</Bold>
+                                        <Small>{contest.sponsor}</Small>
+                                    </div>
+                                </Flex>
+                            </Td>
+                            <Td>{contest.requirements}</Td>
+                            <Td>{contest.prize}</Td>
+                            <Td>{contest.contestants}</Td>
+                            <Td>{contest.startDate}</Td>
+                            <Td>{contest.endDate}</Td>
+                            <Td>{contest.post}</Td>
+                            <Td>{contest.registrationEnds}</Td>
+                            <Td>
+                                <Status started={!contest.ended}>{contest.status}</Status>
+                            </Td>
+                            <Td>
+                                <Button disabled={contest.ended}>{contest.registration}</Button>
+                            </Td>
+                        </Tr>
+                    ))}
+                </tbody>
+            </Table>
+            <Pagination>
+                <PageBtn active>1</PageBtn>
+                <PageBtn>2</PageBtn>
+                <PageBtn>3</PageBtn>
+                <PageBtn>4</PageBtn>
+                <PageBtn>5</PageBtn>
+                <PageBtn>6</PageBtn>
+                <PageBtn><FaGreaterThan size="10px" /></PageBtn>
+            </Pagination>
+        </Container>
+    );
 };
 
 export default ContestTable;
@@ -208,7 +74,7 @@ export default ContestTable;
 const Container = styled.div`
   padding: 2rem;
   font-family: 'Segoe UI', sans-serif;
-  background-color: #f9f9f9;
+  background-color: #F3F4F7;
 `;
 
 const Heading = styled.h2`
@@ -224,10 +90,12 @@ const Heading = styled.h2`
 
 const Table = styled.table`
   width: 100%;
-  border-collapse: collapse;
-  background: white;
+  border-collapse: separate;
+  border-spacing: 0 1rem;
+  background: #eeeff1;
   /* border-radius: 10px; */
   overflow: hidden;
+  
 `;
 
 const TrHeader = styled.tr`
@@ -237,22 +105,24 @@ const TrHeader = styled.tr`
 `;
 
 const Th = styled.th`
-  padding: 1rem;
+  padding: 1rem 0.5rem;
   font-weight: 500;
   font-size: 0.9rem;
 `;
 
 const Tr = styled.tr<{ ended: boolean }>`
-  background: ${({ ended }) => (ended ? '#f2f2f2' : 'white')};
+  background: ${({ ended }) => (ended ? '#f5f5f5d1' : 'white')};
   border-bottom: 1px solid #ddd;
  
 `;
 
 const Td = styled.td`
-  padding: 1rem;
+  padding: 0.5rem 0.5rem;
+  
   vertical-align: middle;
-min-width: 100px;
+  min-width: 100px;
   font-size: 1rem;
+  /* text-align: center; */
   font-weight: 500;
   
 `;
