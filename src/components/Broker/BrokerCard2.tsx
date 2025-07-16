@@ -29,7 +29,7 @@ export const Description = styled.p`
   // border: 2px solid red;
   display: flex;
   gap: 3rem;
-  flexwrap: wrap;
+  flex-wrap: wrap;
   margin: auto;
 
   h4 {
