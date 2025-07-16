@@ -21,8 +21,6 @@ import { FaStar } from "react-icons/fa";
 import { motion } from "framer-motion";
 // import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 import styled from "styled-components";
-import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
-
 
 export const Description = styled.p`
   font-size: 16px;
@@ -115,20 +113,20 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
               <VerifiedBadge>✔ Verified Broker</VerifiedBadge>
             </TitleRow>
             <Description>
-              
-                <div>
-                  <h4>Standard Account</h4>
-                  <p>Up to 0.5 pips</p>
-                </div>
-                <div>
-                  <h4>Raw Account</h4>
-                  <p>Up to 0.3 pips</p>
-                </div>
-                <div>
-                  <h4>CTrader</h4>
-                  <p>Up to 0.2 pips</p>
-                </div>
-              
+
+              <div>
+                <h4>Standard Account</h4>
+                <p>Up to 0.5 pips</p>
+              </div>
+              <div>
+                <h4>Raw Account</h4>
+                <p>Up to 0.3 pips</p>
+              </div>
+              <div>
+                <h4>CTrader</h4>
+                <p>Up to 0.2 pips</p>
+              </div>
+
             </Description>
           </InfoSection>
 
@@ -151,7 +149,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
             <SecondaryButton>Broker Reviews</SecondaryButton>
           </ActionSection>
 
-          
+
         </CardContainer>
       </SlideFadeSection>
     </Container>

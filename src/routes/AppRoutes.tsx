@@ -3,7 +3,7 @@ import Layout from "../Layout";
 import HomePage from "../pages/Home/Homepage";
 import Tools from "../pages/Tools/Tools";
 import Brokers from "../pages/Brokers/BrokersPage";
-import Contests from "../pages/Contests/Contests";
+import Contests from "../pages/Contests/Contestspage";
 import RebateBrokers from "../pages/RebateBrokers/RebateBrokersPage";
 import Analysis from "../pages/Analysis/Analysis";
 import HitWorksPage from "../pages/HitWorksPage/HitWorksPage";
