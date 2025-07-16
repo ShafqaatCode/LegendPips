@@ -21,7 +21,7 @@ import { FaStar } from "react-icons/fa";
 import { motion } from "framer-motion";
 // import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 import styled from "styled-components";
-import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
+
 export const Description = styled.p`
   font-size: 16px;
   color: rgba(15, 23, 42, 0.8);
@@ -141,7 +141,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
               <span>Customer Reviews</span>
             </ReviewText>
           </RatingBox>
-          <ActionSection>
+           <ActionSection>
             <TermsText>Terms & Conditions Apply</TermsText>
             <PrimaryButton>
               View Details <img src={ArrowIcon} alt="Arrow" />
