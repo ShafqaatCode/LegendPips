@@ -92,7 +92,7 @@ const Table = styled.table`
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 1rem;
-  background: #eeeff1;
+  /* background: #eeeff1; */
   /* border-radius: 10px; */
   overflow: hidden;
   
@@ -111,7 +111,7 @@ const Th = styled.th`
 `;
 
 const Tr = styled.tr<{ ended: boolean }>`
-  background: ${({ ended }) => (ended ? '#f5f5f5d1' : 'white')};
+  background: ${({ ended }) => (ended ? '#f9f9f9' : 'white')};
   border-bottom: 1px solid #ddd;
  
 `;
@@ -129,8 +129,8 @@ const Td = styled.td`
 
 const Flex = styled.div`
   display: flex;
-  gap: 1rem;
-  align-items: center;
+  gap: 0.5rem;
+  /* align-items: center; */
 `;
 
 const Logo = styled.img`
