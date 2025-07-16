@@ -116,6 +116,7 @@ const Tr = styled.tr<{ ended: boolean }>`
  
 `;
 
+
 const Td = styled.td`
   padding: 0.5rem 0.5rem;
   
