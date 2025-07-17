@@ -24,6 +24,8 @@ const UpperHeadingDiv = styled(motion.div)`
 
 const HeadingWrapper = styled.div`
   text-align: center;
+  
+  padding: 1rem 0;
 `;
 
 // Animation Variants
@@ -55,9 +57,9 @@ const fadeInUp: Variants = {
 
 // Props Interface
 interface SectionHeadingSetProps {
-  upperText: string;
+  upperText?: string;
   mainHeading: string;
-  subText: string;
+  subText?: string;
 }
 
 // Component

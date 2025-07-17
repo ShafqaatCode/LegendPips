@@ -5,7 +5,7 @@ export const SectionHeading = styled.h1`
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
   font-size: 64px;
-  line-height: 100px;
+  line-height:80px;
   letter-spacing: -0.6%;
   text-align: center;
   text-transform: uppercase;
@@ -48,7 +48,7 @@ export const SubHeading = styled.h2`
   max-width:850px;
   margin:auto;
   // border: 2px solid red;
-  margin-bottom: 2rem;
+  /* margin-bottom: 2rem; */
 
 
   

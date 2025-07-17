@@ -4,6 +4,9 @@ import { Link } from 'react-router-dom';
 import { FaUpload } from 'react-icons/fa';
 import ContestTable from '../../components/ContestTable/ContestsTable';
 import AddImg from '../../assets/Advertisement/image 4.png';
+import ContestList from '../../components/ContestTable/ContestList';
+import AdBanner from '../../components/Ads/AdBanner';
+import Contest from '../../components/ContestTable/Contest';
 
 
 const MainContainer = styled.main`
@@ -37,21 +40,6 @@ const BroadCrumbRow = styled.div`
 
 `
 
-const AdvertisementBar = styled.div`
-  width: 80%;
-  margin: 2rem auto 0rem;
-  height: 100px;
-  
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  img{
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-`
-
 const Contests: React.FC = () => {
   return (
     <MainContainer>
@@ -82,12 +70,13 @@ const Contests: React.FC = () => {
 
         </FeedbackLinks>
       </ToplinksBar>
-      <AdvertisementBar>
-        <img src={AddImg} alt="" />
-      </AdvertisementBar>
+     
+
+      <AdBanner />
 
 
-      <ContestTable />
+      <ContestList />
+      <Contest />
 
     </MainContainer>
   )
