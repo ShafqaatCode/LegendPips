@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 const ContestList = () => {
   const [isMobile, setIsMobile] = useState(false);
 
-  // Resize listener for switching layout
+
   useEffect(() => {
     const checkScreen = () => setIsMobile(window.innerWidth < 1200);
     checkScreen();
@@ -113,6 +113,7 @@ const Container = styled.div`
   padding: 2rem;
   background-color: #f3f4f7;
   font-family: 'Segoe UI', sans-serif;
+  
 `;
 
 const Heading = styled.h2`

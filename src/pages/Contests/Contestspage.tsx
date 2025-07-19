@@ -2,8 +2,6 @@ import React from 'react'
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { FaUpload } from 'react-icons/fa';
-import ContestTable from '../../components/ContestTable/ContestsTable';
-import AddImg from '../../assets/Advertisement/image 4.png';
 import ContestList from '../../components/ContestTable/ContestList';
 import AdBanner from '../../components/Ads/AdBanner';
 import Contest from '../../components/ContestTable/Contest';

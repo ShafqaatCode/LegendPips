@@ -1,24 +1,34 @@
 import styled from "styled-components";
-
-export const TimerContainer = styled.div`
+// Styled
+export const CountdownBox = styled.div`
   display: flex;
-  background-color: #1e2c52;
+  align-items: center;
+  background-color: #1d3250;
+  color: white;
   border-radius: 8px;
-  overflow: hidden;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
 `;
 
-export const TimerItem = styled.div`
-  padding: 8px 12px;
-  text-align: center;
-  color: #ffffff;
+export const TimeUnit = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 1rem;
+
+  strong {
+    font-size: 1.2rem;
+    font-weight: 400;
+  }
+
+  span {
+    font-size: 14px;
+    color: #b0c4de;
+    margin-top: 0.5rem;
+  }
 `;
 
-export const TimeValue = styled.div`
-  font-size: 20px;
-  font-weight: 600;
-`;
-
-export const TimeLabel = styled.div`
-  font-size: 11px;
-  color: #cfd3db;
+export const Colon = styled.span`
+  /* font-weight: bold; */
+  font-size: 1.3rem;
 `;
