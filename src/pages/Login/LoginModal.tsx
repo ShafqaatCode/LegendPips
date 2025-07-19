@@ -1,61 +1,88 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
-
 import LoginForm from "./Login";
 
-interface Props {
+interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const SignupModal: React.FC<Props> = ({ isOpen, onClose }) => {
+const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
+  // Prevent scrolling when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = "unset";
     }
-
     return () => {
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   return (
-    <Backdrop onClick={onClose}>
-      <ModalWrapper onClick={(e) => e.stopPropagation()}>
+    <Overlay onClick={onClose}>
+      <ModalContainer onClick={(e) => e.stopPropagation()}>
+        <CloseButton onClick={onClose}>×</CloseButton>
         <LoginForm />
-      </ModalWrapper>
-    </Backdrop>
+      </ModalContainer>
+    </Overlay>
   );
 };
 
-export default SignupModal;
+export default LoginModal;
 
 // Styled Components
-
-const Backdrop = styled.div`
+const Overlay = styled.div`
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(2px);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
   z-index: 999;
-  overflow-y: auto;
-  padding: 4rem 1rem 2rem;
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  padding: 10vh 0;
+  
+  overflow-y: auto;
 `;
 
-const ModalWrapper = styled.div`
-  /* position: relative;
-  background: #fff;
-  border-radius: 16px;
-  width: 100%;
-  max-width: 700px;
-  padding: 2rem;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2); */
+const ModalContainer = styled.div`
+ 
+  border-radius: 12px;
+ 
+  max-width: 800px;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  
 `;
 
+const CloseButton = styled.button`
+  position: absolute;
+  top: 12px;
+  right: 24px;
+  font-size: 1.6rem;
+  background: transparent;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  @media (max-width: 768px) {
+   top: 12px;
+    right: 2.5rem;
+  }
+ 
+
+  &:hover {
+    color: #ff4444;
+  }
+`;

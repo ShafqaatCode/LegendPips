@@ -67,155 +67,44 @@ const Header: React.FC = () => {
 
   return (
     <>
-    <HeaderWrapper>
-      {menuOpen && <Backdrop onClick={() => setMenuOpen(false)} />}
+      <HeaderWrapper>
+        {menuOpen && <Backdrop onClick={() => setMenuOpen(false)} />}
 
-      {!isScrolled && (
-        <Topbar>
-          <NavLink to="/">
-            <Logo src={LogoImg} alt="LegendPips Logo" />
-          </NavLink>
-
-          <LinkGroup>
-            <NavLink to="/live-chat">
-              <HeaderItem>
-                <img src={SupportIcon} alt="Live Chat" />
-                <span>Live Chat</span>
-              </HeaderItem>
+        {!isScrolled && (
+          <Topbar>
+            <NavLink to="/">
+              <Logo src={LogoImg} alt="LegendPips Logo" />
             </NavLink>
-            <NavLink to="/calculator">
-              <HeaderItem>
-                <img src={CalculatorIcon} alt="Calculator" />
-                <span>Rebate Calculator</span>
-              </HeaderItem>
-            </NavLink>
-            <NavLink to="/location">
-              <HeaderItem>
-                <img src={LocationIcon} alt="Location" />
-                <span>United States</span>
-              </HeaderItem>
-            </NavLink>
-            <NavLink to="/signin">
-              <SignInButton>Sign In</SignInButton>
-            </NavLink>
-          </LinkGroup>
-        </Topbar>
-      )}
 
-      {!isScrolled && (
-        <Navbar>
-          <NavList>
-            {navLinks.map((link) => (
-              <NavItem
-                to={link.to}
-                key={link.to}
-                end={link.end || false}
-                onClick={() => setMenuOpen(false)}
-              >
-                {link.label}
-              </NavItem>
-            ))}
+            <LinkGroup>
+              <NavLink to="/live-chat">
+                <HeaderItem>
+                  <img src={SupportIcon} alt="Live Chat" />
+                  <span>Live Chat</span>
+                </HeaderItem>
+              </NavLink>
+              <NavLink to="/calculator">
+                <HeaderItem>
+                  <img src={CalculatorIcon} alt="Calculator" />
+                  <span>Rebate Calculator</span>
+                </HeaderItem>
+              </NavLink>
+              <NavLink to="/location">
+                <HeaderItem>
+                  <img src={LocationIcon} alt="Location" />
+                  <span>United States</span>
+                </HeaderItem>
+              </NavLink>
+              <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
 
-            <SubmenuWrapper
-              onMouseEnter={() => window.innerWidth > 768 && setSubmenuOpen(true)}
-              onMouseLeave={() => window.innerWidth > 768 && setSubmenuOpen(false)}
-            >
-              <SubmenuToggle onClick={toggleSubmenu}>
-                Tools {submenuOpen ? <FiChevronUp /> : <FiChevronDown />}
-              </SubmenuToggle>
-              {submenuOpen && (
-                <Submenu>
-                  {toolsSubmenu.map((tool) => (
-                    <SubmenuItem to={tool.to} key={tool.to}>{tool.label}</SubmenuItem>
-                  ))}
-                </Submenu>
-              )}
-            </SubmenuWrapper>
-          </NavList>
-        </Navbar>
-      )}
+            </LinkGroup>
+          </Topbar>
+        )}
 
-      {isScrolled && (
-        <StickyBar>
-          <NavLink to="/">
-            <Logo src={LogoImg} alt="LegendPips Logo" />
-          </NavLink>
-          <NavList>
-            {navLinks.map((link) => (
-              <NavItem to={link.to} key={link.to} end={link.end || false}>
-                {link.label}
-              </NavItem>
-            ))}
-            <SubmenuWrapper
-              onMouseEnter={() => window.innerWidth > 768 && setSubmenuOpen(true)}
-              onMouseLeave={() => window.innerWidth > 768 && setSubmenuOpen(false)}
-            >
-              <SubmenuToggle onClick={() => {
-                if (window.innerWidth <= 768) {
-                  setSubmenuOpen(!submenuOpen);
-                }
-              }}>
-                Tools {submenuOpen ? <FiChevronUp /> : <FiChevronDown />}
-              </SubmenuToggle>
-              {submenuOpen && (
-                <Submenu>
-                  {toolsSubmenu.map((tool) => (
-                    <SubmenuItem to={tool.to} key={tool.to}>{tool.label}</SubmenuItem>
-                  ))}
-                </Submenu>
-              )}
-            </SubmenuWrapper>
-          </NavList>
-          <NavLink to="/signin">
-            <SignInButton>Sign In</SignInButton>
-          </NavLink>
-        </StickyBar>
-      )}
-
-      <MobileBar>
-        <NavLink to="/">
-          <Logo src={LogoImg} alt="LegendPips Logo" />
-        </NavLink>
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <NavLink to="/signin">
-            <SignInButton>Sign In</SignInButton>
-          </NavLink>
-          <FaBars
-            size={22}
-            color="white"
-            onClick={() => setMenuOpen(!menuOpen)}
-            style={{ cursor: "pointer" }}
-          />
-        </div>
-      </MobileBar>
-
-      {menuOpen && (
-        <MobileMenu>
-          {[...navLinks, { label: "Tools" }].map((link) =>
-            link.label === "Tools" ? (
-              <div key="Tools">
-                <SubmenuToggle
-                  onClick={() => setSubmenuOpen(!submenuOpen)}
-                >
-                  Tools {submenuOpen ? <FiChevronUp /> : <FiChevronDown />}
-                </SubmenuToggle>
-
-                {submenuOpen && (
-                  <div style={{ paddingLeft: "1rem", display: "flex", flexDirection: "column", gap: "0.4rem", marginTop: "0.75rem" }}>
-                    {toolsSubmenu.map((tool) => (
-                      <NavItem
-                        to={tool.to}
-                        key={tool.to}
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        {tool.label}
-                      </NavItem>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ) : (
-              "to" in link ? (
+        {!isScrolled && (
+          <Navbar>
+            <NavList>
+              {navLinks.map((link) => (
                 <NavItem
                   to={link.to}
                   key={link.to}
@@ -224,14 +113,123 @@ const Header: React.FC = () => {
                 >
                   {link.label}
                 </NavItem>
-              ) : null
-            )
-          )}
-        </MobileMenu>
-      )}
+              ))}
+
+              <SubmenuWrapper
+                onMouseEnter={() => window.innerWidth > 768 && setSubmenuOpen(true)}
+                onMouseLeave={() => window.innerWidth > 768 && setSubmenuOpen(false)}
+              >
+                <SubmenuToggle onClick={toggleSubmenu}>
+                  Tools {submenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+                </SubmenuToggle>
+                {submenuOpen && (
+                  <Submenu>
+                    {toolsSubmenu.map((tool) => (
+                      <SubmenuItem to={tool.to} key={tool.to}>{tool.label}</SubmenuItem>
+                    ))}
+                  </Submenu>
+                )}
+              </SubmenuWrapper>
+            </NavList>
+          </Navbar>
+        )}
+
+        {isScrolled && (
+          <StickyBar>
+            <NavLink to="/">
+              <Logo src={LogoImg} alt="LegendPips Logo" />
+            </NavLink>
+            <NavList>
+              {navLinks.map((link) => (
+                <NavItem to={link.to} key={link.to} end={link.end || false}>
+                  {link.label}
+                </NavItem>
+              ))}
+              <SubmenuWrapper
+                onMouseEnter={() => window.innerWidth > 768 && setSubmenuOpen(true)}
+                onMouseLeave={() => window.innerWidth > 768 && setSubmenuOpen(false)}
+              >
+                <SubmenuToggle onClick={() => {
+                  if (window.innerWidth <= 768) {
+                    setSubmenuOpen(!submenuOpen);
+                  }
+                }}>
+                  Tools {submenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+                </SubmenuToggle>
+                {submenuOpen && (
+                  <Submenu>
+                    {toolsSubmenu.map((tool) => (
+                      <SubmenuItem to={tool.to} key={tool.to}>{tool.label}</SubmenuItem>
+                    ))}
+                  </Submenu>
+                )}
+              </SubmenuWrapper>
+            </NavList>
+            <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
+
+          </StickyBar>
+        )}
+
+        <MobileBar>
+          <NavLink to="/">
+            <Logo src={LogoImg} alt="LegendPips Logo" />
+          </NavLink>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <NavLink to="/signin">
+              <SignInButton>Sign In</SignInButton>
+            </NavLink>
+            <FaBars
+              size={22}
+              color="white"
+              onClick={() => setMenuOpen(!menuOpen)}
+              style={{ cursor: "pointer" }}
+            />
+          </div>
+        </MobileBar>
+
+        {menuOpen && (
+          <MobileMenu>
+            {[...navLinks, { label: "Tools" }].map((link) =>
+              link.label === "Tools" ? (
+                <div key="Tools">
+                  <SubmenuToggle
+                    onClick={() => setSubmenuOpen(!submenuOpen)}
+                  >
+                    Tools {submenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+                  </SubmenuToggle>
+
+                  {submenuOpen && (
+                    <div style={{ paddingLeft: "1rem", display: "flex", flexDirection: "column", gap: "0.4rem", marginTop: "0.75rem" }}>
+                      {toolsSubmenu.map((tool) => (
+                        <NavItem
+                          to={tool.to}
+                          key={tool.to}
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          {tool.label}
+                        </NavItem>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                "to" in link ? (
+                  <NavItem
+                    to={link.to}
+                    key={link.to}
+                    end={link.end || false}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {link.label}
+                  </NavItem>
+                ) : null
+              )
+            )}
+          </MobileMenu>
+        )}
 
 
-    </HeaderWrapper>
+      </HeaderWrapper>
       <SignupModal isOpen={signupOpen} onClose={() => setSignupOpen(false)} />
       <LoginModal isOpen={signinOpen} onClose={() => setSigninOpen(false)} />
     </>
