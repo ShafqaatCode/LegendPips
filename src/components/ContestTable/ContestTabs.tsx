@@ -1,6 +1,8 @@
 import React, { useState, type JSX } from "react";
 import styled from "styled-components";
 import ContestRules from "./ContestRules";
+import ComingSoon from "../../pages/ComminSoon/CommingSoon";
+import Leaderboard from "../LeaderBoard/LeaderBoard";
 
 
 const tabs = [
@@ -32,13 +34,7 @@ const tabContent: Record<string, JSX.Element> = {
   ),
   "Rankings (1230)": (
     <>
-      <h2>Live Rankings</h2>
-      <p>Here you can track the leaderboard. Updated every 5 minutes.</p>
-      <ol>
-        <li>Trader A - $1450</li>
-        <li>Trader B - $1430</li>
-        <li>Trader C - $1402</li>
-      </ol>
+      <Leaderboard />   
     </>
   ),
   "How to Join": (
