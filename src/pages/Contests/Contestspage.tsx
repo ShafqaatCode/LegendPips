@@ -6,6 +6,9 @@ import ContestList from '../../components/ContestTable/ContestList';
 import AdBanner from '../../components/Ads/AdBanner';
 import Contest from '../../components/ContestTable/Contest';
 import ContestImg from '../../assets/Contest_Images/wmug5dukcys 1.png'
+import ContestInfo from '../../components/ContestTable/ContestInstruction';
+import ContestRules from '../../components/ContestTable/ContestRules';
+import ContestTabs from '../../components/ContestTable/ContestTabs';
 
 
 const MainContainer = styled.main`
@@ -75,14 +78,17 @@ const Contests: React.FC = () => {
 
 
       <ContestList />
-      <Contest  imageSrc={ContestImg}
-      title="Q2 Special – The Major's Mix II"
-      subtitle="IC TRADING CUP 2025"
-      eventInfo="Traders Cup Event 7 of 16"
-      endTime={new Date('2025-07-27T13:00:00')}
-      registrationDeadline="Jul 18, 2025, 01:00 PM"
-      sponsorUrl="https://ictrading.com"
-      sponsorText="ictrading.com"/>
+      <Contest imageSrc={ContestImg}
+        title="Q2 Special – The Major's Mix II"
+        subtitle="IC TRADING CUP 2025"
+        eventInfo="Traders Cup Event 7 of 16"
+        endTime={new Date('2025-07-27T13:00:00')}
+        registrationDeadline="Jul 18, 2025, 01:00 PM"
+        sponsorUrl="https://ictrading.com"
+        sponsorText="ictrading.com" />
+      <ContestInfo />
+      <ContestTabs />
+      <ContestRules />
 
     </MainContainer>
   )
