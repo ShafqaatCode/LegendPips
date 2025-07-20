@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
-import LoginForm from "./LoginForm";
-import { FaX } from "react-icons/fa6";
+
+import RegisterForm from "./RegisterForm";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -9,16 +9,16 @@ interface LoginModalProps {
   onSwitchToRegister?: () => void;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegister }) => {
-  
+const RegisterModal: React.FC<LoginModalProps> = ({ isOpen, onClose}) => {
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = "hidden";
     }
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = "hidden";
     };
   }, [isOpen]);
 
@@ -27,14 +27,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegi
   return (
     <Overlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
-        <CloseButton onClick={onClose}><FaX size={"16px"} /></CloseButton>
-        <LoginForm onSwitchToRegister={onSwitchToRegister}/>
+        <RegisterForm onClose={onClose} />
       </ModalContainer>
     </Overlay>
   );
 };
 
-export default LoginModal;
+export default RegisterModal;
 
 // Styled Components
 const Overlay = styled.div`
@@ -50,7 +49,7 @@ const Overlay = styled.div`
   align-items: flex-start;
   padding: 10vh 0;
   
-  overflow-y: auto;
+  overflow-y: auto;  
 `;
 
 const ModalContainer = styled.div`
@@ -59,32 +58,11 @@ const ModalContainer = styled.div`
  
   max-width: 800px;
   position: relative;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  
   margin: auto;
   display: flex;
   align-items: center;
   justify-content: center;
 
   
-`;
-
-const CloseButton = styled.button`
-  position: absolute;
-  top: 12px;
-  right: 24px;
-  font-size: 1.6rem;
-  background: transparent;
-  border: none;
-  color: #333;
-  cursor: pointer;
-  transition: color 0.2s ease;
-  @media (max-width: 768px) {
-   top: 12px;
-    right: 2.5rem;
-  }
- 
-
-  &:hover {
-    color: #ff4444;
-  }
 `;

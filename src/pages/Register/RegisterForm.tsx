@@ -25,6 +25,7 @@ import {
   Highlight,
   RegisterButton
 } from "./Register.styles";
+import { FaX } from "react-icons/fa6";
 
 interface Props {
   isOpen?: boolean;
@@ -47,7 +48,7 @@ const RegisterForm: React.FC<Props> = ({onClose }) => {
 
   return (
     <Container>
-      <CloseBtn onClick={onClose} >x</CloseBtn>
+      <CloseBtn onClick={onClose} ><FaX size={"16px"}/></CloseBtn>
       <Heading>Register</Heading>
 
       <GoogleButton type="button">

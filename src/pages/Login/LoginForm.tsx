@@ -17,8 +17,12 @@ import {
   ForgetPassword,
 } from "./Login.styles";
 
+interface LoginFormProps {
+  onSwitchToRegister?: () => void;
+}
 
-const LoginForm: React.FC = () => {
+
+const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
   const {
     register,
     handleSubmit,
@@ -70,7 +74,7 @@ const LoginForm: React.FC = () => {
         <ForgetPassword>Forget The Password?</ForgetPassword>
 
         <RegisterButton type="submit">Login</RegisterButton>
-        <RegisterButton type="button" style={{ marginTop: "1rem" }}>
+        <RegisterButton onClick={onSwitchToRegister} type="button" style={{ marginTop: "1rem" }}>
           Register
         </RegisterButton>
       </form>

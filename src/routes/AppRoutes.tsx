@@ -9,8 +9,8 @@ import Analysis from "../pages/Analysis/Analysis";
 import HitWorksPage from "../pages/HitWorksPage/HitWorksPage";
 import SignalsPage from "../pages/SignalsPage/SignalsPage";
 import Forum from "../pages/Forum/Forum";
-import LoginForm from "../pages/Login/Login";
-import RegisterForm from "../pages/Register/Register";
+import LoginForm from "../pages/Login/LoginForm";
+import RegisterForm from "../pages/Register/RegisterForm";
 
 // 👇 Add these imports
 

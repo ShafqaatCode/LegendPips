@@ -189,12 +189,20 @@ export const RegisterButton = styled.button`
 export const CloseBtn = styled.button`
   position: absolute;
   top: 12px;
-  right: 16px;
-  background: none;
+  right: 24px;
+  font-size: 1.6rem;
+  background: transparent;
   border: none;
-  font-size: 1.8rem;
   color: #333;
   cursor: pointer;
-  line-height: 1;
+  transition: color 0.2s ease;
+  @media (max-width: 768px) {
+   top: 12px;
+    right: 2.5rem;
+  }
  
+
+  &:hover {
+    color: #ff4444;
+  }
 `;
