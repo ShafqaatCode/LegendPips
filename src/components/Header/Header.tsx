@@ -26,8 +26,9 @@ import LogoImg from "../../assets/icons/image 2.svg";
 import SupportIcon from "../../assets/icons/SupportIcon.svg";
 import CalculatorIcon from "../../assets/icons/calculator-svgrepo-com (1) 1.svg";
 import LocationIcon from "../../assets/icons/Location marker.svg";
-import SignupModal from "../../pages/Register/RegisterModal";
+
 import LoginModal from "../../pages/Login/LoginModal";
+import RegisterModal from "../../pages/Register/RegisterModal";
 
 const navLinks = [
   { to: "/", label: "Home", end: true },
@@ -230,7 +231,7 @@ const Header: React.FC = () => {
 
 
       </HeaderWrapper>
-      <SignupModal isOpen={signupOpen} onClose={() => setSignupOpen(false)} />
+      <RegisterModal isOpen={signupOpen} onClose={() => setSignupOpen(false)} />
       <LoginModal isOpen={signinOpen} onClose={() => setSigninOpen(false)} onSwitchToRegister={() => { setSigninOpen(false); setSignupOpen(true); }} />
     </>
   );
