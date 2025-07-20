@@ -1,5 +1,6 @@
 import React, { useState, type JSX } from "react";
 import styled from "styled-components";
+import ContestRules from "./ContestRules";
 
 
 const tabs = [
@@ -15,13 +16,7 @@ const tabs = [
 const tabContent: Record<string, JSX.Element> = {
   "Rules": (
     <>
-      <h2>Contest Rules</h2>
-      <p>Please read the official contest rules and ensure full compliance before participating.</p>
-      <ul>
-        <li>Only one entry per participant.</li>
-        <li>Expert Advisors (EAs) are not allowed.</li>
-        <li>Max leverage: 200:1, Start balance: $1,000.</li>
-      </ul>
+     <ContestRules />
     </>
   ),
   "FAQs": (
@@ -147,16 +142,12 @@ const TabButton = styled.button<{ active: boolean }>`
     background: ${({ active }) => (active ? "#013e7e" : "#f0f0f0")};
   }
 `;
-
 const TabContent = styled.div`
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 0 0 6px 6px;
   padding: 1.5rem;
   min-height: 200px;
-`;
-
-const Placeholder = styled.div`
   color: #333;
 
   h2 {
@@ -166,6 +157,15 @@ const Placeholder = styled.div`
 
   p {
     font-size: 1rem;
-    color: #555;
+    margin-bottom: 1rem;
+  }
+
+  ul,
+  ol {
+    padding-left: 1.2rem;
+  }
+
+  li {
+    margin-bottom: 0.4rem;
   }
 `;

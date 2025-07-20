@@ -7,7 +7,6 @@ import AdBanner from '../../components/Ads/AdBanner';
 import Contest from '../../components/ContestTable/Contest';
 import ContestImg from '../../assets/Contest_Images/wmug5dukcys 1.png'
 import ContestInfo from '../../components/ContestTable/ContestInstruction';
-import ContestRules from '../../components/ContestTable/ContestRules';
 import ContestTabs from '../../components/ContestTable/ContestTabs';
 
 
@@ -88,7 +87,7 @@ const Contests: React.FC = () => {
         sponsorText="ictrading.com" />
       <ContestInfo />
       <ContestTabs />
-      <ContestRules />
+
 
     </MainContainer>
   )
