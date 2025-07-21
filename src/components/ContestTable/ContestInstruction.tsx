@@ -69,7 +69,7 @@ export default ContestInfo;
 
 // Styled Components
 const Wrapper = styled.div`
-  padding: 2rem;
+  padding: 2rem 3rem;
   background-color: #f9f9ff;
   font-family: 'Segoe UI', sans-serif;
 `;
@@ -85,6 +85,12 @@ const Details = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  border: 2px solid red;
+  margin: 0 4rem;
+  @media (max-width: 786px)
+  {
+    margin: 0;
+  }
 `;
 
 const Item = styled.div`
