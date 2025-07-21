@@ -26,7 +26,7 @@ export const Heading = styled.h2`
 
 export const GoogleButton = styled.button`
   width: 100%;
-  background-color: #1f3b8c;
+  background-color: #132e58;
   color: white;
   padding: 1rem;
   border: none;
@@ -38,6 +38,10 @@ export const GoogleButton = styled.button`
   align-items: center;
   margin-bottom: 1.5rem;
   cursor: pointer;
+
+  &:hover{
+  background-color: #132e58ee;
+  }
 `;
 
 export const GoogleIcon = styled.img`
@@ -112,6 +116,10 @@ export const RegisterButton = styled.button`
   border-radius: 10px;
   font-weight: 400;
   cursor: pointer;
+
+  &:hover{
+  background: #132e58ee;
+  }
 `;
 
 export const ForgetPassword = styled.div`

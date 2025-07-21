@@ -5,12 +5,21 @@ export const Container = styled.div`
   padding: 2rem;
   border-radius: 12px;
   font-family: "Inter", sans-serif;
+  overflow-x: auto;
+`;
+
+export const SearchPaginationWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 `;
 
 export const SearchWrapper = styled.div`
+  flex: 1;
   display: flex;
-  justify-content: flex-start;
-  margin-bottom: 1rem;
+  justify-content: flex-end;
 `;
 
 export const SearchInput = styled.input`
@@ -18,7 +27,15 @@ export const SearchInput = styled.input`
   border: 1px dashed #b2b9c6;
   border-radius: 6px;
   font-size: 1rem;
+  width: 100%;
+  max-width: 300px;
   outline: none;
+`;
+
+export const TopPagination = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 `;
 
 export const Table = styled.table`
@@ -41,8 +58,9 @@ export const TableHeader = styled.th`
   padding: 12px;
   text-align: left;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #555;
+  white-space: nowrap;
 `;
 
 export const TableBody = styled.tbody``;
@@ -51,6 +69,7 @@ export const TableData = styled.td`
   padding: 12px;
   font-size: 0.9rem;
   color: #333;
+  white-space: nowrap;
 `;
 
 export const UserInfo = styled.div`
@@ -79,15 +98,21 @@ export const Pagination = styled.div`
   margin-top: 1.5rem;
   display: flex;
   justify-content: center;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
 `;
 
 export const PageButton = styled.button<{ active?: boolean }>`
-  padding: 8px 14px;
+  padding: 6px 12px;
   border: 1px dashed #b2b9c6;
   background: ${({ active }) => (active ? "#0077cc" : "white")};
   color: ${({ active }) => (active ? "white" : "#333")};
   border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
+  font-size: 0.85rem;
+
+  &:hover {
+    background: ${({ active }) => (active ? "#005fa3" : "#f0f0f0")};
+  }
 `;
