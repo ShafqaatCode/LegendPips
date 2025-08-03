@@ -176,9 +176,11 @@ const Header: React.FC = () => {
             <Logo src={LogoImg} alt="LegendPips Logo" />
           </NavLink>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <NavLink to="/signin">
+            {/* <NavLink to="/signin">
               <SignInButton>Sign In</SignInButton>
-            </NavLink>
+            </NavLink> */}
+
+            <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
             <FaBars
               size={22}
               color="white"
