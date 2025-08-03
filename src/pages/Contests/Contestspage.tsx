@@ -77,7 +77,7 @@ const Contests: React.FC = () => {
 
 
       <ContestList />
-      <Contest imageSrc={ContestImg}
+      {/* <Contest imageSrc={ContestImg}
         title="Q2 Special – The Major's Mix II"
         subtitle="IC TRADING CUP 2025"
         eventInfo="Traders Cup Event 7 of 16"
@@ -85,7 +85,7 @@ const Contests: React.FC = () => {
         registrationDeadline="Jul 18, 2025, 01:00 PM"
         sponsorUrl="https://ictrading.com"
         sponsorText="ictrading.com" />
-      <ContestInfo />
+      <ContestInfo /> */}
       <ContestTabs />
 
 
