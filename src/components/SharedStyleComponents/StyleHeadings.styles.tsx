@@ -13,7 +13,8 @@ export const SectionHeading = styled.h1`
 
   @media (max-width: 768px)
   {
-    font-size: 48px;
+    /* font-size: 48px; */
+    font-size: 36px;
     // border: 2px solid red;
     line-height: 60px;
   }
@@ -41,7 +42,8 @@ export const SectionHeading = styled.h1`
 export const SubHeading = styled.h2`
   font-family: 'Poppins', sans-serif;
   font-weight: 400;
-  font-size: 20px;
+  /* font-size: 20px; */
+  font-size: 18px;
   line-height: 30px;
   letter-spacing: -0.6%;
   text-align: center;
