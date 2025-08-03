@@ -29,7 +29,7 @@ const WorkSectionWrapper = styled.section`
   padding-top: 3rem;
   //   max-width: 1280px;
   margin: auto;
-  overflow: hidden;
+  /* overflow: hidden; */
 `;
 
 const Wrapper = styled.div`
