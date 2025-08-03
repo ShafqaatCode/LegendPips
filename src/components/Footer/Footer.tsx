@@ -5,7 +5,7 @@ import { FaChevronUp } from "react-icons/fa";
 
 const GotoStart = styled.a`
   display: block;
-  margin-top: 1.5rem;
+  /* margin-top: 1.5rem; */
   padding: 1rem 1.5rem;
   font-size: 1rem;
   font-weight: 600;
