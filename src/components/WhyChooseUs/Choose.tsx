@@ -21,6 +21,7 @@ import Icon10 from "../../assets/ChooseusIcons/img1.png";
 import Icon11 from "../../assets/ChooseusIcons/img3.png";
 import Icon12 from "../../assets/ChooseusIcons/img2.png";
 
+
 const WorkSectionWrapper = styled.section`
   padding: 1rem 2rem;
   width: 100%;
