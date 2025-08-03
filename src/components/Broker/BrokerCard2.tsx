@@ -81,7 +81,7 @@ interface BrokerCardProps {
   index: number;
   featured?: boolean;
   title: string;
-  description: string;
+  description?: string;
   logoSrc: string;
   rating: number;
   reviewsCount: string;
@@ -91,7 +91,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
   index,
   featured,
   title,
-  description,
+
   logoSrc,
   rating,
   reviewsCount,

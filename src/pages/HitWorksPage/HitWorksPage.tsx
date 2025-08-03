@@ -3,8 +3,6 @@ import Banner from '../../components/Banner/Banner'
 import bannerImg from "../../assets/banner/BannerBg.jpg";
 import LegendPipsFeatures from '../../components/PipsFeatures/PipsFeatureSection';
 import HowItWorks from '../../components/HItWorks/WorksSection';
-import RegisterModal from '../Register/RegisterForm';
-import LoginForm from '../Login/LoginForm';
 import WhyChooseUs from '../../components/WhyChooseUs/Choose';
 import FeaturesSlider from '../../components/FeatureSection/FeaturesSlider';
 

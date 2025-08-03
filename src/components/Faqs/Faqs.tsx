@@ -18,7 +18,7 @@ import ButtonBase from "../SharedComponents/Button";
 import styled from "styled-components";
 import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 import type { Variants } from "framer-motion";
-import { motion } from "framer-motion"
+
 
 
 

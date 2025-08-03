@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
-import ThumsUpIcon from "../../assets/icons/Image-1.svg";
+
 import GrothImg from "../../assets/icons/GrothImg.svg";
 import ButtonBase from "../SharedComponents/Button";
 
 import { motion } from "framer-motion";
-import type { Variants } from "framer-motion";
 import { FaCircleArrowDown, FaCircleArrowUp } from "react-icons/fa6";
 
 import Icon1 from "../../assets/New folder/Image.png";
@@ -148,18 +147,6 @@ const ButtonContainer = styled.div`
 
 const UpperContentContainer = styled.div``;
 
-const fadeInUp: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.2,
-      duration: 0.5,
-      ease: [0.42, 0, 0.58, 1],
-    },
-  }),
-};
 const POINTS = [
   {
     title: "Broker causing problems? Submit a complaint now.",

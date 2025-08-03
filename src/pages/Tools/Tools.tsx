@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-import Banner from '../../components/Banner/Banner'
-import bannerImg from "../../assets/banner/BannerBg.jpg";
+import ComingSoon from '../ComminSoon/CommingSoon'
+
 
 const Container = styled.div`
 margin-top: 135px;
@@ -13,13 +13,10 @@ margin-top: 135px;
 const Tools: React.FC = () => {
   return (
 
-
-
-    <Banner
-      backgroundImage={bannerImg}
-      title="Tools"
-      breadcrumb="Home > Pages > Tools"
-    />
+    <Container>
+     <ComingSoon />
+      {/* Additional content for Tools page can be added here */}
+    </Container>
 
   )
 }

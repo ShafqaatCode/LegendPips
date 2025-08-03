@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 
 import styled from "styled-components";
-import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
+
 import ButtonBase from "../SharedComponents/Button";
 import ArrowIcon from "../../assets/arrow-narrow-circle-broken-up-right-blue.png";
 import { brokers_data } from "../../data/brokers_data";

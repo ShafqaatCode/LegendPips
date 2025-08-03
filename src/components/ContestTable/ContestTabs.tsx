@@ -60,13 +60,7 @@ const tabContent: Record<string, JSX.Element> = {
   ),
   "Final Qualifiers": (
     <>
-      <h2>Final Round Qualifiers</h2>
-      <p>The following participants have qualified for the final round:</p>
-      <ol>
-        <li>Trader X</li>
-        <li>Trader Y</li>
-        <li>Trader Z</li>
-      </ol>
+      <ComingSoon />
     </>
   ),
   "Forum Posts (35)": (
