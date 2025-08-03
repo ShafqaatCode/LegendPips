@@ -8,18 +8,18 @@ import ButtonBase from "../SharedComponents/Button";
 import { motion } from "framer-motion";
 import { FaCircleArrowDown, FaCircleArrowUp } from "react-icons/fa6";
 
-import Icon1 from "../../assets/New folder/Image.png";
-import Icon2 from "../../assets/New folder/Image 3.png";
-import Icon3 from "../../assets/New folder/Image-1.png";
-import Icon4 from "../../assets/New folder/Image-2.png";
-import Icon5 from "../../assets/New folder/5736412 1.png";
-import Icon6 from "../../assets/New folder/image 3-1.png";
-import Icon7 from "../../assets/New folder/image 3-2.png";
-import Icon8 from "../../assets/New folder/image 3-3.png";
-import Icon9 from "../../assets/New folder/image 3-4.png";
-import Icon10 from "../../assets/New folder/img1.png";
-import Icon11 from "../../assets/New folder/img3.png";
-import Icon12 from "../../assets/New folder/img2.png";
+import Icon1 from "../../assets/ChooseusIcons/Image.png";
+import Icon2 from "../../assets/ChooseusIcons/Image3.png";
+import Icon3 from "../../assets/ChooseusIcons/Image-1.png";
+import Icon4 from "../../assets/ChooseusIcons/Image-2.png";
+import Icon5 from "../../assets/ChooseusIcons/5736412_1.png";
+import Icon6 from "../../assets/ChooseusIcons/image3-1.png";
+import Icon7 from "../../assets/ChooseusIcons/image3-2.png";
+import Icon8 from "../../assets/ChooseusIcons/image3-3.png";
+import Icon9 from "../../assets/ChooseusIcons/image3-4.png";
+import Icon10 from "../../assets/ChooseusIcons/img1.png";
+import Icon11 from "../../assets/ChooseusIcons/img3.png";
+import Icon12 from "../../assets/ChooseusIcons/img2.png";
 
 const WorkSectionWrapper = styled.section`
   padding: 1rem 2rem;
