@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 import { FaUpload } from 'react-icons/fa';
 import ContestList from '../../components/ContestTable/ContestList';
 import AdBanner from '../../components/Ads/AdBanner';
-import Contest from '../../components/ContestTable/Contest';
-import ContestImg from '../../assets/Contest_Images/wmug5dukcys 1.png'
-import ContestInfo from '../../components/ContestTable/ContestInstruction';
+// import Contest from '../../components/ContestTable/Contest';
+// import ContestImg from '../../assets/Contest_Images/wmug5dukcys 1.png'
+// import ContestInfo from '../../components/ContestTable/ContestInstruction';
 import ContestTabs from '../../components/ContestTable/ContestTabs';
 
 
