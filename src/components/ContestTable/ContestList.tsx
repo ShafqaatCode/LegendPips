@@ -249,12 +249,20 @@ const Card = styled.div<{ ended: boolean }>`
 const TopSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
   justify-content: space-between;
   flex-wrap: wrap;
+  
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+  }
 `;
 
 const TitleGroup = styled.div`
+
   flex: 1;
 `;
 

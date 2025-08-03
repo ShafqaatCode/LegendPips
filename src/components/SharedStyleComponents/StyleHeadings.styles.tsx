@@ -56,8 +56,8 @@ export const SubHeading = styled.h2`
   
   @media (max-width: 768px)
   {
+    /* font-size: 18px; */
     font-size: 16px;
-
   }
    
 `;
