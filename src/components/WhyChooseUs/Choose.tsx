@@ -19,7 +19,7 @@ import Icon8 from "../../assets/ChooseusIcons/image3-3.png";
 import Icon9 from "../../assets/ChooseusIcons/image3-4.png";
 import Icon10 from "../../assets/ChooseusIcons/img1.png";
 import Icon11 from "../../assets/ChooseusIcons/img3.png";
-import Icon12 from "../../assets/ChooseusIcons/img2.png";
+import Icon12 from "../../assets/ChooseusIcons/Img2.png";
 
 
 const WorkSectionWrapper = styled.section`
