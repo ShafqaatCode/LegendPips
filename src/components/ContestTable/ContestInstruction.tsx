@@ -85,7 +85,7 @@ const Details = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  border: 2px solid red;
+  /* border: 2px solid red; */
   margin: 0 4rem;
   @media (max-width: 786px)
   {
