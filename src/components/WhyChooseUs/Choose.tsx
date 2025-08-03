@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import { FaCircleArrowDown, FaCircleArrowUp } from "react-icons/fa6";
 
 import Icon1 from "../../assets/ChooseusIcons/Image.png";
-import Icon2 from "../../assets/ChooseusIcons/Image3.png";
+import Icon2 from "../../assets/ChooseusIcons/image3.png";
 import Icon3 from "../../assets/ChooseusIcons/Image-1.png";
 import Icon4 from "../../assets/ChooseusIcons/Image-2.png";
 import Icon5 from "../../assets/ChooseusIcons/5736412_1.png";
