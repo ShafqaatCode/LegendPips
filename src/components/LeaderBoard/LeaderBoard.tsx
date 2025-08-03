@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   Container,
   SearchPaginationWrapper,
@@ -17,7 +17,7 @@ import {
   Pagination,
   PageButton,
   AccountLink,
-} from "./Leaderboard.styled";
+} from "./LeaderBoard.styled";
 import data from "./data";
 
 const rowsPerPage = 10;
