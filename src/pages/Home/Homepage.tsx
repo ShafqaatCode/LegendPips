@@ -15,6 +15,7 @@ import ContestSection from "../../components/Contest/ContestSection";
 
 
 
+
 const HomePage: React.FC = () => {
 
 
@@ -31,6 +32,7 @@ const HomePage: React.FC = () => {
             <ChoosUs />
             <Testimonials />
             <FAQ />
+            
 
         </>
 

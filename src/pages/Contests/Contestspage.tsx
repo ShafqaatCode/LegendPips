@@ -7,7 +7,7 @@ import AdBanner from '../../components/Ads/AdBanner';
 // import Contest from '../../components/ContestTable/Contest';
 // import ContestImg from '../../assets/Contest_Images/wmug5dukcys 1.png'
 // import ContestInfo from '../../components/ContestTable/ContestInstruction';
-import ContestTabs from '../../components/ContestTable/ContestTabs';
+
 import Competitions from '../../components/Contest/Competitions';
 const MainContainer = styled.main`
   margin-top: 135px;
@@ -38,6 +38,8 @@ const BroadCrumbRow = styled.div`
 `
 
 const Contests: React.FC = () => {
+
+
   return (
     <MainContainer>
       <ToplinksBar>
@@ -85,7 +87,7 @@ const Contests: React.FC = () => {
 
       <Competitions />
       
-      <ContestTabs />
+     
 
     </MainContainer>
   )

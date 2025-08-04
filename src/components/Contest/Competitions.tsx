@@ -84,8 +84,8 @@ export default Competitions;
 
 // Styled Components
 const Wrapper = styled.div`
-  padding: 2rem;
-  /* font-family: "Segoe UI", sans-serif; */
+  padding: 2rem 4rem;
+  border: 2px solid red;
 `;
 
 const Header = styled.div`
