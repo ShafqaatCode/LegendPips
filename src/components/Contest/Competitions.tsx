@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { fetchCompetitions } from "./mockApi";
 import type { Competition } from "./mockCompetitions";
 import ContestCard from "./ContestCard";
-
+import TrophyImg from "../../assets/Group.png"
 const filters = ["All", "Upcoming", "Ongoing", "Ended"];
 
 const Competitions: React.FC = () => {
@@ -35,7 +35,7 @@ const Competitions: React.FC = () => {
   return (
     <Wrapper>
       <Header>
-        <Title>🏆 Competitions</Title>
+        <Title> <img src={TrophyImg} alt="TrophyIcon" /> Competitions</Title>
         <Filter>
           <select
             value={activeFilter}
@@ -92,11 +92,16 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   margin: 2rem 0;
+  
 `;
 
 const Title = styled.h2`
   font-size: 2rem;
   color: #012d5c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 `;
 
 const Filter = styled.div`
