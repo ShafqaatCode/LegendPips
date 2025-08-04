@@ -8,13 +8,9 @@ import AdBanner from '../../components/Ads/AdBanner';
 // import ContestImg from '../../assets/Contest_Images/wmug5dukcys 1.png'
 // import ContestInfo from '../../components/ContestTable/ContestInstruction';
 import ContestTabs from '../../components/ContestTable/ContestTabs';
-
-
+import Competitions from '../../components/Contest/Competitions';
 const MainContainer = styled.main`
-
   margin-top: 135px;
-  
-  
   margin:135px auto;
 @media (max-width: ${({ theme }) => theme.breakpoints.laptop})
 {
@@ -76,7 +72,7 @@ const Contests: React.FC = () => {
       <AdBanner />
 
 
-      <ContestList />
+      {/* <ContestList /> */}
       {/* <Contest imageSrc={ContestImg}
         title="Q2 Special – The Major's Mix II"
         subtitle="IC TRADING CUP 2025"
@@ -86,8 +82,10 @@ const Contests: React.FC = () => {
         sponsorUrl="https://ictrading.com"
         sponsorText="ictrading.com" />
       <ContestInfo /> */}
-      <ContestTabs />
 
+      <Competitions />
+      
+      <ContestTabs />
 
     </MainContainer>
   )

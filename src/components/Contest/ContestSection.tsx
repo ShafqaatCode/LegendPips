@@ -11,7 +11,7 @@ const MainWrapper = styled.main`
     background-color: #fff;
    
     padding: 3rem 0;
-
+ border: 2px solid red;;
 `
 
 const Container = styled.section`
@@ -23,6 +23,7 @@ const Container = styled.section`
     gap: 2rem;
     width: 95%;
     margin: auto;
+   
     
 
 `
@@ -39,17 +40,17 @@ const ContestSection: React.FC = () => {
     return (
         <MainWrapper>
 
-        <Container>
+            <Container>
 
-            <ImgWrapper>
-                <img src={NetworkImg} alt="" />
-            </ImgWrapper>
-            <SectionHeadingSet subText="Join our exciting trading contest designed for both new and experienced traders. Make the most profit during the contest period and take home huge cash prizes! Track your rank live and beat the best in the game." mainHeading="Exciting trading Contest " upperText="All in one trading platform" />
+                <ImgWrapper>
+                    <img src={NetworkImg} alt="" />
+                </ImgWrapper>
+                <SectionHeadingSet subText="Join our exciting trading contest designed for both new and experienced traders. Make the most profit during the contest period and take home huge cash prizes! Track your rank live and beat the best in the game." mainHeading="Exciting trading Contest " upperText="All in one trading platform" />
 
-            <ButtonBase fontSize="16px">View Details<img width="24px" src={ArrowIcon} alt="Icon" /></ButtonBase>
+                <ButtonBase fontSize="16px">View Details<img width="24px" src={ArrowIcon} alt="Icon" /></ButtonBase>
 
 
-        </Container>
+            </Container>
         </MainWrapper>
     )
 }
