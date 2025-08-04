@@ -57,7 +57,7 @@ const Card = styled.div`
   display: flex;
   flex-direction: column;
   border: 1px solid #00000040;
-  /* width: 400px; */
+  // min-width: 500px;
 `;
 
 const Header = styled.div<{ status: string }>`
@@ -102,7 +102,7 @@ const Content = styled.div`
 `;
 
 const Title = styled.h3`
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #DE992F;
   line-height: 25px;
@@ -132,7 +132,7 @@ const Tags = styled.div`
   flex-direction: column;
   gap: 0.5rem;
   margin-right: 1rem;
-  justify-content: center;
+  // justify-content: center;
   
   
 `;

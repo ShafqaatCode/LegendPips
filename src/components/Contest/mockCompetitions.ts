@@ -1,3 +1,6 @@
+import contestImg1 from "../../assets/Contest_Images/wmug5dukcys 1-1.png"
+
+
 export interface Competition {
   id: number;
   title: string;
@@ -20,7 +23,7 @@ export const competitionsData: Competition[] = [
     participants: 1391,
     entry: "Free",
     ends: "Aug 2, 2025, 12:00 AM",
-    logo: "https://dummyimage.com/60x60/012d5c/fff.png&text=IC",
+    logo: contestImg1,
   },
   {
     id: 2,
@@ -31,7 +34,7 @@ export const competitionsData: Competition[] = [
     participants: 2514,
     entry: "Free",
     ends: "Jul 15, 2025, 12:00 AM",
-    logo: "https://dummyimage.com/60x60/2ecc71/fff.png&text=FX",
+    logo: contestImg1,
   },
   {
     id: 3,
@@ -42,7 +45,7 @@ export const competitionsData: Competition[] = [
     participants: 3120,
     entry: "Free",
     ends: "Jul 11, 2025, 01:00 PM",
-    logo: "https://dummyimage.com/60x60/f39c12/fff.png&text=TC",
+    logo: contestImg1,
   },
   {
     id: 4,
@@ -53,50 +56,7 @@ export const competitionsData: Competition[] = [
     participants: 1820,
     entry: "Free",
     ends: "Jul 11, 2025, 01:00 PM",
-    logo: "https://dummyimage.com/60x60/3498db/fff.png&text=CR",
+    logo: contestImg1,
   },
-  {
-    id: 5,
-    title: "Crypto Challenge",
-    type: "Weekly",
-    event: "",
-    status: "Ended",
-    participants: 1820,
-    entry: "Free",
-    ends: "Jul 11, 2025, 01:00 PM",
-    logo: "https://dummyimage.com/60x60/3498db/fff.png&text=CR",
-  },
-  {
-    id: 6,
-    title: "Crypto Challenge",
-    type: "Weekly",
-    event: "",
-    status: "Ended",
-    participants: 1820,
-    entry: "Free",
-    ends: "Jul 11, 2025, 01:00 PM",
-    logo: "https://dummyimage.com/60x60/3498db/fff.png&text=CR",
-  },
-  {
-    id: 4,
-    title: "Crypto Challenge",
-    type: "Weekly",
-    event: "",
-    status: "Ended",
-    participants: 1820,
-    entry: "Free",
-    ends: "Jul 11, 2025, 01:00 PM",
-    logo: "https://dummyimage.com/60x60/3498db/fff.png&text=CR",
-  },
-  {
-    id: 4,
-    title: "Crypto Challenge",
-    type: "Weekly",
-    event: "",
-    status: "Ended",
-    participants: 1820,
-    entry: "Free",
-    ends: "Jul 11, 2025, 01:00 PM",
-    logo: "https://dummyimage.com/60x60/3498db/fff.png&text=CR",
-  },
+  
 ];
