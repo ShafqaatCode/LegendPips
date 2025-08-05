@@ -92,6 +92,14 @@ const Header = styled.div<{ status: string }>`
     font-size: 14px;
     color: #f0f0f0;
   }
+
+  @media (max-width: 768px) { 
+
+    span , small {
+
+      font-size: 0.8rem;
+    }
+  }
 `;
 const Body = styled.div`
 
@@ -99,6 +107,9 @@ const Body = styled.div`
   display: flex;
   padding: 1rem 0;
   gap: 0.8rem;
+  @media (max-width: 768px) { 
+    
+  } 
 `;
 
 const Image = styled.img`
@@ -112,11 +123,15 @@ const Content = styled.div`
 `;
 
 const Title = styled.h3`
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #DE992F;
   line-height: 25px;
   margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
 `;
 
 const Type = styled.p`
@@ -133,6 +148,7 @@ const Event = styled.small`
   color: #DE992F;
   margin-bottom: 0.3rem;
   font-weight: 400;
+  line-height: 25px;
   
 `;
 
@@ -154,6 +170,7 @@ const MarketTag = styled.span`
   font-size: 1rem;
   color: #333;
   line-height: 25px;
+  border: 2px solid red;
   
 `;
 
