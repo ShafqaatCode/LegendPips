@@ -5,9 +5,10 @@ import { type Competition } from '../ContestList/mockCompetitions';
 import { fetchCompetitionById } from '../ContestList/mockApi';
 import Spinner from '../Loaders/spinner';
 import ContestHeaderWithModals from '../ContestList/ContestHeader';
-import Leaderboard from '../Leaderboard/LeaderBoard'
+
 import ContestCard from '../Contest/Contest';
 import ContestTabs from './ContestTabs';
+import LeaderBoard from '../Leaderboard/LeaderBoard';
 
 const Wrapper = styled.section`
   margin-top: 135px;
@@ -82,7 +83,7 @@ const ContestDetails: React.FC = () => {
         sponsorText={contestData?.entry ?? ""}
       />
       {contestData && (
-        <Leaderboard />
+        <LeaderBoard />
       )}
        <ContestTabs />
     </Wrapper>

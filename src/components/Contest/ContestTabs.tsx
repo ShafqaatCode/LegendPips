@@ -2,7 +2,7 @@ import React, { useState, type JSX } from "react";
 import styled from "styled-components";
 import ContestRules from "./ContestRules";
 import ComingSoon from "../../pages/ComminSoon/CommingSoon";
-import Leaderboard from "../Leaderboard/LeaderBoard";
+
 
 
 const tabs = [
@@ -34,9 +34,9 @@ const tabContent: Record<string, JSX.Element> = {
   ),
   "Rankings (1230)": (
     <>
-      <Leaderboard />   
+      <div>leaderboard</div> 
     </>
-  ),
+  ),  
   "How to Join": (
     <>
       <h2>Joining the Contest</h2>

@@ -5,7 +5,7 @@ import Spinner from "../Loaders/spinner";
 import { useNavigate } from "react-router-dom";
 
 
-const Leaderboard: React.FC = () => {
+const LeaderBoard: React.FC = () => {
   const [data, setData] = useState<LeaderboardEntry[]>([]);
   const [filteredData, setFilteredData] = useState<LeaderboardEntry[]>([]);
   const [search, setSearch] = useState("");
@@ -100,7 +100,7 @@ const Leaderboard: React.FC = () => {
   );
 };
 
-export default Leaderboard;
+export default LeaderBoard;
 
 // Styled Components
 const Wrapper = styled.div`
