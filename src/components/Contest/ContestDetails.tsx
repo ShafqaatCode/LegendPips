@@ -8,6 +8,10 @@ import ContestHeaderWithModals from '../ContestList/ContestHeader';
 
 import ContestCard from '../Contest/Contest';
 import ContestTabs from './ContestTabs';
+import Podium from '../Winnerpodium/Podium';
+import LeaderBoard from '../Leaderboard/Leaderboard';
+
+import ContestInfo from './ContestInstruction';
 
 
 
@@ -71,7 +75,8 @@ const ContestDetails: React.FC = () => {
   return (
     <Wrapper>
       <ContestHeaderWithModals />
-     
+      <Podium first='shafqaat' second='tumhi' third='me dfds dfds' />
+      <ContestInfo />
      
       <ContestCard
         imageSrc={contestData?.logo ?? ''}
@@ -84,7 +89,7 @@ const ContestDetails: React.FC = () => {
         sponsorText={contestData?.entry ?? ""}
       />
       {contestData && (
-       <div>Leaderboard</div>
+       <LeaderBoard />
       )}
        <ContestTabs />
     </Wrapper>
