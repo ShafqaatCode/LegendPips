@@ -5,12 +5,10 @@ import { type Competition } from '../ContestList/mockCompetitions';
 import { fetchCompetitionById } from '../ContestList/mockApi';
 import Spinner from '../Loaders/spinner';
 import ContestHeaderWithModals from '../ContestList/ContestHeader';
-
 import ContestCard from '../Contest/Contest';
 import ContestTabs from './ContestTabs';
 import Podium from '../Winnerpodium/Podium';
 import LeaderBoard from '../Leaderboard/Leaderboard';
-
 import ContestInfo from './ContestInstruction';
 
 
@@ -75,7 +73,7 @@ const ContestDetails: React.FC = () => {
   return (
     <Wrapper>
       <ContestHeaderWithModals />
-      <Podium first='shafqaat' second='tumhi' third='me dfds dfds' />
+      <Podium first='robit' second='tumhi' third='me dfds dfds' />
       <ContestInfo />
      
       <ContestCard
