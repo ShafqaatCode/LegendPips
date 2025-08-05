@@ -170,7 +170,6 @@ const MarketTag = styled.span`
   font-size: 1rem;
   color: #333;
   line-height: 25px;
-  border: 2px solid red;
   
 `;
 
