@@ -5,14 +5,20 @@ import { type Competition } from '../ContestList/mockCompetitions';
 import { fetchCompetitionById } from '../ContestList/mockApi';
 import Spinner from '../Loaders/spinner';
 import ContestHeaderWithModals from '../ContestList/ContestHeader';
-import Leaderboard from '../Leaderboard/LeaderBoard';
+import Leaderboard from '../Leaderboard/LeaderBoard'
 import ContestCard from '../Contest/Contest';
+import ContestTabs from './ContestTabs';
 
 const Wrapper = styled.section`
   margin-top: 135px;
   /* padding: 2rem; */
   font-family: "Segoe UI", sans-serif;
-  border: 2px solid red;
+  
+
+  @media (max-width: 786px)
+  {
+    margin-top: 80px;
+  }
 `;
 
 const Centered = styled.div`
@@ -64,6 +70,7 @@ const ContestDetails: React.FC = () => {
     <Wrapper>
       <ContestHeaderWithModals />
      
+     
       <ContestCard
         imageSrc={contestData?.logo ?? ''}
         title={contestData?.title ?? ''}
@@ -77,6 +84,7 @@ const ContestDetails: React.FC = () => {
       {contestData && (
         <Leaderboard />
       )}
+       <ContestTabs />
     </Wrapper>
   );
 };
