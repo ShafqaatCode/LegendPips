@@ -8,7 +8,8 @@ import ContestHeaderWithModals from '../ContestList/ContestHeader';
 
 import ContestCard from '../Contest/Contest';
 import ContestTabs from './ContestTabs';
-import LeaderBoard from '../Leaderboard/LeaderBoard';
+
+
 
 const Wrapper = styled.section`
   margin-top: 135px;
@@ -83,7 +84,7 @@ const ContestDetails: React.FC = () => {
         sponsorText={contestData?.entry ?? ""}
       />
       {contestData && (
-        <LeaderBoard />
+       <div>Leaderboard</div>
       )}
        <ContestTabs />
     </Wrapper>
