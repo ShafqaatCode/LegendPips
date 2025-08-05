@@ -6,11 +6,13 @@ import { fetchCompetitionById } from '../ContestList/mockApi';
 import Spinner from '../Loaders/spinner';
 import ContestHeaderWithModals from '../ContestList/ContestHeader';
 import Leaderboard from '../Leaderboard/LeaderBoard';
+import ContestCard from '../Contest/Contest';
 
 const Wrapper = styled.section`
   margin-top: 135px;
-  padding: 2rem;
+  /* padding: 2rem; */
   font-family: "Segoe UI", sans-serif;
+  border: 2px solid red;
 `;
 
 const Centered = styled.div`
@@ -61,9 +63,17 @@ const ContestDetails: React.FC = () => {
   return (
     <Wrapper>
       <ContestHeaderWithModals />
-      <h1>Contest Details</h1>
-      <div>Contest ID: {contestId}</div>
-
+     
+      <ContestCard
+        imageSrc={contestData?.logo ?? ''}
+        title={contestData?.title ?? ''}
+        subtitle={contestData?.event ?? " "}
+        eventInfo={contestData?.type ?? '' }
+        endTime={contestData?.ends ? (typeof contestData.ends === 'string' ? new Date(contestData.ends) : contestData.ends) : new Date()}
+        registrationDeadline={contestData?.ends ?? ''}
+        sponsorUrl={''}
+        sponsorText={contestData?.entry ?? ""}
+      />
       {contestData && (
         <Leaderboard />
       )}
