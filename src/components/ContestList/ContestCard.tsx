@@ -130,7 +130,7 @@ const Title = styled.h3`
   margin: 0;
 
   @media (max-width: 768px) {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
   }
 `;
 
@@ -140,6 +140,10 @@ const Type = styled.p`
   margin: 0.1rem 0;
   font-weight: 400;
   line-height: 25px;
+  
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
 `;
 
 const Event = styled.small`
@@ -150,6 +154,10 @@ const Event = styled.small`
   font-weight: 400;
   line-height: 25px;
   
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
+  
 `;
 
 const Tags = styled.div`
@@ -158,7 +166,7 @@ const Tags = styled.div`
   flex-direction: column;
   gap: 0.5rem;
   margin-right: 1rem;
-  // justify-content: center;
+  /* justify-content: center; */
   
   
 `;
@@ -170,6 +178,11 @@ const MarketTag = styled.span`
   font-size: 1rem;
   color: #333;
   line-height: 25px;
+
+  
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
   
 `;
 
