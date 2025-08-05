@@ -2,7 +2,7 @@ import React, { useState, type JSX } from "react";
 import styled from "styled-components";
 import ContestRules from "./ContestRules";
 import ComingSoon from "../../pages/ComminSoon/CommingSoon";
-import Leaderboard from "../LeaderBoard/LeaderBoard";
+import Leaderboard from "../Leaderboard/LeaderBoard";
 
 
 const tabs = [

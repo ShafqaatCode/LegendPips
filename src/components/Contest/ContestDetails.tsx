@@ -5,6 +5,7 @@ import { type Competition } from '../ContestList/mockCompetitions';
 import { fetchCompetitionById } from '../ContestList/mockApi';
 import Spinner from '../Loaders/spinner';
 import ContestHeaderWithModals from '../ContestList/ContestHeader';
+import Leaderboard from '../Leaderboard/LeaderBoard';
 
 const Wrapper = styled.section`
   margin-top: 135px;
@@ -64,22 +65,7 @@ const ContestDetails: React.FC = () => {
       <div>Contest ID: {contestId}</div>
 
       {contestData && (
-        <div style={{ marginTop: "1rem" }}>
-          <h2>{contestData.title}</h2>
-          <p>Status: {contestData.status}</p>
-          <p>Type: {contestData.type}</p>
-          <p>Event: {contestData.event}</p>
-          <p>Entry Fee: {contestData.entry}</p>
-          <p>Participants: {contestData.participants}</p>
-          {contestData.logo && (
-            <img
-              src={contestData.logo}
-              alt={contestData.title}
-              style={{ width: '200px', height: 'auto', marginTop: '1rem' }}
-            />
-          )}
-          <p>Ends: {contestData.ends}</p>
-        </div>
+        <Leaderboard />
       )}
     </Wrapper>
   );

@@ -1,134 +1,194 @@
-import { useState, useMemo } from "react";
-import {
-  Container,
-  SearchPaginationWrapper,
-  SearchWrapper,
-  SearchInput,
-  TopPagination,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableData,
-  UserInfo,
-  Avatar,
-  Username,
-  Pagination,
-  PageButton,
-  AccountLink,
-} from "./LeaderBoard.styled";
-import data from "./data";
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import { fetchLeaderboard, type LeaderboardEntry } from "../api/mockLeaderboard";
+import Spinner from "../Loaders/spinner";
+import { useNavigate } from "react-router-dom";
 
-const rowsPerPage = 10;
 
-const Leaderboard = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+const Leaderboard: React.FC = () => {
+  const [data, setData] = useState<LeaderboardEntry[]>([]);
+  const [filteredData, setFilteredData] = useState<LeaderboardEntry[]>([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const filteredData = useMemo(() => {
-    return data.filter((user) =>
-      (user.username + user.account).toLowerCase().includes(searchTerm.toLowerCase())
+  const perPage = 10;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchLeaderboard().then((res) => {
+      setData(res);
+      setFilteredData(res);
+      setLoading(false);
+    });
+  }, []);
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    const filtered = data.filter((item) =>
+      item.name.toLowerCase().includes(value.toLowerCase())
     );
-  }, [searchTerm]);
-
-  const pageCount = Math.ceil(filteredData.length / rowsPerPage);
-
-  const paginatedData = useMemo(() => {
-    const start = (currentPage - 1) * rowsPerPage;
-    return filteredData.slice(start, start + rowsPerPage);
-  }, [filteredData, currentPage]);
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= pageCount) setCurrentPage(page);
+    setFilteredData(filtered);
+    setCurrentPage(1);
   };
 
-  return (
-    <Container>
-      <SearchPaginationWrapper>
-        <TopPagination>
-          <PageButton onClick={() => handlePageChange(currentPage - 1)}>{"<"}</PageButton>
-          {Array.from({ length: pageCount }, (_, i) => (
-            <PageButton
-              key={i}
-              onClick={() => handlePageChange(i + 1)}
-              active={currentPage === i + 1}
-            >
-              {i + 1}
-            </PageButton>
-          ))}
-          <PageButton onClick={() => handlePageChange(currentPage + 1)}>{">"}</PageButton>
-        </TopPagination>
+  const totalPages = Math.ceil(filteredData.length / perPage);
+  const paginatedData = filteredData.slice((currentPage - 1) * perPage, currentPage * perPage);
 
-        <SearchWrapper>
-          <SearchInput
-            placeholder="Search"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
+  if (loading) return <Spinner />;
+
+  return (
+    <Wrapper>
+      <Header>
+        <Title>Competition Leader-board</Title>
+        <SearchBox>
+          <input
+            type="text"
+            placeholder="Search by name"
+            value={search}
+            onChange={(e) => handleSearch(e.target.value)}
           />
-        </SearchWrapper>
-      </SearchPaginationWrapper>
+        </SearchBox>
+      </Header>
 
       <Table>
-        <TableHead>
-          <TableRow>
-            <TableHeader>#</TableHeader>
-            <TableHeader>User</TableHeader>
-            <TableHeader>Country</TableHeader>
-            <TableHeader>Account</TableHeader>
-            <TableHeader>Equity</TableHeader>
-            <TableHeader>Open Profit</TableHeader>
-            <TableHeader>Profit %</TableHeader>
-            <TableHeader>Peak Drawdown</TableHeader>
-            <TableHeader>Calculated Trades</TableHeader>
-            <TableHeader>Excluded Trades</TableHeader>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {paginatedData.map((user, index) => (
-            <TableRow key={user.id}>
-              <TableData>{(currentPage - 1) * rowsPerPage + index + 1}</TableData>
-              <TableData>
-                <UserInfo>
-                  <Avatar src={user.flag} alt="flag" />
-                  <Username>{user.username}</Username>
-                </UserInfo>
-              </TableData>
-              <TableData>
-                <Avatar src={user.flag} alt="flag" />
-              </TableData>
-              <TableData>
-                <AccountLink>{user.account}</AccountLink>
-              </TableData>
-              <TableData>{user.equity}</TableData>
-              <TableData>{user.openProfit}</TableData>
-              <TableData>{user.profitPercent}</TableData>
-              <TableData>{user.peakDrawdown}</TableData>
-              <TableData>{user.calculatedTrades}</TableData>
-              <TableData>{user.excludedTrades}</TableData>
-            </TableRow>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Account</th>
+            <th>Account Balance</th>
+            <th>Profit %</th>
+            <th>Trades</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedData.map((entry, index) => (
+            <Row
+              key={entry.id}
+              topRank={index + 1 + (currentPage - 1) * perPage <= 3}
+            >
+              <td>{index + 1 + (currentPage - 1) * perPage}</td>
+              <td>{entry.name}</td>
+              <td>{entry.account}</td>
+              <td>{entry.accountBalance.toLocaleString()}</td>
+              <td>{entry.profitPercent.toFixed(2)}%</td>
+              <td>{entry.trades}</td>
+              <td>
+                <ActionButton onClick={() => navigate(`/leaderboard/${entry.id}`)}>
+                  View Details
+                </ActionButton>
+              </td>
+            </Row>
           ))}
-        </TableBody>
+        </tbody>
       </Table>
 
       <Pagination>
-        <PageButton onClick={() => handlePageChange(currentPage - 1)}>{"<"}</PageButton>
-        {Array.from({ length: pageCount }, (_, i) => (
+        {Array.from({ length: totalPages }, (_, i) => (
           <PageButton
-            key={i}
-            onClick={() => handlePageChange(i + 1)}
+            key={i + 1}
             active={currentPage === i + 1}
+            onClick={() => setCurrentPage(i + 1)}
           >
             {i + 1}
           </PageButton>
         ))}
-        <PageButton onClick={() => handlePageChange(currentPage + 1)}>{">"}</PageButton>
       </Pagination>
-    </Container>
+    </Wrapper>
   );
 };
 
 export default Leaderboard;
+
+// Styled Components
+const Wrapper = styled.div`
+  padding: 2rem;
+  font-family: "Segoe UI", sans-serif;
+  background: #f8fafc;
+`;
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+`;
+
+const Title = styled.h2`
+  font-size: 1.5rem;
+  color: #0f172a;
+`;
+
+const SearchBox = styled.div`
+  input {
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    min-width: 220px;
+  }
+`;
+
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: white;
+  border-radius: 6px;
+  overflow: hidden;
+
+  thead {
+    background: #0f172a;
+    color: white;
+  }
+
+  th, td {
+    text-align: center;
+    padding: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+`;
+
+const Row = styled.tr<{ topRank: boolean }>`
+  background: ${({ topRank }) => (topRank ? "#f0fdf4" : "white")};
+
+  &:hover {
+    background: #f1f5f9;
+  }
+`;
+
+const ActionButton = styled.button`
+  background: #0f172a;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+
+  &:hover {
+    background: #1e293b;
+  }
+`;
+
+const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  gap: 0.3rem;
+`;
+
+const PageButton = styled.button<{ active: boolean }>`
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: ${({ active }) => (active ? "#0f172a" : "white")};
+  color: ${({ active }) => (active ? "white" : "#0f172a")};
+  cursor: pointer;
+
+  &:hover {
+    background: ${({ active }) => (active ? "#1e293b" : "#f1f5f9")};
+  }
+`;
