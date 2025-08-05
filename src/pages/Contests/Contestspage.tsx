@@ -1,14 +1,12 @@
 import React from 'react'
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
-import { FaUpload } from 'react-icons/fa';
 
-import AdBanner from '../../components/Ads/AdBanner';
 // import Contest from '../../components/ContestTable/Contest';
 // import ContestImg from '../../assets/Contest_Images/wmug5dukcys 1.png'
 // import ContestInfo from '../../components/ContestTable/ContestInstruction';
 
 import Competitions from '../../components/Contest/Competitions';
+import ContestHeaderWithModals from '../../components/Contest/ContestHeader';
 const MainContainer = styled.main`
   margin-top: 135px;
   margin:135px auto;
@@ -19,59 +17,18 @@ const MainContainer = styled.main`
   
 `
 
-const ToplinksBar = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: auto;
-  padding: 10px;
-
-`
-
-const FeedbackLinks = styled.div`
-  
-
-`
-const BroadCrumbRow = styled.div`
-  
-
-`
 
 const Contests: React.FC = () => {
 
 
   return (
     <MainContainer>
-      <ToplinksBar>
-        <BroadCrumbRow>
-          <Link to="/home">
-            Home
-          </Link>
-          <span> / </span>
+     
 
-          Contests
-
-        </BroadCrumbRow>
-        <FeedbackLinks>
-          <Link to="/Feedback">
-            Feedback
-          </Link>
-          <span> | </span>
-          <Link to="/Feedback">
-            Help Improve this page
-          </Link>
-          <span> | </span>
-
-          <Link to="/share">
-            Share <FaUpload />
-          </Link>
+      <ContestHeaderWithModals />
 
 
-        </FeedbackLinks>
-      </ToplinksBar>
-
-
-      <AdBanner />
+ 
 
 
       {/* <ContestList /> */}
@@ -86,6 +43,7 @@ const Contests: React.FC = () => {
       <ContestInfo /> */}
 
       <Competitions />
+     
       
      
 

@@ -35,6 +35,6 @@ const AdBannerWrapper = styled.div`
     object-fit: contain;
   }
     @media (max-width: 768px) {
-        
+        margin: 0 auto;;
     }
 `;
