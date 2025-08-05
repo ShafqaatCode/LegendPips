@@ -109,8 +109,26 @@ const Filter = styled.div`
     padding: 0.4rem 0.8rem;
     font-size: 1rem;
     border-radius: 6px;
-    border: 1px solid #ccc;
+    border: 1px solid #050505;
+    background-color: #132E58;
+    color: white;
+   
+
+    option:checked {
+    background-color: #132e58;
+    color: #fff;
+    border-radius: 5px;
   }
+
+   option {
+    background-color: #fff;
+    color: #333;
+  }
+   
+  }
+
+
+  
 `;
 
 const Loading = styled.div`
