@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { fetchCompetitions } from "./mockApi";
 import type { Competition } from "./mockCompetitions";
 import ContestCard from "./ContestCard";
-
+import TrophyImg from "../../assets/Group.png"
 const filters = ["All", "Upcoming", "Ongoing", "Ended"];
 
 const Competitions: React.FC = () => {
@@ -35,7 +35,7 @@ const Competitions: React.FC = () => {
   return (
     <Wrapper>
       <Header>
-        <Title>🏆 Competitions</Title>
+        <Title> <img src={TrophyImg} alt="TrophyIcon" /> Competitions</Title>
         <Filter>
           <select
             value={activeFilter}
@@ -84,19 +84,24 @@ export default Competitions;
 
 // Styled Components
 const Wrapper = styled.div`
-  padding: 2rem;
-  /* font-family: "Segoe UI", sans-serif; */
+  padding: 2rem 4rem;
+  border: 2px solid red;
 `;
 
 const Header = styled.div`
   display: flex;
   justify-content: space-between;
   margin: 2rem 0;
+  
 `;
 
 const Title = styled.h2`
   font-size: 2rem;
   color: #012d5c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 `;
 
 const Filter = styled.div`
@@ -117,8 +122,13 @@ const Loading = styled.div`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  // grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 2.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const Pagination = styled.div`
