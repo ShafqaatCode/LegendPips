@@ -9,9 +9,8 @@ import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-sv
 const MainWrapper = styled.main`
     /* height: 600px; */
     background-color: #fff;
-   
     padding: 3rem 0;
- 
+
 `
 
 const Container = styled.section`
