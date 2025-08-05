@@ -84,10 +84,6 @@ export default Competitions;
 
 
 
-
-
-
-
 const Wrapper = styled.div`
   padding: 2rem 4rem;
   @media (max-width: 768px) {
