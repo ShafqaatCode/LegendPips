@@ -58,5 +58,27 @@ export const competitionsData: Competition[] = [
     ends: "Jul 11, 2025, 01:00 PM",
     logo: contestImg1,
   },
+  {
+    id: 5,
+    title: "Crypto Challenge",
+    type: "Weekly",
+    event: "",
+    status: "Ended",
+    participants: 1820,
+    entry: "Free",
+    ends: "Jul 11, 2025, 01:00 PM",
+    logo: contestImg1,
+  },
+  {
+    id: 6,
+    title: "Crypto Challenge",
+    type: "Weekly",
+    event: "",
+    status: "Ended",
+    participants: 1820,
+    entry: "Free",
+    ends: "Jul 11, 2025, 01:00 PM",
+    logo: contestImg1,
+  },
   
 ];

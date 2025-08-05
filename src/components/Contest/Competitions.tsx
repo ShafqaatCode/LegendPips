@@ -90,14 +90,22 @@ export default Competitions;
 
 const Wrapper = styled.div`
   padding: 2rem 4rem;
+  @media (max-width: 768px) {
+    padding: 1rem 2rem;
+  }
   
 `;
 
 const Header = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin: 2rem 0;
-  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    
+  }
 `;
 
 const Title = styled.h2`
@@ -124,6 +132,14 @@ const Filter = styled.div`
     color: #333;
   }
    
+  }
+
+  @media (max-width: 768px) {
+    /* width: 100%; */
+    margin-top: 1rem;
+   
+    text-align: right;
+    
   }
 
 
