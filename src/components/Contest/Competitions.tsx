@@ -82,7 +82,12 @@ const Competitions: React.FC = () => {
 
 export default Competitions;
 
-// Styled Components
+
+
+
+
+
+
 const Wrapper = styled.div`
   padding: 2rem 4rem;
   
@@ -112,13 +117,7 @@ const Filter = styled.div`
     border: 1px solid #050505;
     background-color: #132E58;
     color: white;
-   
 
-    option:checked {
-    background-color: #132e58;
-    color: #fff;
-    border-radius: 5px;
-  }
 
    option {
     background-color: #fff;
@@ -130,6 +129,8 @@ const Filter = styled.div`
 
   
 `;
+
+
 
 const Loading = styled.div`
   text-align: center;
@@ -152,7 +153,7 @@ const Grid = styled.div`
 const Pagination = styled.div`
   display: flex;
   justify-content: center;
-  margin-top: 1.5rem;
+  margin-top: 3rem;
   gap: 0.4rem;
 `;
 

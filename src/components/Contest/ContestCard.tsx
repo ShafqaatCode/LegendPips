@@ -3,6 +3,9 @@ import styled from "styled-components";
 import { type Competition } from "./mockCompetitions";
 import YellowCircleIcon from "../../assets/Ellipse_3955.svg";
 import GreenCircleIcon from "../../assets/Ellipse3956.svg";
+
+import EntryImg from "../../assets/tag1.png";
+import PeopleImg from "../../assets/friend1.png";
 interface ContestCardProps {
   comp: Competition;
 }
@@ -36,8 +39,8 @@ const ContestCard: React.FC<ContestCardProps> = ({ comp }) => {
 
       <Footer>
         <Info>
-          <span>🎟️ Entery: <Highlight>{comp.entry}</Highlight></span>
-          <span>👥 Participants: <Highlight>{comp.participants}</Highlight></span>
+          <span><img src={EntryImg} alt="Entery Icon" /> Entery: <Highlight>{comp.entry}</Highlight></span>
+          <span><img src={PeopleImg} alt="" /> Participants: <Highlight>{comp.participants}</Highlight></span>
         </Info>
         <DetailsButton>View Details ↗</DetailsButton>
       </Footer>
@@ -51,7 +54,7 @@ export default ContestCard;
 const Card = styled.div`
   background: #fff;
   border-radius: 10px;
-  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
+  
   overflow: hidden;
   font-family: "Segoe UI", sans-serif;
   display: flex;
@@ -189,8 +192,14 @@ const Info = styled.div`
   font-size: 1rem;
   color: #000000;
   font-weight: 300;
-  
-  
+ 
+  span{
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    
+   
+  }
   
 `;
 
