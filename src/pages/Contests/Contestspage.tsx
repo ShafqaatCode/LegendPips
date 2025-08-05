@@ -5,8 +5,8 @@ import styled from 'styled-components';
 // import ContestImg from '../../assets/Contest_Images/wmug5dukcys 1.png'
 // import ContestInfo from '../../components/ContestTable/ContestInstruction';
 
-import Competitions from '../../components/Contest/Competitions';
-import ContestHeaderWithModals from '../../components/Contest/ContestHeader';
+import Competitions from '../../components/ContestList/Competitions';
+import ContestHeaderWithModals from '../../components/ContestList/ContestHeader';
 const MainContainer = styled.main`
   margin-top: 135px;
   margin:135px auto;

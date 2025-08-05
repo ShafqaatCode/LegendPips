@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { FaShareAlt } from "react-icons/fa";
 import ShareModal from "../Feedback/ShareModal";
 import FeedbackModal from "../Feedback/FeedbackModal";
-import AdBanner from "../../components/Ads/AdBanner";
+import AdBanner from "../Ads/AdBanner";
 
 const ContestHeaderWithModals: React.FC = () => {
   const [isShareOpen, setShareOpen] = useState(false);

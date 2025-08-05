@@ -6,11 +6,18 @@ import GreenCircleIcon from "../../assets/Ellipse3956.svg";
 
 import EntryImg from "../../assets/tag1.png";
 import PeopleImg from "../../assets/friend1.png";
+import { useNavigate } from "react-router-dom";
 interface ContestCardProps {
   comp: Competition;
 }
 
 const ContestCard: React.FC<ContestCardProps> = ({ comp }) => {
+
+  const navigate = useNavigate();
+  const handleViewDetails = () => {
+    navigate(`/contests/${comp.id}`);
+  }
+
   return (
     <Card>
       <Header status={comp.status}>
@@ -42,7 +49,7 @@ const ContestCard: React.FC<ContestCardProps> = ({ comp }) => {
           <span><img src={EntryImg} alt="Entery Icon" /> Entery: <Highlight>{comp.entry}</Highlight></span>
           <span><img src={PeopleImg} alt="" /> Participants: <Highlight>{comp.participants}</Highlight></span>
         </Info>
-        <DetailsButton>View Details ↗</DetailsButton>
+        <DetailsButton onClick={handleViewDetails} >View Details ↗</DetailsButton>
       </Footer>
     </Card>
   );

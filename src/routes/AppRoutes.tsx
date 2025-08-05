@@ -11,6 +11,7 @@ import SignalsPage from "../pages/SignalsPage/SignalsPage";
 import Forum from "../pages/Forum/Forum";
 import LoginForm from "../pages/Login/LoginForm";
 import RegisterForm from "../pages/Register/RegisterForm";
+import ContestDetails from "../components/Contest/ContestDetails";
 
 // 👇 Add these imports
 
@@ -18,7 +19,7 @@ import RegisterForm from "../pages/Register/RegisterForm";
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* ⬇ Public routes (outside Layout) */}
+      
       <Route path="/signin" element={<LoginForm />}/>
       <Route path="/register" element={<RegisterForm />} />
 
@@ -27,7 +28,10 @@ const AppRoutes: React.FC = () => {
         <Route index element={<HomePage />} />
         <Route path="tools" element={<Tools />} />
         <Route path="brokers" element={<Brokers />} />
+        
         <Route path="contests" element={<Contests />} />
+        <Route path="contests/:contestId" element={<ContestDetails />} />
+        
         <Route path="signals" element={<SignalsPage />} />
         <Route path="rebates" element={<RebateBrokers />} />
         <Route path="analysis" element={<Analysis />} />

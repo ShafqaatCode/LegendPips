@@ -10,7 +10,7 @@ import Testimonials from "../../components/Testimonials/Testimonials";
 import FAQ from "../../components/Faqs/Faqs";
 import Tabs from "../../components/Signals/Tabs/Tabs";
 import CommunitySection from "../../components/Community/CommunitySection";
-import ContestSection from "../../components/Contest/ContestSection";
+import ContestSection from "../../components/ContestList/ContestSection";
 
 
 
