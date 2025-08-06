@@ -6,9 +6,6 @@ import { fetchCompetitionById } from '../ContestList/mockApi';
 import Spinner from '../Loaders/spinner';
 import ContestHeaderWithModals from '../ContestList/ContestHeader';
 import ContestHeader from './ContestHeader';
-import ContestTabs from './ContestTabs';
-import Podium from '../Winnerpodium/Podium';
-import LeaderBoard from '../Leaderboard/Leaderboard';
 import ContestInfo from './ContestInstruction';
 
 
@@ -76,13 +73,10 @@ const ContestDetails: React.FC = () => {
       <ContestHeaderWithModals />
 
 
-      <ContestHeader />
+      <ContestHeader contestData={contestData}/>
 
       <ContestInfo />
-      {contestData && (
-        <LeaderBoard />
-      )}
-      
+     
 
 
     </Wrapper>

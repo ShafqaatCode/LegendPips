@@ -1,37 +1,45 @@
-import React, { useEffect, useState } from "react";
+// import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
-import { fetchCompetitionById } from "../ContestList/mockApi";
+// import { useParams } from "react-router-dom";
+// import { fetchCompetitionById } from "../ContestList/mockApi";
 import { type Competition } from "../ContestList/mockCompetitions";
 
-import Spinner from "../Loaders/spinner";
+// import Spinner from "../Loaders/spinner";
 import CountDown from "../CountdownTimer/CountdownTimer";
 import Podium from "../Winnerpodium/Podium";
 import TrophyImg from "../../assets/icons/Trophy.svg";
 import PeopleIcon from "../../assets/friend1.png";
 
-const ContestHeader: React.FC = () => {
-  const { contestId } = useParams<{ contestId: string }>();
-  const [contestData, setContestData] = useState<Competition | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface ContestHeaderProps {
+  contestData: Competition | null;
+}
 
-  useEffect(() => {
-    if (!contestId) return;
+const ContestHeader: React.FC<ContestHeaderProps> = ({contestData}) => {
+  // const { contestId } = useParams<{ contestId: string }>();
+  // const [contestData, setContestData] = useState<Competition | null>(null);
+  // const [loading, setLoading] = useState(true);
+  // const [error, setError] = useState<string | null>(null);
 
-    setLoading(true);
-    fetchCompetitionById(parseInt(contestId))
-      .then((data) => {
-        if (!data) throw new Error("Contest not found");
-        setContestData(data);
-      })
-      .catch(() => setError("Failed to fetch contest data"))
-      .finally(() => setLoading(false));
-  }, [contestId]);
+  // useEffect(() => {
+  //   if (!contestId) return;
 
-  if (loading) return <Spinner />;
-  if (error || !contestData)
-    return <ErrorMessage>{error || "Contest not found"}</ErrorMessage>;
+  //   setLoading(true);
+  //   fetchCompetitionById(parseInt(contestId))
+  //     .then((data) => {
+  //       if (!data) throw new Error("Contest not found");
+  //       setContestData(data);
+  //     })
+  //     .catch(() => setError("Failed to fetch contest data"))
+  //     .finally(() => setLoading(false));
+  // }, [contestId]);
+
+  // if (loading) return <Spinner />;
+  // if (error || !contestData)
+  //   return <ErrorMessage>{error || "Contest not found"}</ErrorMessage>;
+
+  if (!contestData) {
+    return <ErrorMessage>Contest data not found.</ErrorMessage>;
+  }
 
   const endDate = new Date(contestData.ends); // Correct Date for countdown
 
