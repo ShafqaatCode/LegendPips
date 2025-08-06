@@ -1,24 +1,51 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FaShareAlt } from "react-icons/fa";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchCompetitionById } from "./mockApi";
+import type { Competition } from "./mockCompetitions";
+
 import ShareModal from "../Feedback/ShareModal";
 import FeedbackModal from "../Feedback/FeedbackModal";
 import AdBanner from "../Ads/AdBanner";
 
-const ContestHeaderWithModals: React.FC = () => {
+interface Props {
+  heading?: string;
+}
+
+const ContestHeaderWithModals: React.FC<Props> = ({ heading }) => {
   const [isShareOpen, setShareOpen] = useState(false);
   const [isFeedbackOpen, setFeedbackOpen] = useState(false);
+  const [contestTitle, setContestTitle] = useState<string>("");
 
-  const shareUrl = window.location.href; 
+  const navigate = useNavigate();
+  const { contestId } = useParams<{ contestId: string }>();
+
+  
+  useEffect(() => {
+    if (contestId) {
+      fetchCompetitionById(parseInt(contestId)).then((data: Competition | null) => {
+        if (data?.title) setContestTitle(data.title);
+        else setContestTitle(""); // fallback if not found
+      });
+    } else {
+      setContestTitle(""); // clear on list page
+    }
+  }, [contestId]);
+
+  const shareUrl = window.location.href;
 
   return (
     <>
       <Wrapper>
-        
+        {/* Top Bar */}
         <TopBar>
           <Breadcrumb>
-            <HomeLink href="#">Home</HomeLink> / <Current>Contests list</Current>
+            <HomeLink onClick={() => navigate("/")}>Home</HomeLink> / Contest List
+            {contestTitle && <span>/</span>}
+            {contestTitle && <Current>{contestTitle}</Current>}
           </Breadcrumb>
+
           <Actions>
             <ActionLink onClick={() => setFeedbackOpen(true)}>
               Feedback / Help improve this page
@@ -30,39 +57,30 @@ const ContestHeaderWithModals: React.FC = () => {
           </Actions>
         </TopBar>
 
-
+        {/* Banner */}
         <Banner>
           <AdBanner />
         </Banner>
 
-        
-        <Heading>
-          Elite Skills Contest on the Web We Never Ask for Real Money!
-        </Heading>
+      
+        {heading && <Heading>{heading}</Heading>}
       </Wrapper>
 
-      
-      <ShareModal
-        isOpen={isShareOpen}
-        onClose={() => setShareOpen(false)}
-        shareUrl={shareUrl}
-      />
-
-      <FeedbackModal
-        isOpen={isFeedbackOpen}
-        onClose={() => setFeedbackOpen(false)}
-      />
+      {/* Modals */}
+      <ShareModal isOpen={isShareOpen} onClose={() => setShareOpen(false)} shareUrl={shareUrl} />
+      <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setFeedbackOpen(false)} />
     </>
   );
 };
 
 export default ContestHeaderWithModals;
 
+// ---------------- Styled Components ----------------
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  color: #0f172a;
+  color: #0F172A;
   background-color: #fff;
   padding: 0.5rem;
   margin: 0.5rem;
@@ -76,23 +94,18 @@ const TopBar = styled.div`
   font-weight: 500;
   flex-wrap: wrap;
   gap: 0.5rem;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
 `;
 
 const Breadcrumb = styled.div`
   display: flex;
   gap: 0.3rem;
+  flex-wrap: wrap;
 `;
 
-const HomeLink = styled.a`
-  color: #0f172a;
+const HomeLink = styled.span`
+  color: #0F172A;
   text-decoration: underline;
-  font-weight: 400;
+  cursor: pointer;
 
   &:hover {
     text-decoration: underline;
@@ -101,6 +114,7 @@ const HomeLink = styled.a`
 
 const Current = styled.span`
   font-weight: 600;
+  word-wrap: break-word;
 `;
 
 const Actions = styled.div`
@@ -127,7 +141,7 @@ const Share = styled.span`
   display: flex;
   align-items: center;
   cursor: pointer;
-  color: #0f172a;
+  color: #0F172A;
 
   &:hover {
     text-decoration: underline;
@@ -136,28 +150,33 @@ const Share = styled.span`
 
 const Banner = styled.div`
   width: 100%;
-  
+
   img {
     width: 100%;
     border-radius: 4px;
+  }
+
+  @media (max-width: 768px) {
+    img {
+      width: 100%;
+      height: auto;
+      min-height: 150px; /* makes ad visually bigger on mobile */
+    }
   }
 `;
 
 const Heading = styled.h2`
   text-align: center;
-  max-width: 900px;
   width: 100%;
+  max-width: 1000px;
   font-size: 2.5rem;
   font-weight: 400;
   color: #132e58;
-  margin: 1rem auto;
+  margin: 2rem auto;
+  word-wrap: break-word;
 
   @media (max-width: 768px) {
     font-size: 1.8rem;
     padding: 0 1rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1.5rem;
   }
 `;

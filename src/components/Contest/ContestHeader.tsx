@@ -15,33 +15,13 @@ interface ContestHeaderProps {
 }
 
 const ContestHeader: React.FC<ContestHeaderProps> = ({contestData}) => {
-  // const { contestId } = useParams<{ contestId: string }>();
-  // const [contestData, setContestData] = useState<Competition | null>(null);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   if (!contestId) return;
-
-  //   setLoading(true);
-  //   fetchCompetitionById(parseInt(contestId))
-  //     .then((data) => {
-  //       if (!data) throw new Error("Contest not found");
-  //       setContestData(data);
-  //     })
-  //     .catch(() => setError("Failed to fetch contest data"))
-  //     .finally(() => setLoading(false));
-  // }, [contestId]);
-
-  // if (loading) return <Spinner />;
-  // if (error || !contestData)
-  //   return <ErrorMessage>{error || "Contest not found"}</ErrorMessage>;
 
   if (!contestData) {
     return <ErrorMessage>Contest data not found.</ErrorMessage>;
   }
 
-  const endDate = new Date(contestData.ends); // Correct Date for countdown
+  const endDate = new Date(contestData.ends); 
 
   const formattedDate = endDate.toLocaleString("en-US", {
     month: "short",
@@ -76,12 +56,12 @@ const ContestHeader: React.FC<ContestHeaderProps> = ({contestData}) => {
         </ContentWrapper>
       </LeftSection>
 
-      {/* Middle Section */}
+      
       <MiddleSection>
         <Podium first="Alice" second="Bob" third="Charlie" />
       </MiddleSection>
 
-      {/* Right Section */}
+      {/* Right Sectioddn */}
       <RightSection>
         {contestData.status !== "Ended" && (
           <>
@@ -127,6 +107,7 @@ const CardContainer = styled.div`
   padding: 1.5rem 2rem;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
   flex-wrap: wrap;
+  margin: 0.5rem;
   
   /* gap: 1rem; */
 `;

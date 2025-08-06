@@ -6,7 +6,7 @@ import styled from 'styled-components';
 // import ContestInfo from '../../components/ContestTable/ContestInstruction';
 
 import Competitions from '../../components/ContestList/Competitions';
-import ContestHeaderWithModals from '../../components/ContestList/ContestHeader';
+import ContestHeaderWithModals from '../../components/ContestList/BrodcumHeader';
 const MainContainer = styled.main`
   margin-top: 135px;
   margin:135px auto;
@@ -23,30 +23,8 @@ const Contests: React.FC = () => {
 
   return (
     <MainContainer>
-     
-
-      <ContestHeaderWithModals />
-
-
- 
-
-
-      {/* <ContestList /> */}
-      {/* <Contest imageSrc={ContestImg}
-        title="Q2 Special – The Major's Mix II"
-        subtitle="IC TRADING CUP 2025"
-        eventInfo="Traders Cup Event 7 of 16"
-        endTime={new Date('2025-07-27T13:00:00')}
-        registrationDeadline="Jul 18, 2025, 01:00 PM"
-        sponsorUrl="https://ictrading.com"
-        sponsorText="ictrading.com" />
-      <ContestInfo /> */}
-
+      <ContestHeaderWithModals heading='Elite Skills Contest on the Web We Never Ask for Real Money!' />
       <Competitions />
-     
-      
-     
-
     </MainContainer>
   )
 }
