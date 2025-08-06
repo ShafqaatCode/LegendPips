@@ -17,7 +17,7 @@ const Accordion = styled.div`
   margin-bottom: 1rem;
   overflow: hidden;
   background: #fff;
-  border: 2px solid red
+  
 `;
 
 const Header = styled.div`
