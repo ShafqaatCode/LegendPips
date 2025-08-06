@@ -37,15 +37,17 @@ const InfoBox = styled.div`
   color: #132e58;
   margin-bottom: 1.5rem;
   max-width: 1000px;
+  
 
   @media (max-width : 768px){
-    font-size: 14px;
+    font-size: 16px;
     padding: 0;
   }
 `;
 
 const SelectLabel = styled.label`
-  display: block;
+font-size: 20px;
+  /* display: block; */
   margin: 1rem 0 0.5rem;
   font-weight: 500;
 `;

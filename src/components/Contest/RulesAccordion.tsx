@@ -17,6 +17,10 @@ const Accordion = styled.div`
   margin-bottom: 1rem;
   overflow: hidden;
   background: #fff;
+
+  ul{
+    list-style: none;
+  }
   
 `;
 
@@ -38,9 +42,16 @@ const Title = styled.h3`
 `;
 
 const Icon = styled.img`
-  width: 40px;
-  height: 40px;
+  width: 100px;
+  height: 100px;
   margin-left: 1rem;
+
+  @media (max-width: 768px)
+  {
+    height: 80px;
+    width: 80px;
+    
+  }
 `;
 
 const Toggle = styled.span`

@@ -33,7 +33,7 @@ const Leaderboard: React.FC = () => {
     return (
         <Wrapper>
             <Titlebar>
-                <Title>Competition Leader-board</Title>
+                <Title>Competition Leaderboard</Title>
                 <SearchBar>
                     <FaSearch />
                     <input type="text"

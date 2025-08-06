@@ -9,11 +9,11 @@ const Note: React.FC = () => {
             <NoteTitle><FaExclamationCircle color="#be1a07" /> Please Note:</NoteTitle>
             <NoteList>
                 <li>If you already have MT5 installed on your mobile device and need to find the broker/server, follow these steps:</li>
-                <li>1. Open the MT5 app and tap the ‘+’ symbol in the top-right corner.</li>
-                <li>2. In the search bar, start typing “Raw Trading...”</li>
+                <li>1. Open the <b>MT5 app</b> and tap the ‘+’ symbol in the top-right corner.</li>
+                <li>2. In the search bar, start typing <b>“Raw Trading...”</b></li>
                 <li>3. From the list of results, select “Raw Trading (Mauritius) Ltd.”</li>
-                <li>4. On the “Login to an existing account” screen, enter your contest login credentials.</li>
-                <li>5. Choose the server named “ICTrading-Demo”</li>
+                <li>4. On the <b>“Login to an existing account”</b> screen, enter your contest login credentials.</li>
+                <li>5. Choose the server named <b>“ICTrading-Demo”</b></li>
             </NoteList>
             <FooterNote>You're all set — best of luck in the contest :)</FooterNote>
         </NoteBox>
@@ -60,9 +60,10 @@ const NoteList = styled.ul`
   @media (max-width: 768px)
   {
     font-size: 16px;
-
+margin-left: 0.5rem;
     li{
         font-size: 16px;
+        
     }
   }
 `;
