@@ -58,7 +58,7 @@ const ContestHeader: React.FC<ContestHeaderProps> = ({contestData}) => {
 
       
       <MiddleSection>
-        <Podium first="Alice" second="Bob" third="Charlie" />
+        <Podium first="Vie" second="Mohmi" third="Taj Wali..." />
       </MiddleSection>
 
       {/* Right Sectioddn */}

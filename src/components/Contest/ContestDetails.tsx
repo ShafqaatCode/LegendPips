@@ -6,11 +6,11 @@ import { fetchCompetitionById } from '../ContestList/mockApi';
 import Spinner from '../Loaders/spinner';
 import ContestHeaderWithModals from '../ContestList/BrodcumHeader';
 import ContestHeader from './ContestHeader';
-import ContestInfo from './ContestInstruction';
+
 
 import Leaderboard from '../Leaderboard/LeaderboardTable';
 import TabButtons from './TabButtons';
-import Note from './Note';
+
 
 
 
