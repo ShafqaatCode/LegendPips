@@ -121,6 +121,7 @@ const Titlebar = styled.div`
   @media (max-width: 768px)
   {
    flex-direction: column;
+   
    gap: 1rem;
   }
 `;
@@ -129,6 +130,11 @@ const Title = styled.h2`
   font-weight: 700;
   color: #132e58;
   margin-bottom: 0.5rem;
+
+  @media (max-width: 768px)
+  {
+    font-size: 1.6rem;
+  }
 `;
 
 const SearchBar = styled.div`
