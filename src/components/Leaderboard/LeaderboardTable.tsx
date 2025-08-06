@@ -102,6 +102,12 @@ const Wrapper = styled.div`
   background: #f9fafb;
   padding: 1rem;
   border-radius: 6px;
+
+  
+  @media (max-width: 768px)
+  {
+  
+  }
 `;
 
 
@@ -110,6 +116,13 @@ const Titlebar = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+
+  
+  @media (max-width: 768px)
+  {
+   flex-direction: column;
+   gap: 1rem;
+  }
 `;
 const Title = styled.h2`
   font-size: 2rem;
@@ -141,6 +154,13 @@ const TableWrapper = styled.div`
 padding:0 2rem;
   overflow-x: auto;
   width: 100%;
+  white-space: nowrap;
+
+  
+  @media (max-width: 768px)
+  {
+    padding: 0 1rem;
+  }
 `;
 
 const Table = styled.table`

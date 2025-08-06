@@ -38,6 +38,12 @@ const NoteTitle = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
+
+  
+  @media (max-width: 768px)
+  {
+    font-size: 20px;
+  }
 `;
 
 const NoteList = styled.ul`
@@ -48,6 +54,16 @@ const NoteList = styled.ul`
   
   li{
     font-size: 1.2rem;
+  }
+
+  
+  @media (max-width: 768px)
+  {
+    font-size: 16px;
+
+    li{
+        font-size: 16px;
+    }
   }
 `;
 

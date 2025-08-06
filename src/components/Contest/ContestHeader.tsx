@@ -110,6 +110,13 @@ const CardContainer = styled.div`
   margin: 0.5rem;
   
   /* gap: 1rem; */
+
+  
+  @media (max-width: 768px)
+  {
+    font-size: 20px;
+    padding: 1rem 1rem;
+  }
 `;
 
 const LeftSection = styled.div``
@@ -136,13 +143,25 @@ const ContentWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  min-width: 250px;
+  /* min-width: 250px; */
+
+  
+
+
+  
 `;
 
 const BannerImage = styled.img`
   width: 150px;
   height: 150px;
   object-fit: cover;
+
+  
+  @media (max-width: 768px)
+  {
+    width: 100px;
+    height: 100px;
+  }
 `;
 
 const TextInfo = styled.div`
@@ -157,6 +176,11 @@ const Title = styled.h2`
   max-width: 350px;
   overflow-wrap: break-word; 
   word-break: break-word;
+
+  @media (max-width: 768px)
+  {
+    font-size: 20px;
+  }
 `;
 
 const Subtitle = styled.h3`

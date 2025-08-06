@@ -6,8 +6,8 @@ const AccordionWrapper = styled.div`
   margin: 0 4rem;
 
 
-    @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-        margin: 0 1rem;
+    @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+        margin: 0;
     }
 `;
 
@@ -17,6 +17,7 @@ const Accordion = styled.div`
   margin-bottom: 1rem;
   overflow: hidden;
   background: #fff;
+  border: 2px solid red
 `;
 
 const Header = styled.div`

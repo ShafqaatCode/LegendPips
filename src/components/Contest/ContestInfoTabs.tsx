@@ -37,6 +37,11 @@ const InfoBox = styled.div`
   color: #132e58;
   margin-bottom: 1.5rem;
   max-width: 1000px;
+
+  @media (max-width : 768px){
+    font-size: 14px;
+    padding: 0;
+  }
 `;
 
 const SelectLabel = styled.label`
@@ -63,8 +68,17 @@ const Warning = styled.div`
   strong {
     display: block;
     font-weight: bold;
-    color: #1a1e4d;
+    color: #132e58;
     margin-bottom: 0.25rem;
+  }
+
+  @media (max-width: 768px)
+  {
+    font-size: 14px;
+
+    strong{
+        font-size: 16px;
+    }
   }
 `;
 
@@ -74,6 +88,11 @@ const CountryBox = styled.div`
   justify-content: baseline;
   gap: 1rem;
   margin-bottom: 1.5rem;
+
+  @media (max-width: 768px)
+  {
+    flex-direction: column;
+  }
 `;
 
 
