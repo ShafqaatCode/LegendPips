@@ -10,6 +10,7 @@ import ContestHeader from './ContestHeader';
 
 import Leaderboard from '../Leaderboard/LeaderboardTable';
 import TabButtons from './TabButtons';
+import ContestInfoTabs from './ContestInfoTabs';
 
 
 
@@ -85,6 +86,7 @@ const ContestDetails: React.FC = () => {
       <TabButtons />
 
       <Leaderboard />
+      <ContestInfoTabs />
       
 
 
