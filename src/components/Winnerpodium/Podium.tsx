@@ -13,10 +13,14 @@ const PodiumWrapper = styled.div`
   display: inline-flex;
   justify-content: center;
   align-items: flex-end;
-  
+  /* border: 2px solid red; */
   margin: 2rem 0 0rem;
   
+@media (max-width: 768px) {
 
+
+}
+    
   
 `;
 

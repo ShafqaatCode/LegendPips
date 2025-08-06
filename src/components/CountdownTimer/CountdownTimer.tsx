@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import {
-  CountdownBox,
-  Colon,
-  TimeUnit
-} from "./CountdownTimer.styles"
+import React, { useEffect, useState, useRef } from 'react';
+import { CountdownBox, Colon, TimeUnit } from "./CountdownTimer.styles";
 
 interface CountDownProps {
   endTime: Date;
 }
 
+interface TimeLeft {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
+
 const CountDown: React.FC<CountDownProps> = ({ endTime }) => {
-  const calculateTimeLeft = () => {
+  const calculateTimeLeft = (): TimeLeft => {
     const now = new Date().getTime();
     const end = endTime.getTime();
     const difference = end - now;
@@ -27,19 +30,35 @@ const CountDown: React.FC<CountDownProps> = ({ endTime }) => {
     };
   };
 
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+  const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft());
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    const timer = setInterval(() => setTimeLeft(calculateTimeLeft()), 1000);
-    return () => clearInterval(timer);
+    intervalRef.current = setInterval(() => {
+      const newTimeLeft = calculateTimeLeft();
+      setTimeLeft(newTimeLeft);
+
+      // Stop timer if finished
+      if (
+        newTimeLeft.days === 0 &&
+        newTimeLeft.hours === 0 &&
+        newTimeLeft.minutes === 0 &&
+        newTimeLeft.seconds === 0
+      ) {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+      }
+    }, 1000);
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [endTime]);
 
   return (
     <CountdownBox>
       <TimeUnit>
         <strong>{timeLeft.days}</strong>
-
-        <span>DAY</span>
+        <span>{timeLeft.days === 1 ? "DAY" : "DAYS"}</span>
       </TimeUnit>
       <Colon>:</Colon>
       <TimeUnit>

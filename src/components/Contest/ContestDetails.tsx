@@ -5,11 +5,12 @@ import { type Competition } from '../ContestList/mockCompetitions';
 import { fetchCompetitionById } from '../ContestList/mockApi';
 import Spinner from '../Loaders/spinner';
 import ContestHeaderWithModals from '../ContestList/ContestHeader';
-import ContestCard from '../Contest/Contest';
+import ContestHeader from './ContestHeader';
 import ContestTabs from './ContestTabs';
 import Podium from '../Winnerpodium/Podium';
 import LeaderBoard from '../Leaderboard/Leaderboard';
 import ContestInfo from './ContestInstruction';
+
 
 
 
@@ -73,23 +74,17 @@ const ContestDetails: React.FC = () => {
   return (
     <Wrapper>
       <ContestHeaderWithModals />
-      <Podium first='robit' second='tumhi' third='me dfds dfds' />
+
+
+      <ContestHeader />
+
       <ContestInfo />
-     
-      <ContestCard
-        imageSrc={contestData?.logo ?? ''}
-        title={contestData?.title ?? ''}
-        subtitle={contestData?.event ?? " "}
-        eventInfo={contestData?.type ?? '' }
-        endTime={contestData?.ends ? (typeof contestData.ends === 'string' ? new Date(contestData.ends) : contestData.ends) : new Date()}
-        registrationDeadline={contestData?.ends ?? ''}
-        sponsorUrl={''}
-        sponsorText={contestData?.entry ?? ""}
-      />
       {contestData && (
-       <LeaderBoard />
+        <LeaderBoard />
       )}
-       <ContestTabs />
+      
+
+
     </Wrapper>
   );
 };
