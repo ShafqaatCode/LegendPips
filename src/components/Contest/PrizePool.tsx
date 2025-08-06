@@ -66,6 +66,12 @@ export default PrizePoolCard;
 
 const Wrapper = styled.div`
     padding: 0 1rem;
+
+    @media (max-width: 768px)
+    {
+      padding: 0 0.5rem;
+      border: 2px solid red;
+    }
 `
 
 const Card = styled.div`
@@ -76,6 +82,12 @@ const Card = styled.div`
   /* max-width: 900px; */
   margin: 0.5rem ;
   
+
+  @media (max-width: 768px)
+  {
+    padding: 1rem;
+    
+  }
 `;
 
 const Header = styled.div`
@@ -96,6 +108,12 @@ const Description = styled.p`
   color: #132e58;
   margin-bottom: 1rem;
   font-weight: 400;
+
+   @media (max-width: 768px)
+  {
+    font-size: 1rem;
+    
+  }
 `;
 
 const PrizeList = styled.ul`
@@ -108,6 +126,14 @@ const PrizeList = styled.ul`
     font-size: 1rem;
     font-weight: 400;
   }
+
+   @media (max-width: 768px)
+  {
+    li{
+      font-size: 14px;
+    }
+    
+  }
 `;
 
 const Footer = styled.div`
@@ -118,8 +144,20 @@ const Footer = styled.div`
   color: #000000;
 
   span {
-    margin-right: 0.2rem;
-    font-weight: 300px;
+    
+    
+    font-weight: 300;
+    
+  }
+
+  strong{
+    margin-left: 7px;
+  }
+  
+
+   @media (max-width: 768px)
+  {
+    font-size: 14px;
     
   }
 `;
