@@ -8,6 +8,7 @@ import ContestHeaderWithModals from '../ContestList/BrodcumHeader';
 import ContestHeader from './ContestHeader';
 import ContestInfo from './ContestInstruction';
 import PrizePoolCard from './PrizePool';
+import Leaderboard from '../Leaderboard/LeaderBoard';
 
 
 
@@ -102,6 +103,8 @@ const ContestDetails: React.FC = () => {
 
 
       <ContestInfo />
+
+      <Leaderboard />
      
 
 
