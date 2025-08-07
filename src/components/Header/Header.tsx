@@ -207,10 +207,14 @@ const Header: React.FC = () => {
                         <NavItem
                           to={tool.to}
                           key={tool.to}
-                          onClick={() => setMenuOpen(false)}
+                          onClick={() => {
+                            setSubmenuOpen(false); // close submenu
+                            setMenuOpen(false);    // close mobile menu
+                          }}
                         >
                           {tool.label}
                         </NavItem>
+
                       ))}
                     </div>
                   )}

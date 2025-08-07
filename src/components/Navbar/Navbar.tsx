@@ -1,9 +1,8 @@
 // Header.tsx
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   HeaderWrapper,
   Topbar,
-  StickyBar,
   Navbar,
   Logo,
   NavList,
@@ -18,7 +17,7 @@ import {
   SubmenuToggle,
   Submenu,
   SubmenuItem,
-} from "../Header/Header.styles";
+} from "./Navbar.styles";
 import { NavLink } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
@@ -26,6 +25,9 @@ import LogoImg from "../../assets/icons/image 2.svg";
 import SupportIcon from "../../assets/icons/SupportIcon.svg";
 import CalculatorIcon from "../../assets/icons/calculator-svgrepo-com (1) 1.svg";
 import LocationIcon from "../../assets/icons/Location marker.svg";
+
+import LoginModal from "../../pages/Login/LoginModal";
+import RegisterModal from "../../pages/Register/RegisterModal";
 
 const navLinks = [
   { to: "/", label: "Home", end: true },
@@ -36,78 +38,33 @@ const navLinks = [
   { to: "/signals", label: "Signals" },
   { to: "/analysis", label: "Analysis" },
   { to: "/forum", label: "Forum" },
-  {
-    label: "Tools",
-    submenu: [
-      { to: "/calculator", label: "Calculator" },
-      { to: "/timer", label: "Timer" },
-    ],
-  },
-  {
-    label: "Resources",
-    submenu: [
-      { to: "/blogs", label: "Blogs" },
-      { to: "/news", label: "News" },
-    ],
-  },
 ];
 
-const NavbarComp: React.FC = () => {
+const toolsSubmenu = [
+  { to: "/calculator", label: "Calculator" },
+  { to: "/timer", label: "Timer" },
+];
+
+const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [submenuOpen, setSubmenuOpen] = useState<string | null>(null);
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  const toggleSubmenu = (label: string) => {
-    setSubmenuOpen((prev) => (prev === label ? null : label));
-  };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 30);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const renderLinks = (isMobile = false) => (
-    navLinks.map((link) =>
-      link.submenu ? (
-        <SubmenuWrapper
-          key={link.label}
-          onMouseEnter={() => !isMobile && setSubmenuOpen(link.label)}
-          onMouseLeave={() => !isMobile && setSubmenuOpen(null)}
-        >
-          <SubmenuToggle onClick={() => toggleSubmenu(link.label)}>
-            {link.label} {submenuOpen === link.label ? <FiChevronUp /> : <FiChevronDown />}
-          </SubmenuToggle>
-          {submenuOpen === link.label && (
-            <Submenu>
-              {link.submenu.map((sub) => (
-                <SubmenuItem to={sub.to} key={sub.to} onClick={() => setMenuOpen(false)}>
-                  {sub.label}
-                </SubmenuItem>
-              ))}
-            </Submenu>
-          )}
-        </SubmenuWrapper>
-      ) : (
-        <NavItem
-          to={link.to!}
-          key={link.to}
-          end={link.end || false}
-          onClick={() => setMenuOpen(false)}
-        >
-          {link.label}
-        </NavItem>
-      )
-    )
-  );
+  const [submenuOpen, setSubmenuOpen] = useState(false); // for desktop
+  const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState(false); // for mobile
+  const [signupOpen, setSignupOpen] = useState(false);
+  const [signinOpen, setSigninOpen] = useState(false);
 
   return (
-    <HeaderWrapper>
-      {menuOpen && <Backdrop onClick={() => setMenuOpen(false)} />}
+    <>
+      <HeaderWrapper>
+        {menuOpen && (
+          <Backdrop
+            onClick={() => {
+              setMenuOpen(false);
+              setMobileSubmenuOpen(false);
+            }}
+          />
+        )}
 
-      {!isScrolled && (
+        {/* Topbar */}
         <Topbar>
           <NavLink to="/">
             <Logo src={LogoImg} alt="LegendPips Logo" />
@@ -132,47 +89,124 @@ const NavbarComp: React.FC = () => {
                 <span>United States</span>
               </HeaderItem>
             </NavLink>
-            <NavLink to="/signin">
-              <SignInButton>Sign In</SignInButton>
-            </NavLink>
+            <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
           </LinkGroup>
         </Topbar>
-      )}
 
-      {!isScrolled && <Navbar><NavList>{renderLinks()}</NavList></Navbar>}
+        {/* Desktop Navbar */}
+        <Navbar>
+          <NavList>
+            {navLinks.map((link) => (
+              <NavItem
+                to={link.to}
+                key={link.to}
+                end={link.end || false}
+              >
+                {link.label}
+              </NavItem>
+            ))}
 
-      {isScrolled && (
-        <StickyBar>
+            <SubmenuWrapper
+              onMouseEnter={() => setSubmenuOpen(true)}
+              onMouseLeave={() => setSubmenuOpen(false)}
+            >
+              <SubmenuToggle>
+                Tools {submenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+              </SubmenuToggle>
+
+              {submenuOpen && (
+                <Submenu>
+                  {toolsSubmenu.map((tool) => (
+                    <SubmenuItem to={tool.to} key={tool.to}>
+                      {tool.label}
+                    </SubmenuItem>
+                  ))}
+                </Submenu>
+              )}
+            </SubmenuWrapper>
+          </NavList>
+        </Navbar>
+
+        {/* Mobile Bar */}
+        <MobileBar>
           <NavLink to="/">
             <Logo src={LogoImg} alt="LegendPips Logo" />
           </NavLink>
-          <NavList>{renderLinks()}</NavList>
-          <NavLink to="/signin">
-            <SignInButton>Sign In</SignInButton>
-          </NavLink>
-        </StickyBar>
-      )}
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
+            <FaBars
+              size={22}
+              color="white"
+              onClick={() => setMenuOpen(!menuOpen)}
+              style={{ cursor: "pointer" }}
+            />
+          </div>
+        </MobileBar>
 
-      <MobileBar>
-        <NavLink to="/">
-          <Logo src={LogoImg} alt="LegendPips Logo" />
-        </NavLink>
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <NavLink to="/signin">
-            <SignInButton>Sign In</SignInButton>
-          </NavLink>
-          <FaBars
-            size={22}
-            color="white"
-            onClick={() => setMenuOpen(!menuOpen)}
-            style={{ cursor: "pointer" }}
-          />
-        </div>
-      </MobileBar>
+        {/* Mobile Menu */}
+        {menuOpen && (
+          <MobileMenu>
+            {navLinks.map((link) => (
+              <NavItem
+                to={link.to}
+                key={link.to}
+                end={link.end || false}
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </NavItem>
+            ))}
 
-      {menuOpen && <MobileMenu>{renderLinks(true)}</MobileMenu>}
-    </HeaderWrapper>
+            {/* Mobile Tools Submenu */}
+            <div>
+              <SubmenuToggle onClick={() => setMobileSubmenuOpen(!mobileSubmenuOpen)}>
+                Tools {mobileSubmenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+              </SubmenuToggle>
+
+              {mobileSubmenuOpen && (
+                <div
+                  style={{
+                    paddingLeft: "1rem",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.4rem",
+                    marginTop: "0.75rem",
+                  }}
+                >
+                  {toolsSubmenu.map((tool) => (
+                    <NavItem
+                      to={tool.to}
+                      key={tool.to}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setMobileSubmenuOpen(false);
+                      }}
+                    >
+                      {tool.label}
+                    </NavItem>
+                  ))}
+                </div>
+              )}
+            </div>
+          </MobileMenu>
+        )}
+      </HeaderWrapper>
+
+      {/* Auth Modals */}
+      <RegisterModal
+        isOpen={signupOpen}
+        onClose={() => setSignupOpen(false)}
+      />
+      <LoginModal
+        isOpen={signinOpen}
+        onClose={() => setSigninOpen(false)}
+        onSwitchToRegister={() => {
+          setSigninOpen(false);
+          setSignupOpen(true);
+        }}
+      />
+    </>
   );
 };
 
-export default NavbarComp;
+export default Header;

@@ -8,19 +8,19 @@ export const BannerWrapper = styled.section`
   align-items: center;
   justify-content: flex-start;
   // height: 100vh;
-  min-height: 650px;
+  min-height: 600px;
 //   border: 2px solid red;
   padding: 0 3rem;
   background-image: url("${bgImage}");
   background-size: cover;
   background-position: center;
-  margin-top: 50px;
+  /* margin-top: 50px; */
   color: ${({ theme }) => theme.colors.WHITE};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     padding: 0 1.5rem;
     justify-content: center;
-    margin-top: 70px;
+    /* margin-top: 70px; */
   }
 
   &::before {
@@ -42,15 +42,19 @@ export const HeroContent = styled.div`
   max-width: 700px;
   display: flex;
   flex-direction: column;
+  
+ 
 
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     width: 80%;
+    margin-top: 0;
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     width: 100%;
     align-items: center;
     text-align: center;
+    margin-top: 0;
   }
 `;
 
@@ -69,7 +73,8 @@ export const SubheadingWrapper = styled(motion.div)`
 export const HeroSubTitle = styled.p`
   font-family: ${({ theme }) => theme.font.family};
   font-size: 20px;
-  font-weight: 400;
+  
+  font-weight: 600;
   line-height: 1.5;
   letter-spacing: -0.6%;
   color: ${({ theme }) => theme.colors.gold};

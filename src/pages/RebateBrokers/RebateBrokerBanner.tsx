@@ -56,9 +56,15 @@ export default RebatesBrokersSection;
 
 const Wrapper = styled.section`
   padding: 4rem 2rem;
-  margin-top: 120px;
+  margin-top: 70px;
   position: relative;
   background-color: #f9fafb;
+  
+
+  @media (max-width: 768px)
+  {
+    margin-top: 0;
+  }
 `;
 
 const Content = styled.div`

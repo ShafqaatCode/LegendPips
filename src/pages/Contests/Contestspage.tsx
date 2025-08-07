@@ -8,11 +8,11 @@ import styled from 'styled-components';
 import Competitions from '../../components/ContestList/Competitions';
 import ContestHeaderWithModals from '../../components/ContestList/BrodcumHeader';
 const MainContainer = styled.main`
-  margin-top: 135px;
-  margin:135px auto;
+  
+  margin:75px auto;
 @media (max-width: ${({ theme }) => theme.breakpoints.laptop})
 {
-  margin-top: 80px;
+  margin-top: 0;
 } 
   
 `

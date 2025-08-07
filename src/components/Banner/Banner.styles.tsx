@@ -10,12 +10,12 @@ export const BannerWrapper = styled.section`
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin-top: 60px;
+  /* margin-top: 60px; */
   padding: 0 1.5rem;
 
   @media (max-width: 768px) {
     height: 440px;
-    margin-top: 75px;
+    /* margin-top: 75px; */
     padding: 0 1rem;
   }
 
