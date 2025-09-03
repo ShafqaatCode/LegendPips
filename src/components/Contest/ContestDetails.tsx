@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { type Competition } from '../ContestList/mockCompetitions';
 import { fetchCompetitionById } from '../ContestList/mockApi';
-import Spinner from '../Loaders/spinner';
+
 import ContestHeaderWithModals from '../ContestList/BrodcumHeader';
 import ContestHeader from './ContestHeader';
 
@@ -11,6 +11,7 @@ import ContestHeader from './ContestHeader';
 import Leaderboard from '../Leaderboard/LeaderboardTable';
 import TabButtons from './TabButtons';
 import ContestInfoTabs from './ContestInfoTabs';
+import Spinner from '../Loaders/Spinner';
 
 
 
@@ -20,7 +21,7 @@ import ContestInfoTabs from './ContestInfoTabs';
 const Wrapper = styled.section`
   margin-top: 135px;
   /* padding: 2rem; */
-  font-family: "Segoe UI", sans-serif;
+  
   
 
   @media (max-width: 786px)
@@ -77,20 +78,11 @@ const ContestDetails: React.FC = () => {
   return (
     <Wrapper>
       <ContestHeaderWithModals />
-
-
       <ContestHeader contestData={contestData} />
-
       {/* <ContestInfo /> */}
-
       <TabButtons />
-
       <Leaderboard />
       <ContestInfoTabs />
-      
-
-
-
     </Wrapper>
   );
 };

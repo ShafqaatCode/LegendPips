@@ -60,6 +60,7 @@ const Wrapper = styled.section`
   position: relative;
   background-color: #f9fafb;
   
+  
 
   @media (max-width: 768px)
   {

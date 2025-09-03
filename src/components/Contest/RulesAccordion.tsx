@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import IconImg from "../../assets/AccordionImgs/11501782 2-1.png";
+
+import PlusIcon from "../../assets/AccordionImgs/Plus.png";
+import MinusIcon from "../../assets/AccordionImgs/minus.png";
+
+
+
 const AccordionWrapper = styled.div`
   /* margin-top: 2rem; */
   margin: 0 4rem;
@@ -55,10 +61,12 @@ const Icon = styled.img`
 `;
 
 const Toggle = styled.span`
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #fbb03b;
-  margin-left: 1rem;
+ 
+  
+ 
+  
+  
+
 `;
 
 const Content = styled.div`
@@ -172,7 +180,7 @@ const RulesAccordion: React.FC = () => {
                 <Accordion key={i}>
                     <Header onClick={() => setOpenIndex(openIndex === i ? null : i)}>
                         <Title>{item.title}</Title>
-                        <Toggle>{openIndex === i ? "−" : "+"}</Toggle>
+                        <Toggle>{openIndex === i ? <img src={MinusIcon} /> : <img src={PlusIcon} />  }</Toggle>
                     </Header>
                     {openIndex === i && (
                         <Content>
