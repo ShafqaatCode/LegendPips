@@ -37,10 +37,10 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 85%;
+  margin-top: 1rem;
   margin: auto;
-  margin-top: 3rem;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.laptop}) {
     flex-direction: column-reverse;
     width: 100%;
   }
@@ -51,6 +51,7 @@ const ContentContainer = styled.div`
   flex-direction: column;
   gap: 2rem;
   max-width: 600px;
+  margin: 1rem auto 0 auto;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     align-items: center;
@@ -120,9 +121,12 @@ const UnderContent = styled.div`
   //   flex-direction: column;
   gap: 2rem 0;
   width: 85%;
-
   margin: 2rem auto;
   flex-wrap: wrap;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.laptop}){
+    justify-content: center;
+  }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     padding: 0 1rem;
