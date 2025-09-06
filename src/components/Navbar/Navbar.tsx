@@ -41,8 +41,14 @@ const navLinks = [
 ];
 
 const toolsSubmenu = [
-  { to: "/calculator", label: "Calculator" },
+  
   { to: "/timer", label: "Timer" },
+  { to: "/pip-calculator", label: "Pip Calculator" },
+  { to: "/position-size-calculator", label: "Position Size Calculator" },
+  { to: "/margin-calculator", label: "Margin Calculator" },
+  { to: "/rebate-calculator", label: "Rebate Calculator" },
+  { to: "/pivot-point-calculator", label: "Pivot Point Calculator" },
+
 ];
 
 const Header: React.FC = () => {
@@ -120,6 +126,7 @@ const Header: React.FC = () => {
                     <SubmenuItem to={tool.to} key={tool.to}>
                       {tool.label}
                     </SubmenuItem>
+
                   ))}
                 </Submenu>
               )}

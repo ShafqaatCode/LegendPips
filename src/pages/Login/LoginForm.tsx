@@ -16,9 +16,15 @@ import {
   RegisterButton,
   ForgetPassword,
 } from "./Login.styles";
+import ForgetPasswordModal from "./ForgetPasswordModal";
 
 interface LoginFormProps {
   onSwitchToRegister?: () => void;
+}
+
+const openForget = () => {
+
+  <ForgetPasswordModal isOpen={true} onClose={() => {}} />;
 }
 
 
@@ -71,14 +77,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
         </Terms>
         {errors.terms && <ErrorMsg>You must accept the terms</ErrorMsg>}
 
-        <ForgetPassword>Forget The Password?</ForgetPassword>
+        <ForgetPassword onClick={openForget}>Forget The Password?</ForgetPassword>
 
         <RegisterButton type="submit">Login</RegisterButton>
         <RegisterButton onClick={onSwitchToRegister} type="button" style={{ marginTop: "1rem" }}>
           Register
         </RegisterButton>
       </form>
-    </Container>
+    </Container> 
   );
 };
 

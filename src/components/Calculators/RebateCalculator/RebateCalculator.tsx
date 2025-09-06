@@ -5,7 +5,7 @@ import styled from "styled-components";
 // ===== Styled Components =====
 const Container = styled.section`
   max-width: 1250px;
-  margin: 40px auto;
+  margin: 100px auto;
   padding: 24px;
   border-radius: 12px;
   background: #ffffff;

@@ -12,6 +12,11 @@ import Forum from "../pages/Forum/Forum";
 import LoginForm from "../pages/Login/LoginForm";
 import RegisterForm from "../pages/Register/RegisterForm";
 import ContestDetails from "../components/Contest/ContestDetails";
+import PipCalculator from "../components/Calculators/PipsCalculator/PipCalculator";
+import MarginCalculator from "../components/Calculators/MarginCalculator/MarginCalculator";
+import PositionSizeCalculator from "../components/Calculators/PositionSizeCalculator/PositionsizeCalculator";
+import PivotPointCalculator from "../components/Calculators/PivotpointCalculator/PivotPointCalculator";
+import RebateCalculator from "../components/Calculators/RebateCalculator/RebateCalculator";
 
 // 👇 Add these imports
 
@@ -36,7 +41,15 @@ const AppRoutes: React.FC = () => {
         <Route path="rebates" element={<RebateBrokers />} />
         <Route path="analysis" element={<Analysis />} />
         <Route path="how-it-works" element={<HitWorksPage />} />
+
         <Route path="forum" element={<Forum />} />
+        {/* 👇 New routes for calculators */}
+        <Route path="pip-calculator" element={<PipCalculator />} />
+        <Route path="position-size-calculator" element={<PositionSizeCalculator />} />
+        <Route path="margin-calculator" element={<MarginCalculator />} />
+        <Route path="rebate-calculator" element={<RebateCalculator />} />
+        <Route path="pivot-point-calculator" element={<PivotPointCalculator />}/>
+
       </Route>
     </Routes>
   );

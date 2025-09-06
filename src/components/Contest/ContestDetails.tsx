@@ -11,7 +11,7 @@ import ContestHeader from './ContestHeader';
 import Leaderboard from '../Leaderboard/LeaderboardTable';
 import TabButtons from './TabButtons';
 import ContestInfoTabs from './ContestInfoTabs';
-import Spinner from '../Loaders/Spinner';
+import Spinner from '../Loaders/spinner';
 
 
 
