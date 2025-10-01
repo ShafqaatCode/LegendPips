@@ -11,7 +11,7 @@ import ContestHeader from './ContestHeader';
 import Leaderboard from '../Leaderboard/LeaderboardTable';
 import TabButtons from './TabButtons';
 import ContestInfoTabs from './ContestInfoTabs';
-import Spinner from '../Loaders/spinner';
+// import Spinner from '../Loaders/spinner';
 
 
 
@@ -64,7 +64,7 @@ const ContestDetails: React.FC = () => {
   if (loading)
     return (
       <Centered>
-        <Spinner />
+        ...Loading...
       </Centered>
     );
 

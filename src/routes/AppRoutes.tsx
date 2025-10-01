@@ -12,11 +12,12 @@ import Forum from "../pages/Forum/Forum";
 import LoginForm from "../pages/Login/LoginForm";
 import RegisterForm from "../pages/Register/RegisterForm";
 import ContestDetails from "../components/Contest/ContestDetails";
-import PipCalculator from "../components/Calculators/PipsCalculator/PipCalculator";
-import MarginCalculator from "../components/Calculators/MarginCalculator/MarginCalculator";
-import PositionSizeCalculator from "../components/Calculators/PositionSizeCalculator/PositionsizeCalculator";
-import PivotPointCalculator from "../components/Calculators/PivotpointCalculator/PivotPointCalculator";
-import RebateCalculator from "../components/Calculators/RebateCalculator/RebateCalculator";
+
+import MarginCalculatorPage from "../pages/MarginCalculator/MarginCalculatorPage";
+import RebateCalculatorPage from "../pages/RebateCalculator/RebateCalculatorPage";
+import PivotPointCalculatorPage from "../pages/PivotPointCalculator/PivotPointCalculatorPage";
+import PositionSizeCalculatorPage from "../pages/PositionSizeCalculator/PositionSizeCalculatorPage";
+import PipCalculatorPage from "../pages/PipCalculator/PipCalculatorPage";
 
 // 👇 Add these imports
 
@@ -44,11 +45,11 @@ const AppRoutes: React.FC = () => {
 
         <Route path="forum" element={<Forum />} />
         {/* 👇 New routes for calculators */}
-        <Route path="pip-calculator" element={<PipCalculator />} />
-        <Route path="position-size-calculator" element={<PositionSizeCalculator />} />
-        <Route path="margin-calculator" element={<MarginCalculator />} />
-        <Route path="rebate-calculator" element={<RebateCalculator />} />
-        <Route path="pivot-point-calculator" element={<PivotPointCalculator />}/>
+        <Route path="pip-calculator" element={<PipCalculatorPage />} />
+        <Route path="position-size-calculator" element={<PositionSizeCalculatorPage />} />
+        <Route path="margin-calculator" element={<MarginCalculatorPage />} />
+        <Route path="rebate-calculator" element={<RebateCalculatorPage />} />
+        <Route path="pivot-point-calculator" element={<PivotPointCalculatorPage />}/>
 
       </Route>
     </Routes>

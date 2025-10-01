@@ -2,13 +2,22 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 
+
 // ===== Styled Components =====
+
+const Wrapper = styled.div`
+
+`
 const Container = styled.section`
   max-width: 1250px;
-  margin: 100px auto;
+  margin: 80px auto 40px;
   padding: 24px;
   border-radius: 12px;
   background: #ffffff;
+
+  @media (max-width: 786px) {
+    margin: 0;
+  }
 `;
 
 const Header = styled.h2`
@@ -44,6 +53,7 @@ const FormRow = styled.div`
 const FormGroup = styled.div`
   min-width: 220px;
   width: 500px;
+  
 `;
 
 const Label = styled.label`
@@ -146,104 +156,110 @@ const MarginCalculator: React.FC = () => {
   };
 
   return (
-    <Container>
-      <Header>Margin Calculator</Header>
-      <Description>
-        The LegendPips Margin Calculator is an indispensable tool for traders to determine the exact margin required to open
-        a position. By factoring in your account currency, chosen trading pair, leverage, and trade size, it ensures you
-        maintain proper margin levels at all times. This promotes responsible risk management, prevents margin-related
-        issues, and helps you trade with confidence knowing your positions are fully supported.
-      </Description>
+    <Wrapper>
 
-      <form onSubmit={(e) => e.preventDefault()}>
-        <FormRow>
-          <FormGroup>
-            <OuterBox>
-              <Label htmlFor="instrument">Instrument</Label>
-              <InnerSelect
-                id="instrument"
-                value={instrument}
-                onChange={(e) => setInstrument(e.target.value)}
-              >
-                <option>XAU/USD</option>
-                <option>EUR/USD</option>
-                <option>GBP/USD</option>
-              </InnerSelect>
-            </OuterBox>
-          </FormGroup>
 
-          <FormGroup>
-            <OuterBox>
-              <Label htmlFor="currency">Deposit Currency</Label>
-              <InnerSelect
-                id="currency"
-                value={depositCurrency}
-                onChange={(e) => setDepositCurrency(e.target.value)}
-              >
-                <option>USD</option>
-                <option>EUR</option>
-                <option>GBP</option>
-              </InnerSelect>
-            </OuterBox>
-          </FormGroup>
-        </FormRow>
+      <Container>
+        <Header>Margin Calculator</Header>
+        <Description>
+          The LegendPips Margin Calculator is an indispensable tool for traders to determine the exact margin required to open
+          a position. By factoring in your account currency, chosen trading pair, leverage, and trade size, it ensures you
+          maintain proper margin levels at all times. This promotes responsible risk management, prevents margin-related
+          issues, and helps you trade with confidence knowing your positions are fully supported.
+        </Description>
 
-        <FormRow>
-          <FormGroup>
-            <OuterBox>
-              <Label htmlFor="price">Current Price (XAU)</Label>
-              <InnerInput
-                id="price"
-                type="number"
-                step="0.00001"
-                value={currentPrice}
-                onChange={(e) => setCurrentPrice(parseFloat(e.target.value) || 0)}
-              />
-            </OuterBox>
-          </FormGroup>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <FormRow>
+            <FormGroup>
+              <OuterBox>
+                <Label htmlFor="instrument">Instrument</Label>
+                <InnerSelect
+                  id="instrument"
+                  value={instrument}
+                  onChange={(e) => setInstrument(e.target.value)}
+                >
+                  <option>XAU/USD</option>
+                  <option>EUR/USD</option>
+                  <option>GBP/USD</option>
+                </InnerSelect>
+              </OuterBox>
+            </FormGroup>
 
-          <FormGroup>
-            <OuterBox>
-              <Label htmlFor="contract">Contract size (Units)</Label>
-              <InnerInput
-                id="contract"
-                type="number"
-                step="1"
-                value={contractSize}
-                onChange={(e) => setContractSize(parseFloat(e.target.value) || 0)}
-              />
-            </OuterBox>
-          </FormGroup>
-        </FormRow>
+            <FormGroup>
+              <OuterBox>
+                <Label htmlFor="currency">Deposit Currency</Label>
+                <InnerSelect
+                  id="currency"
+                  value={depositCurrency}
+                  onChange={(e) => setDepositCurrency(e.target.value)}
+                >
+                  <option>USD</option>
+                  <option>EUR</option>
+                  <option>GBP</option>
+                </InnerSelect>
+              </OuterBox>
+            </FormGroup>
+          </FormRow>
 
-        <FormRow>
-          <FormGroup>
-            <OuterBox>
-              <Label htmlFor="leverage">Leverage</Label>
-              <InnerSelect
-                id="leverage"
-                value={leverage}
-                onChange={(e) => setLeverage(e.target.value)}
-              >
-                <option>50:1</option>
-                <option>100:1</option>
-                <option>200:1</option>
-                <option>500:1</option>
-              </InnerSelect>
-            </OuterBox>
-          </FormGroup>
-        </FormRow>
+          <FormRow>
+            <FormGroup>
+              <OuterBox>
+                <Label htmlFor="price">Current Price (XAU)</Label>
+                <InnerInput
+                  id="price"
+                  type="number"
+                  step="0.00001"
+                  value={currentPrice}
+                  onChange={(e) => setCurrentPrice(parseFloat(e.target.value) || 0)}
+                />
+              </OuterBox>
+            </FormGroup>
 
-        <ButtonRow>
-          <Button type="button" onClick={calculateMargin}>
-            Calculate
-          </Button>
-          <ResultBox>
-            Result : {result.toFixed(5)}
-          </ResultBox>
-        </ButtonRow>
-      </form>
-    </Container>
+            <FormGroup>
+              <OuterBox>
+                <Label htmlFor="contract">Contract size (Units)</Label>
+                <InnerInput
+                  id="contract"
+                  type="number"
+                  step="1"
+                  value={contractSize}
+                  onChange={(e) => setContractSize(parseFloat(e.target.value) || 0)}
+                />
+              </OuterBox>
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup>
+              <OuterBox>
+                <Label htmlFor="leverage">Leverage</Label>
+                <InnerSelect
+                  id="leverage"
+                  value={leverage}
+                  onChange={(e) => setLeverage(e.target.value)}
+                >
+                  <option>50:1</option>
+                  <option>100:1</option>
+                  <option>200:1</option>
+                  <option>500:1</option>
+                </InnerSelect>
+              </OuterBox>
+            </FormGroup>
+          </FormRow>
+
+          <ButtonRow>
+            <Button type="button" onClick={calculateMargin}>
+              Calculate
+            </Button>
+            <ResultBox>
+              Result : {result.toFixed(5)}
+            </ResultBox>
+          </ButtonRow>
+        </form>
+
+      </Container>
+      
+    </Wrapper>
   );
 };
 
