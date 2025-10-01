@@ -3,11 +3,8 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { type Competition } from '../ContestList/mockCompetitions';
 import { fetchCompetitionById } from '../ContestList/mockApi';
-
 import ContestHeaderWithModals from '../ContestList/BrodcumHeader';
 import ContestHeader from './ContestHeader';
-
-
 import Leaderboard from '../Leaderboard/LeaderboardTable';
 import TabButtons from './TabButtons';
 import ContestInfoTabs from './ContestInfoTabs';
