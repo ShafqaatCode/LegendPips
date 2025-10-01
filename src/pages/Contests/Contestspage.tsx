@@ -10,6 +10,7 @@ import ContestHeaderWithModals from '../../components/ContestList/BrodcumHeader'
 const MainContainer = styled.main`
   
   margin:75px auto;
+ 
 @media (max-width: ${({ theme }) => theme.breakpoints.laptop})
 {
   margin-top: 0;

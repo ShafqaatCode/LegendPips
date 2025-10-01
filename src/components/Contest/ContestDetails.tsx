@@ -16,14 +16,15 @@ import ContestInfoTabs from './ContestInfoTabs';
 
 
 const Wrapper = styled.section`
-  margin-top: 135px;
+  margin-top: 85px;
   /* padding: 2rem; */
   
   
 
   @media (max-width: 786px)
   {
-    margin-top: 80px;
+    /* margin-top: 80px; */
+    margin: 0;
   }
 `;
 

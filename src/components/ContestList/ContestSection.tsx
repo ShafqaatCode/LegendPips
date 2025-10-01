@@ -10,7 +10,7 @@ const MainWrapper = styled.main`
     /* height: 600px; */
     background-color: #fff;
     padding: 3rem 0;
-
+/* border: 2px solid red; */
 `
 
 const Container = styled.section`
