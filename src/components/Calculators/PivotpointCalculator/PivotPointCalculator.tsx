@@ -5,10 +5,14 @@ import styled from "styled-components";
 // ===== Styled Components =====
 const Container = styled.section`
   max-width: 1250px;
-  margin: 100px auto;
+ margin: 80px auto 40px;
   padding: 24px;
   border-radius: 12px;
   background: #ffffff;
+
+   @media (max-width: 786px) {
+    margin: 0;
+  }
 `;
 
 const Header = styled.h2`
