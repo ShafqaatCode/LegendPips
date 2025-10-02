@@ -12,7 +12,7 @@ const Brokers: React.FC = () => {
     <>
       
       <BrokerHeroSection2 />
-      <AllBrokersList showAll={true} />
+      <AllBrokersList  />
 
     </>
   )
