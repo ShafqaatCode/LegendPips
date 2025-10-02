@@ -5,9 +5,11 @@ const Wrapper = styled.section`
     
     position: relative;
     background-color: #f9f8f8;
-    max-width: 1440px;
+    /* width: 98%; */
+    max-width: 1400px;
     overflow: hidden;
     margin: 100px auto 0 auto;
+    /* padding: 10px; */
     
     
     
@@ -17,9 +19,9 @@ const MainContainer = styled.div`
 position: relative;
     height: 100%;
     img{
-        width: 100%;
-        max-width: 600px;
-        height: 90%;
+        width: 650px;
+        
+        height: auto;
         position: absolute;
         right: -40px;
         bottom: 0;
@@ -69,7 +71,7 @@ const Left = styled.div`
  display: flex;
  flex-direction: column;
  justify-content: center;
- 
+ padding: 1rem;
     height: 100%;
 `;
 

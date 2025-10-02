@@ -1,6 +1,7 @@
 import React from 'react'
 
 import BrokerHeroSection2 from './BrokerHeroSection2';
+import AllBrokersList from '../../components/Broker/AllBrokersList2';
 // import BrokerHeroSection from './BrokerHeroSection';
 
 
@@ -9,8 +10,10 @@ import BrokerHeroSection2 from './BrokerHeroSection2';
 const Brokers: React.FC = () => {
   return (
     <>
-      {/* <BrokerHeroSection /> */}
+      
       <BrokerHeroSection2 />
+      <AllBrokersList showAll={true} />
+
     </>
   )
 }

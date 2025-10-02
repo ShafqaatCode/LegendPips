@@ -7,17 +7,15 @@ import {
   TitleRow,
   VerifiedBadge,
   FeaturedRibbon,
-  RatingBox,
-  StarRow,
-  ReviewText,
+ 
   ActionSection,
   PrimaryButton,
   SecondaryButton,
   TermsText,
   TopIndex,
   Container,
-} from "./BrokerCard.styles";
-import { FaStar } from "react-icons/fa";
+} from "./BrokerCard3.styles";
+
 import { motion } from "framer-motion";
 import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 import styled from "styled-components";
@@ -28,9 +26,11 @@ export const Description = styled.p`
   margin: 0;
   // border: 2px solid red;
   display: flex;
-  gap: 3rem;
+  /* justify-content: space-between; */
+  gap: 4rem;
   flex-wrap: wrap;
   margin: auto;
+  
 
   h4 {
     font-size: 16px;
@@ -83,8 +83,9 @@ interface BrokerCardProps {
   title: string;
   description?: string;
   logoSrc: string;
-  rating: number;
-  reviewsCount: string;
+  rating?: number;
+  reviewsCount?: string;
+  features: { name: string; value: string }[];
 }
 
 const BrokerCard: React.FC<BrokerCardProps> = ({
@@ -92,8 +93,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
   featured,
   title,
   logoSrc,
-  rating,
-  reviewsCount,
+ features,
 }) => {
   return (
     <Container>
@@ -113,7 +113,14 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
             </TitleRow>
             <Description>
 
-              <div>
+              {features.map((feature, idx) => (
+                <div key={idx}>
+                  <h4>{feature.name}</h4>
+                  <p>{feature.value}</p>
+                </div>
+              ))}
+
+              {/* <div>
                 <h4>Standard Account</h4>
                 <p>Up to 0.5 pips</p>
               </div>
@@ -125,21 +132,15 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
                 <h4>CTrader</h4>
                 <p>Up to 0.2 pips</p>
               </div>
+              <div>
+                <h4>CTrader</h4>
+                <p>Up to 0.2 pips</p>
+              </div> */}
 
             </Description>
           </InfoSection>
 
-          <RatingBox>
-            <StarRow>
-              {[...Array(5)].map((_, i) => (
-                <FaStar key={i} color={i < rating ? "#FBAF00" : "#ccc"} />
-              ))}
-            </StarRow>
-            <ReviewText>
-              <strong>{reviewsCount}</strong>
-              <span>Customer Reviews</span>
-            </ReviewText>
-          </RatingBox>
+         
            <ActionSection>
             <TermsText>Terms & Conditions Apply</TermsText>
             <PrimaryButton>

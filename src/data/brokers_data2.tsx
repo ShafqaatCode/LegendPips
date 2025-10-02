@@ -1,0 +1,58 @@
+export const brokers = [
+  {
+    index: 1,
+    featured: true,
+    title: "IC Markets",
+    logoSrc: "/images/icmarkets.png",
+    rating: 5,
+    reviewsCount: "1200+",
+    features: [
+      { name: "Standard Account", value: "Up to 0.5 pips" },
+      { name: "Raw Account", value: "Up to 0.3 pips" },
+      { name: "cTrader", value: "Up to 0.2 pips" },
+      { name: "Min Deposit", value: "$200" },
+    ],
+  },
+  {
+    index: 2,
+    featured: false,
+    title: "XM Broker",
+    logoSrc: "/images/xm.png",
+    rating: 4,
+    reviewsCount: "850+",
+    features: [
+      { name: "Standard Account", value: "Up to 0.7 pips" },
+      { name: "Micro Account", value: "Up to 0.5 pips" },
+      { name: "Swap-Free", value: "Available" },
+      { name: "Min Deposit", value: "$50" },
+    ],
+  },
+  {
+    index: 3,
+    featured: true,
+    title: "Pepperstone",
+    logoSrc: "/images/pepperstone.png",
+    rating: 5,
+    reviewsCount: "2000+",
+    features: [
+      { name: "Standard Account", value: "Up to 0.6 pips" },
+      { name: "Raw Account", value: "Up to 0.1 pips" },
+      { name: "cTrader", value: "Available" },
+      { name: "Min Deposit", value: "$100" },
+    ],
+  },
+  {
+    index: 4,
+    featured: false,
+    title: "FXTM",
+    logoSrc: "/images/fxtm.png",
+    rating: 3,
+    reviewsCount: "500+",
+    features: [
+      { name: "Standard Account", value: "Up to 0.8 pips" },
+      { name: "ECN Account", value: "Up to 0.3 pips" },
+      { name: "Demo Account", value: "Available" },
+      { name: "Min Deposit", value: "$10" },
+    ],
+  },
+];
