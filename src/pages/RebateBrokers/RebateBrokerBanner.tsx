@@ -1,4 +1,3 @@
-
 import styled from "styled-components";
 import GirlImage from "../../assets/bannerGirl.png";
 import { FaPen } from "react-icons/fa";
@@ -26,7 +25,7 @@ const RebatesBrokersSection = () => {
             Regardless of whether your trade wins or loses, every time you trade,
             a portion of your spread or commission is paid back to you as real
             cash — with no impact on your trading conditions. The more you trade,
-            the more you earn! Earnings will depend on your broker’s rebate rate,
+            the more you earn! Earnings will depend on your broker's rebate rate,
             the instruments you trade, and your total trading volume.
           </Description>
 
@@ -59,11 +58,14 @@ const Wrapper = styled.section`
   margin-top: 70px;
   position: relative;
   background-color: #f9fafb;
-  
-  
 
-  @media (max-width: 768px)
-  {
+  @media (max-width: 1024px) {
+    margin-top: 0;
+  }
+
+  @media (max-width: 768px) {
+    margin-top: 0;
+    padding: 2rem 1rem;
     margin-top: 0;
   }
 `;
@@ -75,11 +77,24 @@ const Content = styled.div`
   max-width: 1400px;
   margin: auto;
   flex-wrap: wrap;
+
+  @media (max-width: 1024px) {
+    gap: 3rem;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 2rem;
+  }
 `;
 
 const Left = styled.div`
   flex: 1;
   min-width: 350px;
+
+  @media (max-width: 768px) {
+    min-width: 100%;
+  }
 `;
 
 const Right = styled.div`
@@ -87,6 +102,10 @@ const Right = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const Title = styled.h2`
@@ -94,6 +113,14 @@ const Title = styled.h2`
   font-weight: 700;
   color: #1f3b8c;
   margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    font-size: 28px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 24px;
+  }
 `;
 
 const Tabs = styled.div`
@@ -102,34 +129,74 @@ const Tabs = styled.div`
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   background-color: #fff;
   margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 0;
+  }
 `;
 
 const Tab = styled.button<{ active?: boolean }>`
-  border-color:2px solid ${({ active }) => (active ? "#fcd34d" : "#ffffff")};
-//   border: 1px solid black;
+  border: 2px solid ${({ active }) => (active ? "#fcd34d" : "#ffffff")};
   padding: 0.8rem 1.5rem;
-//   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   color: #1f3b8c;
+  background-color: #fff;
   box-shadow: ${({ active }) =>
     active ? "0px 4px 15px rgba(0,0,0,0.1)" : "none"};
+
+  @media (max-width: 768px) {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    font-size: 14px;
+  }
+
+  @media (max-width: 480px) {
+    width: 100%;
+    padding: 0.8rem;
+  }
 `;
 
 const FeatureBox = styled.div`
   background-color: #1f3b8c;
   color: white;
   padding: 1rem 2rem;
-  border-radius: 24px 24px 0 24px ;
+  border-radius: 24px 24px 0 24px;
   font-size: 24px;
   max-width: 500px;
   margin-bottom: 2rem;
   font-weight: 500;
-  letter-spacing: 9%;
+  letter-spacing: 0.09em;
   position: absolute;
   top: 70px;
   left: 50%;
-transform: translateX(-20%);
+  transform: translateX(-20%);
+
+  @media (max-width: 1200px) {
+    position: static;
+    transform: none;
+    max-width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 20px 20px 0 20px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 18px;
+    padding: 0.8rem 1.2rem;
+    border-radius: 16px 16px 0 16px;
+  }
 `;
 
 const Highlight = styled.span`
@@ -142,6 +209,14 @@ const Subtitle = styled.h3`
   font-weight: 600;
   margin-bottom: 1rem;
   color: #1f3b8c;
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 18px;
+  }
 `;
 
 const Description = styled.p`
@@ -149,6 +224,15 @@ const Description = styled.p`
   line-height: 1.7;
   margin-bottom: 1rem;
   color: #334155;
+
+  @media (max-width: 768px) {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 14px;
+  }
 `;
 
 const SearchBar = styled.div`
@@ -156,6 +240,15 @@ const SearchBar = styled.div`
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    gap: 0.8rem;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 1rem;
+  }
 `;
 
 const SearchInput = styled.input`
@@ -168,6 +261,17 @@ const SearchInput = styled.input`
 
   &::placeholder {
     color: #94a3b8;
+  }
+
+  @media (max-width: 768px) {
+    min-width: 250px;
+    padding: 0.9rem;
+  }
+
+  @media (max-width: 480px) {
+    width: 100%;
+    min-width: 100%;
+    font-size: 15px;
   }
 `;
 
@@ -182,10 +286,29 @@ const CTAButton = styled.button`
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
+
+  @media (max-width: 768px) {
+    padding: 0.9rem 1.5rem;
+  }
+
+  @media (max-width: 480px) {
+    width: 100%;
+    padding: 1rem;
+    font-size: 15px;
+  }
 `;
 
 const Image = styled.img`
   max-width: 100%;
   height: auto;
   border-radius: 12px;
+
+  @media (max-width: 1024px) {
+    max-width: 400px;
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;

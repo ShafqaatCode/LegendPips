@@ -7,9 +7,11 @@ import BrokerCard3 from "./BrokerCard3";
 const BrokerSectionWrapper = styled.section`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  /* align-items: center; */
+  /* gap: 2rem; */
   padding: 1rem 0;
-  margin: 3rem 0rem;
+  margin: 3rem auto;
+  
   
 `;
 
@@ -17,6 +19,7 @@ const BrokerWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
+
 
   @media (max-width: 768px) {
     gap: 1rem;

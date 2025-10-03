@@ -3,9 +3,10 @@ import styled from "styled-components";
 export const Container = styled.section`
   margin:0px 40px;
   max-width: 1400px;
-  /* margin: auto; */
-  @media (max-width: 1000px) {
-    margin: 0;
+  
+  
+  @media (max-width: 1200px) {
+    margin: auto;
   }
 `;
 
@@ -22,7 +23,7 @@ export const CardContainer = styled.div`
   flex-wrap: wrap;
   /* width: 90%; */
   margin: auto;
-  /* box-shadow: 0 0 0 3px #fbc113; */
+  
 
   @media (max-width: 1024px) {
     gap: 2rem;
@@ -55,12 +56,13 @@ export const FeaturedRibbon = styled.div`
   position: absolute;
   top: 0;
   right: 0;
-  background-color: #d97706;
+  background-color: #fac41d;
   color: white;
   padding: 6px 14px;
   font-weight: bold;
   font-size: 12px;
   border-radius: 0 12px 0 5px;
+ 
 `;
 
 export const LogoSection = styled.div`
