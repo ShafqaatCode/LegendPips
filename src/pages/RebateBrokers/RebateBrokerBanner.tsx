@@ -35,18 +35,20 @@ const RebatesBrokersSection = () => {
             simply from cashback!
           </Description>
 
-          <SearchBar>
-            <SearchInput placeholder="Search Your Broker" />
-            <CTAButton>
-              Report <FaPen style={{ marginLeft: 6 }} />
-            </CTAButton>
-          </SearchBar>
+         
         </Left>
 
         <Right>
           <Image src={GirlImage} alt="Girl pointing" />
         </Right>
+        
       </Content>
+       <SearchBar>
+            <SearchInput placeholder="Search Your Broker" />
+            <CTAButton>
+              Report <FaPen style={{ marginLeft: 6 }} />
+            </CTAButton>
+          </SearchBar>
     </Wrapper>
   );
 };
@@ -176,7 +178,7 @@ const FeatureBox = styled.div`
   letter-spacing: 0.09em;
   position: absolute;
   top: 70px;
-  left: 50%;
+  left: 45%;
   transform: translateX(-20%);
 
   @media (max-width: 1200px) {
@@ -241,6 +243,7 @@ const SearchBar = styled.div`
   gap: 1rem;
   flex-wrap: wrap;
 
+
   @media (max-width: 768px) {
     gap: 0.8rem;
   }
@@ -258,6 +261,7 @@ const SearchInput = styled.input`
   border: 1px solid #cbd5e1;
   font-size: 16px;
   min-width: 300px;
+  border: 1px solid #132E58B2;
 
   &::placeholder {
     color: #94a3b8;
@@ -276,13 +280,13 @@ const SearchInput = styled.input`
 `;
 
 const CTAButton = styled.button`
-  background-color: #1f3b8c;
+  background-color: #132e58;
   color: white;
-  padding: 1rem 2rem;
+  padding: 1rem 4rem;
   border: none;
   border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 400;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -290,6 +294,7 @@ const CTAButton = styled.button`
 
   @media (max-width: 768px) {
     padding: 0.9rem 1.5rem;
+    font-size: 20px;
   }
 
   @media (max-width: 480px) {
