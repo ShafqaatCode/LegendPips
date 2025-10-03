@@ -17,7 +17,7 @@ import {
 } from "./BrokerCard3.styles";
 
 import { motion } from "framer-motion";
-import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
+import ArrowIcon from "../../assets/icons/blueCircle.svg";
 import styled from "styled-components";
 
 export const Description = styled.p`
@@ -144,9 +144,9 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
            <ActionSection>
             <TermsText>Terms & Conditions Apply</TermsText>
             <PrimaryButton>
-              View Details <img src={ArrowIcon} alt="Arrow" />
+              Setup Account 
             </PrimaryButton>
-            <SecondaryButton>Broker Reviews</SecondaryButton>
+            <SecondaryButton>Broker Reviews <img src={ArrowIcon} alt="Arrow" /></SecondaryButton>
           </ActionSection>
 
 

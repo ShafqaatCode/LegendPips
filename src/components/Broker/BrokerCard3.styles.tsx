@@ -204,7 +204,8 @@ export const PrimaryButton = styled.button`
   background-color: ${({ theme }) => theme.colors.primary};
   color: #fff;
   border: none;
-  padding: 0.7rem 2.2rem;
+  padding: 0.6rem 2.3rem;
+  /* padding: 7px 20px; */
   border-radius: 2rem;
   font-size: 16px;
   font-weight: 500;
@@ -222,7 +223,7 @@ export const PrimaryButton = styled.button`
 `;
 
 export const SecondaryButton = styled.a`
-  color: #0f1c46;
+  color: #132e58;
   font-size: 14px;
   text-decoration: none;
   display: flex;
