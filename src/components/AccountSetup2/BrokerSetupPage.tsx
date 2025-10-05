@@ -1,37 +1,31 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { ChevronDown, Loader2, CheckCircle2, ArrowLeft } from "lucide-react";
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { ChevronDown, Loader2, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { Broker } from './BrokerListingPage';
 
-type BrokerProps = {
-  name?: string;
-  logo?: string;
-  features?: string[];
-  description?: string;
+type BrokerSetupPageProps = {
+  broker: Broker;
+  onBack: () => void;
 };
 
-export default function LiveAccountSetup({ 
-  name = "XM MARKET", 
-  logo, 
-  features, 
-  description 
-}: BrokerProps) {
+export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
-    accountName: "",
-    accountNumber: "",
-    accountType: "",
-    tradingPlatform: "",
-    jurisdiction: "",
+    accountName: '',
+    accountNumber: '',
+    accountType: '',
+    tradingPlatform: '',
+    jurisdiction: ''
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [submitted, setSubmitted] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }));
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
@@ -39,21 +33,21 @@ export default function LiveAccountSetup({
     const newErrors: { [key: string]: string } = {};
     
     if (!formData.accountName.trim()) {
-      newErrors.accountName = "Account name is required";
+      newErrors.accountName = 'Account name is required';
     }
     if (!formData.accountNumber.trim()) {
-      newErrors.accountNumber = "Account number is required";
+      newErrors.accountNumber = 'Account number is required';
     } else if (!/^\d+$/.test(formData.accountNumber)) {
-      newErrors.accountNumber = "Account number must contain only digits";
+      newErrors.accountNumber = 'Account number must contain only digits';
     }
     if (!formData.accountType) {
-      newErrors.accountType = "Please select account type";
+      newErrors.accountType = 'Please select account type';
     }
     if (!formData.tradingPlatform) {
-      newErrors.tradingPlatform = "Please select trading platform";
+      newErrors.tradingPlatform = 'Please select trading platform';
     }
     if (!formData.jurisdiction) {
-      newErrors.jurisdiction = "Please select jurisdiction";
+      newErrors.jurisdiction = 'Please select jurisdiction';
     }
     
     setErrors(newErrors);
@@ -74,7 +68,7 @@ export default function LiveAccountSetup({
     
     setLoading(false);
     setSubmitted(true);
-    console.log("Submitted form:", formData);
+    console.log('Submitted form:', { broker: broker.name, ...formData });
   };
 
   const goToStep = (step: number) => {
@@ -83,18 +77,15 @@ export default function LiveAccountSetup({
     }
   };
 
-  const defaultFeatures = [
-    "Regulated in multiple jurisdictions globally",
-    "Spreads from 0.0 pips",
-    "50+ tradable instruments worldwide"
-  ];
-
-  const defaultDescription = "Trade 1,000+ instruments including Forex, CFDs, Commodities, Indices, Stocks & Cryptocurrencies";
-
   return (
-    <Wrapper>
+    <PageWrapper>
       <Container>
-        <Header>IC Markets Live Account Setup</Header>
+        <BackButton onClick={onBack}>
+          <ArrowLeft size={18} />
+          Back to Broker Details
+        </BackButton>
+        
+        <Header>{broker.name} Live Account Setup</Header>
 
         {/* Progress Steps */}
         <ProgressContainer>
@@ -120,40 +111,31 @@ export default function LiveAccountSetup({
         {/* Step 1 - Broker Information */}
         {currentStep === 1 && (
           <Card>
-            <BrokerInfoSection>
-              <LogoBox>
-                {logo ? (
-                  <BrokerLogo src={logo} alt={name} />
-                ) : (
-                  <LogoText>XM</LogoText>
-                )}
-              </LogoBox>
-              <BrokerContent>
-                <BrokerHeader>
-                  <BrokerTitle>{name}</BrokerTitle>
-                  <DetailButton>Detailed Broker</DetailButton>
-                </BrokerHeader>
-                <FeatureList>
-                  {(features || defaultFeatures).map((feature, i) => (
-                    <li key={i}>• {feature}</li>
+            <BrokerSetupHeader>
+              <SetupLogoBadge color={getLogoColor(broker.id)}>
+                {broker.logo}
+              </SetupLogoBadge>
+              <div>
+                <SetupBrokerTitle>{broker.name}</SetupBrokerTitle>
+                {broker.verified && <SetupVerified>Verified Broker</SetupVerified>}
+                <SetupFeatures>
+                  {broker.features.map((f, i) => (
+                    <li key={i}>• {f}</li>
                   ))}
-                </FeatureList>
-                <BrokerDescription>
-                  {description || defaultDescription}
-                </BrokerDescription>
-              </BrokerContent>
-            </BrokerInfoSection>
+                </SetupFeatures>
+                <SetupDescription>{broker.description}</SetupDescription>
+              </div>
+            </BrokerSetupHeader>
 
             <StepBadge>Step 1</StepBadge>
-
             <InfoBox>
-              <InfoTitle>Start Your Live Trading Journey with {name}</InfoTitle>
-              <OpenAccountButton onClick={() => setCurrentStep(2)}>
-                Open Account
-              </OpenAccountButton>
+              <InfoTitle>Start Your Live Trading Journey with {broker.name}</InfoTitle>
+              <PrimaryButton onClick={() => setCurrentStep(2)}>
+                Start Trading
+              </PrimaryButton>
               <NotesList>
-                <li>• Existing XM profiles or accounts are not eligible for this offer. Please create a new profile using the button above.</li>
-                <li>• Even if your profile is already assigned to our IB, you will still need to open additional accounts through the referral link provided above.</li>
+                <li>• Based in the EU, Brazil, the UK, or Australia? Please start your journey by opening an account with {broker.name}.</li>
+                <li>• If your live account is already connected to another IB, simply open a new one with a different email through the link above.</li>
                 <li>• If you don't have an IB linked yet, just enter your account number in Step 2 to connect with our IB group.</li>
               </NotesList>
             </InfoBox>
@@ -164,7 +146,7 @@ export default function LiveAccountSetup({
         {currentStep === 2 && (
           <Card>
             <StepBadge>Step 2</StepBadge>
-            <SectionTitle>Enter your Live XM Account Number</SectionTitle>
+            <SectionTitle>Enter your Live {broker.name} Account Number</SectionTitle>
 
             <FormGrid>
               <FormField>
@@ -214,6 +196,7 @@ export default function LiveAccountSetup({
                     <option value="standard">Standard</option>
                     <option value="micro">Micro</option>
                     <option value="zero">Zero</option>
+                    <option value="raw">Raw Spread</option>
                   </Select>
                   <IconWrapper>
                     <ChevronDown size={20} />
@@ -271,17 +254,17 @@ export default function LiveAccountSetup({
             </FormFieldSingle>
 
             <TermsText>
-              I understand and accept the{" "}
+              I understand and accept the{' '}
               <TermsLink href="#" onClick={(e) => e.preventDefault()}>
                 Terms and Conditions
               </TermsLink>
             </TermsText>
 
             <ButtonGroup>
-              <BackButton onClick={() => setCurrentStep(1)}>
+              <BackButtonSecondary onClick={() => setCurrentStep(1)}>
                 <ArrowLeft size={18} />
                 Back
-              </BackButton>
+              </BackButtonSecondary>
               <ContinueButton onClick={handleContinueToStep3}>
                 Continue to Step 3
               </ContinueButton>
@@ -304,7 +287,7 @@ export default function LiveAccountSetup({
                       Submitting...
                     </>
                   ) : (
-                    "Submit"
+                    'Submit'
                   )}
                 </SubmitButton>
               </>
@@ -313,17 +296,18 @@ export default function LiveAccountSetup({
                 <CheckCircle2 size={64} color="#10b981" />
                 <SuccessTitle>Account Successfully Linked!</SuccessTitle>
                 <SuccessMessage>
-                  Your account has been submitted and linked to our system. You will receive a confirmation email shortly.
+                  Your {broker.name} account has been submitted and linked to our system. 
+                  You will receive a confirmation email shortly.
                 </SuccessMessage>
                 <ResetButton onClick={() => {
                   setCurrentStep(1);
                   setSubmitted(false);
                   setFormData({
-                    accountName: "",
-                    accountNumber: "",
-                    accountType: "",
-                    tradingPlatform: "",
-                    jurisdiction: "",
+                    accountName: '',
+                    accountNumber: '',
+                    accountType: '',
+                    tradingPlatform: '',
+                    jurisdiction: '',
                   });
                 }}>
                   Submit Another Account
@@ -333,24 +317,50 @@ export default function LiveAccountSetup({
           </Card>
         )}
       </Container>
-    </Wrapper>
+    </PageWrapper>
   );
 }
 
-/* Styled Components */
-const Wrapper = styled.div`
-  min-height: 100vh;
-  background-color: #f9fafb;
-  padding: 2rem 1rem;
+// Helper function
+function getLogoColor(id: string): string {
+  const colors: { [key: string]: string } = {
+    '1': '#10b981',
+    '2': '#ef4444',
+    '3': '#f59e0b',
+    '4': '#3b82f6',
+    '5': '#8b5cf6',
+  };
+  return colors[id] || '#6b7280';
+}
 
-  @media (max-width: 768px) {
-    padding: 1.5rem 1rem;
-  }
+// Styled Components
+const PageWrapper = styled.div`
+  min-height: 100vh;
+  background: #f3f4f6;
+  padding: 2rem 1rem;
 `;
 
 const Container = styled.div`
   max-width: 1000px;
   margin: 0 auto;
+`;
+
+const BackButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  font-size: 0.875rem;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  padding: 0.5rem 0;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #1f2937;
+  }
 `;
 
 const Header = styled.h1`
@@ -394,13 +404,13 @@ const StepCircle = styled.div<{ active: boolean; clickable?: boolean }>`
   justify-content: center;
   font-size: 1.25rem;
   font-weight: 700;
-  background-color: ${props => props.active ? '#f59e0b' : '#d1d5db'};
-  color: ${props => props.active ? '#ffffff' : '#6b7280'};
-  transition: all 0.3s ease;
-  cursor: ${props => props.clickable ? 'pointer' : 'default'};
+  background: ${p => p.active ? '#f59e0b' : '#d1d5db'};
+  color: ${p => p.active ? '#fff' : '#6b7280'};
+  transition: all 0.3s;
+  cursor: ${p => p.clickable ? 'pointer' : 'default'};
 
   &:hover {
-    ${props => props.clickable && `
+    ${p => p.clickable && `
       transform: scale(1.05);
       box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
     `}
@@ -428,8 +438,8 @@ const ProgressLine = styled.div<{ active: boolean }>`
   height: 4px;
   margin: 0 1rem;
   margin-top: -2rem;
-  background-color: ${props => props.active ? '#f59e0b' : '#d1d5db'};
-  transition: all 0.3s ease;
+  background: ${p => p.active ? '#f59e0b' : '#d1d5db'};
+  transition: all 0.3s;
 
   @media (max-width: 768px) {
     margin: 0 0.5rem;
@@ -438,99 +448,62 @@ const ProgressLine = styled.div<{ active: boolean }>`
 `;
 
 const Card = styled.div`
-  background-color: #ffffff;
+  background: #fff;
   border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 2rem;
-  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
   @media (max-width: 768px) {
     padding: 1.25rem;
   }
 `;
 
-const BrokerInfoSection = styled.div`
+const BrokerSetupHeader = styled.div`
   display: flex;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
 
   @media (max-width: 768px) {
     flex-direction: column;
-    gap: 1rem;
   }
 `;
 
-const LogoBox = styled.div`
+const SetupLogoBadge = styled.div<{ color: string }>`
   width: 6rem;
   height: 6rem;
-  background-color: #000000;
+  background: ${p => p.color};
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
   flex-shrink: 0;
 `;
 
-const BrokerLogo = styled.img`
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-`;
-
-const LogoText = styled.span`
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 1.5rem;
-`;
-
-const BrokerContent = styled.div`
-  flex: 1;
-`;
-
-const BrokerHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1rem;
-
-  @media (max-width: 640px) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-`;
-
-const BrokerTitle = styled.h2`
+const SetupBrokerTitle = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
   color: #f59e0b;
-
-  @media (max-width: 768px) {
-    font-size: 1.25rem;
-  }
+  margin-bottom: 0.5rem;
 `;
 
-const DetailButton = styled.button`
-  background-color: #2563eb;
-  color: #ffffff;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  border: none;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #1d4ed8;
-  }
+const SetupVerified = styled.div`
+  display: inline-block;
+  background: #3b82f6;
+  color: #fff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
 `;
 
-const FeatureList = styled.ul`
+const SetupFeatures = styled.ul`
   list-style: none;
   padding: 0;
-  margin: 0 0 1rem 0;
+  margin: 0.75rem 0;
   font-size: 0.875rem;
   color: #374151;
 
@@ -539,16 +512,15 @@ const FeatureList = styled.ul`
   }
 `;
 
-const BrokerDescription = styled.p`
+const SetupDescription = styled.p`
   font-size: 0.875rem;
   color: #6b7280;
-  margin: 0;
   line-height: 1.6;
 `;
 
 const StepBadge = styled.div`
   display: inline-block;
-  background-color: #f3f4f6;
+  background: #f3f4f6;
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
   font-size: 0.875rem;
@@ -558,7 +530,6 @@ const StepBadge = styled.div`
 `;
 
 const InfoBox = styled.div`
-  background-color: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
   padding: 1.5rem;
@@ -573,27 +544,22 @@ const InfoTitle = styled.h3`
   font-weight: 600;
   color: #1f2937;
   margin-bottom: 1rem;
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-  }
 `;
 
-const OpenAccountButton = styled.button`
-  background-color: #1f2937;
-  color: #ffffff;
+const PrimaryButton = styled.button`
+  background: #1e3a8a;
+  color: #fff;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   border: none;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  margin-bottom: 1rem;
-  width: 100%;
   transition: all 0.2s;
+  width: 100%;
 
   &:hover {
-    background-color: #374151;
+    background: #1e40af;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
@@ -606,7 +572,7 @@ const OpenAccountButton = styled.button`
 const NotesList = styled.ul`
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 1rem 0 0 0;
   font-size: 0.875rem;
   color: #6b7280;
   line-height: 1.6;
@@ -671,16 +637,16 @@ const Required = styled.span`
 const Input = styled.input<{ hasError?: boolean }>`
   width: 100%;
   padding: 0.75rem 1rem;
-  background-color: #1f2937;
-  color: #ffffff;
+  background: #1f2937;
+  color: #fff;
+  border: 2px solid ${p => p.hasError ? '#ef4444' : 'transparent'};
   border-radius: 0.5rem;
-  border: 2px solid ${props => props.hasError ? '#ef4444' : 'transparent'};
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s;
 
   &:focus {
-    border-color: ${props => props.hasError ? '#ef4444' : '#3b82f6'};
+    border-color: ${p => p.hasError ? '#ef4444' : '#3b82f6'};
   }
 
   &::placeholder {
@@ -698,7 +664,7 @@ const IconWrapper = styled.div`
   right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #ffffff;
+  color: #fff;
   pointer-events: none;
 `;
 
@@ -706,10 +672,10 @@ const Select = styled.select<{ hasError?: boolean }>`
   width: 100%;
   padding: 0.75rem 1rem;
   padding-right: 2.5rem;
-  background-color: #1f2937;
-  color: #ffffff;
+  background: #1f2937;
+  color: #fff;
+  border: 2px solid ${p => p.hasError ? '#ef4444' : 'transparent'};
   border-radius: 0.5rem;
-  border: 2px solid ${props => props.hasError ? '#ef4444' : 'transparent'};
   font-size: 1rem;
   outline: none;
   appearance: none;
@@ -717,12 +683,12 @@ const Select = styled.select<{ hasError?: boolean }>`
   transition: border-color 0.2s;
 
   &:focus {
-    border-color: ${props => props.hasError ? '#ef4444' : '#3b82f6'};
+    border-color: ${p => p.hasError ? '#ef4444' : '#3b82f6'};
   }
 
   option {
-    background-color: #1f2937;
-    color: #ffffff;
+    background: #1f2937;
+    color: #fff;
   }
 `;
 
@@ -730,9 +696,6 @@ const ErrorText = styled.span`
   color: #ef4444;
   font-size: 0.75rem;
   margin-top: 0.375rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
 `;
 
 const TermsText = styled.p`
@@ -762,8 +725,8 @@ const ButtonGroup = styled.div`
   }
 `;
 
-const BackButton = styled.button`
-  background-color: #e5e7eb;
+const BackButtonSecondary = styled.button`
+  background: #e5e7eb;
   color: #374151;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
@@ -777,7 +740,7 @@ const BackButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background-color: #d1d5db;
+    background: #d1d5db;
   }
 
   @media (max-width: 640px) {
@@ -787,18 +750,18 @@ const BackButton = styled.button`
 `;
 
 const ContinueButton = styled.button`
-  background-color: #1f2937;
-  color: #ffffff;
+  background: #1e3a8a;
+  color: #fff;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   border: none;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: #374151;
+    background: #1e40af;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
@@ -809,13 +772,13 @@ const ContinueButton = styled.button`
 `;
 
 const SubmitButton = styled.button`
-  background-color: #1f2937;
-  color: #ffffff;
+  background: #1e3a8a;
+  color: #fff;
   padding: 0.75rem 2rem;
   border-radius: 0.5rem;
   border: none;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
@@ -825,7 +788,7 @@ const SubmitButton = styled.button`
   width: 100%;
 
   &:hover:not(:disabled) {
-    background-color: #374151;
+    background: #1e40af;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
@@ -840,12 +803,8 @@ const SubmitButton = styled.button`
   }
 
   @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 
   @media (min-width: 640px) {
@@ -876,18 +835,18 @@ const SuccessMessage = styled.p`
 `;
 
 const ResetButton = styled.button`
-  background-color: #1f2937;
-  color: #ffffff;
+  background: #1e3a8a;
+  color: #fff;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   border: none;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: #374151;
+    background: #1e40af;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
