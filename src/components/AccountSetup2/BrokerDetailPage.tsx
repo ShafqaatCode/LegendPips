@@ -227,6 +227,8 @@ const BackButton = styled.button`
   cursor: pointer;
   margin-bottom: 1.5rem;
   padding: 0.5rem 0;
+  
+  padding: 1rem;
 
   &:hover {
     color: #1f2937;
@@ -241,7 +243,7 @@ const HeaderSection = styled.div`
   display: flex;
   align-items: center;
   gap: 2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); */
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -269,6 +271,8 @@ const BrokerLogo = styled.img`
 
 const HeaderContent = styled.div`
   flex: 1;
+  /* border: 2px solid red; */
+  /* align-self: self-start; */
 `;
 
 const BrokerTitle = styled.h1`
@@ -322,13 +326,13 @@ const SetupButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-
+width: 222px;
   &:hover {
     background: #1e40affd;
   }
 
   @media (max-width: 768px) {
-    width: 100%;
+    /* width: 100%; */
   }
 `;
 
@@ -349,6 +353,7 @@ const TabButton = styled.button<{ active?: boolean }>`
   cursor: pointer;
   border-radius:12px;
   font-size: 40px;
+  margin: 1rem;
 
   &:hover {
     background: ${p => p.active ? '#fbbf24' : '#f3f4f6'};
@@ -578,12 +583,15 @@ const VisitWebsiteButton = styled.a`
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
+  text-align: center;
 
   &:hover {
     background: #1e40affd;
   }
 
   @media (max-width: 768px) {
-    width: 100%;
+    /* width: 100%; */
+text-align: center;
+
   }
 `;

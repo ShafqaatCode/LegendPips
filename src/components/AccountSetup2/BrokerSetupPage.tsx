@@ -333,12 +333,12 @@ export default BrokerSetupPage;
 // Styled Components
 const PageWrapper = styled.div`
   min-height: 100vh;
-  background: #f3f4f6;
+  /* background: #f3f4f6; */
   padding: 2rem 1rem;
 `;
 
 const Container = styled.div`
-  max-width: 1000px;
+  max-width: 1180px;
   margin: 0 auto;
 `;
 
@@ -614,8 +614,10 @@ const FormField = styled.div`
   display: flex;
   /* flex-direction: column; */
   justify-content: space-between;
-  
+  border: 1px solid #132E5899;
   align-items: center;
+  padding: 0.5rem;
+  border-radius: 12px;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -628,8 +630,10 @@ const FormFieldSingle = styled.div`
   justify-content: space-between;
   margin-bottom: 1.5rem;
   max-width: 49%;
-  border: 2px solid blue;
+  border: 1px solid #132E5899;
   align-items: center;
+  padding: 0.5rem;
+  border-radius: 12px;
   
 
   @media (max-width: 768px) {
@@ -781,13 +785,13 @@ const BackButtonSecondary = styled.button`
 `;
 
 const ContinueButton = styled.button`
-  background: #1e3a8a;
+  background: #132e58;
   color: #fff;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   border: none;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 
