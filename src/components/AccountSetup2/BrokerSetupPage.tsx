@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ChevronDown, Loader2, CheckCircle2, ArrowLeft } from 'lucide-react';
-import { Broker } from './BrokerListingPage';
+import type { Broker } from './BrokerListingPage';
 
 type BrokerSetupPageProps = {
   broker: Broker;
   onBack: () => void;
 };
 
-export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps) {
+const BrokerSetupPage: React.FC<BrokerSetupPageProps> = ({ broker, onBack }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -31,7 +31,7 @@ export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps
 
   const validateStep2 = (): boolean => {
     const newErrors: { [key: string]: string } = {};
-    
+
     if (!formData.accountName.trim()) {
       newErrors.accountName = 'Account name is required';
     }
@@ -49,7 +49,7 @@ export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps
     if (!formData.jurisdiction) {
       newErrors.jurisdiction = 'Please select jurisdiction';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -62,10 +62,9 @@ export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps
 
   const handleSubmit = async () => {
     setLoading(true);
-    
-    // Simulate API call
+
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
     setLoading(false);
     setSubmitted(true);
     console.log('Submitted form:', { broker: broker.name, ...formData });
@@ -77,6 +76,17 @@ export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps
     }
   };
 
+  const getLogoColor = (id: string): string => {
+    const colors: { [key: string]: string } = {
+      '1': '#10b981',
+      '2': '#ef4444',
+      '3': '#f59e0b',
+      '4': '#3b82f6',
+      '5': '#8b5cf6',
+    };
+    return colors[id] || '#6b7280';
+  };
+
   return (
     <PageWrapper>
       <Container>
@@ -84,36 +94,35 @@ export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps
           <ArrowLeft size={18} />
           Back to Broker Details
         </BackButton>
-        
+
         <Header>{broker.name} Live Account Setup</Header>
 
-        {/* Progress Steps */}
         <ProgressContainer>
           <StepsWrapper>
             {[1, 2, 3].map((step, index) => (
               <React.Fragment key={step}>
                 <StepCircleWrapper>
-                  <StepCircle 
-                    active={currentStep >= step}
-                    clickable={step < currentStep}
+                  <StepCircle
+                    $active={currentStep >= step}
+                    $clickable={step < currentStep}
                     onClick={() => goToStep(step)}
                   >
                     {step}
                   </StepCircle>
                   <StepLabel>Step</StepLabel>
                 </StepCircleWrapper>
-                {index < 2 && <ProgressLine active={currentStep > step} />}
+                {index < 2 && <ProgressLine $active={currentStep > step} />}
               </React.Fragment>
             ))}
           </StepsWrapper>
         </ProgressContainer>
 
-        {/* Step 1 - Broker Information */}
         {currentStep === 1 && (
           <Card>
             <BrokerSetupHeader>
               <SetupLogoBadge color={getLogoColor(broker.id)}>
-                {broker.logo}
+                {/* {broker.logo} */}
+                <img src={broker.logo} alt="broker logo" />
               </SetupLogoBadge>
               <div>
                 <SetupBrokerTitle>{broker.name}</SetupBrokerTitle>
@@ -142,7 +151,6 @@ export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps
           </Card>
         )}
 
-        {/* Step 2 - Account Details Form */}
         {currentStep === 2 && (
           <Card>
             <StepBadge>Step 2</StepBadge>
@@ -159,7 +167,7 @@ export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps
                   value={formData.accountName}
                   onChange={handleInputChange}
                   placeholder="Enter account name"
-                  hasError={!!errors.accountName}
+                  $hasError={!!errors.accountName}
                 />
                 {errors.accountName && <ErrorText>{errors.accountName}</ErrorText>}
               </FormField>
@@ -174,7 +182,7 @@ export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps
                   value={formData.accountNumber}
                   onChange={handleInputChange}
                   placeholder="Enter account number"
-                  hasError={!!errors.accountNumber}
+                  $hasError={!!errors.accountNumber}
                 />
                 {errors.accountNumber && <ErrorText>{errors.accountNumber}</ErrorText>}
               </FormField>
@@ -190,7 +198,7 @@ export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps
                     name="accountType"
                     value={formData.accountType}
                     onChange={handleInputChange}
-                    hasError={!!errors.accountType}
+                    $hasError={!!errors.accountType}
                   >
                     <option value="">Select</option>
                     <option value="standard">Standard</option>
@@ -214,7 +222,7 @@ export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps
                     name="tradingPlatform"
                     value={formData.tradingPlatform}
                     onChange={handleInputChange}
-                    hasError={!!errors.tradingPlatform}
+                    $hasError={!!errors.tradingPlatform}
                   >
                     <option value="">Select</option>
                     <option value="mt4">MT4</option>
@@ -238,7 +246,7 @@ export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps
                   name="jurisdiction"
                   value={formData.jurisdiction}
                   onChange={handleInputChange}
-                  hasError={!!errors.jurisdiction}
+                  $hasError={!!errors.jurisdiction}
                 >
                   <option value="">Select</option>
                   <option value="global">Global</option>
@@ -272,11 +280,10 @@ export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps
           </Card>
         )}
 
-        {/* Step 3 - Submit */}
         {currentStep === 3 && (
           <Card>
             <StepBadge>Step 3</StepBadge>
-            
+
             {!submitted ? (
               <>
                 <SectionTitle>Submit Your Account</SectionTitle>
@@ -296,7 +303,7 @@ export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps
                 <CheckCircle2 size={64} color="#10b981" />
                 <SuccessTitle>Account Successfully Linked!</SuccessTitle>
                 <SuccessMessage>
-                  Your {broker.name} account has been submitted and linked to our system. 
+                  Your {broker.name} account has been submitted and linked to our system.
                   You will receive a confirmation email shortly.
                 </SuccessMessage>
                 <ResetButton onClick={() => {
@@ -319,19 +326,9 @@ export default function BrokerSetupPage({ broker, onBack }: BrokerSetupPageProps
       </Container>
     </PageWrapper>
   );
-}
+};
 
-// Helper function
-function getLogoColor(id: string): string {
-  const colors: { [key: string]: string } = {
-    '1': '#10b981',
-    '2': '#ef4444',
-    '3': '#f59e0b',
-    '4': '#3b82f6',
-    '5': '#8b5cf6',
-  };
-  return colors[id] || '#6b7280';
-}
+export default BrokerSetupPage;
 
 // Styled Components
 const PageWrapper = styled.div`
@@ -395,7 +392,7 @@ const StepCircleWrapper = styled.div`
   z-index: 10;
 `;
 
-const StepCircle = styled.div<{ active: boolean; clickable?: boolean }>`
+const StepCircle = styled.div<{ $active: boolean; $clickable?: boolean }>`
   width: 3.5rem;
   height: 3.5rem;
   border-radius: 50%;
@@ -404,13 +401,13 @@ const StepCircle = styled.div<{ active: boolean; clickable?: boolean }>`
   justify-content: center;
   font-size: 1.25rem;
   font-weight: 700;
-  background: ${p => p.active ? '#f59e0b' : '#d1d5db'};
-  color: ${p => p.active ? '#fff' : '#6b7280'};
+  background: ${p => p.$active ? '#f59e0b' : '#d1d5db'};
+  color: ${p => p.$active ? '#fff' : '#6b7280'};
   transition: all 0.3s;
-  cursor: ${p => p.clickable ? 'pointer' : 'default'};
+  cursor: ${p => p.$clickable ? 'pointer' : 'default'};
 
   &:hover {
-    ${p => p.clickable && `
+    ${p => p.$clickable && `
       transform: scale(1.05);
       box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
     `}
@@ -433,12 +430,12 @@ const StepLabel = styled.span`
   }
 `;
 
-const ProgressLine = styled.div<{ active: boolean }>`
+const ProgressLine = styled.div<{ $active: boolean }>`
   flex: 1;
   height: 4px;
   margin: 0 1rem;
   margin-top: -2rem;
-  background: ${p => p.active ? '#f59e0b' : '#d1d5db'};
+  background: ${p => p.$active ? '#f59e0b' : '#d1d5db'};
   transition: all 0.3s;
 
   @media (max-width: 768px) {
@@ -448,11 +445,11 @@ const ProgressLine = styled.div<{ active: boolean }>`
 `;
 
 const Card = styled.div`
-  background: #fff;
+  /* background: #fff; */
   border-radius: 0.75rem;
   padding: 2rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-
+  
   @media (max-width: 768px) {
     padding: 1.25rem;
   }
@@ -462,31 +459,30 @@ const BrokerSetupHeader = styled.div`
   display: flex;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
-
+  
+  background: #fff;
+  padding: 0.4rem;
+  border: 1px solid #0000004D;
+  border-radius: 8px;
   @media (max-width: 768px) {
     flex-direction: column;
   }
 `;
 
 const SetupLogoBadge = styled.div<{ color: string }>`
-  width: 6rem;
-  height: 6rem;
-  background: ${p => p.color};
-  border-radius: 0.5rem;
+ 
   display: flex;
-  align-items: center;
+  align-items: start;
   justify-content: center;
-  color: #fff;
-  font-size: 2rem;
-  font-weight: 700;
-  flex-shrink: 0;
+ 
 `;
 
 const SetupBrokerTitle = styled.h2`
-  font-size: 1.5rem;
+  font-size:3rem;
   font-weight: 700;
-  color: #f59e0b;
+  color: #DE992F;
   margin-bottom: 0.5rem;
+
 `;
 
 const SetupVerified = styled.div`
@@ -504,35 +500,42 @@ const SetupFeatures = styled.ul`
   list-style: none;
   padding: 0;
   margin: 0.75rem 0;
-  font-size: 0.875rem;
-  color: #374151;
+  font-size: 20px;
+  color: #132e58;
+  font-weight: 400;
 
   li {
     margin-bottom: 0.25rem;
   }
+
+ 
 `;
 
 const SetupDescription = styled.p`
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: 20px;
+  color: #132e58;
   line-height: 1.6;
 `;
 
 const StepBadge = styled.div`
   display: inline-block;
-  background: #f3f4f6;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
+  background: #d9d9d9;
+  padding: 0.5rem 1.2rem;
+  border-radius: 30px;
   font-size: 0.875rem;
   font-weight: 500;
   color: #374151;
   margin-bottom: 1.5rem;
+  width: 120px;
+  text-align: center;
 `;
 
 const InfoBox = styled.div`
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
   padding: 1.5rem;
+  
+  background: #fff;
 
   @media (max-width: 768px) {
     padding: 1rem;
@@ -540,20 +543,20 @@ const InfoBox = styled.div`
 `;
 
 const InfoTitle = styled.h3`
-  font-size: 1.125rem;
+  font-size: 24px;
   font-weight: 600;
-  color: #1f2937;
+  color: #132e58;
   margin-bottom: 1rem;
 `;
 
 const PrimaryButton = styled.button`
-  background: #1e3a8a;
+  background: #132e58;
   color: #fff;
   padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
+  border-radius: 30px;
   border: none;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
   width: 100%;
@@ -573,9 +576,11 @@ const NotesList = styled.ul`
   list-style: none;
   padding: 0;
   margin: 1rem 0 0 0;
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: 20px;
+  font-weight: 400;
+  color: #132e58;
   line-height: 1.6;
+  
 
   li {
     margin-bottom: 0.5rem;
@@ -598,6 +603,7 @@ const FormGrid = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   margin-bottom: 1rem;
+  
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -606,47 +612,64 @@ const FormGrid = styled.div`
 
 const FormField = styled.div`
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
+  justify-content: space-between;
+  
+  align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 const FormFieldSingle = styled.div`
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
+  justify-content: space-between;
   margin-bottom: 1.5rem;
-  max-width: 50%;
+  max-width: 49%;
+  border: 2px solid blue;
+  align-items: center;
+  
 
   @media (max-width: 768px) {
+    flex-direction: column;
     max-width: 100%;
   }
 `;
 
 const Label = styled.label`
-  font-size: 0.875rem;
+  font-size: 20px;
   font-weight: 500;
-  color: #374151;
+  color: #132e58;
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  white-space: nowrap;
+  /* border: 2px solid blue; */
 `;
 
 const Required = styled.span`
   color: #ef4444;
 `;
 
-const Input = styled.input<{ hasError?: boolean }>`
+const Input = styled.input<{ $hasError?: boolean }>`
   width: 100%;
   padding: 0.75rem 1rem;
-  background: #1f2937;
+  background: #132e58;
   color: #fff;
-  border: 2px solid ${p => p.hasError ? '#ef4444' : 'transparent'};
+  border: 2px solid ${p => p.$hasError ? '#ef4444' : 'transparent'};
   border-radius: 0.5rem;
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s;
+  width: 236px;
+
+  
 
   &:focus {
-    border-color: ${p => p.hasError ? '#ef4444' : '#3b82f6'};
+    border-color: ${p => p.$hasError ? '#ef4444' : '#3b82f6'};
   }
 
   &::placeholder {
@@ -657,6 +680,13 @@ const Input = styled.input<{ hasError?: boolean }>`
 const SelectWrapper = styled.div`
   position: relative;
   width: 100%;
+  display: flex;
+  justify-content: end;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
+
 `;
 
 const IconWrapper = styled.div`
@@ -668,13 +698,14 @@ const IconWrapper = styled.div`
   pointer-events: none;
 `;
 
-const Select = styled.select<{ hasError?: boolean }>`
+const Select = styled.select<{ $hasError?: boolean }>`
   width: 100%;
+  max-width: 236px;
   padding: 0.75rem 1rem;
   padding-right: 2.5rem;
-  background: #1f2937;
+  background: #132e58;
   color: #fff;
-  border: 2px solid ${p => p.hasError ? '#ef4444' : 'transparent'};
+  border: 2px solid ${p => p.$hasError ? '#ef4444' : 'transparent'};
   border-radius: 0.5rem;
   font-size: 1rem;
   outline: none;
@@ -683,7 +714,7 @@ const Select = styled.select<{ hasError?: boolean }>`
   transition: border-color 0.2s;
 
   &:focus {
-    border-color: ${p => p.hasError ? '#ef4444' : '#3b82f6'};
+    border-color: ${p => p.$hasError ? '#ef4444' : '#3b82f6'};
   }
 
   option {

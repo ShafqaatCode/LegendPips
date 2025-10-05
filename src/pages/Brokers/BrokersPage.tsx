@@ -1,9 +1,10 @@
 import React from 'react'
 
 import BrokerHeroSection2 from './BrokerHeroSection2';
-import AllBrokersList from '../../components/Broker/AllBrokersList2';
-import LiveAccountSetup from '../../components/AccountSetup/LiveAccountSetup';
-import BrokerSystem from '../../components/AccountSetup/BrokerReview';
+// import AllBrokersList from '../../components/Broker/AllBrokersList2';
+// import LiveAccountSetup from '../../components/AccountSetup/LiveAccountSetup';
+// import BrokerSystem from '../../components/AccountSetup/BrokerReview';
+import BrokerList from '../../components/AccountSetup2/dummyData';
 // import BrokerHeroSection from './BrokerHeroSection';
 
 
@@ -14,9 +15,11 @@ const Brokers: React.FC = () => {
     <>
       
       <BrokerHeroSection2 />
-      <AllBrokersList  />
-      <LiveAccountSetup />
-      <BrokerSystem />
+      {/* <AllBrokersList  /> */}
+      {/* <LiveAccountSetup /> */}
+      {/* <BrokerSystem /> */}
+      <BrokerList />
+
 
     </>
   )
