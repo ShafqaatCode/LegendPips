@@ -5,11 +5,11 @@ import LegendPipsFeatures from '../../components/PipsFeatures/PipsFeatureSection
 import HowItWorks from '../../components/HItWorks/WorksSection';
 import WhyChooseUs from '../../components/WhyChooseUs/Choose';
 import FeaturesSlider from '../../components/FeatureSection/FeaturesSlider';
-import RebateCalculator from '../../components/Calculators/RebateCalculator/RebateCalculator';
-import MarginCalculator from '../../components/Calculators/MarginCalculator/MarginCalculator';
-import PipCalculator from '../../components/Calculators/PipsCalculator/PipCalculator';
-import PivotPointCalculator from '../../components/Calculators/PivotpointCalculator/PivotPointCalculator';
-import PositionSizeCalculator from '../../components/Calculators/PositionSizeCalculator/PositionsizeCalculator';
+// import RebateCalculator from '../../components/Calculators/RebateCalculator/RebateCalculator';
+// import MarginCalculator from '../../components/Calculators/MarginCalculator/MarginCalculator';
+// import PipCalculator from '../../components/Calculators/PipsCalculator/PipCalculator';
+// import PivotPointCalculator from '../../components/Calculators/PivotpointCalculator/PivotPointCalculator';
+// import PositionSizeCalculator from '../../components/Calculators/PositionSizeCalculator/PositionsizeCalculator';
 
 
 
@@ -38,11 +38,11 @@ const HitWorksPage: React.FC = () => {
       <LegendPipsFeatures />
 
       <WhyChooseUs />
-      <RebateCalculator />
+      {/* <RebateCalculator />
       <MarginCalculator />
       <PipCalculator />
       <PivotPointCalculator />
-      <PositionSizeCalculator />
+      <PositionSizeCalculator /> */}
 
     </>
   )
