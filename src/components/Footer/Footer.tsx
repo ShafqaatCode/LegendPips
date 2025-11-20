@@ -181,78 +181,96 @@ const FooterText = styled.p`
   //   border: 2px solid red;
 `;
 
+const Description2 = styled.p`
+  margin-top: 1.25rem;
+  font-size: 14px;
+  color: #ffffff;
+  line-height: 30px;
+  text-align: center;
+`;
+
+
 const Footer2: React.FC = () => {
   return (
     <>
-    <GotoStart href="#top"><FaChevronUp size="1.3rem" /></GotoStart>
-    <Section>
-      
-      <Container>
-        <Grid>
-          <LogoContainer>
-            <a href="/">
-              <LogoImage src={logo_white} alt="LegendPips" />
-            </a>
-            <Description>
-              Join Legend Pips and unlock your Forex potential with expert
-              guidance, secure trading, and real support.
-            </Description>
-          </LogoContainer>
+      <GotoStart href="#top"><FaChevronUp size="1.3rem" /></GotoStart>
+      <Section>
 
-          <LinkContainer>
-            <LinkHeading>Company</LinkHeading>
-            <LinkList>
-              <LinkItem>
-                <Link to="/about">About</Link>
-              </LinkItem>
-              <LinkItem>
-                <Link to="/features">Features</Link>
-              </LinkItem>
-              <LinkItem>
-                <Link to="/brokers">Brokers</Link>
-              </LinkItem>
-              <LinkItem>
-                <Link to="/tools">Tools</Link>
-              </LinkItem>
-            </LinkList>
-          </LinkContainer>
+        <Container>
+          <Grid>
+            <LogoContainer>
+              <a href="/">
+                <LogoImage src={logo_white} alt="LegendPips" />
+              </a>
+              <Description>
+                Join Legend Pips and unlock your Forex potential with expert
+                guidance, secure trading, and real support.
+              </Description>
+            </LogoContainer>
 
-          <LinkContainer>
-            <LinkHeading>Help</LinkHeading>
-            <LinkList>
-              <LinkItem>
-                <Link to="/support">Customer Support</Link>
-              </LinkItem>
-              <LinkItem>
-                <Link to="/delivery">Delivery Details</Link>
-              </LinkItem>
-              <LinkItem>
-                <Link to="/terms">Terms & Conditions</Link>
-              </LinkItem>
-              <LinkItem>
-                <Link to="/privacy">Privacy Policy</Link>
-              </LinkItem>
-            </LinkList>
-          </LinkContainer>
+            <LinkContainer>
+              <LinkHeading>Company</LinkHeading>
+              <LinkList>
+                <LinkItem>
+                  <Link to="/about">About</Link>
+                </LinkItem>
+                <LinkItem>
+                  <Link to="/features">Features</Link>
+                </LinkItem>
+                <LinkItem>
+                  <Link to="/brokers">Brokers</Link>
+                </LinkItem>
+                <LinkItem>
+                  <Link to="/tools">Tools</Link>
+                </LinkItem>
+              </LinkList>
+            </LinkContainer>
 
-          <NewsletterContainer>
-            <NewsletterHeading>Newsletter</NewsletterHeading>
-            <NewsletterForm>
-              <NewsletterInput
-                type="email"
-                placeholder="Enter your email address"
-              />
-              <NewsletterButton type="submit">Subscribe Now</NewsletterButton>
-            </NewsletterForm>
-          </NewsletterContainer>
-        </Grid>
+            <LinkContainer>
+              <LinkHeading>Help</LinkHeading>
+              <LinkList>
+                <LinkItem>
+                  <Link to="/support">Customer Support</Link>
+                </LinkItem>
+                <LinkItem>
+                  <Link to="/delivery">Delivery Details</Link>
+                </LinkItem>
+                <LinkItem>
+                  <Link to="/terms">Terms & Conditions</Link>
+                </LinkItem>
+                <LinkItem>
+                  <Link to="/privacy">Privacy Policy</Link>
+                </LinkItem>
+              </LinkList>
+            </LinkContainer>
 
-        <Divider />
-        <FooterText>
-          © Copyright 2022, All Rights Reserved by LegendPips
-        </FooterText>
-      </Container>
-    </Section>
+            <NewsletterContainer>
+              <NewsletterHeading>Newsletter</NewsletterHeading>
+              <NewsletterForm>
+                <NewsletterInput
+                  type="email"
+                  placeholder="Enter your email address"
+                />
+                <NewsletterButton type="submit">Subscribe Now</NewsletterButton>
+              </NewsletterForm>
+            </NewsletterContainer>
+          </Grid>
+
+          <Divider />
+          <Description2>
+            LegendPips does not provide accounts to residents of the United States. The content of this website is not intended for individuals in any country or jurisdiction where such distribution or use would violate local laws or regulations.
+          </Description2>
+          <Description2>
+            Trading foreign exchange involves significant risk and may not be appropriate for all investors. The use of leverage can increase both potential gains and potential losses. Before engaging in forex trading, assess your investment objectives, trading experience, and risk appetite. You should be prepared to lose some or all of your invested capital. Only trade with money you can afford to lose. Make sure you understand the risks involved and, if necessary, seek independent financial or tax advice. All information provided is for educational purposes only and should not be considered investment advice.
+          </Description2>
+
+
+          <Divider />
+          <FooterText>
+            © Copyright 2022, All Rights Reserved by LegendPips
+          </FooterText>
+        </Container>
+      </Section>
     </>
   );
 };
