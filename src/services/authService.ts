@@ -1,4 +1,4 @@
-import { API_CONFIG, setAuthToken, removeAuthToken, getAuthHeaders } from "../utils/apiConfig";
+import { API_CONFIG, setAuthToken, removeAuthToken, getAuthToken } from "../utils/apiConfig";
 
 export interface LoginRequest {
   email: string;

@@ -1,19 +1,8 @@
 import contestImg1 from "../../assets/Contest_Images/wmug5dukcys 1-1.png";
 
-export interface Competition {
-  id: number;
-  title: string;
-  subtitle?: string;
-  type: string;
-  event: string;
-  status: "Upcoming" | "Ongoing" | "Ended";
-  participants: number;
-  entry: string;
-  ends: string; 
-  logo: string;
-  sponsorUrl?: string;
-  sponsorText?: string;
-}
+import type { Competition } from "../../services/contestService";
+
+export type { Competition };
 
 export const competitionsData: Competition[] = [
   {

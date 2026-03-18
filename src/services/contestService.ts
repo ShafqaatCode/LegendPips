@@ -1,4 +1,4 @@
-import { API_CONFIG, getAuthHeaders } from "../utils/apiConfig";
+import { API_CONFIG } from "../utils/apiConfig";
 
 export interface Competition {
   _id?: string;

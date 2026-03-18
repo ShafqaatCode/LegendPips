@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { fetchAnalysisById, fetchLatestAnalysis } from '../../services/analysisService';
 import type { Analysis } from '../../types/analysis.types';
-import AnalysisCard from './AnalysisCard';
 import XMBanner from '../Signals/XMBanner';
 import ArrowRight from '../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg';
 
@@ -138,7 +137,7 @@ const Author = styled.span`
   color: #132E58;
 `;
 
-const Date = styled.span`
+const PublishedDate = styled.span`
   color: #999;
   font-size: 13px;
 `;
@@ -444,8 +443,8 @@ const AnalysisDetail: React.FC = () => {
   const handleNewsClick = (item: Analysis) => {
     if (!item._id) return;
 
-    const safeCategory =
-      item.category && item.category !== 'All' ? item.category : ('Market Outlook' as Analysis['category']);
+    // `item.category` is already constrained by `Analysis['category']` (no "All" value).
+    const safeCategory: Analysis["category"] = item.category ?? "Market Outlook";
 
     // Demo mode helper: for external articles, cache the clicked article so the detail page can render
     // even if the backend isn't available or NewsAPI returns a different set.
@@ -512,7 +511,7 @@ const AnalysisDetail: React.FC = () => {
 
             <Meta>
               <Author>By: {analysis.author}</Author>
-              <Date>{formatDate(analysis.publishedAt)}</Date>
+              <PublishedDate>{formatDate(analysis.publishedAt)}</PublishedDate>
             </Meta>
 
             <Content>

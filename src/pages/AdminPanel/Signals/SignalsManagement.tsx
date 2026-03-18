@@ -242,7 +242,7 @@ const SignalsManagement: React.FC = () => {
                   <PairBadge>{signal.pair}</PairBadge>
                 </TableCell>
                 <TableCell>
-                  <TypeButton $type={signal.type}>
+                  <TypeButton $type={signal.type as "buy" | "sell"}>
                     {signal.type === 'buy' ? <FiTrendingUp /> : <FiTrendingDown />}
                     {signal.type.toUpperCase()}
                   </TypeButton>

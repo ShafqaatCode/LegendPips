@@ -105,9 +105,11 @@ const ActionButtons = styled.div`
   flex-wrap: wrap;
 `;
 
-const ActionButton = styled.button<{ $primary?: boolean }>`
-  background: ${({ $primary }) => ($primary ? '#132E58' : 'white')};
-  color: ${({ $primary }) => ($primary ? 'white' : '#132E58')};
+const ActionButton = styled.button<{ $primary?: boolean; $yellow?: boolean }>`
+  background: ${({ $primary, $yellow }) =>
+    $yellow ? '#Fbbf24' : $primary ? '#132E58' : 'white'};
+  color: ${({ $primary, $yellow }) =>
+    $yellow ? '#132E58' : $primary ? 'white' : '#132E58'};
   border: 2px solid #132E58;
   padding: 10px 20px;
   font-size: 14px;
@@ -120,7 +122,8 @@ const ActionButton = styled.button<{ $primary?: boolean }>`
   gap: 8px;
   
   &:hover {
-    background: ${({ $primary }) => ($primary ? '#0b1b38' : '#f0f7ff')};
+    background: ${({ $primary, $yellow }) =>
+      $yellow ? '#f4b400' : $primary ? '#0b1b38' : '#f0f7ff'};
     transform: translateY(-2px);
   }
   
@@ -373,8 +376,8 @@ const Sidebar = styled.aside`
   }
 `;
 
-const SidebarSection = styled.div`
-  background: #132E58;
+const SidebarSection = styled.div<{ $white?: boolean }>`
+  background: ${({ $white }) => ($white ? 'white' : '#132E58')};
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
@@ -437,7 +440,9 @@ const ForumThreadDetail: React.FC = () => {
       avatar: 'EM',
       date: 'Posted: April 25, 2025',
       content: 'My win rate improved after tracking every trade. Small changes in entries and exits made a big difference.',
-      image: 'https://via.placeholder.com/800x400/132E58/Fbbf24?text=Trading+Chart'
+      image: 'https://via.placeholder.com/800x400/132E58/Fbbf24?text=Trading+Chart',
+      likes: 0,
+      dislikes: 0
     },
     comments: [
       {
@@ -446,7 +451,9 @@ const ForumThreadDetail: React.FC = () => {
         avatar: 'M',
         date: '2 hours ago',
         content: 'Great insights! I\'ve been doing the same and seeing similar results.',
-        avatarColor: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+        avatarColor: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+        likes: 0,
+        dislikes: 0
       },
       {
         id: '2',
@@ -454,7 +461,9 @@ const ForumThreadDetail: React.FC = () => {
         avatar: 'SJ',
         date: '5 hours ago',
         content: 'Thanks for sharing. What tools do you use for tracking?',
-        avatarColor: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+        avatarColor: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+        likes: 0,
+        dislikes: 0
       }
     ]
   };

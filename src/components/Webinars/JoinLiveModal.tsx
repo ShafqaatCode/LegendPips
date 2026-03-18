@@ -98,7 +98,7 @@ const InfoBox = styled.div`
   margin-bottom: 2rem;
 `;
 
-const InfoItem = styled.div`
+const InfoItem = styled.div<{ icon: "calendar" | "time" | "instructor" }>`
   display: flex;
   align-items: center;
   gap: 0.75rem;

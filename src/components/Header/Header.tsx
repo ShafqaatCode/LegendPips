@@ -31,7 +31,6 @@ import LocationIcon from "../../assets/icons/Location marker.svg";
 import LoginModal from "../../pages/Login/LoginModal";
 import RegisterModal from "../../pages/Register/RegisterModal";
 import { useAuth } from "../../contexts/AuthContext";
-import { NavLink } from "react-router-dom";
 
 const navLinks = [
   { to: "/", label: "Home", end: true },

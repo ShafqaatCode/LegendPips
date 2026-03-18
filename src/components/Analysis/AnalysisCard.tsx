@@ -113,7 +113,7 @@ const Author = styled.span`
   color: #132E58;
 `;
 
-const Date = styled.span`
+const PublishedDate = styled.span`
   color: #999;
   font-size: 12px;
 `;
@@ -180,10 +180,8 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysis, featured = false 
       return;
     }
 
-    const safeCategory =
-      analysis.category && analysis.category !== 'All'
-        ? analysis.category
-        : ('Market Outlook' as Analysis['category']);
+    // `analysis.category` is already constrained by `Analysis['category']` (no "All" value).
+    const safeCategory: Analysis["category"] = analysis.category ?? "Market Outlook";
 
     // Cache external article data on click so the detail page can render without needing the backend.
     if (analysis.isExternal) {
@@ -221,7 +219,7 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysis, featured = false 
         <Title $featured={featured}>{analysis.title}</Title>
         <Meta>
           <Author>By {analysis.author}</Author>
-          <Date>{formatDate(analysis.publishedAt)}</Date>
+          <PublishedDate>{formatDate(analysis.publishedAt)}</PublishedDate>
         </Meta>
       </Content>
     </Card>

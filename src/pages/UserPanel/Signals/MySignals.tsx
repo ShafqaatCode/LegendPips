@@ -262,7 +262,7 @@ const MySignals: React.FC = () => {
             </TableCell>
             <TableCell data-label="Type">
               <ActionButton
-                $type={signal.locked ? 'locked' : signal.type}
+                $type={signal.locked ? 'locked' : (signal.type as "buy" | "sell")}
                 disabled={signal.locked}
               >
                 {signal.locked ? (

@@ -21,7 +21,7 @@ const ContestHeader: React.FC<ContestHeaderProps> = ({contestData}) => {
     return <ErrorMessage>Contest data not found.</ErrorMessage>;
   }
 
-  const endDate = new Date(contestData.ends); 
+  const endDate = contestData.ends ? new Date(contestData.ends) : new Date(); 
 
   const formattedDate = endDate.toLocaleString("en-US", {
     month: "short",
