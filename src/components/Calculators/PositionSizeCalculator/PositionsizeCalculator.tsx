@@ -10,8 +10,9 @@ const Container = styled.section`
   border-radius: 12px;
   background: #ffffff;
 
-   @media (max-width: 786px) {
-    margin: 0;
+   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    margin: 40px auto 20px;
+    padding: 20px;
   }
 `;
 
@@ -30,6 +31,11 @@ const Description = styled.p`
   color: #132e58;
   font-size: 20px;
   line-height: 1.6;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    font-size: 16px;
+    margin: 12px 0 30px;
+  }
 `;
 
 const FormRow = styled.div`
@@ -40,14 +46,20 @@ const FormRow = styled.div`
   margin-bottom: 16px;
   margin: 0 20px 20px 20px;
 
-  @media (max-width: 600px) {
-    margin: auto;
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    margin: 0 0 20px 0;
   }
 `;
 
 const FormGroup = styled.div`
+  flex: 1;
   min-width: 250px;
-  width: 550px;
+  max-width: 500px;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    min-width: 100%;
+    max-width: 100%;
+  }
 `;
 
 const Label = styled.label`
@@ -129,6 +141,11 @@ const ResultsGrid = styled.div`
   gap: 16px;
   flex-wrap: wrap;
   margin-top: 24px;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    flex-direction: column;
+    gap: 12px;
+  }
 `;
 
 const ResultBox = styled.div`
@@ -136,20 +153,27 @@ const ResultBox = styled.div`
   color: #ffffff;
   font-weight: 600;
   padding: 16px 40px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 20px;
   text-align: center;
+  white-space: nowrap;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    padding: 12px 24px;
+    font-size: 16px;
+    width: 100%;
+  }
 `;
 
 // ===== Component =====
 const PositionSizeCalculator: React.FC = () => {
   const [instrument, setInstrument] = useState("XAU/USD");
   const [currency, setCurrency] = useState("USD");
-  const [accountSize, setAccountSize] = useState<number>(0);
-  const [stopLoss, setStopLoss] = useState<number>(0);
-  const [contractSize, setContractSize] = useState<number>(0);
+  const [accountSize, setAccountSize] = useState<number>(1000);
+  const [stopLoss, setStopLoss] = useState<number>(20);
+  const [contractSize, setContractSize] = useState<number>(100);
   const [riskMode, setRiskMode] = useState("%");
-  const [riskValue, setRiskValue] = useState<number>(0);
+  const [riskValue, setRiskValue] = useState<number>(2);
 
   const [results, setResults] = useState({
     money: 0,
@@ -182,10 +206,7 @@ const PositionSizeCalculator: React.FC = () => {
     <Container>
       <Header>Position Size Calculator</Header>
       <Description>
-        The Lot Size Calculator is an essential risk management tool that
-        enables traders to determine the optimal position size for each trade.
-        By factoring in the selected currency pair, risk tolerance, and chosen
-        stop-loss level, it helps maintain a balanced approach to trading.
+        The Lot Size Calculator is an essential risk management tool for determining optimal position size, factoring in currency pair, risk tolerance, and stop-loss level to manage risk and maximize gains.
       </Description>
 
       <form onSubmit={(e) => e.preventDefault()}>
@@ -287,11 +308,13 @@ const PositionSizeCalculator: React.FC = () => {
         </ButtonRow>
       </form>
 
-      <ResultsGrid>
-        <ResultBox>Money, {currency}: {results.money.toFixed(2)}</ResultBox>
-        <ResultBox>Units: {results.units.toFixed(2)}</ResultBox>
-        <ResultBox>Lots: {results.lots.toFixed(3)}</ResultBox>
-      </ResultsGrid>
+      {results.money > 0 && (
+        <ResultsGrid>
+          <ResultBox>Money, {currency}: ${results.money.toFixed(2)}</ResultBox>
+          <ResultBox>Units: {results.units.toFixed(0)}</ResultBox>
+          <ResultBox>Lots: {results.lots.toFixed(3)}</ResultBox>
+        </ResultsGrid>
+      )}
     </Container>
   );
 };

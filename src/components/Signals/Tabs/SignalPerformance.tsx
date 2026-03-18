@@ -20,12 +20,18 @@ type SignalPerformanceProps = {
 };
 
 const Container = styled.div`
-  width: 440px;
+  width: 100%;
+  max-width: 440px;
   background: white;
   border-radius: 8px;
   padding: 24px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
   font-family: 'Segoe UI', sans-serif;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    max-width: 100%;
+    padding: 20px;
+  }
 `;
 
 const Title = styled.h2`
@@ -58,6 +64,10 @@ const StatValue = styled.div`
 const StatLabel = styled.div`
   font-size: 12px;
   color: #555;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    font-size: 11px;
+  }
 `;
 
 const InfoList = styled.div`
@@ -79,15 +89,14 @@ const InfoRowStyled = styled.div`
 // Default values
 const defaultStats: Stat[] = [
   { value: '87%', label: 'Win Rate', bgColor: '#e6fbe6', textColor: '#2ecc71' },
-  { value: '1,245', label: 'Total Signals', bgColor: '#f1f6ff', textColor: '#3498db' },
-  { value: '+2340', label: 'Average Pips/Month', bgColor: '#fff8e6', textColor: '#f4b400' },
-  { value: '24/7', label: 'Market Coverage', bgColor: '#f9f1ff', textColor: '#9b59b6' },
+  { value: '1248', label: 'Total Pips', bgColor: '#e3f2fd', textColor: '#2196f3' },
+  { value: '+$2340', label: 'Total Profit', bgColor: '#fff8e6', textColor: '#f4b400' },
+  { value: '947', label: 'Open Signals', bgColor: '#f3e5f5', textColor: '#9c27b0' },
 ];
 
 const defaultInfo: InfoRow[] = [
-  { label: 'Free Signals:', value: '3 per day' },
-  { label: 'Premium Signals:', value: 'Unlimited' },
-  { label: 'Alert Methods:', value: 'Email, SMS, Telegram' },
+  { label: 'Free Signal to Premium Signal', value: '' },
+  { label: 'Open Only Premium Signals', value: '' },
 ];
 
 const SignalPerformance: React.FC<SignalPerformanceProps> = ({
@@ -110,7 +119,7 @@ const SignalPerformance: React.FC<SignalPerformanceProps> = ({
         {info.map((row, index) => (
           <InfoRowStyled key={index}>
             <span>{row.label}</span>
-            <span>{row.value}</span>
+            {row.value && <span>{row.value}</span>}
           </InfoRowStyled>
         ))}
       </InfoList>

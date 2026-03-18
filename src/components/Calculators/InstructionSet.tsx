@@ -33,11 +33,18 @@ const InstructionsSection: React.FC<InstructionsProps> = ({
       {/* Static Why Choose Section */}
       <SectionTitle className="WhyThis">Why Choose LegendPips Service?</SectionTitle>
       <Paragraph>
-        The <strong>LegendPips {calculatorName} Calculator</strong> is trusted
-        by traders worldwide for accurate, transparent, and reliable trade
-        sizing. We are committed to helping you manage risk effectively and
-        boost your profitability through a simple, hassle-free calculation
-        process.
+        {calculatorName === "Position Size" && (
+          <>The LegendPips Position Size Calculator is trusted by traders worldwide for accurate, transparent, and reliable trade sizing. We are committed to helping you manage risk effectively and boost your profitability through a simple, hassle-free calculation process.</>
+        )}
+        {calculatorName === "Pip" && (
+          <>The LegendPips Pip Calculator is trusted by traders worldwide for accurate, transparent, and reliable pip value calculations. We are committed to helping you trade smarter by providing a simple, hassle-free way to measure the impact of price movements on your positions.</>
+        )}
+        {calculatorName === "Margin" && (
+          <>The LegendPips Margin Calculator is trusted by traders worldwide for accurate, transparent, and reliable margin calculations. It helps you manage your funds responsibly and trade with confidence by providing a simple, hassle-free way to determine the exact margin required for every position.</>
+        )}
+        {calculatorName === "Pivot Point" && (
+          <>The LegendPips Pivot Point Calculator is trusted by traders worldwide for accurate, transparent and reliable pivot level calculations. It helps you identify key support and resistance zones, improving trade entries through a simple, hassle-free process.</>
+        )}
       </Paragraph>
     </Wrapper>
   );

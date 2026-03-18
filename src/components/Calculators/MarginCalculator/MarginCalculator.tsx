@@ -15,8 +15,9 @@ const Container = styled.section`
   border-radius: 12px;
   background: #ffffff;
 
-  @media (max-width: 786px) {
-    margin: 0;
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    margin: 40px auto 20px;
+    padding: 20px;
   }
 `;
 
@@ -51,9 +52,14 @@ const FormRow = styled.div`
 `;
 
 const FormGroup = styled.div`
+  flex: 1;
   min-width: 220px;
-  width: 500px;
+  max-width: 500px;
   
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    min-width: 100%;
+    max-width: 100%;
+  }
 `;
 
 const Label = styled.label`
@@ -112,6 +118,11 @@ const ButtonRow = styled.div`
   align-items: center;
   gap: 16px;
   margin-top: 20px;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    flex-direction: column;
+    width: 100%;
+  }
 `;
 
 const Button = styled.button`
@@ -134,9 +145,17 @@ const ResultBox = styled.div`
   background: #de992f;
   color: #ffffff;
   font-weight: 600;
-  padding: 8px 60px;
-  border-radius: 6px;
+  padding: 12px 40px;
+  border-radius: 8px;
   font-size: 24px;
+  white-space: nowrap;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    padding: 10px 24px;
+    font-size: 20px;
+    width: 100%;
+    text-align: center;
+  }
 `;
 
 // ===== Component =====
@@ -251,9 +270,11 @@ const MarginCalculator: React.FC = () => {
             <Button type="button" onClick={calculateMargin}>
               Calculate
             </Button>
-            <ResultBox>
-              Result : {result.toFixed(5)}
-            </ResultBox>
+            {result > 0 && (
+              <ResultBox>
+                Result: {result.toFixed(5)}
+              </ResultBox>
+            )}
           </ButtonRow>
         </form>
 

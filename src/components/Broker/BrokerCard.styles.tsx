@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const Container = styled.section`
-  margin-left: 60px;
+  margin-left: 0;
   @media (max-width: 1000px) {
     margin: 0;
   }
@@ -12,8 +12,8 @@ export const CardContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 3rem;
-  padding: 1.8rem 1.8rem 1.8rem 6rem;
+  gap: 2rem;
+  padding: 1.3rem 1.2rem 1.3rem 4.5rem;
   background-color: #fefefe;
   border-radius: 12px;
   background-clip: padding-box;
@@ -23,8 +23,8 @@ export const CardContainer = styled.div`
   // box-shadow: 0 0 0 3px #fbc113;
 
   @media (max-width: 1024px) {
-    gap: 2rem;
-    padding-left: 5rem;
+    gap: 1.6rem;
+    padding-left: 3.8rem;
     width: 90%;
   }
 
@@ -43,9 +43,9 @@ export const TopIndex = styled.span`
   position: absolute;
   color: white;
   top: -20px;
-  left: 20px;
+  left: 16px;
   text-align: center;
-  padding: 5px 12px;
+  padding: 4px 10px;
   border-radius: 5px;
 `;
 
@@ -80,8 +80,8 @@ export const LogoSection = styled.div`
 `;
 
 export const LogoImg = styled.img`
-  height: 140px;
-  width: 140px;
+  height: 110px;
+  width: 110px;
   border-radius: 50%;
   background-color: #fff;
   object-fit: cover;
@@ -111,12 +111,12 @@ export const TitleRow = styled.div`
   margin-bottom: 0.5rem;
 
   h2 {
-    font-size: 36px;
+    font-size: 30px;
     margin: 0;
     color: #0f1c46;
 
     @media (max-width: 768px) {
-      font-size: 28px;
+      font-size: 26px;
     }
   }
 
@@ -149,8 +149,8 @@ export const RatingBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
-  min-width: 120px;
+  padding: 1.4rem;
+  min-width: 110px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 5px;
   text-align: center;
@@ -172,7 +172,7 @@ export const ReviewText = styled.div`
   margin-top: 6px;
 
   strong {
-    font-size: 18px;
+    font-size: 16px;
     color: #0f1c46;
   }
 
@@ -205,16 +205,16 @@ export const PrimaryButton = styled.button`
   background-color: ${({ theme }) => theme.colors.primary};
   color: #fff;
   border: none;
-  padding: 0.7rem 2.2rem;
+  padding: 0.6rem 1.8rem;
   border-radius: 2rem;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
   width: 100%;
-  max-width: 200px;
+  max-width: 180px;
   justify-content: center;
 
   &:hover {

@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { type Competition } from "./mockCompetitions";
+import { type Competition } from "../../services/contestService";
 import YellowCircleIcon from "../../assets/Ellipse_3955.svg";
 import GreenCircleIcon from "../../assets/Ellipse3956.svg";
 
@@ -15,7 +15,8 @@ const ContestCard: React.FC<ContestCardProps> = ({ comp }) => {
 
   const navigate = useNavigate();
   const handleViewDetails = () => {
-    navigate(`/contests/${comp.id}`);
+    const contestId = comp.id || comp._id || "";
+    navigate(`/contests/${contestId}`);
   }
 
   return (

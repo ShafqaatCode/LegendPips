@@ -13,16 +13,16 @@ import { Link } from "react-router-dom";
 const BrokerSectionWrapper = styled.section`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.6rem;
   padding: 1rem 0;
-  margin: 3rem 1rem;
+  margin: 2rem 0;
   /* border: 2px solid red; */
 `;
 
 const BrokerWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.4rem;
 `;
 
 const ButtonContainer = styled.div`

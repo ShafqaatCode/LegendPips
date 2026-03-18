@@ -89,6 +89,28 @@ export const SignInButton = styled.button`
   }
 `;
 
+// User Panel Button
+export const UserPanelButton = styled(NavLink)`
+  background-color: ${({ theme }) => theme.colors.WHITE};
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+  text-decoration: none;
+  color: ${({ theme }) => theme.colors.primary};
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:hover {
+    background-color: ${activeColor};
+    color: black;
+  }
+`;
+
 // Desktop Navbar
 export const Navbar = styled.nav`
   padding: 1.3rem 0;

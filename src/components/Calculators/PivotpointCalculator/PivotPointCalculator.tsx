@@ -10,8 +10,9 @@ const Container = styled.section`
   border-radius: 12px;
   background: #ffffff;
 
-   @media (max-width: 786px) {
-    margin: 0;
+   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    margin: 40px auto 20px;
+    padding: 20px;
   }
 `;
 
@@ -46,8 +47,14 @@ const FormRow = styled.div`
 `;
 
 const FormGroup = styled.div`
+  flex: 1;
   min-width: 220px;
-  width: 500px;
+  max-width: 500px;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    min-width: 100%;
+    max-width: 100%;
+  }
 `;
 
 const Label = styled.label`
@@ -123,10 +130,18 @@ const Button = styled.button`
 `;
 
 const ResultsGrid = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
-  flex-wrap: wrap;
   margin-top: 24px;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const ResultBox = styled.div<{ highlight?: boolean }>`
@@ -134,23 +149,28 @@ const ResultBox = styled.div<{ highlight?: boolean }>`
   color: ${({ highlight }) => (highlight ? "#ffffff" : "#132e58")};
   font-weight: 600;
   padding: 16px;
-  border-radius: 6px;
-  font-size: 24px;
+  border-radius: 8px;
+  font-size: 20px;
   text-align: center;
   
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    font-size: 18px;
+    padding: 12px;
+  }
 
-  span{
+  span {
     margin-left: 10px;
+    font-weight: 700;
   }
 `;
 
 // ===== Component =====
 const PivotPointCalculator: React.FC = () => {
   const [type, setType] = useState("Standard");
-  const [high, setHigh] = useState<string>("0000");
-  const [low, setLow] = useState<string>("0000");
-  const [open, setOpen] = useState<string>("0000");
-  const [close, setClose] = useState<string>("0000");
+  const [high, setHigh] = useState<string>("3000");
+  const [low, setLow] = useState<string>("2000");
+  const [open, setOpen] = useState<string>("2800");
+  const [close, setClose] = useState<string>("2800");
   const [results, setResults] = useState<Record<string, number>>({
     pivot: 0,
     r1: 0,
@@ -214,8 +234,7 @@ const PivotPointCalculator: React.FC = () => {
     <Container>
       <Header>Pivot Point Calculator</Header>
       <Description>
-        The Pivot Point Calculator helps traders identify potential support and resistance levels using OHLC data.
-        Choose from Standard, Camarilla, Woodie’s, or DeMark’s methods to calculate multiple levels.
+        The LegendPips Pivot Point Calculator is a powerful tool for identifying potential support and resistance levels in the market, it calculates four different pivot point types Camarilla, Woodie's, Floor, and DeMark's using OHLC data (open, high, low, and close). For each method, the calculator generates multiple support and resistance levels, helping traders pinpoint key price zones for entries, exits, and stop-loss placements. This tool enhances decision-making and provides a structured approach to trading around critical market levels.
       </Description>
 
       <form onSubmit={(e) => e.preventDefault()}>
@@ -290,15 +309,17 @@ const PivotPointCalculator: React.FC = () => {
         </ButtonRow>
       </form>
 
-      <ResultsGrid>
-        <ResultBox>Resistance 3: <span>{results.r3.toFixed(2)}</span> </ResultBox>
-        <ResultBox>Resistance 2: <span>{results.r2.toFixed(2)}</span></ResultBox>
-        <ResultBox>Resistance 1: <span>{results.r1.toFixed(2)}</span></ResultBox>
-        <ResultBox highlight>Pivot Point: <span>{results.pivot.toFixed(2)}</span></ResultBox>
-        <ResultBox>Support 1: <span>{results.s1.toFixed(2)}</span></ResultBox>
-        <ResultBox>Support 2: <span>{results.s2.toFixed(2)}</span></ResultBox>
-        <ResultBox>Support 3: <span>{results.s3.toFixed(2)}</span></ResultBox>
-      </ResultsGrid>
+      {results.pivot > 0 && (
+        <ResultsGrid>
+          <ResultBox>Resistance 3: <span>{results.r3.toFixed(0)}</span></ResultBox>
+          <ResultBox>Resistance 2: <span>{results.r2.toFixed(0)}</span></ResultBox>
+          <ResultBox>Resistance 1: <span>{results.r1.toFixed(0)}</span></ResultBox>
+          <ResultBox highlight>Pivot Point: <span>{results.pivot.toFixed(0)}</span></ResultBox>
+          <ResultBox>Support 1: <span>{results.s1.toFixed(0)}</span></ResultBox>
+          <ResultBox>Support 2: <span>{results.s2.toFixed(0)}</span></ResultBox>
+          <ResultBox>Support 3: <span>{results.s3.toFixed(0)}</span></ResultBox>
+        </ResultsGrid>
+      )}
     </Container>
   );
 };

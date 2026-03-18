@@ -1,25 +1,55 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { fetchCompetitions } from "./mockApi";
-import type { Competition } from "./mockCompetitions";
+import { fetchCompetitions, type Competition } from "../../services/contestService";
 import ContestCard from "./ContestCard";
 import TrophyImg from "../../assets/Group.png"
+import { competitionsData } from "./mockCompetitions";
 const filters = ["All", "Upcoming", "Ongoing", "Ended"];
 
 const Competitions: React.FC = () => {
+  // Demo mode: use mock data so the client can see the UI without needing backend.
+  // Later, switch this to `false` to use the API again (we keep the API code intact).
+  const useMockData = true;
+
   const [activeFilter, setActiveFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const perPage = 6;
 
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    fetchCompetitions().then((data) => {
-      setCompetitions(data);
-      setLoading(false);
-    });
-  }, []);
+    const loadCompetitions = async () => {
+      if (useMockData) {
+        setCompetitions(competitionsData as unknown as Competition[]);
+        setLoading(false);
+        setError("");
+        return;
+      }
+
+      setLoading(true);
+      setError("");
+      try {
+        const data = await fetchCompetitions(
+          activeFilter === "All" ? undefined : activeFilter,
+          currentPage,
+          perPage
+        );
+        setCompetitions(data);
+      } catch (err: any) {
+        const errorMessage = err.message || "Failed to load competitions";
+        setError(errorMessage);
+        console.error("Error loading competitions:", err);
+        // Set empty array on error so UI doesn't break
+        setCompetitions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCompetitions();
+  }, [activeFilter, currentPage]);
 
   const filteredData =
     activeFilter === "All"
@@ -55,6 +85,10 @@ const Competitions: React.FC = () => {
 
       {loading ? (
         <Loading>Loading competitions...</Loading>
+      ) : error ? (
+        <Loading style={{ color: "#e74c3c" }}>{error}</Loading>
+      ) : paginatedData.length === 0 ? (
+        <Loading>No competitions found</Loading>
       ) : (
         <>
           <Grid>

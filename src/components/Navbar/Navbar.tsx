@@ -36,8 +36,12 @@ const navLinks = [
   { to: "/contests", label: "Contests" },
   { to: "/brokers", label: "Brokers" },
   { to: "/signals", label: "Signals" },
+  { to: "/rewards", label: "Rewards" },
   { to: "/analysis", label: "Analysis" },
   { to: "/forum", label: "Forum" },
+  { to: "/courses", label: "Courses" },
+  { to: "/trading-videos", label: "Trading Videos" },
+  { to: "/webinars", label: "Webinars" },
 ];
 
 const toolsSubmenu = [

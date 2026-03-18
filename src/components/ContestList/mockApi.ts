@@ -1,19 +1,8 @@
-import { competitionsData, type Competition } from "./mockCompetitions";
+// This file is kept for backward compatibility
+// The actual API calls are now in src/services/contestService.ts
+import { fetchCompetitions as fetchCompetitionsAPI, fetchCompetitionById as fetchCompetitionByIdAPI, type Competition } from "../../services/contestService";
 
-export const fetchCompetitions = (): Promise<Competition[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(competitionsData); 
-    }, 500);
-  });
-};
-
-
-export const fetchCompetitionById = (id: number): Promise<Competition | null> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const competition = competitionsData.find((comp) => comp.id === id);
-      resolve(competition ?? null);
-    }, 500);
-  });
-}
+// Re-export the API functions for backward compatibility
+export const fetchCompetitions = fetchCompetitionsAPI;
+export const fetchCompetitionById = fetchCompetitionByIdAPI;
+export type { Competition };

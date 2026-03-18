@@ -110,9 +110,9 @@ const Testimonials: React.FC = () => {
   return (
     <TestimonialContainer>
       <SectionHeadingSet
-        upperText="All in one Trading platform"
-        mainHeading="Testimonials"
-        subText="Discover why traders worldwide trust us as their top choice. With a focus on delivering consistent profits, exceptional service, cutting-edge technology."
+        upperText=""
+        mainHeading="TESTIMONIALS"
+        subText="Discover why traders worldwide trust us as their top choice, with a focus on delivering consistent profits, exceptional service, cutting-edge technology."
       />
       <SliderWrapper>
         <SlideTrack currentIndex={currentIndex}>

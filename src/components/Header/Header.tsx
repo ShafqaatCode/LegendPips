@@ -11,6 +11,7 @@ import {
   LinkGroup,
   HeaderItem,
   SignInButton,
+  UserPanelButton,
   MobileBar,
   MobileMenu,
   Backdrop,
@@ -29,6 +30,8 @@ import LocationIcon from "../../assets/icons/Location marker.svg";
 
 import LoginModal from "../../pages/Login/LoginModal";
 import RegisterModal from "../../pages/Register/RegisterModal";
+import { useAuth } from "../../contexts/AuthContext";
+import { NavLink } from "react-router-dom";
 
 const navLinks = [
   { to: "/", label: "Home", end: true },
@@ -39,6 +42,9 @@ const navLinks = [
   { to: "/signals", label: "Signals" },
   { to: "/analysis", label: "Analysis" },
   { to: "/forum", label: "Forum" },
+  { to: "/courses", label: "Courses" },
+  { to: "/trading-videos", label: "Trading Videos" },
+  { to: "/webinars", label: "Webinars" },
 ];
 
 const toolsSubmenu = [
@@ -52,6 +58,7 @@ const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [signupOpen, setSignupOpen] = useState(false);
   const [signinOpen, setSigninOpen] = useState(false);
+  const { isAuthenticated, user } = useAuth();
 
 
   const toggleSubmenu = () => {
@@ -96,8 +103,13 @@ const Header: React.FC = () => {
                   <span>United States</span>
                 </HeaderItem>
               </NavLink>
-              <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
-
+              {isAuthenticated ? (
+                <UserPanelButton to={user?.role === 'admin' ? '/admin-panel' : '/user-panel'}>
+                  <span>{user?.role === 'admin' ? 'Admin Panel' : `${user?.firstName || 'User'}'s Panel`}</span>
+                </UserPanelButton>
+              ) : (
+                <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
+              )}
             </LinkGroup>
           </Topbar>
         )}
@@ -166,8 +178,13 @@ const Header: React.FC = () => {
                 )}
               </SubmenuWrapper>
             </NavList>
-            <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
-
+            {isAuthenticated ? (
+              <UserPanelButton to={user?.role === 'admin' ? '/admin-panel' : '/user-panel'}>
+                <span>{user?.role === 'admin' ? 'Admin Panel' : `${user?.firstName || 'User'}'s Panel`}</span>
+              </UserPanelButton>
+            ) : (
+              <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
+            )}
           </StickyBar>
         )}
 
@@ -180,7 +197,13 @@ const Header: React.FC = () => {
               <SignInButton>Sign In</SignInButton>
             </NavLink> */}
 
-            <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
+            {isAuthenticated ? (
+              <UserPanelButton to={user?.role === 'admin' ? '/admin-panel' : '/user-panel'} style={{ color: 'white', background: 'transparent', border: '1px solid white' }}>
+                <span>{user?.role === 'admin' ? 'Admin' : user?.firstName || 'User'}</span>
+              </UserPanelButton>
+            ) : (
+              <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
+            )}
             <FaBars
               size={22}
               color="white"

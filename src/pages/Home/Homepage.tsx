@@ -19,7 +19,7 @@ import { useState } from "react";
 const HomePage: React.FC = () => {
 
 
-   const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(true);
 
 
 

@@ -9,8 +9,9 @@ const Container = styled.section`
   padding: 24px;
   border-radius: 12px;
   background: #ffffff;
-   @media (max-width: 786px) {
-    margin: 0;
+   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    margin: 40px auto 20px;
+    padding: 20px;
   }
 `;
 
@@ -45,8 +46,14 @@ const FormRow = styled.div`
 `;
 
 const FormGroup = styled.div`
+  flex: 1;
   min-width: 220px;
-  width: 500px;
+  max-width: 500px;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    min-width: 100%;
+    max-width: 100%;
+  }
 `;
 
 const Label = styled.label`
@@ -103,6 +110,11 @@ const ButtonRow = styled.div`
   align-items: center;
   gap: 16px;
   margin-top: 20px;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    flex-direction: column;
+    width: 100%;
+  }
 `;
 
 const Button = styled.button`
@@ -125,23 +137,31 @@ const ResultBox = styled.div`
   background: #de992f;
   color: #ffffff;
   font-weight: 600;
-  padding: 8px 60px;
-  border-radius: 6px;
+  padding: 12px 40px;
+  border-radius: 8px;
   font-size: 24px;
+  white-space: nowrap;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    padding: 10px 24px;
+    font-size: 20px;
+    width: 100%;
+    text-align: center;
+  }
 `;
 
 // ===== Component =====
 const PipCalculator: React.FC = () => {
-  const [instrument, setInstrument] = useState("EUR/USD");
+  const [instrument, setInstrument] = useState("XAU/USD");
   const [depositCurrency, setDepositCurrency] = useState("USD");
-  const [pips, setPips] = useState<number>(1);           // default 1 pip
-  const [contractSize, setContractSize] = useState<number>(100000); // standard lot
+  const [pips, setPips] = useState<number>(20);
+  const [contractSize, setContractSize] = useState<number>(100);
   const [result, setResult] = useState<number>(0);
 
   const calculatePipValue = () => {
-    // Basic pip value formula (simplified for demo):
-    // Pip Value = (Pip * Contract Size) / 10,000
-    const pipValue = (pips * contractSize) / 10000;
+    // For XAU/USD and similar pairs: Pip Value = (Pips * Contract Size) / 10
+    // Simplified calculation for demo
+    const pipValue = (pips * contractSize) / 10;
     setResult(pipValue);
   };
 
@@ -149,9 +169,7 @@ const PipCalculator: React.FC = () => {
     <Container>
       <Header>Pip Calculator</Header>
       <Description>
-        Our Pip Calculator is a vital tool for Forex traders to accurately determine pip values across different account
-        types. Whether trading standard, mini, or micro lots, it helps you measure the impact of price movements on your
-        positions. By knowing the precise pip value, you can manage risk more effectively and make smarter trading decisions.
+        The Pip Calculator is a vital tool for Forex traders to accurately determine pip values across different account types. It helps you measure the impact of price movements and enables smarter trading decisions.
       </Description>
 
       <form onSubmit={(e) => e.preventDefault()}>
@@ -164,10 +182,10 @@ const PipCalculator: React.FC = () => {
                 value={instrument}
                 onChange={(e) => setInstrument(e.target.value)}
               >
+                <option>XAU/USD</option>
                 <option>EUR/USD</option>
                 <option>GBP/USD</option>
                 <option>USD/JPY</option>
-                <option>XAU/USD</option>
               </InnerSelect>
             </OuterBox>
           </FormGroup>
@@ -222,9 +240,11 @@ const PipCalculator: React.FC = () => {
           <Button type="button" onClick={calculatePipValue}>
             Calculate
           </Button>
-          <ResultBox>
-            Result : {result.toFixed(2)}
-          </ResultBox>
+          {result > 0 && (
+            <ResultBox>
+              US ${result.toFixed(2)}
+            </ResultBox>
+          )}
         </ButtonRow>
       </form>
     </Container>

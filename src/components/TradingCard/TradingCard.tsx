@@ -16,12 +16,19 @@ const Card = styled.div`
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
   padding: 20px 10px;
   text-align: center;
-  width: 452px;
+  width: 100%;
+  max-width: 452px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  height: 100%;
+  justify-content: space-between;
+  min-height: 500px;
   border: 1px solid #0000004D;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    min-height: auto;
+    padding: 16px 8px;
+  }
 `;
 
 const Outerbox = styled.div`
