@@ -49,6 +49,7 @@ const ContentWrapper = styled.div`
 `;
 
 type Signal = {
+  id?: string;
   pair: string;
   entry: string;
   tp: string;

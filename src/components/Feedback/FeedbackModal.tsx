@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { submitFeedback } from "../../services/feedbackService";
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -28,22 +29,16 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
     setSuccess(null);
 
     try {
-      // Simulating API call
-      const res = await fetch("/api/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, message }),
+      await submitFeedback({
+        email,
+        message,
+        page: typeof window !== "undefined" ? window.location.pathname : undefined,
       });
-
-      if (res.ok) {
-        setSuccess("Thank you for your feedback!");
-        setEmail("");
-        setMessage("");
-      } else {
-        throw new Error("Failed to send feedback");
-      }
+      setSuccess("Thank you for your feedback!");
+      setEmail("");
+      setMessage("");
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }

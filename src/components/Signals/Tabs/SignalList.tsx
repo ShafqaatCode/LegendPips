@@ -5,6 +5,7 @@ import ArrowRight from '../../../assets/icons/arrow-narrow-circle-broken-up-righ
 type SignalStatus = 'buy' | 'sell';
 
 type Signal = {
+  id?: string;
   pair: string;
   entry: string;
   tp: string;
@@ -171,7 +172,7 @@ const RecentSignals: React.FC<RecentSignalsProps> = ({
 
       <SignalList>
         {signals.map((signal, idx) => (
-          <SignalItem key={idx}>
+          <SignalItem key={signal.id || `${signal.pair}-${idx}`}>
             <SignalInfo>
               <ColorBar color={signal.status === 'buy' ? '#27ae60' : '#e74c3c'} />
               <SignalDetails>

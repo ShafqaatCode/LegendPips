@@ -11,17 +11,11 @@ import FAQ from "../../components/Faqs/Faqs";
 import Tabs from "../../components/Signals/Tabs/Tabs";
 import CommunitySection from "../../components/Community/CommunitySection";
 import ContestSection from "../../components/ContestList/ContestSection";
-import { UnderDevelopmentModal } from "../Home/UnderDevModel";
-import { useState } from "react";
-
-
+// import { UnderDevelopmentModal } from "../Home/UnderDevModel";
+// import { useState } from "react";
 
 const HomePage: React.FC = () => {
-
-
-  const [showModal, setShowModal] = useState(true);
-
-
+  // const [showModal, setShowModal] = useState(true);
 
     return (
         <>
@@ -36,10 +30,10 @@ const HomePage: React.FC = () => {
             <ChoosUs />
             <Testimonials />
             <FAQ />
-            <UnderDevelopmentModal
+            {/* <UnderDevelopmentModal
                 open={showModal}
                 onClose={() => setShowModal(false)}
-            />
+            /> */}
 
 
         </>

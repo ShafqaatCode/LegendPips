@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { FiAward, FiTrendingUp, FiUsers, FiCalendar, FiArrowRight } from 'react-icons/fi';
+import { FiCalendar, FiArrowRight } from 'react-icons/fi';
+import { fetchMyContests } from '../../../services/contestService';
 
 const Container = styled.div`
   max-width: 1400px;
@@ -201,51 +202,32 @@ const EmptyText = styled.p`
 
 const MyContests: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState('all');
+  const [contests, setContests] = useState<any[]>([]);
 
-  const contests = [
-    {
-      id: 1,
-      title: 'Forex Trading Championship',
-      description: 'Compete with traders worldwide in this month-long championship.',
-      status: 'active',
-      participants: 1250,
-      prize: '$50,000',
-      endDate: '2024-02-15',
-      rank: 45,
-      profit: '+12.5%',
-    },
-    {
-      id: 2,
-      title: 'Crypto Master Challenge',
-      description: 'Show your crypto trading skills and win amazing prizes.',
-      status: 'active',
-      participants: 890,
-      prize: '$25,000',
-      endDate: '2024-02-20',
-      rank: 12,
-      profit: '+18.3%',
-    },
-    {
-      id: 3,
-      title: 'Gold Rush Competition',
-      description: 'Trade XAU/USD and compete for the top spot.',
-      status: 'upcoming',
-      participants: 0,
-      prize: '$15,000',
-      startDate: '2024-02-10',
-    },
-    {
-      id: 4,
-      title: 'Weekly Trading Sprint',
-      description: 'Fast-paced weekly competition for quick traders.',
-      status: 'completed',
-      participants: 450,
-      prize: '$5,000',
-      endDate: '2024-01-28',
-      rank: 8,
-      profit: '+15.2%',
-    },
-  ];
+  useEffect(() => {
+    fetchMyContests()
+      .then((items) => {
+        const mapped = items.map((entry: any) => {
+          const contest = entry.contest || {};
+          const endDate = contest.endDate ? new Date(contest.endDate).toISOString().slice(0, 10) : undefined;
+          const statusRaw = contest.status || "Upcoming";
+          const status = statusRaw === "Ongoing" ? "active" : statusRaw === "Upcoming" ? "upcoming" : "completed";
+          return {
+            id: contest._id,
+            title: contest.title || "Contest",
+            description: contest.description || contest.subtitle || "Contest participation",
+            status,
+            participants: contest.participants || 0,
+            endDate,
+            rank: 0,
+            profit: `${Number(entry.leaderboardStats?.profitPercent || 0).toFixed(2)}%`,
+            startDate: contest.startDate ? new Date(contest.startDate).toISOString().slice(0, 10) : undefined,
+          };
+        });
+        setContests(mapped);
+      })
+      .catch(() => setContests([]));
+  }, []);
 
   const filteredContests = contests.filter((contest) => {
     if (activeFilter === 'all') return true;

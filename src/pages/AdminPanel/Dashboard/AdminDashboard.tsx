@@ -1,6 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { FiUsers, FiAward, FiVideo, FiFileText, FiTrendingUp, FiDollarSign, FiActivity, FiArrowUp, FiArrowDown } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import {
+  FiUsers,
+  FiAward,
+  FiVideo,
+  FiFileText,
+  FiActivity,
+  FiArrowUp,
+  FiArrowDown,
+  FiInbox,
+  FiTrendingUp,
+  FiBook,
+  FiDollarSign,
+  FiBarChart2,
+} from 'react-icons/fi';
+import { fetchAdminFullMetrics, fetchAdminActivityFeed } from '../../../services/adminEngagementService';
 
 const DashboardContainer = styled.div`
   max-width: 1600px;
@@ -206,104 +221,219 @@ const ActivityTime = styled.div`
 `;
 
 const AdminDashboard: React.FC = () => {
-  const stats = [
-    {
-      icon: FiUsers,
-      label: 'Total Users',
-      value: '1,234',
-      change: '+12%',
-      positive: true,
-      color: '#3b82f6',
-    },
-    {
-      icon: FiAward,
-      label: 'Active Contests',
-      value: '8',
-      change: '+2',
-      positive: true,
-      color: '#Fbbf24',
-    },
-    {
-      icon: FiTrendingUp,
-      label: 'Total Signals',
-      value: '456',
-      change: '+23',
-      positive: true,
-      color: '#10b981',
-    },
-    {
-      icon: FiVideo,
-      label: 'Webinars',
-      value: '32',
-      change: '+5',
-      positive: true,
-      color: '#8b5cf6',
-    },
-    {
-      icon: FiFileText,
-      label: 'Analysis Articles',
-      value: '128',
-      change: '+8',
-      positive: true,
-      color: '#ec4899',
-    },
-    {
-      icon: FiDollarSign,
-      label: 'Total Revenue',
-      value: '$45,678',
-      change: '+15%',
-      positive: true,
-      color: '#10b981',
-    },
-  ];
+  const navigate = useNavigate();
+  const [metricsLoading, setMetricsLoading] = useState(true);
+  const [feedLoading, setFeedLoading] = useState(true);
+  const [metricsError, setMetricsError] = useState<string | null>(null);
+  const [metrics, setMetrics] = useState<{
+    summary: {
+      totalUsers: number;
+      newFeedbackOpen: number;
+      newFeedback24h: number;
+      newFeedbackWeek: number;
+      activity24h: number;
+    };
+    platform: {
+      newUsers7d: number;
+      contestsTotal: number;
+      contestParticipantsTotal: number;
+      webinarsTotal: number;
+      coursesPublished: number;
+      brokersPublished: number;
+      signalsPublished: number;
+      activityLast7dTotal: number;
+      rebateUsd30d: number;
+    };
+  } | null>(null);
+  const [feedItems, setFeedItems] = useState<
+    { id: string; userLabel: string; type: string; title: string; description: string; time: string }[]
+  >([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        setMetricsLoading(true);
+        setMetricsError(null);
+        const data = await fetchAdminFullMetrics();
+        if (!cancelled) {
+          setMetrics({ summary: data.summary, platform: data.platform });
+        }
+      } catch (e) {
+        if (!cancelled) setMetricsError(e instanceof Error ? e.message : 'Failed to load metrics');
+      } finally {
+        if (!cancelled) setMetricsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        setFeedLoading(true);
+        const data = await fetchAdminActivityFeed(1, 10);
+        if (!cancelled) setFeedItems(data.items);
+      } catch {
+        if (!cancelled) setFeedItems([]);
+      } finally {
+        if (!cancelled) setFeedLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const colorForType = (t: string) => {
+    if (t === 'contest') return '#Fbbf24';
+    if (t === 'webinar') return '#8b5cf6';
+    if (t === 'course') return '#8b5cf6';
+    if (t === 'forum') return '#ec4899';
+    if (t === 'feedback') return '#6366f1';
+    if (t === 'signal') return '#f59e0b';
+    if (t === 'rebate') return '#10b981';
+    return '#6b7280';
+  };
+
+  const stats = metricsLoading
+    ? Array.from({ length: 8 }).map((_, i) => ({
+        icon: FiUsers,
+        label: 'Loading…',
+        value: '—',
+        change: '…',
+        positive: true,
+        color: '#e5e7eb',
+        key: `s-${i}`,
+      }))
+    : metrics
+      ? [
+          {
+            icon: FiUsers,
+            key: 'users',
+            label: 'Total users',
+            value: String(metrics.summary.totalUsers),
+            change: `${metrics.platform.newUsers7d} new accounts (7 days)`,
+            positive: true,
+            color: '#3b82f6',
+          },
+          {
+            icon: FiAward,
+            key: 'contests',
+            label: 'Contests',
+            value: String(metrics.platform.contestsTotal),
+            change: `${metrics.platform.contestParticipantsTotal} participant rows`,
+            positive: true,
+            color: '#Fbbf24',
+          },
+          {
+            icon: FiTrendingUp,
+            key: 'signals',
+            label: 'Published signals',
+            value: String(metrics.platform.signalsPublished),
+            change: 'in signal catalog',
+            positive: true,
+            color: '#10b981',
+          },
+          {
+            icon: FiVideo,
+            key: 'webinars',
+            label: 'Webinars',
+            value: String(metrics.platform.webinarsTotal),
+            change: 'scheduled / recorded',
+            positive: true,
+            color: '#8b5cf6',
+          },
+          {
+            icon: FiBook,
+            key: 'courses',
+            label: 'Published courses',
+            value: String(metrics.platform.coursesPublished),
+            change: `${metrics.platform.brokersPublished} published brokers`,
+            positive: true,
+            color: '#6366f1',
+          },
+          {
+            icon: FiActivity,
+            key: 'activity',
+            label: 'Activity (24h)',
+            value: String(metrics.summary.activity24h),
+            change: `${metrics.platform.activityLast7dTotal} events (7 days)`,
+            positive: true,
+            color: '#0ea5e9',
+          },
+          {
+            icon: FiInbox,
+            key: 'feedback',
+            label: 'Open feedback',
+            value: String(metrics.summary.newFeedbackOpen),
+            change: `${metrics.summary.newFeedback24h} submissions (24h)`,
+            positive: metrics.summary.newFeedbackOpen === 0,
+            color: '#ec4899',
+          },
+          {
+            icon: FiDollarSign,
+            key: 'rebates',
+            label: 'Rebates credited (30d)',
+            value: `$${metrics.platform.rebateUsd30d.toFixed(2)}`,
+            change: 'from rebate ledger',
+            positive: true,
+            color: '#059669',
+          },
+        ]
+      : [];
 
   const quickActions = [
     {
       icon: FiUsers,
       title: 'Manage Users',
       description: 'View and manage all users',
+      path: '/admin-panel/users',
     },
     {
       icon: FiAward,
       title: 'Create Contest',
       description: 'Set up a new trading contest',
+      path: '/admin-panel/contests',
     },
     {
       icon: FiVideo,
       title: 'Add Webinar',
       description: 'Schedule a new webinar',
+      path: '/admin-panel/webinars',
     },
     {
       icon: FiFileText,
       title: 'Publish Analysis',
       description: 'Create new analysis article',
-    },
-  ];
-
-  const recentActivities = [
-    {
-      icon: FiUsers,
-      text: 'New user registration: john.doe@example.com',
-      time: '5 minutes ago',
-      color: '#3b82f6',
+      path: '/admin-panel/analysis',
     },
     {
-      icon: FiAward,
-      text: 'Contest "Forex Championship" started',
-      time: '1 hour ago',
-      color: '#Fbbf24',
+      icon: FiInbox,
+      title: 'Feedback inbox',
+      description: 'Read and triage user feedback',
+      path: '/admin-panel/feedback-inbox',
     },
     {
-      icon: FiVideo,
-      text: 'Webinar "Advanced Trading" completed',
-      time: '2 hours ago',
-      color: '#8b5cf6',
+      icon: FiActivity,
+      title: 'User activity feed',
+      description: 'Cross-platform activity log',
+      path: '/admin-panel/user-activity',
     },
     {
-      icon: FiFileText,
-      text: 'New analysis article published',
-      time: '3 hours ago',
-      color: '#ec4899',
+      icon: FiDollarSign,
+      title: 'Rebate credits',
+      description: 'Grant and review cashback ledger',
+      path: '/admin-panel/rebate-credits',
+    },
+    {
+      icon: FiBarChart2,
+      title: 'Reports & analytics',
+      description: 'Exports and activity breakdown',
+      path: '/admin-panel/reports',
     },
   ];
 
@@ -312,13 +442,28 @@ const AdminDashboard: React.FC = () => {
       <WelcomeSection>
         <WelcomeTitle>Admin Dashboard 👋</WelcomeTitle>
         <WelcomeText>
-          Overview of your platform's performance and activities.
+          Overview of your platform&apos;s performance and activities.
         </WelcomeText>
       </WelcomeSection>
 
+      {metricsError && (
+        <div
+          style={{
+            background: '#fef2f2',
+            color: '#b91c1c',
+            padding: '1rem',
+            borderRadius: 10,
+            marginBottom: '1rem',
+            border: '1px solid #fecaca',
+          }}
+        >
+          {metricsError}
+        </div>
+      )}
+
       <StatsGrid>
         {stats.map((stat, index) => (
-          <StatCard key={index}>
+          <StatCard key={'key' in stat ? (stat as { key: string }).key : index}>
             <StatHeader>
               <StatIcon $color={stat.color}>
                 <stat.icon />
@@ -328,7 +473,7 @@ const AdminDashboard: React.FC = () => {
             <StatLabel>{stat.label}</StatLabel>
             <StatChange $positive={stat.positive}>
               {stat.positive ? <FiArrowUp /> : <FiArrowDown />}
-              {stat.change} this month
+              {stat.change}
             </StatChange>
           </StatCard>
         ))}
@@ -337,7 +482,18 @@ const AdminDashboard: React.FC = () => {
       <SectionTitle>Quick Actions</SectionTitle>
       <QuickActionsGrid>
         {quickActions.map((action, index) => (
-          <ActionCard key={index}>
+          <ActionCard
+            key={index}
+            role="button"
+            tabIndex={0}
+            onClick={() => action.path && navigate(action.path)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (action.path) navigate(action.path);
+              }
+            }}
+          >
             <ActionIcon>
               <action.icon />
             </ActionIcon>
@@ -347,20 +503,46 @@ const AdminDashboard: React.FC = () => {
         ))}
       </QuickActionsGrid>
 
-      <SectionTitle>Recent Activity</SectionTitle>
+      <SectionTitle>Recent user activity</SectionTitle>
       <RecentActivity>
         <ActivityList>
-          {recentActivities.map((activity, index) => (
-            <ActivityItem key={index}>
-              <ActivityIcon $color={activity.color}>
-                <activity.icon />
-              </ActivityIcon>
+          {feedLoading && (
+            <ActivityItem>
               <ActivityContent>
-                <ActivityText>{activity.text}</ActivityText>
-                <ActivityTime>{activity.time}</ActivityTime>
+                <ActivityText>Loading activity…</ActivityText>
               </ActivityContent>
             </ActivityItem>
-          ))}
+          )}
+          {!feedLoading && feedItems.length === 0 && (
+            <ActivityItem>
+              <ActivityContent>
+                <ActivityText>No recent activity logged.</ActivityText>
+              </ActivityContent>
+            </ActivityItem>
+          )}
+          {!feedLoading &&
+            feedItems.map((row) => {
+              const color = colorForType(row.type);
+              return (
+                <ActivityItem key={row.id}>
+                  <ActivityIcon $color={color}>
+                    <FiActivity />
+                  </ActivityIcon>
+                  <ActivityContent>
+                    <ActivityText>
+                      <strong>{row.userLabel}</strong> — {row.title}{' '}
+                      <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>({row.type})</span>
+                    </ActivityText>
+                    <ActivityTime>{row.time}</ActivityTime>
+                    {row.description ? (
+                      <ActivityTime style={{ marginTop: 4, display: 'block', color: '#4b5563' }}>
+                        {row.description}
+                      </ActivityTime>
+                    ) : null}
+                  </ActivityContent>
+                </ActivityItem>
+              );
+            })}
         </ActivityList>
       </RecentActivity>
     </DashboardContainer>

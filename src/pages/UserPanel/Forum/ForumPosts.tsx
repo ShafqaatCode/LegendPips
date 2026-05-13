@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { FiMessageSquare, FiThumbsUp, FiThumbsDown, FiCalendar, FiUser } from 'react-icons/fi';
+import React, { useCallback, useEffect, useState } from "react";
+import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
+import { FiMessageSquare, FiThumbsUp, FiThumbsDown, FiCalendar, FiUser, FiLoader } from "react-icons/fi";
+import { fetchMyForumPosts, type MyForumPostItem } from "../../../services/forumService";
 
 const Container = styled.div`
   max-width: 1400px;
@@ -17,7 +19,7 @@ const Header = styled.div`
 const Title = styled.h1`
   font-size: 2rem;
   font-weight: 700;
-  color: #132E58;
+  color: #132e58;
   margin: 0;
 `;
 
@@ -35,11 +37,11 @@ const PostCard = styled.div`
   border: 1px solid #e5e7eb;
   transition: all 0.2s ease;
   cursor: pointer;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    border-color: #Fbbf24;
+    border-color: #fbbf24;
   }
 `;
 
@@ -53,7 +55,7 @@ const PostHeader = styled.div`
 const PostTitle = styled.h3`
   font-size: 1.25rem;
   font-weight: 700;
-  color: #132E58;
+  color: #132e58;
   margin: 0;
   flex: 1;
 `;
@@ -65,9 +67,9 @@ const PostMeta = styled.div`
   color: #6b7280;
   font-size: 0.875rem;
   margin-bottom: 0.75rem;
-  
+
   svg {
-    color: #Fbbf24;
+    color: #fbbf24;
   }
 `;
 
@@ -103,14 +105,14 @@ const StatItem = styled.div`
   color: #6b7280;
   font-size: 0.875rem;
   font-weight: 500;
-  
+
   svg {
-    color: #132E58;
+    color: #132e58;
   }
 `;
 
 const ViewButton = styled.button`
-  background: #132E58;
+  background: #132e58;
   color: white;
   border: none;
   padding: 0.625rem 1.25rem;
@@ -118,45 +120,68 @@ const ViewButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: #1a4a7a;
   }
 `;
 
+const Empty = styled.div`
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: #6b7280;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+`;
+
 const ForumPosts: React.FC = () => {
-  const posts = [
-    {
-      id: 1,
-      title: 'Best Trading Strategy for Beginners',
-      content: 'I\'ve been trading for 6 months now and wanted to share my experience with beginners. Here are some key strategies that helped me...',
-      author: 'John Doe',
-      date: '2024-01-15',
-      likes: 24,
-      replies: 8,
-      views: 156,
-    },
-    {
-      id: 2,
-      title: 'EUR/USD Analysis - Current Market Trends',
-      content: 'Let\'s discuss the current EUR/USD trends and what we can expect in the coming weeks. I\'ve noticed some interesting patterns...',
-      author: 'John Doe',
-      date: '2024-01-14',
-      likes: 18,
-      replies: 12,
-      views: 203,
-    },
-    {
-      id: 3,
-      title: 'Risk Management Tips That Changed My Trading',
-      content: 'After losing significant capital early in my trading journey, I learned the importance of proper risk management. Here are my top tips...',
-      author: 'John Doe',
-      date: '2024-01-13',
-      likes: 32,
-      replies: 15,
-      views: 289,
-    },
-  ];
+  const navigate = useNavigate();
+  const [posts, setPosts] = useState<MyForumPostItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const items = await fetchMyForumPosts();
+      setPosts(items);
+    } catch (e: any) {
+      setError(e.message || "Failed to load posts");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  if (loading) {
+    return (
+      <Container>
+        <Header>
+          <Title>My Forum Posts</Title>
+        </Header>
+        <Empty>
+          <FiLoader style={{ fontSize: "2rem", marginBottom: "0.5rem" }} />
+          Loading…
+        </Empty>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container>
+        <Header>
+          <Title>My Forum Posts</Title>
+        </Header>
+        <Empty style={{ color: "#b91c1c" }}>{error}</Empty>
+      </Container>
+    );
+  }
 
   return (
     <Container>
@@ -164,42 +189,59 @@ const ForumPosts: React.FC = () => {
         <Title>My Forum Posts</Title>
       </Header>
 
-      <PostsList>
-        {posts.map((post) => (
-          <PostCard key={post.id}>
-            <PostHeader>
-              <PostTitle>{post.title}</PostTitle>
-            </PostHeader>
-            <PostMeta>
-              <span>
-                <FiUser />
-                {post.author}
-              </span>
-              <span>
-                <FiCalendar />
-                {post.date}
-              </span>
-            </PostMeta>
-            <PostContent>{post.content}</PostContent>
-            <PostFooter>
-              <PostStats>
-                <StatItem>
-                  <FiThumbsUp />
-                  {post.likes}
-                </StatItem>
-                <StatItem>
-                  <FiMessageSquare />
-                  {post.replies} Replies
-                </StatItem>
-                <StatItem>
-                  {post.views} Views
-                </StatItem>
-              </PostStats>
-              <ViewButton>View Thread</ViewButton>
-            </PostFooter>
-          </PostCard>
-        ))}
-      </PostsList>
+      {posts.length === 0 ? (
+        <Empty>
+          <p>Threads you start or comment on will show here.</p>
+          <p style={{ marginTop: "0.75rem" }}>
+            <ViewButton type="button" onClick={() => navigate("/forum")}>
+              Browse forums
+            </ViewButton>
+          </p>
+        </Empty>
+      ) : (
+        <PostsList>
+          {posts.map((post) => (
+            <PostCard key={post.id} onClick={() => navigate(`/forum/thread/${post.id}`)}>
+              <PostHeader>
+                <PostTitle>{post.title}</PostTitle>
+              </PostHeader>
+              <PostMeta>
+                <span>
+                  <FiUser />
+                  {post.author}
+                </span>
+                <span>
+                  <FiCalendar />
+                  {post.date}
+                </span>
+              </PostMeta>
+              <PostContent>{post.content}</PostContent>
+              <PostFooter>
+                <PostStats>
+                  <StatItem>
+                    <FiThumbsUp />
+                    {post.likes}
+                  </StatItem>
+                  <StatItem>
+                    <FiMessageSquare />
+                    {post.replies} Replies
+                  </StatItem>
+                  <StatItem>{post.views} Views</StatItem>
+                </PostStats>
+                <ViewButton
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/forum/thread/${post.id}`);
+                  }}
+                >
+                  View Thread
+                </ViewButton>
+              </PostFooter>
+            </PostCard>
+          ))}
+        </PostsList>
+      )}
     </Container>
   );
 };

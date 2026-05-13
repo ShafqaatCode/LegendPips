@@ -1,10 +1,7 @@
 // import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-// import { useParams } from "react-router-dom";
-// import { fetchCompetitionById } from "../ContestList/mockApi";
-import { type Competition } from "../ContestList/mockCompetitions";
+import { type Competition } from "../../services/contestService";
 
-// import Spinner from "../Loaders/spinner";
 import CountDown from "../CountdownTimer/CountdownTimer";
 import Podium from "../Winnerpodium/Podium";
 import TrophyImg from "../../assets/icons/Trophy.svg";

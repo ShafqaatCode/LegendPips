@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FaX } from "react-icons/fa6";
+import { forgotPassword } from "../../services/authService";
 
 interface ForgetPasswordModalProps {
   isOpen: boolean;
@@ -10,6 +11,8 @@ interface ForgetPasswordModalProps {
 
 const ForgetPasswordModal: React.FC<ForgetPasswordModalProps> = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     if (isOpen) {
@@ -24,12 +27,20 @@ const ForgetPasswordModal: React.FC<ForgetPasswordModalProps> = ({ isOpen, onClo
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: connect with backend reset password API
-    alert(`Password reset link sent to: ${email}`);
-    setEmail("");
-    onClose();
+    try {
+      setLoading(true);
+      setMessage("");
+      const res = await forgotPassword(email);
+      setMessage(res.message || "If the email exists, reset link has been sent.");
+      setEmail("");
+      setTimeout(() => onClose(), 1200);
+    } catch (err: any) {
+      setMessage(err.message || "Failed to request password reset");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,7 +62,10 @@ const ForgetPasswordModal: React.FC<ForgetPasswordModalProps> = ({ isOpen, onClo
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-            <SubmitButton type="submit">Send Reset Link</SubmitButton>
+            {message && <Description>{message}</Description>}
+            <SubmitButton type="submit" disabled={loading}>
+              {loading ? "Sending..." : "Send Reset Link"}
+            </SubmitButton>
           </form>
         </FormWrapper>
       </ModalContainer>

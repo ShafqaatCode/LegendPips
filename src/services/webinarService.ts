@@ -1,13 +1,23 @@
-const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_URL || "http://localhost:3000",
-  TIMEOUT: 30000,
+import { API_CONFIG } from "../utils/apiConfig";
+
+const TIMEOUT_MS = 30000;
+
+const authHeaders = (): HeadersInit => {
+  if (typeof localStorage === "undefined") {
+    return { "Content-Type": "application/json" };
+  }
+  const token = localStorage.getItem("token");
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
 };
 
 // Helper function for fetch with timeout
 const fetchWithTimeout = async (
   url: string,
   options: RequestInit,
-  timeout: number = API_CONFIG.TIMEOUT
+  timeout: number = TIMEOUT_MS
 ): Promise<Response> => {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
@@ -107,14 +117,14 @@ export const fetchWebinars = async (
     }
 
     const response = await fetchWithTimeout(
-      `${API_CONFIG.BASE_URL}/api/webinars?${params.toString()}`,
+      `${API_CONFIG.BASE_URL}/webinars?${params.toString()}`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       },
-      API_CONFIG.TIMEOUT
+      TIMEOUT_MS
     );
 
     if (!response.ok) {
@@ -146,14 +156,14 @@ export const fetchWebinars = async (
 export const fetchWebinarById = async (id: string): Promise<Webinar> => {
   try {
     const response = await fetchWithTimeout(
-      `${API_CONFIG.BASE_URL}/api/webinars/${id}`,
+      `${API_CONFIG.BASE_URL}/webinars/${id}`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       },
-      API_CONFIG.TIMEOUT
+      TIMEOUT_MS
     );
 
     if (!response.ok) {
@@ -179,15 +189,13 @@ export const reserveWebinarSeat = async (
 ): Promise<any> => {
   try {
     const response = await fetchWithTimeout(
-      `${API_CONFIG.BASE_URL}/api/webinars/reserve`,
+      `${API_CONFIG.BASE_URL}/webinars/reserve`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: authHeaders(),
         body: JSON.stringify(data),
       },
-      API_CONFIG.TIMEOUT
+      TIMEOUT_MS
     );
 
     if (!response.ok) {
@@ -212,15 +220,13 @@ export const reserveWebinarSeat = async (
 export const joinLiveWebinar = async (data: JoinLiveRequest): Promise<any> => {
   try {
     const response = await fetchWithTimeout(
-      `${API_CONFIG.BASE_URL}/api/webinars/join`,
+      `${API_CONFIG.BASE_URL}/webinars/join`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: authHeaders(),
         body: JSON.stringify(data),
       },
-      API_CONFIG.TIMEOUT
+      TIMEOUT_MS
     );
 
     if (!response.ok) {
@@ -247,15 +253,13 @@ export const watchWebinarReplay = async (
 ): Promise<any> => {
   try {
     const response = await fetchWithTimeout(
-      `${API_CONFIG.BASE_URL}/api/webinars/watch`,
+      `${API_CONFIG.BASE_URL}/webinars/watch`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: authHeaders(),
         body: JSON.stringify(data),
       },
-      API_CONFIG.TIMEOUT
+      TIMEOUT_MS
     );
 
     if (!response.ok) {

@@ -6,7 +6,9 @@ import GreenCircleIcon from "../../assets/Ellipse3956.svg";
 
 import EntryImg from "../../assets/tag1.png";
 import PeopleImg from "../../assets/friend1.png";
+import defaultContestLogo from "../../assets/Contest_Images/wmug5dukcys 1-1.png";
 import { useNavigate } from "react-router-dom";
+import { joinCompetition } from "../../services/contestService";
 interface ContestCardProps {
   comp: Competition;
 }
@@ -14,6 +16,17 @@ interface ContestCardProps {
 const ContestCard: React.FC<ContestCardProps> = ({ comp }) => {
 
   const navigate = useNavigate();
+  const handleJoin = async () => {
+    if (comp.status === "Ended") return;
+    const contestId = comp.id || comp._id || "";
+    if (!contestId) return;
+    try {
+      const res = await joinCompetition(contestId);
+      alert(res.message || "Joined successfully");
+    } catch (error: any) {
+      alert(error.message || "Please login to join contest");
+    }
+  };
   const handleViewDetails = () => {
     const contestId = comp.id || comp._id || "";
     navigate(`/contests/${contestId}`);
@@ -27,7 +40,7 @@ const ContestCard: React.FC<ContestCardProps> = ({ comp }) => {
       </Header>
 
       <Body>
-        <Image src={comp.logo} alt={comp.title} />
+        <Image src={comp.logo || defaultContestLogo} alt={comp.title} />
         <Content>
           <Title>{comp.title}</Title>
           <Type>{comp.type}</Type>
@@ -38,7 +51,7 @@ const ContestCard: React.FC<ContestCardProps> = ({ comp }) => {
         </Content>
         <Tags>
           <StatusTag status={comp.status}>{comp.status}</StatusTag>
-          <JoinButton status={comp.status}>
+          <JoinButton status={comp.status} onClick={handleJoin}>
             {comp.status === "Ended" ? "Closed" : "Join Now"}
           </JoinButton>
         </Tags>

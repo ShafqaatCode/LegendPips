@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { useParams, useNavigate } from 'react-router-dom';
+import { fetchForumThread, postForumComment, type ForumThreadDetailResponse } from '../../services/forumService';
+import { getAuthToken } from '../../utils/apiConfig';
 
 const PageWrapper = styled.section`
   background: #fafbfc;
@@ -427,82 +429,75 @@ const ForumThreadDetail: React.FC = () => {
   const { threadId } = useParams<{ threadId: string }>();
   const navigate = useNavigate();
   const [comment, setComment] = useState('');
+  const [data, setData] = useState<ForumThreadDetailResponse['thread'] | null>(null);
+  const [related, setRelated] = useState<{ id: string; title: string; date: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [posting, setPosting] = useState(false);
 
-  // Mock data - in real app, this would come from API
-  const threadData = {
-    id: threadId || '1',
-    title: 'Trading Performance Chat',
-    created: 'November 21, 2025',
-    participants: '0',
-    replies: '0',
-    post: {
-      author: 'Easy Money Forex',
-      avatar: 'EM',
-      date: 'Posted: April 25, 2025',
-      content: 'My win rate improved after tracking every trade. Small changes in entries and exits made a big difference.',
-      image: 'https://via.placeholder.com/800x400/132E58/Fbbf24?text=Trading+Chart',
-      likes: 0,
-      dislikes: 0
-    },
-    comments: [
-      {
-        id: '1',
-        author: 'Marko Vukic',
-        avatar: 'M',
-        date: '2 hours ago',
-        content: 'Great insights! I\'ve been doing the same and seeing similar results.',
-        avatarColor: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-        likes: 0,
-        dislikes: 0
-      },
-      {
-        id: '2',
-        author: 'Sarah Johnson',
-        avatar: 'SJ',
-        date: '5 hours ago',
-        content: 'Thanks for sharing. What tools do you use for tracking?',
-        avatarColor: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-        likes: 0,
-        dislikes: 0
-      }
-    ]
-  };
-
-  const relatedThreads = [
-    {
-      id: '1',
-      title: 'Protect Your Account with Smarter Risk',
-      date: 'Last update November 22, 2005 12:07 AM'
-    },
-    {
-      id: '2',
-      title: 'Risk Control for Better Trades',
-      date: 'November 21, 2005 1:52 PM'
-    },
-    {
-      id: '3',
-      title: 'Stronger Trading Starts with Smart Risk',
-      date: 'November 21, 2005 08:41 PM'
-    },
-    {
-      id: '4',
-      title: 'USDJPY Gains Extend to Yearly Highs',
-      date: 'November 21, 2005 08:41 PM'
-    },
-    {
-      id: '5',
-      title: 'Build Consistency with Solid Risk Plans',
-      date: 'November 21, 2005 06:15 PM'
+  const loadThread = useCallback(async () => {
+    if (!threadId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetchForumThread(threadId);
+      setData(res.thread);
+      setRelated(res.related || []);
+    } catch (e: any) {
+      setError(e.message || 'Thread not found');
+      setData(null);
+    } finally {
+      setLoading(false);
     }
-  ];
+  }, [threadId]);
 
-  const handlePostComment = () => {
-    if (comment.trim()) {
-      // In real app, this would post to API
-      console.log('Posting comment:', comment);
+  useEffect(() => {
+    loadThread();
+  }, [loadThread]);
+
+  const handlePostComment = async () => {
+    if (!comment.trim() || !threadId) return;
+    if (!getAuthToken()) {
+      navigate('/signin', { state: { from: `/forum/thread/${threadId}` } });
+      return;
+    }
+    setPosting(true);
+    try {
+      await postForumComment(threadId, comment.trim());
       setComment('');
+      await loadThread();
+    } catch (e: any) {
+      alert(e.message || 'Failed to post comment');
+    } finally {
+      setPosting(false);
     }
   };
+
+  if (loading) {
+    return (
+      <PageWrapper>
+        <ContentWrapper>
+          <MainContent>
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>Loading thread…</div>
+          </MainContent>
+        </ContentWrapper>
+      </PageWrapper>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <PageWrapper>
+        <ContentWrapper>
+          <MainContent>
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#b91c1c' }}>{error || 'Not found'}</div>
+          </MainContent>
+        </ContentWrapper>
+      </PageWrapper>
+    );
+  }
+
+  const threadData = data;
 
   return (
     <PageWrapper>
@@ -518,7 +513,9 @@ const ForumThreadDetail: React.FC = () => {
           </ThreadHeader>
 
           <ActionButtons>
-            <SectionBadge>My win rate improved...</SectionBadge>
+            <SectionBadge type="button">
+              {threadData.title.length > 28 ? `${threadData.title.slice(0, 28)}…` : threadData.title}
+            </SectionBadge>
             <ActionButton $yellow>Latest Posts</ActionButton>
             <ActionButton $primary>
               Add a Post
@@ -538,7 +535,9 @@ const ForumThreadDetail: React.FC = () => {
             </PostHeader>
             <PostContent>
               <PostText>{threadData.post.content}</PostText>
-              <PostImage src={threadData.post.image} alt="Trading Chart" />
+              {threadData.post.image ? (
+                <PostImage src={threadData.post.image} alt="Thread attachment" />
+              ) : null}
               <PostActions>
                 <ActionIcon $type="up">{threadData.post.likes}</ActionIcon>
                 <ActionIcon $type="down">{threadData.post.dislikes}</ActionIcon>
@@ -557,7 +556,9 @@ const ForumThreadDetail: React.FC = () => {
                 onChange={(e) => setComment(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handlePostComment()}
               />
-              <PostCommentButton onClick={handlePostComment}>Post</PostCommentButton>
+              <PostCommentButton type="button" onClick={handlePostComment} disabled={posting}>
+                {posting ? 'Posting…' : 'Post'}
+              </PostCommentButton>
             </CommentForm>
 
             <CommentList>
@@ -584,7 +585,7 @@ const ForumThreadDetail: React.FC = () => {
           <SidebarSection>
             <SidebarTitle>Related Threads</SidebarTitle>
             <ThreadList>
-              {relatedThreads.map((thread) => (
+              {related.map((thread) => (
                 <ThreadItem key={thread.id} onClick={() => navigate(`/forum/thread/${thread.id}`)}>
                   <ThreadItemTitle>{thread.title}</ThreadItemTitle>
                   <ThreadItemDate>{thread.date}</ThreadItemDate>

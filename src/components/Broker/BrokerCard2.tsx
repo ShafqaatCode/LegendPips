@@ -85,7 +85,19 @@ interface BrokerCardProps {
   logoSrc: string;
   rating: number;
   reviewsCount: string;
+  accountTypes?: Array<{
+    name: string;
+    spreadFrom?: string;
+    minDeposit?: string;
+    commission?: string;
+  }>;
 }
+
+const DEFAULT_REBATE_ACCOUNT_ROWS = [
+  { name: "Standard Account", spreadFrom: "Up to 0.5 pips" },
+  { name: "Raw Account", spreadFrom: "Up to 0.3 pips" },
+  { name: "CTrader", spreadFrom: "Up to 0.2 pips" },
+];
 
 const BrokerCard: React.FC<BrokerCardProps> = ({
   index,
@@ -94,7 +106,15 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
   logoSrc,
   rating,
   reviewsCount,
+  accountTypes,
 }) => {
+  const accountRows =
+    accountTypes && accountTypes.length > 0
+      ? accountTypes.slice(0, 3).map((a) => ({
+          name: a.name,
+          detail: a.spreadFrom || a.minDeposit || a.commission || "—",
+        }))
+      : DEFAULT_REBATE_ACCOUNT_ROWS.map((a) => ({ name: a.name, detail: a.spreadFrom }));
   return (
     <Container>
       <SlideFadeSection>
@@ -112,20 +132,12 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
               <VerifiedBadge>✔ Verified Broker</VerifiedBadge>
             </TitleRow>
             <Description>
-
-              <div>
-                <h4>Standard Account</h4>
-                <p>Up to 0.5 pips</p>
-              </div>
-              <div>
-                <h4>Raw Account</h4>
-                <p>Up to 0.3 pips</p>
-              </div>
-              <div>
-                <h4>CTrader</h4>
-                <p>Up to 0.2 pips</p>
-              </div>
-
+              {accountRows.map((row, i) => (
+                <div key={`${row.name}-${i}`}>
+                  <h4>{row.name}</h4>
+                  <p>{row.detail}</p>
+                </div>
+              ))}
             </Description>
           </InfoSection>
 

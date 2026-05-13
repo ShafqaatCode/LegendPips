@@ -4,6 +4,7 @@ import type { Competition } from "../../services/contestService";
 
 export type { Competition };
 
+/** @deprecated Contest list uses `GET /api/getAllContests`. Kept for reference; run `npm run seed:public-contests` in the backend. */
 export const competitionsData: Competition[] = [
   {
     id: 1,

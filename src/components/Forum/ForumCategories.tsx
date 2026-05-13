@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import ArrowRight from '../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg';
+import { fetchForumFeed, type ForumFeedSection } from '../../services/forumService';
 
 const SectionWrapper = styled.section`
   background: #fafbfc;
@@ -270,6 +271,11 @@ const MetaItem = styled.span`
   gap: 0.25rem;
 `;
 
+interface CategoryData {
+  title: string;
+  topics: ForumTopic[];
+}
+
 interface ForumTopic {
   id: string;
   title: string;
@@ -283,174 +289,78 @@ interface ForumTopic {
   };
 }
 
-interface CategoryData {
-  title: string;
-  topics: ForumTopic[];
-}
-
-const forumData: CategoryData[] = [
-  {
-    title: 'Take the Leap. See the Gain.',
-    topics: [
-      {
-        id: '1',
-        title: 'Beginners - What is Forex Trading?',
-        description: 'A simple guide that explains currency trading, market basics, and how new traders can get started.',
-        participants: '8M',
-        replies: '1.2M',
-        lastPoster: {
-          name: 'John Doe',
-          time: '2 hours ago',
-          avatar: 'JD'
-        }
-      },
-      {
-        id: '2',
-        title: 'Trading Performance Chat',
-        description: 'Sync your account to review your performance, track your profits, and share your results when you want to.',
-        participants: '2.1K',
-        replies: '975',
-        lastPoster: {
-          name: 'Jane Smith',
-          time: '5 hours ago',
-          avatar: 'JS'
-        }
-      }
-    ]
-  },
-  {
-    title: 'Learn Today. Profit Tomorrow.',
-    topics: [
-      {
-        id: '3',
-        title: 'Premium Trading Discussion',
-        description: 'Premium Trading Discussion is a space for serious traders to share insights, strategies, and market analysis for smarter trading decisions.',
-        participants: '45',
-        replies: '1.7K',
-        lastPoster: {
-          name: 'Mike Johnson',
-          time: '1 day ago',
-          avatar: 'MJ'
-        }
-      },
-      {
-        id: '4',
-        title: 'Prop Firm Discussions',
-        description: 'All about proprietary trading firms, compare funding programs, share your results, and learn how to secure funded accounts.',
-        participants: '87',
-        replies: '1.9K',
-        lastPoster: {
-          name: 'Sarah Williams',
-          time: '3 days ago',
-          avatar: 'SW'
-        }
-      }
-    ]
-  },
-  {
-    title: 'Trade Smart, Win Big.',
-    topics: [
-      {
-        id: '5',
-        title: 'Trading Education',
-        description: 'Learn from others and post your own educational trading insights.',
-        participants: '92',
-        replies: '854',
-        lastPoster: {
-          name: 'David Brown',
-          time: '4 hours ago',
-          avatar: 'DB'
-        }
-      },
-      {
-        id: '6',
-        title: 'User Threads',
-        description: 'Create your own thread or trading journal and connect with other traders. Share insights, experiences, and ideas - this is your space to shine.',
-        participants: '1.5K',
-        replies: '2.7K',
-        lastPoster: {
-          name: 'Emily Davis',
-          time: '6 hours ago',
-          avatar: 'ED'
-        }
-      }
-    ]
-  },
-  {
-    title: 'Take Action. See Results.',
-    topics: [
-      {
-        id: '7',
-        title: 'Crypto Exchanges Chat',
-        description: 'Talk platforms, fees, and features. Which crypto exchange reigns supreme? You decide!',
-        participants: '1.7K',
-        replies: '3.1K',
-        lastPoster: {
-          name: 'Chris Wilson',
-          time: '1 hour ago',
-          avatar: 'CW'
-        }
-      },
-      {
-        id: '8',
-        title: 'XAUUSD Trading',
-        description: 'XAUUSD (Gold) Chat is a thread for trading ideas, news, and analysis. Share charts, setups, and your market insights.',
-        participants: '89',
-        replies: '1.5K',
-        lastPoster: {
-          name: 'Alex Taylor',
-          time: '2 days ago',
-          avatar: 'AT'
-        }
-      }
-    ]
-  },
-  {
-    title: 'Step In Today. Lead Tomorrow.',
-    topics: [
-      {
-        id: '9',
-        title: 'Advanced Strategies',
-        description: 'Discuss advanced trading strategies, risk management, and portfolio optimization techniques.',
-        participants: '234',
-        replies: '1.2K',
-        lastPoster: {
-          name: 'Robert Lee',
-          time: '8 hours ago',
-          avatar: 'RL'
-        }
-      },
-      {
-        id: '10',
-        title: 'Market Analysis Hub',
-        description: 'Share your market analysis, technical indicators, and trading setups with the community.',
-        participants: '567',
-        replies: '2.3K',
-        lastPoster: {
-          name: 'Lisa Anderson',
-          time: '12 hours ago',
-          avatar: 'LA'
-        }
-      }
-    ]
-  }
-];
-
 const ForumCategories: React.FC = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [forumData, setForumData] = useState<CategoryData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  const loadFeed = useCallback(async () => {
+    setLoading(true);
+    setLoadError(null);
+    try {
+      const sections: ForumFeedSection[] = await fetchForumFeed();
+      setForumData(
+        sections.map((s) => ({
+          title: s.title,
+          topics: s.topics.map((t) => ({
+            id: t.id,
+            title: t.title,
+            description: t.description,
+            participants: t.participants,
+            replies: t.replies,
+            lastPoster: t.lastPoster,
+          })),
+        }))
+      );
+    } catch (e: any) {
+      setLoadError(e.message || 'Failed to load forums');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadFeed();
+  }, [loadFeed]);
 
   const handleJoinClick = () => {
     navigate('/register');
   };
 
-  const filteredData = forumData.map(category => ({
-    ...category,
-    topics: category.topics.filter(topic =>
-      topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      topic.description.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  })).filter(category => category.topics.length > 0);
+  const filteredData = forumData
+    .map((category) => ({
+      ...category,
+      topics: category.topics.filter(
+        (topic) =>
+          topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          topic.description.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    }))
+    .filter((category) => category.topics.length > 0);
+
+  if (loading) {
+    return (
+      <SectionWrapper>
+        <ContentWrapper>
+          <SectionTitle>Trader Community Forums</SectionTitle>
+          <div style={{ textAlign: 'center', color: '#666', padding: '2rem' }}>Loading forums…</div>
+        </ContentWrapper>
+      </SectionWrapper>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <SectionWrapper>
+        <ContentWrapper>
+          <SectionTitle>Trader Community Forums</SectionTitle>
+          <div style={{ textAlign: 'center', color: '#b91c1c', padding: '2rem' }}>{loadError}</div>
+        </ContentWrapper>
+      </SectionWrapper>
+    );
+  }
 
   return (
     <SectionWrapper>
@@ -466,6 +376,12 @@ const ForumCategories: React.FC = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </SearchBar>
+
+        {filteredData.length === 0 && (
+          <div style={{ textAlign: 'center', color: '#666', padding: '2rem' }}>
+            {searchQuery.trim() ? 'No topics match your search.' : 'No forum topics yet.'}
+          </div>
+        )}
 
         {filteredData.map((category, categoryIndex) => (
           <CategoryGroup key={categoryIndex}>

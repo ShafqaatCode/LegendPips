@@ -29,6 +29,7 @@ import MyTradingVideos from "../pages/UserPanel/TradingVideos/TradingVideos";
 import SavedAnalysis from "../pages/UserPanel/Analysis/SavedAnalysis";
 import ForumPosts from "../pages/UserPanel/Forum/ForumPosts";
 import Activity from "../pages/UserPanel/Activity/Activity";
+import MyRebates from "../pages/UserPanel/Rebates/MyRebates";
 import Calendar from "../pages/UserPanel/Calendar/Calendar";
 import Settings from "../pages/UserPanel/Settings/Settings";
 import ProtectedRoute from "../components/UserPanel/ProtectedRoute";
@@ -43,6 +44,9 @@ import AnalysisManagement from "../pages/AdminPanel/Analysis/AnalysisManagement"
 import CoursesManagement from "../pages/AdminPanel/Courses/CoursesManagement";
 import Reports from "../pages/AdminPanel/Reports/Reports";
 import AdminSettings from "../pages/AdminPanel/Settings/AdminSettings";
+import AdminFeedbackInbox from "../pages/AdminPanel/Engagement/AdminFeedbackInbox";
+import AdminUserActivityFeed from "../pages/AdminPanel/Engagement/AdminUserActivityFeed";
+import AdminRebateCredits from "../pages/AdminPanel/Rebates/AdminRebateCredits";
 import ProtectedAdminRoute from "../components/AdminPanel/ProtectedAdminRoute";
 
 import MarginCalculatorPage from "../pages/MarginCalculator/MarginCalculatorPage";
@@ -79,6 +83,9 @@ const AppRoutes: React.FC = () => {
         <Route path="analysis" element={<AnalysisManagement />} />
         <Route path="courses" element={<CoursesManagement />} />
         <Route path="reports" element={<Reports />} />
+        <Route path="feedback-inbox" element={<AdminFeedbackInbox />} />
+        <Route path="user-activity" element={<AdminUserActivityFeed />} />
+        <Route path="rebate-credits" element={<AdminRebateCredits />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>
 
@@ -101,6 +108,7 @@ const AppRoutes: React.FC = () => {
         <Route path="analysis" element={<SavedAnalysis />} />
         <Route path="forum" element={<ForumPosts />} />
         <Route path="activity" element={<Activity />} />
+        <Route path="rebates" element={<MyRebates />} />
         <Route path="calendar" element={<Calendar />} />
         <Route path="settings" element={<Settings />} />
       </Route>

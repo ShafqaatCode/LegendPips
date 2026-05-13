@@ -1,7 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiTrendingUp, FiTrendingDown, FiLock, FiUnlock } from 'react-icons/fi';
 import SimpleModal from '../../../components/AdminPanel/SimpleModal';
+import {
+  fetchAdminSignals,
+  createAdminSignal,
+  updateAdminSignal,
+  deleteAdminSignal,
+} from '../../../services/signalService';
 
 const Container = styled.div`
   max-width: 1600px;
@@ -119,13 +125,15 @@ const StatusBadge = styled.span<{ $status: string }>`
   font-size: 0.75rem;
   font-weight: 600;
   background: ${({ $status }) => {
-    if ($status === 'active') return '#10b98115';
+    if ($status === 'active' || $status === 'open') return '#10b98115';
     if ($status === 'closed') return '#6b728015';
+    if ($status === 'pending') return '#Fbbf2415';
     return '#Fbbf2415';
   }};
   color: ${({ $status }) => {
-    if ($status === 'active') return '#10b981';
+    if ($status === 'active' || $status === 'open') return '#10b981';
     if ($status === 'closed') return '#6b7280';
+    if ($status === 'pending') return '#Fbbf24';
     return '#Fbbf24';
   }};
 `;
@@ -159,44 +167,58 @@ const SignalsManagement: React.FC = () => {
   const [formEntry, setFormEntry] = useState('1.0850');
   const [formTp, setFormTp] = useState('1.0900');
   const [formSl, setFormSl] = useState('1.0820');
-  const [formStatus, setFormStatus] = useState<'active' | 'closed'>('active');
+  const [formStatus, setFormStatus] = useState<'active' | 'closed' | 'pending'>('active');
   const [formPremium, setFormPremium] = useState(false);
+  const [formAssetClass, setFormAssetClass] = useState<'forex' | 'crypto' | 'commodities' | 'other'>('forex');
 
-  const [signals, setSignals] = useState([
-    {
-      id: '1',
-      pair: 'EUR/USD',
-      type: 'buy',
-      entry: '1.0850',
-      tp: '1.0900',
-      sl: '1.0820',
-      status: 'active',
-      premium: false,
-      createdAt: '2024-01-20',
-    },
-    {
-      id: '2',
-      pair: 'GBP/USD',
-      type: 'sell',
-      entry: '1.2650',
-      tp: '1.2600',
-      sl: '1.2680',
-      status: 'closed',
-      premium: false,
-      createdAt: '2024-01-19',
-    },
-    {
-      id: '3',
-      pair: 'XAU/USD',
-      type: 'buy',
-      entry: '2025.50',
-      tp: '2035.00',
-      sl: '2020.00',
-      status: 'active',
-      premium: true,
-      createdAt: '2024-01-20',
-    },
-  ]);
+  type SignalRow = {
+    id: string;
+    pair: string;
+    type: 'buy' | 'sell';
+    entry: string;
+    tp: string;
+    sl: string;
+    status: 'active' | 'closed' | 'pending';
+    premium: boolean;
+    createdAt: string;
+    assetClass: 'forex' | 'crypto' | 'commodities' | 'other';
+  };
+
+  const [signals, setSignals] = useState<SignalRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    try {
+      setLoading(true);
+      setLoadError(null);
+      const data = await fetchAdminSignals(1, 100);
+      setSignals(
+        data.items.map((s) => ({
+          id: s.id,
+          pair: s.pair,
+          type: s.direction,
+          entry: s.entry,
+          tp: s.tp,
+          sl: s.sl,
+          status: s.status,
+          premium: s.premium,
+          createdAt: s.createdAt ? new Date(s.createdAt).toISOString().slice(0, 10) : '',
+          assetClass: (['forex', 'crypto', 'commodities', 'other'].includes(String(s.assetClass))
+            ? s.assetClass
+            : 'forex') as SignalRow['assetClass'],
+        }))
+      );
+    } catch (e) {
+      setLoadError(e instanceof Error ? e.message : 'Failed to load signals');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   return (
     <Container>
@@ -214,6 +236,7 @@ const SignalsManagement: React.FC = () => {
             setFormSl('1.0820');
             setFormStatus('active');
             setFormPremium(false);
+            setFormAssetClass('forex');
             setIsModalOpen(true);
           }}
         >
@@ -222,10 +245,26 @@ const SignalsManagement: React.FC = () => {
         </Button>
       </Header>
 
+      {loadError && (
+        <div
+          style={{
+            marginBottom: '1rem',
+            padding: '0.75rem 1rem',
+            borderRadius: 8,
+            background: '#fef2f2',
+            color: '#b91c1c',
+            border: '1px solid #fecaca',
+          }}
+        >
+          {loadError}
+        </div>
+      )}
+
       <SignalsTable>
         <Table>
           <TableHeader>
             <TableHeaderRow>
+              <TableHeaderCell>Asset</TableHeaderCell>
               <TableHeaderCell>Pair</TableHeaderCell>
               <TableHeaderCell>Type</TableHeaderCell>
               <TableHeaderCell>Entry / TP / SL</TableHeaderCell>
@@ -236,8 +275,21 @@ const SignalsManagement: React.FC = () => {
             </TableHeaderRow>
           </TableHeader>
           <TableBody>
+            {loading && signals.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8}>Loading…</TableCell>
+              </TableRow>
+            ) : null}
+            {!loading && signals.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8}>No signals yet. Create one to publish on the site.</TableCell>
+              </TableRow>
+            ) : null}
             {signals.map((signal) => (
               <TableRow key={signal.id}>
+                <TableCell>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#374151' }}>{signal.assetClass}</span>
+                </TableCell>
                 <TableCell>
                   <PairBadge>{signal.pair}</PairBadge>
                 </TableCell>
@@ -281,6 +333,7 @@ const SignalsManagement: React.FC = () => {
                         setFormSl(signal.sl);
                         setFormStatus(signal.status as any);
                         setFormPremium(!!signal.premium);
+                        setFormAssetClass(signal.assetClass);
                         setIsModalOpen(true);
                       }}
                     >
@@ -321,10 +374,15 @@ const SignalsManagement: React.FC = () => {
               <IconButton onClick={() => setIsModalOpen(false)}>Cancel</IconButton>
               <IconButton
                 $danger
-                onClick={() => {
+                onClick={async () => {
                   if (!selectedSignalId) return;
-                  setSignals((prev) => prev.filter((s) => s.id !== selectedSignalId));
-                  setIsModalOpen(false);
+                  try {
+                    await deleteAdminSignal(selectedSignalId);
+                    setIsModalOpen(false);
+                    await refresh();
+                  } catch (e) {
+                    alert(e instanceof Error ? e.message : 'Delete failed');
+                  }
                 }}
               >
                 <FiTrash2 />
@@ -335,12 +393,10 @@ const SignalsManagement: React.FC = () => {
             <>
               <IconButton onClick={() => setIsModalOpen(false)}>Cancel</IconButton>
               <IconButton
-                onClick={() => {
-                  if (modalMode === 'add') {
-                    const id = String(Date.now());
-                    setSignals((prev) => [
-                      {
-                        id,
+                onClick={async () => {
+                  try {
+                    if (modalMode === 'add') {
+                      await createAdminSignal({
                         pair: formPair,
                         type: formType,
                         entry: formEntry,
@@ -348,29 +404,25 @@ const SignalsManagement: React.FC = () => {
                         sl: formSl,
                         status: formStatus,
                         premium: formPremium,
-                        createdAt: new Date().toISOString().slice(0, 10),
-                      },
-                      ...prev,
-                    ]);
-                  } else if (modalMode === 'edit' && selectedSignalId) {
-                    setSignals((prev) =>
-                      prev.map((s) =>
-                        s.id === selectedSignalId
-                          ? {
-                              ...s,
-                              pair: formPair,
-                              type: formType,
-                              entry: formEntry,
-                              tp: formTp,
-                              sl: formSl,
-                              status: formStatus,
-                              premium: formPremium,
-                            }
-                          : s
-                      )
-                    );
+                        assetClass: formAssetClass,
+                      });
+                    } else if (modalMode === 'edit' && selectedSignalId) {
+                      await updateAdminSignal(selectedSignalId, {
+                        pair: formPair,
+                        type: formType,
+                        entry: formEntry,
+                        tp: formTp,
+                        sl: formSl,
+                        status: formStatus,
+                        premium: formPremium,
+                        assetClass: formAssetClass,
+                      });
+                    }
+                    setIsModalOpen(false);
+                    await refresh();
+                  } catch (e) {
+                    alert(e instanceof Error ? e.message : 'Save failed');
                   }
-                  setIsModalOpen(false);
                 }}
               >
                 <FiEdit2 />
@@ -399,6 +451,27 @@ const SignalsManagement: React.FC = () => {
                   outline: 'none',
                 }}
               />
+            </label>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontWeight: 700, color: '#132E58' }}>Market</span>
+              <select
+                value={formAssetClass}
+                onChange={(e) => setFormAssetClass(e.target.value as typeof formAssetClass)}
+                style={{
+                  flex: 1,
+                  padding: '0.75rem 0.9rem',
+                  borderRadius: 10,
+                  border: '2px solid #e5e7eb',
+                  outline: 'none',
+                  background: 'white',
+                }}
+              >
+                <option value="forex">Forex</option>
+                <option value="crypto">Crypto</option>
+                <option value="commodities">Commodities</option>
+                <option value="other">Other</option>
+              </select>
             </label>
 
             <label style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -479,6 +552,7 @@ const SignalsManagement: React.FC = () => {
               >
                 <option value="active">active</option>
                 <option value="closed">closed</option>
+                <option value="pending">pending</option>
               </select>
             </label>
 

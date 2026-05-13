@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
 import PieChartImg from "../../assets/icons/statistics1.svg";
 import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
+import { fetchLeaderboard } from "../../services/contestService";
 
 interface LeaderboardEntry {
   rank: number;
@@ -13,19 +14,21 @@ interface LeaderboardEntry {
   profit: string;
   trades: number;
 }
+interface LeaderboardProps {
+  contestId: string;
+}
 
-const data: LeaderboardEntry[] = [
-  { rank: 1, name: "Via", account: "Contest Account", accountNumber: "352819", balance: "18,830.30", profit: "2,117.90%", trades: 28 },
-  { rank: 2, name: "Mohmi", account: "Contest Account", accountNumber: "353810", balance: "20,230.30", profit: "1,927.80%", trades: 19 },
-  { rank: 3, name: "Taj Wali Khan", account: "Contest Account", accountNumber: "342816", balance: "17,830.30", profit: "1,784.55%", trades: 32 },
-  { rank: 4, name: "Josphine", account: "Contest Account", accountNumber: "362819", balance: "17,630.30", profit: "1,454.55%", trades: 34 },
-  { rank: 5, name: "Rose", account: "Contest Account", accountNumber: "352819", balance: "16,630.30", profit: "1,394.55%", trades: 31 },
-  { rank: 6, name: "Amaar", account: "Contest Account", accountNumber: "372819", balance: "13,430.30", profit: "1,364.55%", trades: 29 },
-];
-
-const Leaderboard: React.FC = () => {
+const Leaderboard: React.FC<LeaderboardProps> = ({ contestId }) => {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<LeaderboardEntry | null>(null);
+  const [data, setData] = useState<LeaderboardEntry[]>([]);
+
+  React.useEffect(() => {
+    if (!contestId) return;
+    fetchLeaderboard(contestId)
+      .then((items) => setData(items as LeaderboardEntry[]))
+      .catch(() => setData([]));
+  }, [contestId]);
 
   const filtered = data.filter((entry) =>
     entry.name.toLowerCase().includes(search.toLowerCase())

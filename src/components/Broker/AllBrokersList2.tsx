@@ -1,25 +1,19 @@
-import React, { useState, useMemo } from "react"; 
+import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { brokers_data } from "../../data/brokers_data";
 import BrokerCard3 from "./BrokerCard3";
-
+import { fetchRebatesPageBrokers } from "../../services/brokerService";
+import type { ApiBroker } from "../../services/brokerService";
+import { mapApiBrokerToRebateCardRow } from "../../utils/rebatesBrokersDisplay";
 
 const BrokerSectionWrapper = styled.section`
-  display: flex;
-  flex-direction: column;
-  /* align-items: center; */
-  /* gap: 2rem; */
   padding: 1rem 0;
   margin: 3rem auto;
-  
-  
 `;
 
 const BrokerWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
-
 
   @media (max-width: 768px) {
     gap: 1rem;
@@ -34,11 +28,10 @@ const PaginationContainer = styled.div`
   margin-top: 2rem;
 `;
 
-// Use a CSS-valid selector structure
 const PageButton = styled.button<{ $isActive?: boolean }>`
-  background-color: ${props => (props.$isActive ? "#132E58" : "transparent")};
-  color: ${props => (props.$isActive ? "white" : "#132E58")};
-  border: 1px solid #132E58;
+  background-color: ${(props) => (props.$isActive ? "#132E58" : "transparent")};
+  color: ${(props) => (props.$isActive ? "white" : "#132E58")};
+  border: 1px solid #132e58;
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
@@ -53,89 +46,120 @@ const PageButton = styled.button<{ $isActive?: boolean }>`
     opacity: 0.5;
   }
 `;
-// ---------------------------------------------
 
-const ITEMS_PER_PAGE = 5; // Cards per page
+const StatusLine = styled.p`
+  text-align: center;
+  color: #6b7280;
+`;
 
-const AllBrokersList: React.FC = () => {
-  
+const ITEMS_PER_PAGE = 5;
+
+const parseFeatures = (b: ApiBroker): { name: string; value: string }[] => {
+  const rows = (b.features || []).map((line) => {
+    const i = line.indexOf(":");
+    if (i === -1) return { name: line, value: "" };
+    return { name: line.slice(0, i).trim(), value: line.slice(i + 1).trim() };
+  });
+  return rows.length ? rows : [{ name: "Details", value: b.description?.slice(0, 120) || "—" }];
+};
+
+const AllBrokersListPaginated: React.FC = () => {
+  const [brokers, setBrokers] = useState<ApiBroker[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const totalItems = brokers_data.length;
-  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
-  // Logic to calculate which subset of brokers to display
-  const visiableBrokers = useMemo(() => {
-    // Calculate indices for the current page
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    
-    // Return the slice of data
-    return brokers_data.slice(startIndex, endIndex);
-  }, [currentPage, totalItems]); 
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        setLoading(true);
+        const items = await fetchRebatesPageBrokers();
+        if (!cancelled) {
+          setBrokers(items);
+          setError(null);
+        }
+      } catch (e: any) {
+        if (!cancelled) {
+          setError(e.message || "Failed to load brokers");
+          setBrokers([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-  // Page change handler
+  const totalPages = Math.max(1, Math.ceil(brokers.length / ITEMS_PER_PAGE));
+
+  const visibleBrokers = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return brokers.slice(start, start + ITEMS_PER_PAGE);
+  }, [brokers, currentPage]);
+
   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
-  // Function to render page number buttons
   const renderPaginationButtons = () => {
     const buttons = [];
     for (let i = 1; i <= totalPages; i++) {
       buttons.push(
-        <PageButton
-          key={i}
-          $isActive={i === currentPage}
-          onClick={() => handlePageChange(i)}
-        >
+        <PageButton key={i} $isActive={i === currentPage} onClick={() => handlePageChange(i)}>
           {i}
         </PageButton>
       );
     }
     return buttons;
   };
-  
-  // Show pagination only if there is more than one page
-  const shouldShowPagination = totalPages > 1;
+
+  if (loading) {
+    return (
+      <BrokerSectionWrapper>
+        <StatusLine>Loading brokers…</StatusLine>
+      </BrokerSectionWrapper>
+    );
+  }
+
+  if (error) {
+    return (
+      <BrokerSectionWrapper>
+        <StatusLine>{error}</StatusLine>
+      </BrokerSectionWrapper>
+    );
+  }
 
   return (
     <BrokerSectionWrapper>
-      
       <BrokerWrapper>
-        {visiableBrokers.map((broker, idx) => {
-            // FIX: Use a safe, unique key without assuming 'id' exists.
-            // We use the index relative to the *whole* data set for a better key,
-            // or fall back to the local index + page number.
-            const uniqueKey = (currentPage - 1) * ITEMS_PER_PAGE + idx;
-            
-            return (
-                <BrokerCard3 
-                    // Using a unique index derived from its position in the full dataset
-                    key={uniqueKey} 
-                    {...broker} 
-                />
-            );
+        {visibleBrokers.map((b, idx) => {
+          const row = mapApiBrokerToRebateCardRow(b);
+          const uniqueKey = (currentPage - 1) * ITEMS_PER_PAGE + idx;
+          return (
+            <BrokerCard3
+              key={b._id || String(uniqueKey)}
+              index={row.index}
+              featured={row.featured}
+              title={row.title}
+              logoSrc={row.logoSrc}
+              rating={row.rating}
+              reviewsCount={row.reviewsCount}
+              features={parseFeatures(b)}
+            />
+          );
         })}
       </BrokerWrapper>
-      
-      {/* Render Pagination Controls */}
-      {shouldShowPagination && (
+
+      {totalPages > 1 && (
         <PaginationContainer>
-          <PageButton
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
+          <PageButton onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
             Previous
           </PageButton>
-
           {renderPaginationButtons()}
-          
-          <PageButton
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
+          <PageButton onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
             Next
           </PageButton>
         </PaginationContainer>
@@ -144,4 +168,4 @@ const AllBrokersList: React.FC = () => {
   );
 };
 
-export default AllBrokersList;
+export default AllBrokersListPaginated;

@@ -14,6 +14,9 @@ import {
   FiShield,
   FiDatabase,
   FiX,
+  FiInbox,
+  FiActivity,
+  FiDollarSign,
 } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -215,6 +218,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
   ];
 
   const systemMenuItems = [
+    { to: '/admin-panel/feedback-inbox', label: 'Feedback inbox', icon: FiInbox },
+    { to: '/admin-panel/user-activity', label: 'User activity', icon: FiActivity },
+    { to: '/admin-panel/rebate-credits', label: 'Rebate credits', icon: FiDollarSign },
     { to: '/admin-panel/reports', label: 'Reports & Analytics', icon: FiBarChart2 },
     { to: '/admin-panel/settings', label: 'Settings', icon: FiSettings },
   ];

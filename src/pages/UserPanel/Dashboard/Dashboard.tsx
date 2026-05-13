@@ -1,7 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FiTrendingUp, FiAward, FiVideo, FiBook, FiUsers, FiDollarSign } from 'react-icons/fi';
 import { useAuth } from '../../../contexts/AuthContext';
+import { fetchMyDashboard, type DashboardStat } from '../../../services/userInsightService';
+
+const iconByKey: Record<string, React.ElementType> = {
+  contests: FiAward,
+  signals: FiTrendingUp,
+  webinars: FiVideo,
+  courses: FiBook,
+  forum: FiUsers,
+  rebates: FiDollarSign,
+};
 
 const DashboardContainer = styled.div`
   max-width: 1400px;
@@ -154,58 +164,56 @@ const ActionDescription = styled.p`
   margin: 0;
 `;
 
+const ActivityHint = styled.p`
+  font-size: 0.9375rem;
+  color: #374151;
+  margin: -1rem 0 2rem;
+  padding: 1rem 1.25rem;
+  background: #f0f9ff;
+  border-radius: 10px;
+  border: 1px solid #bae6fd;
+`;
+
+const ErrorBanner = styled.div`
+  background: #fef2f2;
+  color: #b91c1c;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  border: 1px solid #fecaca;
+`;
+
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
-  const stats = [
-    {
-      icon: FiAward,
-      label: 'Active Contests',
-      value: '5',
-      change: '+2',
-      positive: true,
-      color: '#Fbbf24',
-    },
-    {
-      icon: FiTrendingUp,
-      label: 'Total Signals',
-      value: '127',
-      change: '+12',
-      positive: true,
-      color: '#10b981',
-    },
-    {
-      icon: FiVideo,
-      label: 'Webinars Watched',
-      value: '23',
-      change: '+5',
-      positive: true,
-      color: '#3b82f6',
-    },
-    {
-      icon: FiBook,
-      label: 'Courses Completed',
-      value: '8',
-      change: '+2',
-      positive: true,
-      color: '#8b5cf6',
-    },
-    {
-      icon: FiUsers,
-      label: 'Forum Posts',
-      value: '42',
-      change: '+7',
-      positive: true,
-      color: '#ec4899',
-    },
-    {
-      icon: FiDollarSign,
-      label: 'Total Rebates',
-      value: '$1,234',
-      change: '+$156',
-      positive: true,
-      color: '#10b981',
-    },
-  ];
+  const [stats, setStats] = useState<DashboardStat[]>([]);
+  const [activitySummary, setActivitySummary] = useState<{
+    thisMonth: number;
+    changeText: string;
+    positive: boolean;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await fetchMyDashboard();
+        if (cancelled) return;
+        setStats(data.stats || []);
+        setActivitySummary(data.activitySummary || null);
+      } catch (e) {
+        if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load dashboard');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const quickActions = [
     {
@@ -237,26 +245,51 @@ const Dashboard: React.FC = () => {
           Welcome back, {user?.firstName || 'User'}! 👋
         </WelcomeTitle>
         <WelcomeText>
-          Here's what's happening with your trading journey today.
+          Here&apos;s what&apos;s happening with your trading journey today.
         </WelcomeText>
       </WelcomeSection>
 
+      {error && <ErrorBanner>{error}</ErrorBanner>}
+      {activitySummary && !loading && (
+        <ActivityHint>
+          <strong>Activity this month:</strong> {activitySummary.thisMonth} logged events
+          <span style={{ color: activitySummary.positive ? '#059669' : '#dc2626', marginLeft: '0.5rem', fontWeight: 600 }}>
+            ({activitySummary.changeText} vs last month)
+          </span>
+        </ActivityHint>
+      )}
+
       <StatsGrid>
-        {stats.map((stat, index) => (
-          <StatCard key={index}>
-            <StatHeader>
-              <StatIcon $color={stat.color}>
-                <stat.icon />
-              </StatIcon>
-            </StatHeader>
-            <StatValue>{stat.value}</StatValue>
-            <StatLabel>{stat.label}</StatLabel>
-            <StatChange $positive={stat.positive}>
-              <FiTrendingUp />
-              {stat.change} this month
-            </StatChange>
-          </StatCard>
-        ))}
+        {loading
+          ? Array.from({ length: 6 }).map((_, index) => (
+              <StatCard key={index}>
+                <StatHeader>
+                  <StatIcon $color="#e5e7eb">
+                    <FiAward />
+                  </StatIcon>
+                </StatHeader>
+                <StatValue style={{ opacity: 0.4 }}>—</StatValue>
+                <StatLabel style={{ opacity: 0.5 }}>Loading…</StatLabel>
+              </StatCard>
+            ))
+          : stats.map((stat) => {
+              const Icon = iconByKey[stat.key] || FiTrendingUp;
+              return (
+                <StatCard key={stat.key}>
+                  <StatHeader>
+                    <StatIcon $color={stat.color}>
+                      <Icon />
+                    </StatIcon>
+                  </StatHeader>
+                  <StatValue>{stat.value}</StatValue>
+                  <StatLabel>{stat.label}</StatLabel>
+                  <StatChange $positive={stat.positive}>
+                    <FiTrendingUp />
+                    {stat.changeText} this month
+                  </StatChange>
+                </StatCard>
+              );
+            })}
       </StatsGrid>
 
       <SectionTitle>Quick Actions</SectionTitle>

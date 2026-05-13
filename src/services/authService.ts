@@ -1,4 +1,4 @@
-import { API_CONFIG, setAuthToken, removeAuthToken, getAuthToken } from "../utils/apiConfig";
+import { API_CONFIG, setAuthToken, removeAuthToken, getAuthToken, getAuthHeaders } from "../utils/apiConfig";
 
 export interface LoginRequest {
   email: string;
@@ -28,6 +28,11 @@ export interface AuthResponse {
   message: string;
   user: User;
   token: string;
+}
+
+export interface BasicResponse {
+  success: boolean;
+  message: string;
 }
 
 // Helper function to add timeout to fetch
@@ -152,4 +157,48 @@ export const getCurrentUser = (): User | null => {
 // Check if user is authenticated
 export const isAuthenticated = (): boolean => {
   return !!getAuthToken();
+};
+
+export const forgotPassword = async (email: string): Promise<BasicResponse> => {
+  const response = await fetchWithTimeout(
+    `${API_CONFIG.BASE_URL}/forgot-password`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    },
+    API_CONFIG.TIMEOUT
+  );
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to request reset");
+  return data;
+};
+
+export const resetPassword = async (token: string, password: string): Promise<BasicResponse> => {
+  const response = await fetchWithTimeout(
+    `${API_CONFIG.BASE_URL}/reset-password`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, password }),
+    },
+    API_CONFIG.TIMEOUT
+  );
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to reset password");
+  return data;
+};
+
+export const getMe = async (): Promise<{ success: boolean; user: User }> => {
+  const response = await fetchWithTimeout(
+    `${API_CONFIG.BASE_URL}/me`,
+    {
+      method: "GET",
+      headers: getAuthHeaders(),
+    },
+    API_CONFIG.TIMEOUT
+  );
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to fetch profile");
+  return data;
 };

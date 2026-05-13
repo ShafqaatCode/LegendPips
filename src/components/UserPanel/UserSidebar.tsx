@@ -16,7 +16,8 @@ import {
   FiBarChart2,
   FiCalendar,
   FiX,
-  FiMenu
+  FiMenu,
+  FiDollarSign,
 } from 'react-icons/fi';
 
 const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
@@ -221,6 +222,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
     { to: '/user-panel/profile', label: 'My Profile', icon: FiUser },
     { to: '/user-panel/contests', label: 'My Contests', icon: FiAward },
     { to: '/user-panel/signals', label: 'My Signals', icon: FiTrendingUp },
+    { to: '/user-panel/rebates', label: 'My Rebates', icon: FiDollarSign },
   ];
 
   const contentMenuItems = [

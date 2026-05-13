@@ -24,12 +24,6 @@ interface LoginFormProps {
   onSwitchToRegister?: () => void;
 }
 
-const openForget = () => {
-
-  <ForgetPasswordModal isOpen={true} onClose={() => {}} />;
-}
-
-
 const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
   const {
     register,
@@ -42,6 +36,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const [isForgotOpen, setIsForgotOpen] = useState(false);
 
   const onSubmit = async (data: any) => {
     setIsLoading(true);
@@ -134,7 +129,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
         </Terms>
         {errors.terms && <ErrorMsg>You must accept the terms</ErrorMsg>}
 
-        <ForgetPassword onClick={openForget}>Forget The Password?</ForgetPassword>
+        <ForgetPassword onClick={() => setIsForgotOpen(true)}>Forget The Password?</ForgetPassword>
 
         <RegisterButton type="submit" disabled={isLoading}>
           {isLoading ? "Logging in..." : "Login"}
@@ -143,6 +138,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
           Register
         </RegisterButton>
       </form>
+      <ForgetPasswordModal isOpen={isForgotOpen} onClose={() => setIsForgotOpen(false)} />
     </Container> 
   );
 };

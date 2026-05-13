@@ -132,6 +132,12 @@ const CourseButton = styled.button<{ $orange?: boolean }>`
 `;
 
 const ForexCoursesSection: React.FC = () => {
+  const scrollToCatalog = () => {
+    const el = document.getElementById("course-catalog");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+    else window.location.hash = "course-catalog";
+  };
+
   const freeCourseFeatures = [
     'Beginner Forex Trading Course',
     'Learn the ethics of your trade and how you can trade forex',
@@ -165,7 +171,9 @@ const ForexCoursesSection: React.FC = () => {
                 <FeatureItem key={index}>{feature}</FeatureItem>
               ))}
             </FeaturesList>
-            <CourseButton>Start learning free</CourseButton>
+            <CourseButton type="button" onClick={scrollToCatalog}>
+              Start learning free
+            </CourseButton>
           </CourseCard>
           
           <CourseCard $orange>
@@ -177,7 +185,9 @@ const ForexCoursesSection: React.FC = () => {
                 <FeatureItem key={index}>{feature}</FeatureItem>
               ))}
             </FeaturesList>
-            <CourseButton $orange>Enroll now $250</CourseButton>
+            <CourseButton $orange type="button" onClick={scrollToCatalog}>
+              View catalog & enroll
+            </CourseButton>
           </CourseCard>
         </CoursesGrid>
       </ContentWrapper>

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { login as loginApi, getCurrentUser, isAuthenticated as hasToken, logout as logoutApi } from '../services/authService';
 
 export interface User {
   id: string;
@@ -31,37 +32,6 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-// Dummy users for testing
-const DUMMY_USERS = [
-  {
-    id: '1',
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'user@example.com',
-    password: 'password123',
-    role: 'trader',
-    phone: '+1234567890',
-  },
-  {
-    id: '2',
-    firstName: 'Jane',
-    lastName: 'Smith',
-    email: 'jane@example.com',
-    password: 'password123',
-    role: 'trader',
-    phone: '+1234567891',
-  },
-  {
-    id: '3',
-    firstName: 'Admin',
-    lastName: 'User',
-    email: 'admin@example.com',
-    password: 'admin123',
-    role: 'admin',
-    phone: '+1234567892',
-  },
-];
-
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,16 +40,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const loadUser = () => {
       try {
-        const storedUser = localStorage.getItem('user');
-        const storedToken = localStorage.getItem('authToken');
-        
-        if (storedUser && storedToken) {
-          setUser(JSON.parse(storedUser));
+        const storedUser = getCurrentUser();
+        if (storedUser && hasToken()) {
+          setUser(storedUser as User);
         }
       } catch (error) {
         console.error('Error loading user:', error);
         localStorage.removeItem('user');
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('token');
       } finally {
         setIsLoading(false);
       }
@@ -89,42 +57,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Find user in dummy users
-    const foundUser = DUMMY_USERS.find(
-      u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-    );
-
-    if (foundUser) {
-      const userData: User = {
-        id: foundUser.id,
-        firstName: foundUser.firstName,
-        lastName: foundUser.lastName,
-        email: foundUser.email,
-        role: foundUser.role,
-        phone: foundUser.phone,
-      };
-
-      // Generate dummy token
-      const token = `dummy_token_${Date.now()}_${foundUser.id}`;
-
-      // Store in localStorage
-      localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('authToken', token);
-
-      setUser(userData);
-
-      return { success: true };
-    } else {
-      return { success: false, message: 'Invalid email or password' };
+    try {
+      const response = await loginApi({ email, password });
+      if (response.success && response.user) {
+        setUser(response.user as User);
+        return { success: true };
+      }
+      return { success: false, message: response.message || 'Invalid email or password' };
+    } catch (error: any) {
+      return { success: false, message: error.message || 'Login failed' };
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('authToken');
+    logoutApi();
     setUser(null);
   };
 

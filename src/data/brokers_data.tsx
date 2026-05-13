@@ -5,6 +5,7 @@ import XmLogo from "../assets/TradeMarketBrands/Ellipse 2-1.png";
 import FpLogo from "../assets/TradeMarketBrands/Ellipse 2-3.png";
 import FocusLogo from "../assets/TradeMarketBrands/Ellipse 1.png";
 
+/** Legacy static list kept for reference. Live UI uses `GET /brokers?rebatesPage=1` (see AllBrokersList / AllBrokersList2). */
 export const brokers_data = [
   {
     index: 1,

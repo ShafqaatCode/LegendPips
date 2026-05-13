@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FaShareAlt } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchCompetitionById } from "./mockApi";
-import type { Competition } from "./mockCompetitions";
+import { fetchCompetitionById } from "../../services/contestService";
 
 import ShareModal from "../Feedback/ShareModal";
 import FeedbackModal from "../Feedback/FeedbackModal";
@@ -23,14 +22,14 @@ const ContestHeaderWithModals: React.FC<Props> = ({ heading }) => {
 
   
   useEffect(() => {
-    if (contestId) {
-      fetchCompetitionById(parseInt(contestId)).then((data: Competition | null) => {
-        if (data?.title) setContestTitle(data.title);
-        else setContestTitle(""); // fallback if not found
-      });
-    } else {
-      setContestTitle(""); // clear on list page
+    if (!contestId) {
+      setContestTitle("");
+      return;
     }
+    fetchCompetitionById(contestId).then((data) => {
+      if (data?.title) setContestTitle(data.title);
+      else setContestTitle("");
+    });
   }, [contestId]);
 
   const shareUrl = window.location.href;

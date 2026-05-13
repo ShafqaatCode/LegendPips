@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { type Competition } from '../ContestList/mockCompetitions';
-import { fetchCompetitionById } from '../ContestList/mockApi';
+import { fetchCompetitionById, type Competition } from '../../services/contestService';
 import ContestHeaderWithModals from '../ContestList/BrodcumHeader';
 import ContestHeader from './ContestHeader';
 import Leaderboard from '../Leaderboard/LeaderboardTable';
@@ -44,7 +43,7 @@ const ContestDetails: React.FC = () => {
   useEffect(() => {
     if (!contestId) return;
 
-    fetchCompetitionById(parseInt(contestId))
+    fetchCompetitionById(contestId)
       .then((data) => {
         if (data) {
           setContestData(data);
@@ -79,7 +78,7 @@ const ContestDetails: React.FC = () => {
       <ContestHeader contestData={contestData} />
       {/* <ContestInfo /> */}
       <TabButtons />
-      <Leaderboard />
+      <Leaderboard contestId={contestId || ""} />
       <ContestInfoTabs />
     </Wrapper>
   );
