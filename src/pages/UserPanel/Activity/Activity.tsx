@@ -11,6 +11,7 @@ import {
   FiDollarSign,
 } from 'react-icons/fi';
 import { fetchMyActivity, type ActivityRow } from '../../../services/userInsightService';
+import { ActivityTimelineSkeleton, ShimmerBar } from '../../../components/SharedComponents/Shimmer';
 
 const iconForType = (type: string): React.ElementType => {
   switch (type) {
@@ -201,7 +202,7 @@ const Activity: React.FC = () => {
       {error && <ErrorBanner>{error}</ErrorBanner>}
 
       <ActivityTimeline>
-        {loading && <EmptyState>Loading…</EmptyState>}
+        {loading && <ActivityTimelineSkeleton rows={6} />}
         {!loading && items.length === 0 && (
           <EmptyState>No activity yet. Join a contest, take a course, or post on the forum to see events here.</EmptyState>
         )}
@@ -230,7 +231,7 @@ const Activity: React.FC = () => {
             disabled={loadingMore}
             onClick={() => load(page + 1, true)}
           >
-            {loadingMore ? 'Loading…' : 'Load more'}
+            {loadingMore ? <ShimmerBar $h="14px" $w="5.5rem" style={{ margin: "0 auto" }} /> : 'Load more'}
           </LoadMore>
         )}
       </ActivityTimeline>

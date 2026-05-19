@@ -5,6 +5,7 @@ import { fetchAnalysisById, fetchLatestAnalysis } from '../../services/analysisS
 import type { Analysis } from '../../types/analysis.types';
 import XMBanner from '../Signals/XMBanner';
 import ArrowRight from '../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg';
+import { ArticleDetailSkeleton } from '../SharedComponents/Shimmer';
 
 const DetailWrapper = styled.section`
   background: #fafbfc;
@@ -76,24 +77,23 @@ const PlaceholderHeader = styled.div`
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 72px;
+  font-size: clamp(2.5rem, 8vw, 3.5rem);
   font-weight: bold;
-  
+
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 48px;
+    font-size: clamp(2rem, 10vw, 2.5rem);
   }
 `;
 
 const Title = styled.h1`
-  font-size: 32px;
+  font-size: ${({ theme }) => theme.typography.panelSectionTitle};
   font-weight: 700;
-  color: #132E58;
-  margin-bottom: 1.25rem;
-  line-height: 1.4;
-  
+  color: #132e58;
+  margin: 0 0 1rem;
+  line-height: 1.35;
+
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 24px;
-    margin-bottom: 1rem;
+    font-size: ${({ theme }) => theme.typography.body};
   }
 `;
 
@@ -340,15 +340,6 @@ const PromoButton = styled.button`
   }
 `;
 
-const LoadingWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-  font-size: 18px;
-  color: #666;
-`;
-
 const ErrorWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -470,7 +461,11 @@ const AnalysisDetail: React.FC = () => {
   if (loading) {
     return (
       <DetailWrapper>
-        <LoadingWrapper>Loading analysis...</LoadingWrapper>
+        <ContentWrapper>
+          <MainContent>
+            <ArticleDetailSkeleton />
+          </MainContent>
+        </ContentWrapper>
       </DetailWrapper>
     );
   }

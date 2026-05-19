@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FiDollarSign, FiRefreshCw } from 'react-icons/fi';
 import { fetchMyRebateCredits, formatUsd, type RebateCreditRow } from '../../../services/rebateService';
+import { TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
 
 const Container = styled.div`
   max-width: 1000px;
@@ -180,11 +181,7 @@ const MyRebates: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {loading && (
-              <tr>
-                <Td colSpan={4}>Loading…</Td>
-              </tr>
-            )}
+            {loading && <TableBodySkeleton rows={5} cols={4} />}
             {!loading && items.length === 0 && (
               <tr>
                 <Td colSpan={4}>

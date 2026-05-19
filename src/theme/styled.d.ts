@@ -31,7 +31,24 @@ declare module 'styled-components' {
       tablet: string;
       mobile: string;
       laptop: string;
-    }
-    
+    };
+    typography: {
+      heroTitle: string;
+      heroTitleLh: string;
+      heroSubtitle: string;
+      sectionTitle: string;
+      sectionTitleLh: string;
+      bannerTitle: string;
+      bannerTitleLh: string;
+      bannerUpper: string;
+      panelPageTitle: string;
+      panelSectionTitle: string;
+      cardTitle: string;
+      body: string;
+      lead: string;
+      caption: string;
+      pageGutter: string;
+      contentMax: string;
+    };
   }
 }

@@ -276,18 +276,18 @@ const HeaderContent = styled.div`
 `;
 
 const BrokerTitle = styled.h1`
-  font-size: 48px;
+  font-size: ${({ theme }) => theme.typography.heroTitle};
   font-weight: 700;
   color: #de992f;
   margin: 0 0 0.5rem 0;
 
   @media (max-width: 768px) {
-    font-size: 1.5rem;
+    font-size: ${({ theme }) => theme.typography.sectionTitle};
   }
 `;
 
 const BrokerSubtitle = styled.p`
-  font-size: 24px;
+  font-size: ${({ theme }) => theme.typography.panelSectionTitle};
   font-weight: 400;
   color: #132e58;
   margin: 0;
@@ -319,14 +319,16 @@ const VerifiedBadge = styled.div`
 const SetupButton = styled.button`
   background: #132e58;
   color: #fff;
-  padding: 0.75rem 2rem;
+  padding: 0.55rem 1.25rem;
   border-radius: 24px;
   border: none;
-  font-size: 1rem;
+  font-size: ${({ theme }) => theme.typography.body};
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-width: 222px;
+  width: auto;
+  min-width: 10rem;
+  max-width: 100%;
   &:hover {
     background: #1e40affd;
   }
@@ -352,8 +354,8 @@ const TabButton = styled.button<{ active?: boolean }>`
   font-weight: 600;
   cursor: pointer;
   border-radius:12px;
-  font-size: 40px;
-  margin: 1rem;
+  font-size: ${({ theme }) => theme.typography.panelSectionTitle};
+  margin: 0.5rem 0.35rem;
 
   &:hover {
     background: ${p => p.active ? '#fbbf24' : '#f3f4f6'};

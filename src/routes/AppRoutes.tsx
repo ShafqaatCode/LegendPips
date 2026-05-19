@@ -5,6 +5,7 @@ import Tools from "../pages/Tools/Tools";
 import Brokers from "../pages/Brokers/BrokersPage";
 import Contests from "../pages/Contests/Contestspage";
 import RebateBrokers from "../pages/RebateBrokers/RebateBrokersPage";
+import RebateBrokerDetailPage from "../pages/RebateBrokers/RebateBrokerDetailPage";
 import Analysis from "../pages/Analysis/Analysis";
 import AnalysisDetail from "../components/Analysis/AnalysisDetail";
 import HitWorksPage from "../pages/HitWorksPage/HitWorksPage";
@@ -124,6 +125,7 @@ const AppRoutes: React.FC = () => {
         
         <Route path="signals" element={<SignalsPage />} />
         <Route path="rewards" element={<RewardsPage />} />
+        <Route path="rebates/broker/:brokerId" element={<RebateBrokerDetailPage />} />
         <Route path="rebates" element={<RebateBrokers />} />
         <Route path="analysis" element={<Analysis />} />
         <Route path="analysis/:id" element={<AnalysisDetail />} />

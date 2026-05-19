@@ -3,33 +3,21 @@ import styled from 'styled-components';
 
 const SectionWrapper = styled.section`
   background: white;
-  padding: 80px 3rem;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 60px 2rem;
-  }
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: 40px 1.5rem;
-  }
+  padding: clamp(2.5rem, 6vw, 3.5rem) ${({ theme }) => theme.typography.pageGutter};
 `;
 
 const ContentWrapper = styled.div`
-  max-width: 1400px;
+  max-width: ${({ theme }) => theme.typography.contentMax};
   margin: 0 auto;
 `;
 
 const Heading = styled.h2`
-  font-size: 42px;
+  font-size: ${({ theme }) => theme.typography.sectionTitle};
+  line-height: ${({ theme }) => theme.typography.sectionTitleLh};
   font-weight: 700;
-  color: #132E58;
+  color: #132e58;
   text-align: center;
-  margin-bottom: 3rem;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 32px;
-    margin-bottom: 2rem;
-  }
+  margin: 0 auto 2rem;
 `;
 
 const BenefitsList = styled.ul`
@@ -39,7 +27,7 @@ const BenefitsList = styled.ul`
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  max-width: 1000px;
+  max-width: ${({ theme }) => theme.typography.contentMax};
   margin: 0 auto;
 `;
 

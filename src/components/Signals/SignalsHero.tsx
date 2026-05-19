@@ -4,21 +4,24 @@ import bannerBg from '../../assets/banner/BannerBg.jpg';
 
 const HeroWrapper = styled.section`
   position: relative;
-  min-height: 600px;
+  min-height: clamp(380px, 52vh, 480px);
   display: flex;
   align-items: center;
-  padding: 120px 3rem 80px 3rem;
+  padding: clamp(4rem, 9vw, 5.5rem) ${({ theme }) => theme.typography.pageGutter}
+    clamp(2.25rem, 5vw, 3.5rem);
   overflow: hidden;
-  background: linear-gradient(135deg, #0b1b38 0%, #132E58 100%);
-  
+  background: linear-gradient(135deg, #0b1b38 0%, #132e58 100%);
+
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 100px 2rem 60px 2rem;
-    min-height: 500px;
+    padding: clamp(3.5rem, 8vw, 5rem) ${({ theme }) => theme.typography.pageGutter}
+      clamp(2rem, 4vw, 3rem);
+    min-height: 420px;
   }
-  
+
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: 100px 1.5rem 40px 1.5rem;
-    min-height: 450px;
+    padding: clamp(3.25rem, 8vw, 4.5rem) ${({ theme }) => theme.typography.pageGutter}
+      clamp(1.75rem, 4vw, 2.5rem);
+    min-height: 380px;
     flex-direction: column;
   }
 `;
@@ -48,7 +51,7 @@ const ContentWrapper = styled.div`
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 1200px;
+  max-width: ${({ theme }) => theme.typography.contentMax};
   margin: 0 auto;
 `;
 
@@ -64,62 +67,36 @@ const LeftContent = styled.div`
 `;
 
 const MainHeading = styled.h1`
-  font-size: 56px;
+  font-size: ${({ theme }) => theme.typography.heroTitle};
   font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: 1.5rem;
+  line-height: ${({ theme }) => theme.typography.heroTitleLh};
+  margin: 0 0 1rem;
   color: white;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    font-size: 42px;
-  }
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 32px;
-    margin-bottom: 1rem;
-  }
 `;
 
 const HighlightText = styled.span`
-  color: #Fbbf24;
+  color: #fbbf24;
 `;
 
 const Description = styled.p`
-  font-size: 18px;
-  line-height: 1.6;
-  margin-bottom: 1rem;
+  font-size: ${({ theme }) => theme.typography.body};
+  line-height: 1.65;
+  margin: 0 0 0.75rem;
   color: rgba(255, 255, 255, 0.9);
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 16px;
-  }
 `;
 
 const SubDescription = styled.p`
-  font-size: 16px;
+  font-size: ${({ theme }) => theme.typography.body};
   line-height: 1.6;
-  margin-bottom: 2rem;
+  margin: 0 0 1.5rem;
   color: rgba(255, 255, 255, 0.8);
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 14px;
-    margin-bottom: 1.5rem;
-  }
 `;
 
-
-
 const RecentPerformanceHeading = styled.h3`
-  font-size: 24px;
+  font-size: ${({ theme }) => theme.typography.panelSectionTitle};
   font-weight: 600;
-  margin-top: 3rem;
-  margin-bottom: 1.5rem;
+  margin: 2rem 0 1rem;
   color: white;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 20px;
-    margin-top: 2rem;
-  }
 `;
 
 const SignalsHero: React.FC = () => {

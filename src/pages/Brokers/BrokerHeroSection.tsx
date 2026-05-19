@@ -51,7 +51,7 @@ export default BrokerHeroSection;
 
 // ========== Styled Components ==========
 const Wrapper = styled.section`
-  padding: 4rem 2rem;
+  padding: clamp(2.5rem, 6vw, 3.5rem) ${({ theme }) => theme.typography.pageGutter};
   background-color: #ffffff;
 `;
 
@@ -59,9 +59,9 @@ const Content = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 2rem;
-  max-width: 1250px;
-  margin: auto;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  max-width: ${({ theme }) => theme.typography.contentMax};
+  margin: 0 auto;
   flex-wrap: wrap;
 `;
 
@@ -73,52 +73,48 @@ const Right = styled.div`
   flex: 0.8;
   display: flex;
   justify-content: center;
-  /* align-items: center; */
-  border: 2px solid red;
   position: relative;
-  
 `;
 
 const Title = styled.h2`
-  font-size: 36px;
+  font-size: ${({ theme }) => theme.typography.sectionTitle};
+  line-height: ${({ theme }) => theme.typography.sectionTitleLh};
   font-weight: 700;
   color: #1f3b8c;
-  margin-bottom: 1rem;
+  margin: 0 0 0.75rem;
 `;
 
 const Subtitle = styled.h3`
-  font-size: 20px;
+  font-size: ${({ theme }) => theme.typography.panelSectionTitle};
   font-weight: 600;
-  margin: 1.5rem 0 1rem;
+  margin: 1rem 0 0.65rem;
   color: #1f3b8c;
 `;
 
 const Description = styled.p`
-  font-size: 16px;
-  line-height: 1.7;
-  margin-bottom: 1rem;
+  font-size: ${({ theme }) => theme.typography.body};
+  line-height: 1.65;
+  margin: 0 0 0.75rem;
   color: #334155;
 `;
 
 const ImageWrapper = styled.div`
   position: relative;
   display: inline-block;
-  border: 2px solid #e2e8f0;
-  
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
 `;
 
-const Image = styled.img`
-
-`;
+const Image = styled.img``;
 
 const FeatureBox = styled.div`
   background-color: #1f3b8c;
   color: white;
-  padding: 1rem 2rem;
-  border-radius: 16px;
-  font-size: 20px;
+  padding: 0.85rem 1.25rem;
+  border-radius: 12px;
+  font-size: ${({ theme }) => theme.typography.body};
   font-weight: 500;
-  max-width: 400px;
+  max-width: min(22rem, 100%);
 
   position: absolute;
   top: 20px;

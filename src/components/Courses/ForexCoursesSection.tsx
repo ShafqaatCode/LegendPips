@@ -3,61 +3,57 @@ import styled from 'styled-components';
 
 const SectionWrapper = styled.section`
   background: #fafbfc;
-  padding: 80px 3rem;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 60px 2rem;
-  }
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: 40px 1.5rem;
-  }
+  padding: clamp(2.5rem, 6vw, 3.5rem) ${({ theme }) => theme.typography.pageGutter};
 `;
 
 const ContentWrapper = styled.div`
-  max-width: 1400px;
+  max-width: ${({ theme }) => theme.typography.contentMax};
   margin: 0 auto;
 `;
 
 const Heading = styled.h2`
-  font-size: 42px;
+  font-size: ${({ theme }) => theme.typography.sectionTitle};
+  line-height: ${({ theme }) => theme.typography.sectionTitleLh};
   font-weight: 700;
-  color: #132E58;
+  color: #132e58;
   text-align: center;
-  margin-bottom: 3rem;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 32px;
-    margin-bottom: 2rem;
-  }
+  margin: 0 auto 2rem;
 `;
 
 const CoursesGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 3rem;
-  
+  gap: clamp(1.5rem, 3vw, 2rem);
+
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.5rem;
   }
 `;
 
 const CourseCard = styled.div<{ $orange?: boolean }>`
-  background: ${({ $orange }) => ($orange ? '#Fbbf24' : '#132E58')};
+  background: ${({ $orange }) => ($orange ? "#Fbbf24" : "#132E58")};
   border-radius: 16px;
-  padding: 3rem;
-  color: ${({ $orange }) => ($orange ? '#132E58' : 'white')};
+  padding: clamp(1.5rem, 4vw, 2rem);
+  color: ${({ $orange }) => ($orange ? "#132E58" : "white")};
   position: relative;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: 2rem;
-  }
+`;
+
+const CourseTitle = styled.h3`
+  font-size: ${({ theme }) => theme.typography.panelSectionTitle};
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+`;
+
+const CourseSubtitle = styled.p`
+  font-size: ${({ theme }) => theme.typography.body};
+  margin: 0 0 1.25rem;
+  opacity: 0.9;
 `;
 
 const Badge = styled.div<{ $orange?: boolean }>`
-  background: ${({ $orange }) => ($orange ? '#132E58' : '#Fbbf24')};
-  color: ${({ $orange }) => ($orange ? 'white' : '#132E58')};
+  background: ${({ $orange }) => ($orange ? "#132E58" : "#Fbbf24")};
+  color: ${({ $orange }) => ($orange ? "white" : "#132E58")};
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;
@@ -66,27 +62,11 @@ const Badge = styled.div<{ $orange?: boolean }>`
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
-  
+
   &::before {
     content: ${({ $orange }) => ($orange ? '"👑"' : '"FREE"')};
     font-size: 14px;
   }
-`;
-
-const CourseTitle = styled.h3`
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 24px;
-  }
-`;
-
-const CourseSubtitle = styled.p`
-  font-size: 16px;
-  margin-bottom: 2rem;
-  opacity: 0.9;
 `;
 
 const FeaturesList = styled.ul`

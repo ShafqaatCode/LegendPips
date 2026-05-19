@@ -1,4 +1,5 @@
 import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   CardContainer,
   LogoSection,
@@ -22,39 +23,53 @@ import { motion } from "framer-motion";
 import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 import styled from "styled-components";
 
-export const Description = styled.p`
-  font-size: 16px;
-  color: rgba(15, 23, 42, 0.8);
+export const Description = styled.div`
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: rgba(15, 23, 42, 0.72);
   margin: 0;
-  // border: 2px solid red;
   display: flex;
-  gap: 3rem;
+  gap: 1.25rem;
   flex-wrap: wrap;
-  margin: auto;
+  row-gap: 0.65rem;
 
   h4 {
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin: 0 0 0.15rem 0;
+    color: #0f1c46;
   }
 
   p {
-    font-size: 14px;
-    font-weight: 300;
-    // text-align: center;
+    font-size: 0.7rem;
+    font-weight: 400;
+    margin: 0;
+    color: rgba(15, 23, 42, 0.65);
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.laptop}) {
-    flex-wrap: wrap;
-    gap: 2rem;
+    justify-content: center;
+    gap: 1rem;
     text-align: center;
   }
 
   @media (max-width: 768px) {
-    // text-align: left;
-    // flex-direction: column;
     justify-content: center;
-    gap: 1rem;
+    gap: 0.75rem;
   }
+`;
+
+const BodyBlurb = styled.p`
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: rgba(15, 23, 42, 0.75);
+  margin: 0 0 0.6rem 0;
+  width: 100%;
+  max-width: 36rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 `;
 
 
@@ -82,6 +97,7 @@ interface BrokerCardProps {
   featured?: boolean;
   title: string;
   description?: string;
+  brokerId?: string;
   logoSrc: string;
   rating: number;
   reviewsCount: string;
@@ -103,11 +119,14 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
   index,
   featured,
   title,
+  description,
+  brokerId,
   logoSrc,
   rating,
   reviewsCount,
   accountTypes,
 }) => {
+  const navigate = useNavigate();
   const accountRows =
     accountTypes && accountTypes.length > 0
       ? accountTypes.slice(0, 3).map((a) => ({
@@ -131,6 +150,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
               <h2>{title}</h2>
               <VerifiedBadge>✔ Verified Broker</VerifiedBadge>
             </TitleRow>
+            {description?.trim() ? <BodyBlurb>{description.trim()}</BodyBlurb> : null}
             <Description>
               {accountRows.map((row, i) => (
                 <div key={`${row.name}-${i}`}>
@@ -154,10 +174,23 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
           </RatingBox>
            <ActionSection>
             <TermsText>Terms & Conditions Apply</TermsText>
-            <PrimaryButton>
+            <PrimaryButton
+              type="button"
+              disabled={!brokerId}
+              onClick={() => brokerId && navigate(`/rebates/broker/${brokerId}`)}
+              style={!brokerId ? { opacity: 0.55, cursor: "not-allowed" } : undefined}
+            >
               View Details <img src={ArrowIcon} alt="Arrow" />
             </PrimaryButton>
-            <SecondaryButton>Broker Reviews</SecondaryButton>
+            {brokerId ? (
+              <SecondaryButton as={Link} to={`/rebates/broker/${brokerId}`}>
+                Broker Reviews
+              </SecondaryButton>
+            ) : (
+              <SecondaryButton as="span" style={{ opacity: 0.55, cursor: "not-allowed", pointerEvents: "none" }}>
+                Broker Reviews
+              </SecondaryButton>
+            )}
           </ActionSection>
 
 

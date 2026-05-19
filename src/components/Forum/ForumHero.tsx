@@ -5,85 +5,61 @@ import ArrowRight from '../../assets/icons/arrow-narrow-circle-broken-up-right-s
 
 const HeroWrapper = styled.section`
   position: relative;
-  padding: 120px 3rem 80px 3rem;
+  padding: clamp(2.5rem, 6vw, 4rem) ${({ theme }) => theme.typography.pageGutter};
   background: white;
   overflow: hidden;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 100px 2rem 60px 2rem;
-  }
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: 100px 1.5rem 40px 1.5rem;
-  }
 `;
 
 const ContentWrapper = styled.div`
-  max-width: 1400px;
+  max-width: ${({ theme }) => theme.typography.contentMax};
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4rem;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
   align-items: center;
-  
+
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.75rem;
   }
 `;
 
 const LeftContent = styled.div`
-  color: #132E58;
+  color: #132e58;
 `;
 
 const Title = styled.h1`
-  font-size: 48px;
+  font-size: ${({ theme }) => theme.typography.heroTitle};
   font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: 1rem;
-  color: #132E58;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    font-size: 40px;
-  }
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 32px;
-  }
+  line-height: ${({ theme }) => theme.typography.heroTitleLh};
+  margin: 0 0 0.65rem;
+  color: #132e58;
 `;
 
 const HighlightText = styled.span`
-  color: #Fbbf24;
+  color: #fbbf24;
 `;
 
 const Subtitle = styled.p`
-  font-size: 24px;
+  font-size: ${({ theme }) => theme.typography.heroSubtitle};
   font-weight: 500;
-  color: #132E58;
-  margin-bottom: 1.5rem;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 20px;
-  }
+  color: #132e58;
+  margin: 0 0 1rem;
 `;
 
 const Description = styled.p`
-  font-size: 16px;
-  line-height: 1.7;
+  font-size: ${({ theme }) => theme.typography.body};
+  line-height: 1.65;
   color: #555;
-  margin-bottom: 2rem;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 15px;
-  }
+  margin: 0 0 1.25rem;
 `;
 
 const JoinButton = styled.button`
-  background: #Fbbf24;
-  color: #132E58;
+  background: #fbbf24;
+  color: #132e58;
   border: none;
-  padding: 14px 32px;
-  font-size: 16px;
+  padding: 0.55rem 1.25rem;
+  font-size: ${({ theme }) => theme.typography.body};
   font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
@@ -116,28 +92,19 @@ const RightContent = styled.div`
 
 const CommunityGraphic = styled.div`
   width: 100%;
-  max-width: 500px;
-  height: 400px;
+  max-width: min(380px, 100%);
+  height: clamp(220px, 36vh, 300px);
   background: linear-gradient(135deg, #f0f7ff 0%, #e8f4ff 100%);
-  border-radius: 20px;
+  border-radius: 16px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   &::before {
-    content: '👥';
-    font-size: 200px;
+    content: "👥";
+    font-size: clamp(4rem, 18vw, 7rem);
     opacity: 0.3;
-  }
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    height: 300px;
-    max-width: 100%;
-    
-    &::before {
-      font-size: 120px;
-    }
   }
 `;
 

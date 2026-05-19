@@ -7,6 +7,7 @@ import ContestHeader from './ContestHeader';
 import Leaderboard from '../Leaderboard/LeaderboardTable';
 import TabButtons from './TabButtons';
 import ContestInfoTabs from './ContestInfoTabs';
+import { CenteredBlockSkeleton } from '../SharedComponents/Shimmer';
 // import Spinner from '../Loaders/spinner';
 
 
@@ -15,14 +16,11 @@ import ContestInfoTabs from './ContestInfoTabs';
 
 
 const Wrapper = styled.section`
-  margin-top: 85px;
-  /* padding: 2rem; */
-  
-  
+  margin: 0;
+  padding: 0.35rem 0 0;
+  box-sizing: border-box;
 
-  @media (max-width: 786px)
-  {
-    /* margin-top: 80px; */
+  @media (max-width: 786px) {
     margin: 0;
   }
 `;
@@ -61,7 +59,7 @@ const ContestDetails: React.FC = () => {
   if (loading)
     return (
       <Centered>
-        ...Loading...
+        <CenteredBlockSkeleton />
       </Centered>
     );
 

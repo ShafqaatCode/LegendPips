@@ -86,26 +86,26 @@ const Overlay = styled.div`
   z-index: 999;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding: 10vh 0;
+  align-items: center;
+  padding: 1rem;
   overflow-y: auto;
 `;
 
 const ModalContainer = styled.div`
   border-radius: 12px;
-  max-width: 500px;
-  width: 90%;
+  max-width: min(400px, 100%);
+  width: 100%;
   position: relative;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   background: #fff;
-  padding: 40px 30px;
+  padding: 1.5rem 1.25rem 1.5rem;
 `;
 
 const CloseButton = styled.button`
   position: absolute;
-  top: 12px;
-  right: 24px;
-  font-size: 1.6rem;
+  top: 10px;
+  right: 14px;
+  font-size: 1.25rem;
   background: transparent;
   border: none;
   color: #333;
@@ -124,26 +124,26 @@ const FormWrapper = styled.div`
 `;
 
 const Title = styled.h2`
-  font-size: 24px;
+  font-size: 1.125rem;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 0.5rem;
   color: #132e58;
 `;
 
 const Description = styled.p`
-  font-size: 16px;
+  font-size: 0.8125rem;
   color: #444;
-  margin-bottom: 24px;
+  margin-bottom: 1rem;
   line-height: 1.5;
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: 12px;
+  padding: 0.65rem 0.75rem;
   border-radius: 6px;
   border: 1px solid #ccc;
-  font-size: 16px;
-  margin-bottom: 20px;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
 
   &:focus {
     outline: none;
@@ -154,12 +154,13 @@ const Input = styled.input`
 const SubmitButton = styled.button`
   background: #0d2c54;
   color: #fff;
-  font-size: 18px;
+  font-size: 0.875rem;
   font-weight: 600;
-  padding: 12px;
+  padding: 0.6rem 0.85rem;
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  width: 100%;
   transition: background 0.2s ease;
 
   &:hover {

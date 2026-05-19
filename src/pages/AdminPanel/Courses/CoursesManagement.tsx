@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
-import { FiPlus, FiEdit2, FiTrash2, FiBook, FiLoader } from "react-icons/fi";
+import { FiPlus, FiEdit2, FiTrash2, FiBook } from "react-icons/fi";
 import SimpleModal from "../../../components/AdminPanel/SimpleModal";
+import { CourseGridSkeleton } from "../../../components/SharedComponents/Shimmer";
 import {
   adminCreateCourse,
   adminDeleteCourse,
@@ -397,9 +398,7 @@ const CoursesManagement: React.FC = () => {
       {listError && <ErrorBanner>{listError}</ErrorBanner>}
 
       {listLoading ? (
-        <div style={{ textAlign: "center", padding: "3rem", color: "#132e58" }}>
-          <FiLoader style={{ fontSize: "2rem", animation: "spin 1s linear infinite" }} />
-        </div>
+        <CourseGridSkeleton cards={6} />
       ) : (
         <CoursesGrid>
           {courses.map((course) => (
@@ -449,8 +448,6 @@ const CoursesManagement: React.FC = () => {
           ))}
         </CoursesGrid>
       )}
-
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
       <SimpleModal
         isOpen={isModalOpen}

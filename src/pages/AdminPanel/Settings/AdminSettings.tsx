@@ -8,6 +8,7 @@ import {
   requestInvalidateCache,
   type PlatformSettings,
 } from "../../../services/platformSettingsService";
+import { PanelCardListSkeleton } from "../../../components/SharedComponents/Shimmer";
 
 const Container = styled.div`
   max-width: 1000px;
@@ -176,7 +177,11 @@ const AdminSettings: React.FC = () => {
         <Header>
           <Title>Admin Settings</Title>
         </Header>
-        <Status>{error || "Loading settings…"}</Status>
+        {error ? (
+          <Status style={{ color: "#b91c1c" }}>{error}</Status>
+        ) : (
+          <PanelCardListSkeleton cards={4} />
+        )}
       </Container>
     );
   }

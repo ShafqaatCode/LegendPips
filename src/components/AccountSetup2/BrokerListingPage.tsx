@@ -1,8 +1,28 @@
-import React, { useState, useMemo } from 'react';
-import styled from 'styled-components';
-import { motion } from 'framer-motion';
+import React, { useState, useMemo, useEffect } from "react";
+import styled from "styled-components";
+import { motion } from "framer-motion";
+import { FaStar } from "react-icons/fa";
+import {
+  Container,
+  CardContainer,
+  LogoSection,
+  LogoImg,
+  InfoSection,
+  TitleRow,
+  VerifiedBadge,
+  FeaturedRibbon,
+  RatingBox,
+  StarRow,
+  ReviewText,
+  ActionSection,
+  PrimaryButton,
+  SecondaryButton,
+  TermsText,
+  TopIndex,
+} from "../Broker/BrokerCard.styles";
+import { Description } from "../Broker/BrokerCard2";
+import TradeLogo from "../../assets/TradeMarketBrands/Ellipse 1-1.svg";
 
-// Types
 export type Broker = {
   id: string;
   name: string;
@@ -43,15 +63,53 @@ type BrokerListingPageProps = {
 
 const ITEMS_PER_PAGE = 5;
 
-// Animation variants
 const fadeInUp = {
   hidden: { opacity: 0, y: 60 },
   visible: { opacity: 1, y: 0 },
 };
 
+function averageReviewStars(reviews: Review[]): number {
+  if (!reviews?.length) return 0;
+  const sum = reviews.reduce((s, r) => s + r.rating, 0);
+  return Math.min(5, Math.max(0, Math.round(sum / reviews.length)));
+}
+
+const BodyBlurb = styled.p`
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: rgba(15, 23, 42, 0.75);
+  margin: 0 0 0.6rem 0;
+  width: 100%;
+  max-width: 36rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+`;
+
+const ListingLogo: React.FC<{ src: string }> = ({ src }) => {
+  const [url, setUrl] = useState(src);
+  useEffect(() => {
+    setUrl(src);
+  }, [src]);
+  return (
+    <LogoImg
+      src={url}
+      alt=""
+      onError={() => setUrl(TradeLogo)}
+    />
+  );
+};
+
 const BrokerListingPage: React.FC<BrokerListingPageProps> = ({ brokers, onBrokerSelect }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   const totalItems = brokers.length;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
@@ -64,35 +122,31 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({ brokers, onBroker
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const renderPaginationButtons = () => {
-    const buttons = [];
+    const buttons: React.ReactNode[] = [];
     const maxVisiblePages = 5;
-    
+
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         buttons.push(
-          <PageButton
+          <PaginatorButton
             key={i}
             $isActive={i === currentPage}
             onClick={() => handlePageChange(i)}
           >
             {i}
-          </PageButton>
+          </PaginatorButton>
         );
       }
     } else {
       buttons.push(
-        <PageButton
-          key={1}
-          $isActive={1 === currentPage}
-          onClick={() => handlePageChange(1)}
-        >
+        <PaginatorButton key={1} $isActive={1 === currentPage} onClick={() => handlePageChange(1)}>
           1
-        </PageButton>
+        </PaginatorButton>
       );
 
       if (currentPage > 3) {
@@ -104,13 +158,9 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({ brokers, onBroker
 
       for (let i = start; i <= end; i++) {
         buttons.push(
-          <PageButton
-            key={i}
-            $isActive={i === currentPage}
-            onClick={() => handlePageChange(i)}
-          >
+          <PaginatorButton key={i} $isActive={i === currentPage} onClick={() => handlePageChange(i)}>
             {i}
-          </PageButton>
+          </PaginatorButton>
         );
       }
 
@@ -119,13 +169,13 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({ brokers, onBroker
       }
 
       buttons.push(
-        <PageButton
+        <PaginatorButton
           key={totalPages}
           $isActive={totalPages === currentPage}
           onClick={() => handlePageChange(totalPages)}
         >
           {totalPages}
-        </PageButton>
+        </PaginatorButton>
       );
     }
 
@@ -136,352 +186,153 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({ brokers, onBroker
 
   return (
     <PageWrapper>
-      <Container>
+      <SectionInner>
         <Header>
-          <Title>Forex Brokers</Title>
-          <Subtitle>Find the best forex brokers with cashback rewards</Subtitle>
+          <Heading>Forex Brokers</Heading>
+          <Subheading>Find the best forex brokers with cashback rewards</Subheading>
         </Header>
 
-        <BrokerList>
+        <BrokerStack>
           {visibleBrokers.map((broker, idx) => {
             const globalIndex = (currentPage - 1) * ITEMS_PER_PAGE + idx + 1;
+            const stars = averageReviewStars(broker.reviews);
+            const reviewCount = broker.reviews?.length ?? 0;
+
             return (
-              <motion.div
-                key={broker.id}
-                variants={fadeInUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-              >
-                <CardContainer>
-                  {broker.topCashback && <FeaturedRibbon>Featured</FeaturedRibbon>}
-                  <TopIndex>{globalIndex}</TopIndex>
+              <Container key={broker.id}>
+                <motion.div
+                  variants={fadeInUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                >
+                  <CardContainer>
+                    {broker.topCashback && <FeaturedRibbon>Featured</FeaturedRibbon>}
+                    <TopIndex>{globalIndex}</TopIndex>
 
-                  <LogoSection>
-                    <LogoImg src={broker.logo} alt={`${broker.name} Logo`} />
-                  </LogoSection>
+                    <LogoSection>
+                      <ListingLogo src={broker.logo} />
+                    </LogoSection>
 
-                  <InfoSection>
-                    <TitleRow>
-                      <h2>{broker.name}</h2>
-                      {broker.verified && <VerifiedBadge>✔ Verified Broker</VerifiedBadge>}
-                    </TitleRow>
-                    
-                    <Description>
-                      <div>
-                        <h4>Minimum Deposit</h4>
-                        <p>${broker.minDeposit}</p>
-                      </div>
-                      <div>
-                        <h4>Regulated By</h4>
-                        <p>{broker.regulation}</p>
-                      </div>
-                      <div>
-                        <h4>Spread From</h4>
-                        <p>{broker.spreadFrom}</p>
-                      </div>
-                      <div>
-                        <h4>Crypto Trading</h4>
-                        <p>{broker.crypto}</p>
-                      </div>
-                    </Description>
-                  </InfoSection>
+                    <InfoSection>
+                      <TitleRow>
+                        <h2>{broker.name}</h2>
+                        {broker.verified ? <VerifiedBadge>✔ Verified Broker</VerifiedBadge> : null}
+                      </TitleRow>
+                      {broker.description?.trim() ? (
+                        <BodyBlurb>{broker.description.trim()}</BodyBlurb>
+                      ) : null}
+                      <Description>
+                        <div>
+                          <h4>Minimum Deposit</h4>
+                          <p>${broker.minDeposit}</p>
+                        </div>
+                        <div>
+                          <h4>Regulated By</h4>
+                          <p>{broker.regulation}</p>
+                        </div>
+                        <div>
+                          <h4>Spread From</h4>
+                          <p>{broker.spreadFrom}</p>
+                        </div>
+                        <div>
+                          <h4>Crypto Trading</h4>
+                          <p>{broker.crypto}</p>
+                        </div>
+                      </Description>
+                    </InfoSection>
 
-                  <ActionSection>
-                    <TermsText>Terms & Conditions Apply</TermsText>
-                    <PrimaryButton onClick={() => onBrokerSelect(broker)}>
-                      Setup Account
-                    </PrimaryButton>
-                    <SecondaryButton onClick={() => onBrokerSelect(broker)}>
-                      Broker Reviews →
-                    </SecondaryButton>
-                  </ActionSection>
-                </CardContainer>
-              </motion.div>
+                    <RatingBox>
+                      <StarRow>
+                        {[...Array(5)].map((_, i) => (
+                          <FaStar key={i} color={i < stars ? "#FBAF00" : "#d1d5db"} />
+                        ))}
+                      </StarRow>
+                      <ReviewText>
+                        <strong>{reviewCount.toLocaleString()}</strong>
+                        <span>Reviews</span>
+                      </ReviewText>
+                    </RatingBox>
+
+                    <ActionSection>
+                      <TermsText>Terms & Conditions Apply</TermsText>
+                      <PrimaryButton type="button" onClick={() => onBrokerSelect(broker)}>
+                        Setup Account
+                      </PrimaryButton>
+                      <SecondaryButton as="button" type="button" onClick={() => onBrokerSelect(broker)}>
+                        Broker Reviews →
+                      </SecondaryButton>
+                    </ActionSection>
+                  </CardContainer>
+                </motion.div>
+              </Container>
             );
           })}
-        </BrokerList>
+        </BrokerStack>
 
         {shouldShowPagination && (
           <PaginationContainer>
-            <PageButton
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
+            <PaginatorButton onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
               Previous
-            </PageButton>
+            </PaginatorButton>
 
             {renderPaginationButtons()}
-            
-            <PageButton
+
+            <PaginatorButton
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             >
               Next
-            </PageButton>
+            </PaginatorButton>
           </PaginationContainer>
         )}
-      </Container>
+      </SectionInner>
     </PageWrapper>
   );
 };
 
 export default BrokerListingPage;
 
-// Styled Components - Matching your exact structure
-const PageWrapper = styled.div`
-  min-height: 100vh;
-  background: #f3f4f6;
-  padding: 2rem 1rem;
-
+const PageWrapper = styled.section`
+  background: #f8fafc;
+  padding: 0 0 2rem;
+  box-sizing: border-box;
 `;
 
-const Container = styled.section`
-  margin: 0px 30px;
-  max-width: 1400px;
-  /* margin: auto; */
-  @media (min-width: 1440px) {
-    margin: auto;
-  }
+const SectionInner = styled.div`
+  max-width: ${({ theme }) => theme.typography.contentMax};
+  margin: 0 auto;
+  padding: 1.25rem ${({ theme }) => theme.typography.pageGutter} 0;
+  box-sizing: border-box;
 `;
 
 const Header = styled.div`
-  margin-bottom: 2rem;
+  margin-bottom: 1.1rem;
 `;
 
-const Title = styled.h1`
-  font-size: 2rem;
+const Heading = styled.h1`
+  font-size: 1.75rem;
   font-weight: 700;
   color: #132e58;
-  margin-bottom: 0.5rem;
+  margin: 0 0 0.35rem;
+  letter-spacing: -0.02em;
 
   @media (max-width: 768px) {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 `;
 
-const Subtitle = styled.p`
-  font-size: 1rem;
-  color: #6b7280;
-`;
-
-const BrokerList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  
-
-  @media (max-width: 768px) {
-    gap: 1rem;
-  }
-`;
-
-const CardContainer = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-  padding: 1rem;
-  background-color: #fefefe;
-  border-radius: 12px;
-  background-clip: padding-box;
-  flex-wrap: wrap;
-  margin: auto;
-
-  @media (max-width: 1024px) {
-    gap: 2rem;
-    /* padding-left: 5rem; */
-    width: 90%;
-  }
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem 1.5rem;
-    width: 95%;
-    gap: 1.5rem;
-    margin: 1rem auto;
-  }
-`;
-
-const TopIndex = styled.span`
-  background-color: #132E58;
-  position: absolute;
-  color: white;
-  top: -20px;
-  left: 20px;
-  text-align: center;
-  padding: 5px 12px;
-  border-radius: 5px;
-`;
-
-const FeaturedRibbon = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: #fac41d;
-  color: white;
-  padding: 6px 14px;
-  font-weight: bold;
-  font-size: 12px;
-  border-radius: 0 12px 0 5px;
-`;
-
-const LogoSection = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  @media (max-width: 768px) {
-    position: relative;
-    top: auto;
-    left: auto;
-    transform: none;
-    margin-bottom: 1rem;
-  }
-`;
-
-const LogoImg = styled.img`
-  height: 140px;
-  width: 140px;
-  border-radius: 50%;
-  background-color: #fff;
-  object-fit: cover;
-
-  @media (max-width: 768px) {
-    height: 100px;
-    width: 100px;
-  }
-`;
-
-const InfoSection = styled.div`
-  flex: 2;
-  min-width: 250px;
-
-  @media (max-width: 768px) {
-    min-width: unset;
-    width: 100%;
-    text-align: center;
-  }
-`;
-
-const TitleRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
-
-  h2 {
-    font-size: 36px;
-    margin: 0;
-    color: #0f1c46;
-
-    @media (max-width: 768px) {
-      font-size: 28px;
-    }
-  }
-
-  @media (max-width: 768px) {
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-`;
-
-const VerifiedBadge = styled.span`
-  background-color: #2563eb;
-  color: #ffffff;
-  font-size: 13px;
-  padding: 4px 10px;
-  border-radius: 5px;
-  white-space: nowrap;
-`;
-
-const Description = styled.div`
-  font-size: 16px;
-  color: rgba(15, 23, 42, 0.8);
+const Subheading = styled.p`
+  font-size: 0.95rem;
+  color: #64748b;
   margin: 0;
-  display: flex;
-  gap: 4rem;
-  flex-wrap: wrap;
-  margin: auto;
-
-  h4 {
-    font-size: 16px;
-    font-weight: 500;
-  }
-
-  p {
-    font-size: 14px;
-    font-weight: 300;
-  }
-
-  @media (max-width: 1024px) {
-    flex-wrap: wrap;
-    gap: 2rem;
-    text-align: center;
-  }
-
-  @media (max-width: 768px) {
-    justify-content: center;
-    gap: 1rem;
-  }
 `;
 
-const ActionSection = styled.div`
-  min-width: 160px;
+const BrokerStack = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
-
-  @media (max-width: 768px) {
-    align-items: center;
-    width: 100%;
-  }
-`;
-
-const TermsText = styled.span`
-  font-size: 10px;
-  color: #0f172a;
-`;
-
-const PrimaryButton = styled.button`
-  background-color: #132E58;
-  color: #fff;
-  border: none;
-  padding: 0.6rem 2.3rem;
-  border-radius: 2rem;
-  font-size: 16px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  width: 100%;
-  max-width: 200px;
-  justify-content: center;
-
-  &:hover {
-    background-color: #1a2c60;
-  }
-`;
-
-const SecondaryButton = styled.button`
-  color: #132e58;
-  font-size: 14px;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  background: none;
-  border: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
+  gap: 0.85rem;
 `;
 
 const PaginationContainer = styled.div`
@@ -489,37 +340,38 @@ const PaginationContainer = styled.div`
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 3rem;
+  margin-top: 2rem;
   flex-wrap: wrap;
 `;
 
-const PageButton = styled.button<{ $isActive?: boolean }>`
-  background-color: ${props => (props.$isActive ? '#132E58' : 'transparent')};
-  color: ${props => (props.$isActive ? 'white' : '#132E58')};
-  border: 1px solid #132E58;
+const PaginatorButton = styled.button<{ $isActive?: boolean }>`
+  background-color: ${(props) => (props.$isActive ? "#132E58" : "transparent")};
+  color: ${(props) => (props.$isActive ? "white" : "#132E58")};
+  border: 1px solid #132e58;
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: background 0.2s ease, color 0.2s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   min-width: 2.5rem;
   justify-content: center;
+  font-size: 0.875rem;
 
   &:hover:not(:disabled) {
-    background-color: ${props => (props.$isActive ? '#132E58' : '#f0f0f0')};
+    background-color: ${(props) => (props.$isActive ? "#132E58" : "#f1f5f9")};
   }
 
   &:disabled {
     cursor: not-allowed;
-    opacity: 0.5;
+    opacity: 0.45;
   }
 
   @media (max-width: 768px) {
     padding: 0.4rem 0.75rem;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
   }
 `;
 

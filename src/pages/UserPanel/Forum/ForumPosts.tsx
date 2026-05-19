@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { FiMessageSquare, FiThumbsUp, FiThumbsDown, FiCalendar, FiUser, FiLoader } from "react-icons/fi";
+import { FiMessageSquare, FiThumbsUp, FiThumbsDown, FiCalendar, FiUser } from "react-icons/fi";
 import { fetchMyForumPosts, type MyForumPostItem } from "../../../services/forumService";
+import { PanelCardListSkeleton } from "../../../components/SharedComponents/Shimmer";
 
 const Container = styled.div`
   max-width: 1400px;
@@ -165,8 +166,7 @@ const ForumPosts: React.FC = () => {
           <Title>My Forum Posts</Title>
         </Header>
         <Empty>
-          <FiLoader style={{ fontSize: "2rem", marginBottom: "0.5rem" }} />
-          Loading…
+          <PanelCardListSkeleton cards={4} />
         </Empty>
       </Container>
     );

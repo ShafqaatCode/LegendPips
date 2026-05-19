@@ -64,11 +64,12 @@ export const fetchPublicBrokers = async (search?: string): Promise<ApiBroker[]> 
   return data.items || [];
 };
 
-/** Brokers for /rebates and home broker strip (same CMS list, optional limit). */
-export const fetchRebatesPageBrokers = async (opts?: { limit?: number }): Promise<ApiBroker[]> => {
+/** Brokers for /rebates and home broker strip (same CMS list, optional limit & search). */
+export const fetchRebatesPageBrokers = async (opts?: { limit?: number; search?: string }): Promise<ApiBroker[]> => {
   const qs = new URLSearchParams();
   qs.set("rebatesPage", "1");
   if (opts?.limit !== undefined) qs.set("limit", String(opts.limit));
+  if (opts?.search?.trim()) qs.set("search", opts.search.trim());
   const data = await fetchJson(`${API_CONFIG.BASE_URL}/brokers?${qs.toString()}`);
   return data.items || [];
 };

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { FiTrendingUp, FiAward, FiVideo, FiBook, FiUsers, FiDollarSign } from 'react-icons/fi';
 import { useAuth } from '../../../contexts/AuthContext';
 import { fetchMyDashboard, type DashboardStat } from '../../../services/userInsightService';
+import { ShimmerBar } from '../../../components/SharedComponents/Shimmer';
 
 const iconByKey: Record<string, React.ElementType> = {
   contests: FiAward,
@@ -268,8 +269,15 @@ const Dashboard: React.FC = () => {
                     <FiAward />
                   </StatIcon>
                 </StatHeader>
-                <StatValue style={{ opacity: 0.4 }}>—</StatValue>
-                <StatLabel style={{ opacity: 0.5 }}>Loading…</StatLabel>
+                <StatValue>
+                  <ShimmerBar $h="28px" $w="55%" />
+                </StatValue>
+                <StatLabel>
+                  <ShimmerBar $h="13px" $w="75%" />
+                </StatLabel>
+                <StatChange $positive>
+                  <ShimmerBar $h="12px" $w="85%" />
+                </StatChange>
               </StatCard>
             ))
           : stats.map((stat) => {

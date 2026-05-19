@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FiBarChart2, FiTrendingUp, FiTrendingDown, FiDownload, FiCalendar, FiUsers, FiActivity, FiDollarSign, FiAward } from 'react-icons/fi';
 import { fetchAdminFullMetrics, type PlatformMetrics, type EngagementSummary } from '../../../services/adminEngagementService';
+import { ShimmerBar, TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
 
 const Container = styled.div`
   max-width: 1600px;
@@ -261,11 +262,21 @@ const Reports: React.FC = () => {
                 <stat.icon />
               </StatIcon>
             </StatHeader>
-            <StatValue>{stat.value}</StatValue>
-            <StatLabel>{stat.label}</StatLabel>
+            <StatValue>
+              {loading || !summary || !platform ? <ShimmerBar $h="32px" $w="48%" /> : stat.value}
+            </StatValue>
+            <StatLabel>
+              {loading || !summary || !platform ? <ShimmerBar $h="14px" $w="70%" /> : stat.label}
+            </StatLabel>
             <StatChange $positive={stat.positive}>
-              {stat.positive ? <FiTrendingUp /> : <FiTrendingDown />}
-              {stat.change}
+              {loading || !summary || !platform ? (
+                <ShimmerBar $h="12px" $w="85%" />
+              ) : (
+                <>
+                  {stat.positive ? <FiTrendingUp /> : <FiTrendingDown />}
+                  {stat.change}
+                </>
+              )}
             </StatChange>
           </StatCard>
         ))}
@@ -275,7 +286,17 @@ const Reports: React.FC = () => {
         <SectionTitle>Activity by type (last 7 days)</SectionTitle>
         <Meta>Based on the unified activity log (same source as the user activity feed).</Meta>
         {!platform || loading ? (
-          <Meta>Loading…</Meta>
+          <Table>
+            <thead>
+              <tr>
+                <Th>Type</Th>
+                <Th>Events</Th>
+              </tr>
+            </thead>
+            <tbody>
+              <TableBodySkeleton rows={6} cols={2} />
+            </tbody>
+          </Table>
         ) : (
           <Table>
             <thead>
@@ -305,7 +326,17 @@ const Reports: React.FC = () => {
       <ReportsSection>
         <SectionTitle>Content catalog snapshot</SectionTitle>
         {!platform || !summary || loading ? (
-          <Meta>Loading…</Meta>
+          <Table>
+            <thead>
+              <tr>
+                <Th>Metric</Th>
+                <Th>Value</Th>
+              </tr>
+            </thead>
+            <tbody>
+              <TableBodySkeleton rows={10} cols={2} />
+            </tbody>
+          </Table>
         ) : (
           <Table>
             <thead>

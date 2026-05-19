@@ -38,23 +38,19 @@ const Overlay = styled.div`
   z-index: 999;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  // padding: 10vh 0; 
-  overflow-y: auto;  
- 
+  align-items: center;
+  padding: 1rem;
+  overflow-y: auto;
 `;
 
 const ModalContainer = styled.div`
- 
   border-radius: 12px;
-
-  max-width: 800px;
+  max-width: min(460px, 100%);
+  width: 100%;
   position: relative;
-  
+
   margin: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  
 `;

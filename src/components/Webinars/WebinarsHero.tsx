@@ -3,61 +3,50 @@ import styled from 'styled-components';
 
 const HeroWrapper = styled.section`
   background: white;
-  padding: 80px 3rem 60px 3rem;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 60px 2rem 40px 2rem;
-  }
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: 40px 1.5rem 30px 1.5rem;
-  }
+  padding: clamp(2.5rem, 6vw, 4rem) ${({ theme }) => theme.typography.pageGutter};
 `;
 
 const ContentWrapper = styled.div`
-  max-width: 1400px;
+  max-width: ${({ theme }) => theme.typography.contentMax};
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 4rem;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
   align-items: center;
-  
+
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.75rem;
   }
 `;
 
 const LeftContent = styled.div``;
 
 const Heading = styled.h1`
-  font-size: 48px;
+  font-size: ${({ theme }) => theme.typography.heroTitle};
   font-weight: 700;
-  color: #132E58;
-  margin-bottom: 1.5rem;
-  line-height: 1.3;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 36px;
-  }
+  color: #132e58;
+  margin: 0 0 1rem;
+  line-height: ${({ theme }) => theme.typography.heroTitleLh};
 `;
 
 const HighlightText = styled.span`
-  color: #Fbbf24;
+  color: #fbbf24;
 `;
 
 const Description = styled.p`
-  font-size: 16px;
-  line-height: 1.7;
+  font-size: ${({ theme }) => theme.typography.body};
+  line-height: 1.65;
   color: #555;
-  max-width: 700px;
+  max-width: 40rem;
+  margin: 0;
 `;
 
 const RightContent = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     order: -1;
     justify-content: flex-start;
@@ -65,20 +54,14 @@ const RightContent = styled.div`
 `;
 
 const IconWrapper = styled.div`
-  width: 120px;
-  height: 120px;
+  width: clamp(72px, 14vw, 96px);
+  height: clamp(72px, 14vw, 96px);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 80px;
-  color: #132E58;
-  opacity: 0.8;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    width: 100px;
-    height: 100px;
-    font-size: 60px;
-  }
+  font-size: clamp(2.25rem, 6vw, 3rem);
+  color: #132e58;
+  opacity: 0.85;
 `;
 
 const WebinarsHero: React.FC = () => {

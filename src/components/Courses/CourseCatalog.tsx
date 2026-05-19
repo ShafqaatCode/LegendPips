@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
-import { FiBook, FiClock, FiLock, FiLoader } from "react-icons/fi";
+import { FiBook, FiClock, FiLock } from "react-icons/fi";
 import {
   enrollInCourse,
   fetchPublishedCourses,
   type Course,
 } from "../../services/courseService";
 import { getAuthToken } from "../../utils/apiConfig";
+import { CourseGridSkeleton } from "../SharedComponents/Shimmer";
 
 const SectionWrapper = styled.section`
   background: #ffffff;
@@ -104,7 +105,7 @@ const Thumb = styled.div<{ $img?: string }>`
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 2.5rem;
+  font-size: 1.75rem;
 `;
 
 const PremiumBadge = styled.span`
@@ -237,14 +238,6 @@ const Message = styled.div<{ $error?: boolean }>`
   font-size: 0.95rem;
 `;
 
-const LoadingWrap = styled.div`
-  display: flex;
-  justify-content: center;
-  padding: 3rem;
-  color: #132e58;
-  font-size: 2rem;
-`;
-
 const CourseCatalog: React.FC = () => {
   const navigate = useNavigate();
   const [category, setCategory] = useState<string>("All");
@@ -316,11 +309,7 @@ const CourseCatalog: React.FC = () => {
           <Message $error={banner.toLowerCase().includes("fail")}>{banner}</Message>
         )}
 
-        {loading && (
-          <LoadingWrap>
-            <FiLoader style={{ animation: "spin 0.9s linear infinite" }} />
-          </LoadingWrap>
-        )}
+        {loading && <CourseGridSkeleton cards={8} />}
         {!loading && error && <Message $error>{error}</Message>}
         {!loading && !error && items.length === 0 && (
           <Message>No published courses yet. Admins can add courses from the admin panel.</Message>
@@ -368,7 +357,6 @@ const CourseCatalog: React.FC = () => {
           </Grid>
         )}
       </ContentWrapper>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </SectionWrapper>
   );
 };

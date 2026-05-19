@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { FiBook, FiCheckCircle, FiClock, FiTrendingUp, FiLoader } from "react-icons/fi";
+import { FiBook, FiCheckCircle, FiClock, FiTrendingUp } from "react-icons/fi";
 import {
   fetchMyCourseEnrollments,
   updateCourseProgress,
   type MyEnrollmentItem,
 } from "../../../services/courseService";
+import { PanelCardListSkeleton } from "../../../components/SharedComponents/Shimmer";
 
 const Container = styled.div`
   max-width: 1400px;
@@ -242,8 +243,7 @@ const MyCourses: React.FC = () => {
           <Title>My Courses</Title>
         </Header>
         <EmptyState>
-          <FiLoader style={{ fontSize: "2rem", marginBottom: "0.5rem" }} />
-          <div>Loading your enrollments…</div>
+          <PanelCardListSkeleton cards={3} />
         </EmptyState>
       </Container>
     );

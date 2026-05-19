@@ -118,9 +118,9 @@ export const ArrowBase = styled.button`
   border: none;
   background: ${({ theme }) => theme.colors.WHITE};
   color: ${({ theme }) => theme.colors.primary};
-  font-size: 1.8rem;
+  font-size: 1.35rem;
   border-radius: 50%;
-  padding: 0.7rem 1rem;
+  padding: 0.5rem 0.65rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   transition: background 0.3s ease;

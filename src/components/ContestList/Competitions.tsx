@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { fetchCompetitions, type Competition } from "../../services/contestService";
 import ContestCard from "./ContestCard";
 import TrophyImg from "../../assets/Group.png";
+import { BrokerListSkeleton } from "../SharedComponents/Shimmer";
 
 const filters = ["All", "Upcoming", "Ongoing", "Ended"];
 
@@ -15,6 +16,7 @@ const Competitions: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
+  const [refetchTick, setRefetchTick] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -48,13 +50,13 @@ const Competitions: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [activeFilter, currentPage]);
+  }, [activeFilter, currentPage, refetchTick]);
 
+  const bumpContests = () => setRefetchTick((t) => t + 1);
   return (
     <Wrapper>
       <Header>
         <Title>
-          {" "}
           <img src={TrophyImg} alt="TrophyIcon" /> Competitions
         </Title>
         <Filter>
@@ -75,18 +77,23 @@ const Competitions: React.FC = () => {
       </Header>
 
       {loading ? (
-        <Loading>Loading competitions...</Loading>
+        <BrokerListSkeleton rows={perPage} />
       ) : error ? (
         <Loading style={{ color: "#e74c3c" }}>{error}</Loading>
       ) : competitions.length === 0 ? (
         <Loading>No competitions found</Loading>
       ) : (
         <>
-          <Grid>
-            {competitions.map((comp) => (
-              <ContestCard key={String(comp.id ?? comp._id ?? "")} comp={comp} />
+          <CardStack>
+            {competitions.map((comp, idx) => (
+              <ContestCard
+                key={String(comp.id ?? comp._id ?? "")}
+                comp={comp}
+                index={(currentPage - 1) * perPage + idx + 1}
+                onJoined={bumpContests}
+              />
             ))}
-          </Grid>
+          </CardStack>
 
           <Pagination>
             {Array.from({ length: totalPages }, (_, i) => (
@@ -107,18 +114,21 @@ const Competitions: React.FC = () => {
 
 export default Competitions;
 
-const Wrapper = styled.div`
-  padding: 2rem 4rem;
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
+const Wrapper = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: ${({ theme }) => theme.typography.contentMax};
+  margin: 0 auto;
+  padding: 0 ${({ theme }) => theme.typography.pageGutter} 1.5rem;
+  box-sizing: border-box;
 `;
 
 const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 2rem 0;
+  margin: 0.85rem 0 1.1rem;
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
@@ -162,14 +172,11 @@ const Loading = styled.div`
   color: #555;
 `;
 
-const Grid = styled.div`
-  grid-template-columns: repeat(2, 1fr);
-  display: grid;
-  gap: 2.5rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+/** Same vertical rhythm as rebate broker cards (`AllBrokersList`). */
+const CardStack = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
 `;
 
 const Pagination = styled.div`

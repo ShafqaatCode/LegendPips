@@ -22,16 +22,18 @@ import { useAuth } from "../../contexts/AuthContext";
 
 interface LoginFormProps {
   onSwitchToRegister?: () => void;
+  /** When provided, successful login runs this instead of redirecting away (e.g. modal on /contests). */
+  onLoginSuccess?: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onLoginSuccess }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
-  const { login, user } = useAuth();
+  const { login } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,6 +48,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
       const response = await login(data.email, data.password);
 
       if (response.success) {
+        if (onLoginSuccess) {
+          onLoginSuccess();
+          return;
+        }
         // Wait a moment for state to update, then check role and redirect
         setTimeout(() => {
           const userData = JSON.parse(localStorage.getItem('user') || '{}');
@@ -58,7 +64,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
           window.location.reload();
         }, 200);
       } else {
-        setError(response.message || "Invalid email or password. Try: user@example.com / password123");
+        setError(response.message || "Invalid email or password.");
       }
     } catch (err: any) {
       setError(err.message || "Login failed. Please try again.");
@@ -71,29 +77,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
   return (
     <Container>
       <Heading>Login</Heading>
-
-      {/* Dummy Login Helper */}
-      <div style={{
-        background: '#f0f7ff',
-        border: '1px solid #Fbbf24',
-        borderRadius: '8px',
-        padding: '1rem',
-        marginBottom: '1.5rem',
-        fontSize: '0.875rem',
-        color: '#132E58'
-      }}>
-        <strong>Demo Credentials:</strong>
-        <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <div>
-            <strong>Regular User:</strong>
-            <div style={{ marginLeft: '0.5rem' }}>Email: <strong>user@example.com</strong> | Password: <strong>password123</strong></div>
-          </div>
-          <div>
-            <strong>Admin User:</strong>
-            <div style={{ marginLeft: '0.5rem' }}>Email: <strong>admin@example.com</strong> | Password: <strong>admin123</strong></div>
-          </div>
-        </div>
-      </div>
 
       <GoogleButton type="button">
         Continue with Google <GoogleIcon src={GLogo} alt="G" />
@@ -134,7 +117,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
         <RegisterButton type="submit" disabled={isLoading}>
           {isLoading ? "Logging in..." : "Login"}
         </RegisterButton>
-        <RegisterButton onClick={onSwitchToRegister} type="button" style={{ marginTop: "1rem" }}>
+        <RegisterButton onClick={onSwitchToRegister} type="button" style={{ marginTop: "0.65rem" }}>
           Register
         </RegisterButton>
       </form>

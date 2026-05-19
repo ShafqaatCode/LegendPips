@@ -3,28 +3,20 @@ import styled from 'styled-components';
 
 const HeroWrapper = styled.section`
   background: white;
-  padding: 80px 3rem 40px 3rem;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 60px 2rem 30px 2rem;
-  }
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: 60px 1.5rem 20px 1.5rem;
-  }
+  padding: clamp(2.5rem, 6vw, 4rem) ${({ theme }) => theme.typography.pageGutter};
 `;
 
 const ContentWrapper = styled.div`
-  max-width: 1200px;
+  max-width: ${({ theme }) => theme.typography.contentMax};
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 3rem;
-  
+  gap: clamp(1.25rem, 3vw, 2rem);
+
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     flex-direction: column;
-    gap: 2rem;
+    gap: 1.5rem;
   }
 `;
 
@@ -34,48 +26,30 @@ const LeftContent = styled.div`
 `;
 
 const MainHeading = styled.h1`
-  font-size: 56px;
+  font-size: ${({ theme }) => theme.typography.heroTitle};
   font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: 1.5rem;
-  color: #132E58;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    font-size: 42px;
-  }
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 32px;
-    margin-bottom: 1rem;
-  }
+  line-height: ${({ theme }) => theme.typography.heroTitleLh};
+  margin: 0 0 0.75rem;
+  color: #132e58;
 `;
 
 const HighlightText = styled.span`
-  color: #Fbbf24;
+  color: #fbbf24;
 `;
 
 const SubHeading = styled.h2`
-  font-size: 24px;
+  font-size: ${({ theme }) => theme.typography.panelSectionTitle};
   font-weight: 600;
-  line-height: 1.4;
-  margin-bottom: 1.5rem;
-  color: #132E58;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 20px;
-    margin-bottom: 1rem;
-  }
+  line-height: 1.35;
+  margin: 0 0 0.75rem;
+  color: #132e58;
 `;
 
 const Description = styled.p`
-  font-size: 16px;
-  line-height: 1.7;
-  color: #666;
-  margin-bottom: 1rem;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 14px;
-  }
+  font-size: ${({ theme }) => theme.typography.body};
+  line-height: 1.65;
+  color: #555;
+  margin: 0;
 `;
 
 const RightContent = styled.div`
@@ -87,13 +61,13 @@ const RightContent = styled.div`
 `;
 
 const IconWrapper = styled.div`
-  width: 200px;
-  height: 200px;
+  width: clamp(120px, 22vw, 160px);
+  height: clamp(120px, 22vw, 160px);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #Fbbf24;
-  
+  color: #fbbf24;
+
   svg {
     width: 100%;
     height: 100%;

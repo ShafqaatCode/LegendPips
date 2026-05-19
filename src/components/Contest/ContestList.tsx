@@ -110,24 +110,23 @@ const ContestList = () => {
 export default ContestList;
 
 const Container = styled.div`
-  padding: 2rem;
+  padding: clamp(1.25rem, 3vw, 1.75rem) ${({ theme }) => theme.typography.pageGutter};
   background-color: #f3f4f7;
-  font-family: 'Segoe UI', sans-serif;
-  
+  font-family: "Segoe UI", sans-serif;
 `;
 
 const Heading = styled.h2`
   text-align: center;
-  font-weight: 400;
-  margin-bottom: 3rem;
+  font-weight: 600;
+  margin: 1.25rem auto 2rem;
   color: #132e58;
-  margin: 2rem auto;
-  max-width: 80%;
-  letter-spacing: 0%;
-  font-size: 2.8rem;
+  max-width: min(42rem, 90%);
+  letter-spacing: -0.02em;
+  font-size: ${({ theme }) => theme.typography.sectionTitle};
+  line-height: ${({ theme }) => theme.typography.sectionTitleLh};
 
   @media (max-width: 768px) {
-    font-size: 1.8rem;
+    font-size: 1.35rem;
   }
 `;
 

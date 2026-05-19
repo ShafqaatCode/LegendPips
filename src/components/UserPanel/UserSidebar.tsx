@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   FiHome,
@@ -18,6 +18,7 @@ import {
   FiX,
   FiMenu,
   FiDollarSign,
+  FiGlobe,
 } from 'react-icons/fi';
 
 const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
@@ -213,7 +214,6 @@ interface UserSidebarProps {
 }
 
 const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { user, logout: authLogout } = useAuth();
 
@@ -327,6 +327,21 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
             >
               <FiSettings />
               <span>Settings</span>
+            </NavLinkStyled>
+          </NavItem>
+        </NavList>
+      </NavSection>
+
+      <NavSection>
+        <NavList>
+          <NavItem>
+            <NavLinkStyled
+              to="/"
+              end
+              onClick={() => window.innerWidth <= 992 && onToggle()}
+            >
+              <FiGlobe />
+              <span>Back to homepage</span>
             </NavLinkStyled>
           </NavItem>
         </NavList>

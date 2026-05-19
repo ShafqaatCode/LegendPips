@@ -3,6 +3,7 @@ import styled from "styled-components";
 import BrokerCard3 from "./BrokerCard3";
 import { fetchRebatesPageBrokers } from "../../services/brokerService";
 import type { ApiBroker } from "../../services/brokerService";
+import { BrokerListSkeleton } from "../SharedComponents/Shimmer";
 import { mapApiBrokerToRebateCardRow } from "../../utils/rebatesBrokersDisplay";
 
 const BrokerSectionWrapper = styled.section`
@@ -119,7 +120,7 @@ const AllBrokersListPaginated: React.FC = () => {
   if (loading) {
     return (
       <BrokerSectionWrapper>
-        <StatusLine>Loading brokers…</StatusLine>
+        <BrokerListSkeleton rows={5} />
       </BrokerSectionWrapper>
     );
   }

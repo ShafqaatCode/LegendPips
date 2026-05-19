@@ -10,6 +10,8 @@ import {
   LinkGroup,
   HeaderItem,
   SignInButton,
+  UserPanelButton,
+  PortalOutlineButton,
   MobileBar,
   MobileMenu,
   Backdrop,
@@ -20,7 +22,8 @@ import {
 } from "./Navbar.styles";
 import { NavLink } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
-import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { FiChevronDown, FiChevronUp, FiShield, FiUser } from "react-icons/fi";
+import { useAuth } from "../../contexts/AuthContext";
 import LogoImg from "../../assets/icons/image 2.svg";
 import SupportIcon from "../../assets/icons/SupportIcon.svg";
 import CalculatorIcon from "../../assets/icons/calculator-svgrepo-com (1) 1.svg";
@@ -61,6 +64,10 @@ const Header: React.FC = () => {
   const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState(false); // for mobile
   const [signupOpen, setSignupOpen] = useState(false);
   const [signinOpen, setSigninOpen] = useState(false);
+  const { isAuthenticated, user } = useAuth();
+
+  const portalPath = user?.role === "admin" ? "/admin-panel" : "/user-panel";
+  const isAdmin = user?.role === "admin";
 
   return (
     <>
@@ -99,7 +106,14 @@ const Header: React.FC = () => {
                 <span>United States</span>
               </HeaderItem>
             </NavLink>
-            <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
+            {isAuthenticated ? (
+              <UserPanelButton to={portalPath} title={isAdmin ? "Open admin panel" : "Open your account panel"}>
+                {isAdmin ? <FiShield size={18} aria-hidden /> : <FiUser size={18} aria-hidden />}
+                <span>{isAdmin ? "Admin panel" : `${user?.firstName || "My"} account`}</span>
+              </UserPanelButton>
+            ) : (
+              <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
+            )}
           </LinkGroup>
         </Topbar>
 
@@ -144,7 +158,14 @@ const Header: React.FC = () => {
             <Logo src={LogoImg} alt="LegendPips Logo" />
           </NavLink>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
+            {isAuthenticated ? (
+              <PortalOutlineButton to={portalPath} title={isAdmin ? "Admin panel" : "My account panel"}>
+                {isAdmin ? <FiShield size={18} aria-hidden /> : <FiUser size={18} aria-hidden />}
+                <span>{isAdmin ? "Admin" : user?.firstName || "Account"}</span>
+              </PortalOutlineButton>
+            ) : (
+              <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
+            )}
             <FaBars
               size={22}
               color="white"
@@ -157,6 +178,11 @@ const Header: React.FC = () => {
         {/* Mobile Menu */}
         {menuOpen && (
           <MobileMenu>
+            {isAuthenticated && (
+              <NavItem to={portalPath} onClick={() => setMenuOpen(false)}>
+                {isAdmin ? "Admin panel" : "My account panel"}
+              </NavItem>
+            )}
             {navLinks.map((link) => (
               <NavItem
                 to={link.to}

@@ -7,21 +7,24 @@ import ArrowIcon from "../../assets/arrow-narrow-circle-broken-up-right-blue.png
 
 import { Link } from "react-router-dom";
 import BrokerCard2 from "./BrokerCard2";
+import { BrokerListSkeleton } from "../SharedComponents/Shimmer";
 import { fetchRebatesPageBrokers } from "../../services/brokerService";
 import { mapApiBrokerToRebateCardRow, type RebateBrokerCardRow } from "../../utils/rebatesBrokersDisplay";
 
 const BrokerSectionWrapper = styled.section`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 1rem 0;
-  margin: 3rem 1rem;
+  gap: 1rem;
+  max-width: ${({ theme }) => theme.typography.contentMax};
+  margin: 0 auto;
+  padding: 0 ${({ theme }) => theme.typography.pageGutter} 1.5rem;
+  box-sizing: border-box;
 `;
 
 const BrokerWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 0.85rem;
 `;
 
 const ButtonContainer = styled.div`
@@ -38,9 +41,11 @@ const StatusLine = styled.p`
 
 interface props {
   showAll?: boolean;
+  /** Debounced query for /rebates broker search (optional). */
+  search?: string;
 }
 
-const AllBrokersList: React.FC<props> = ({ showAll = false }) => {
+const AllBrokersList: React.FC<props> = ({ showAll = false, search = "" }) => {
   const [rows, setRows] = useState<RebateBrokerCardRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,7 +53,9 @@ const AllBrokersList: React.FC<props> = ({ showAll = false }) => {
     let cancelled = false;
     (async () => {
       try {
-        const items = await fetchRebatesPageBrokers(showAll ? undefined : { limit: 5 });
+        const items = await fetchRebatesPageBrokers(
+          showAll ? { search: search || undefined } : { limit: 5, search: search || undefined }
+        );
         const mapped = items.map(mapApiBrokerToRebateCardRow);
         if (!cancelled) {
           setRows(mapped);
@@ -64,16 +71,20 @@ const AllBrokersList: React.FC<props> = ({ showAll = false }) => {
     return () => {
       cancelled = true;
     };
-  }, [showAll]);
+  }, [showAll, search]);
 
   const visibleRows = rows ?? [];
 
   return (
     <BrokerSectionWrapper>
       {error && <StatusLine>{error}</StatusLine>}
-      {rows === null && !error && <StatusLine>Loading brokers…</StatusLine>}
+      {rows === null && !error && <BrokerListSkeleton rows={showAll ? 5 : 3} />}
       {rows !== null && visibleRows.length === 0 && !error && (
-        <StatusLine>No rebate brokers are published yet. Run the rebates seed on the server.</StatusLine>
+        <StatusLine>
+          {search.trim()
+            ? "No brokers match your search. Try another name or keyword."
+            : "No rebate brokers are published yet. Run the rebates seed on the server."}
+        </StatusLine>
       )}
       <BrokerWrapper>
         {visibleRows.map((broker) => (
@@ -82,6 +93,7 @@ const AllBrokersList: React.FC<props> = ({ showAll = false }) => {
             index={broker.index}
             featured={broker.featured}
             title={broker.title}
+            brokerId={broker.key}
             description={broker.description}
             logoSrc={broker.logoSrc}
             rating={broker.rating}
@@ -97,8 +109,8 @@ const AllBrokersList: React.FC<props> = ({ showAll = false }) => {
               bgColor="transparent"
               color="#132E58"
               borderColor="#132E58"
-              padding="1rem 2.5rem"
-              fontSize="1.2rem"
+              padding="0.55rem 1.35rem"
+              fontSize="0.875rem"
               fontWeight="600"
             >
               View All Brokers <img src={ArrowIcon} alt="icon" />

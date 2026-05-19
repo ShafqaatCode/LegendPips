@@ -12,29 +12,29 @@ export const CardContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
-  padding: 1.3rem 1.2rem 1.3rem 4.5rem;
-  background-color: #fefefe;
-  border-radius: 12px;
+  gap: 1.25rem;
+  padding: 0.85rem 1rem 0.85rem 3.15rem;
+  background-color: #ffffff;
+  border-radius: 10px;
   background-clip: padding-box;
   flex-wrap: wrap;
-  width: 90%;
-  margin: auto;
-  // box-shadow: 0 0 0 3px #fbc113;
+  width: 100%;
+  max-width: ${({ theme }) => theme.typography.contentMax};
+  margin: 0 auto;
+  border: 1px solid #e8eaef;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 6px 16px rgba(15, 23, 42, 0.05);
 
   @media (max-width: 1024px) {
-    gap: 1.6rem;
-    padding-left: 3.8rem;
-    width: 90%;
+    gap: 1rem;
+    padding: 0.85rem 0.9rem 0.85rem 2.85rem;
   }
 
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
-    padding: 2rem 1.5rem;
-    width: 95%;
-    gap: 1.5rem;
-    margin: 1rem auto;
+    padding: 1.25rem 1rem;
+    max-width: 100%;
+    gap: 1rem;
   }
 `;
 
@@ -42,23 +42,30 @@ export const TopIndex = styled.span`
   background-color: ${({ theme }) => theme.colors.primary};
   position: absolute;
   color: white;
-  top: -20px;
-  left: 16px;
+  top: -10px;
+  left: 12px;
   text-align: center;
-  padding: 4px 10px;
-  border-radius: 5px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  min-width: 1.35rem;
+  padding: 3px 7px;
+  border-radius: 4px;
+  line-height: 1.2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 `;
 
 export const FeaturedRibbon = styled.div`
   position: absolute;
   top: 0;
   right: 0;
-  background-color: #d97706;
+  background-color: #c2410c;
   color: white;
-  padding: 6px 14px;
-  font-weight: bold;
-  font-size: 12px;
-  border-radius: 0 12px 0 5px;
+  padding: 4px 10px;
+  font-weight: 600;
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 0 10px 0 6px;
 `;
 
 export const LogoSection = styled.div`
@@ -80,25 +87,27 @@ export const LogoSection = styled.div`
 `;
 
 export const LogoImg = styled.img`
-  height: 110px;
-  width: 110px;
+  height: 64px;
+  width: 64px;
   border-radius: 50%;
   background-color: #fff;
   object-fit: cover;
-  // box-shadow: 0 0 0 4px #fbc113;
+  border: 1px solid #eef0f4;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
 
   @media (max-width: 768px) {
-    height: 100px;
-    width: 100px;
+    height: 72px;
+    width: 72px;
   }
 `;
 
 export const InfoSection = styled.div`
   flex: 2;
-  min-width: 250px;
+  min-width: 0;
+  max-width: min(36rem, 100%);
 
   @media (max-width: 768px) {
-    min-width: unset;
+    max-width: 100%;
     width: 100%;
     text-align: center;
   }
@@ -107,41 +116,52 @@ export const InfoSection = styled.div`
 export const TitleRow = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
 
   h2 {
-    font-size: 30px;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
     margin: 0;
     color: #0f1c46;
+    line-height: 1.3;
 
     @media (max-width: 768px) {
-      font-size: 26px;
+      font-size: 1rem;
     }
   }
 
   @media (max-width: 768px) {
     justify-content: center;
-    flex-wrap: wrap;
   }
 `;
 
 export const VerifiedBadge = styled.span`
-  background-color: #2563eb;
+  background-color: #1d4ed8;
   color: #ffffff;
-  font-size: 13px;
-  padding: 4px 10px;
-  border-radius: 5px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
   white-space: nowrap;
+  letter-spacing: 0.02em;
 `;
 
 export const Description = styled.p`
-  font-size: 16px;
-  color: rgba(15, 23, 42, 0.8);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: rgba(15, 23, 42, 0.72);
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 
   @media (max-width: 768px) {
     text-align: center;
+    -webkit-line-clamp: 4;
   }
 `;
 
@@ -149,87 +169,116 @@ export const RatingBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1.4rem;
-  min-width: 110px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
+  justify-content: center;
+  padding: 0.55rem 0.65rem;
+  min-width: 5.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   text-align: center;
+  background: #fafbfc;
 
   @media (max-width: 768px) {
     align-self: center;
-    width: 80%;
-    max-width: 300px;
+    width: auto;
+    min-width: 7rem;
   }
 `;
 
 export const StarRow = styled.div`
   display: flex;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
+  font-size: 11px;
+  line-height: 1;
+
+  svg {
+    width: 11px;
+    height: 11px;
+  }
 `;
 
 export const ReviewText = styled.div`
-  margin-top: 6px;
+  margin-top: 4px;
 
   strong {
-    font-size: 16px;
+    font-size: 0.8125rem;
+    font-weight: 600;
     color: #0f1c46;
   }
 
   span {
     display: block;
-    font-size: 12px;
+    font-size: 0.65rem;
     color: #6b7280;
+    margin-top: 1px;
+    letter-spacing: 0.01em;
   }
 `;
 
 export const ActionSection = styled.div`
-  min-width: 160px;
+  min-width: 7.5rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
+  align-items: stretch;
+  gap: 0.35rem;
 
   @media (max-width: 768px) {
     align-items: center;
     width: 100%;
+    max-width: 220px;
   }
 `;
 
 export const TermsText = styled.span`
-  font-size: 10px;
-  color: #0f172a;
+  font-size: 0.6rem;
+  color: #64748b;
+  text-align: center;
+  line-height: 1.3;
 `;
 
 export const PrimaryButton = styled.button`
   background-color: ${({ theme }) => theme.colors.primary};
   color: #fff;
   border: none;
-  padding: 0.6rem 1.8rem;
-  border-radius: 2rem;
-  font-size: 14px;
-  font-weight: 500;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
   cursor: pointer;
   width: 100%;
-  max-width: 180px;
+  max-width: 9.5rem;
+  margin: 0 auto;
   justify-content: center;
+  transition: background 0.2s ease, transform 0.15s ease;
 
-  &:hover {
+  img {
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover:not(:disabled) {
     background-color: #1a2c60;
+  }
+
+  &:disabled {
+    opacity: 0.5;
   }
 `;
 
 export const SecondaryButton = styled.a`
-  color: #0f1c46;
-  font-size: 14px;
+  color: #132e58;
+  font-size: 0.75rem;
+  font-weight: 500;
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 0.35rem;
   cursor: pointer;
+  margin-top: 0.1rem;
 
   &:hover {
     text-decoration: underline;

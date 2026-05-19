@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { FiDollarSign, FiRefreshCw, FiPlus } from 'react-icons/fi';
 import SimpleModal from '../../../components/AdminPanel/SimpleModal';
 import { fetchAdminRebateCredits, grantRebateAdmin, formatUsd, type RebateCreditRow } from '../../../services/rebateService';
+import { TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
 
 const Container = styled.div`
   max-width: 1200px;
@@ -250,11 +251,7 @@ const AdminRebateCredits: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {loading && (
-              <tr>
-                <Td colSpan={5}>Loading…</Td>
-              </tr>
-            )}
+            {loading && <TableBodySkeleton rows={6} cols={5} />}
             {!loading &&
               items.map((row) => (
                 <tr key={row.id}>

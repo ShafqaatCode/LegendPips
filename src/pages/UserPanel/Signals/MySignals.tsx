@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FiTrendingUp, FiTrendingDown, FiLock, FiCalendar, FiFilter, FiEye } from 'react-icons/fi';
 import { fetchPublicSignals, trackSignalView, type ApiSignal } from '../../../services/signalService';
+import { SignalsTableSkeleton } from '../../../components/SharedComponents/Shimmer';
 
 const Container = styled.div`
   max-width: 1400px;
@@ -284,7 +285,7 @@ const MySignals: React.FC = () => {
           <div>Date</div>
           <div>Activity</div>
         </TableHeader>
-        {loading && <EmptyHint>Loading…</EmptyHint>}
+        {loading && <SignalsTableSkeleton rows={6} />}
         {!loading && signals.length === 0 && !error && (
           <EmptyHint>No signals published yet. Check back soon or browse the Signals page.</EmptyHint>
         )}

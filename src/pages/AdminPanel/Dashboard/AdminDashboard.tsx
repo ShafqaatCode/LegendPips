@@ -16,6 +16,7 @@ import {
   FiBarChart2,
 } from 'react-icons/fi';
 import { fetchAdminFullMetrics, fetchAdminActivityFeed } from '../../../services/adminEngagementService';
+import { ShimmerBar, ActivityTimelineSkeleton } from '../../../components/SharedComponents/Shimmer';
 
 const DashboardContainer = styled.div`
   max-width: 1600px;
@@ -469,11 +470,17 @@ const AdminDashboard: React.FC = () => {
                 <stat.icon />
               </StatIcon>
             </StatHeader>
-            <StatValue>{stat.value}</StatValue>
-            <StatLabel>{stat.label}</StatLabel>
+            <StatValue>{metricsLoading ? <ShimmerBar $h="32px" $w="52%" /> : stat.value}</StatValue>
+            <StatLabel>{metricsLoading ? <ShimmerBar $h="14px" $w="72%" /> : stat.label}</StatLabel>
             <StatChange $positive={stat.positive}>
-              {stat.positive ? <FiArrowUp /> : <FiArrowDown />}
-              {stat.change}
+              {metricsLoading ? (
+                <ShimmerBar $h="12px" $w="88%" />
+              ) : (
+                <>
+                  {stat.positive ? <FiArrowUp /> : <FiArrowDown />}
+                  {stat.change}
+                </>
+              )}
             </StatChange>
           </StatCard>
         ))}
@@ -509,7 +516,7 @@ const AdminDashboard: React.FC = () => {
           {feedLoading && (
             <ActivityItem>
               <ActivityContent>
-                <ActivityText>Loading activity…</ActivityText>
+                <ActivityTimelineSkeleton rows={4} />
               </ActivityContent>
             </ActivityItem>
           )}

@@ -11,6 +11,8 @@ export interface RegisterRequest {
   email: string;
   password: string;
   phone?: string;
+  /** Required when server enforces email OTP (omit only if SKIP_EMAIL_OTP on backend). */
+  otp?: string;
 }
 
 export interface User {
@@ -82,6 +84,22 @@ export const login = async (credentials: LoginRequest): Promise<AuthResponse> =>
   }
 };
 
+/** Request a 6-digit registration code to the given email (must not already be registered). */
+export const sendRegistrationOtp = async (email: string): Promise<BasicResponse> => {
+  const response = await fetchWithTimeout(
+    `${API_CONFIG.BASE_URL}/register/send-otp`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email.trim() }),
+    },
+    API_CONFIG.TIMEOUT
+  );
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Could not send verification code");
+  return data;
+};
+
 // Register API
 export const register = async (userData: RegisterRequest): Promise<AuthResponse> => {
   try {
@@ -109,6 +127,7 @@ export const register = async (userData: RegisterRequest): Promise<AuthResponse>
           email: userData.email,
           password: userData.password,
           phone: userData.phone,
+          ...(userData.otp !== undefined && userData.otp !== "" ? { otp: userData.otp.trim() } : {}),
         }),
       },
       API_CONFIG.TIMEOUT

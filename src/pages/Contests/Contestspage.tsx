@@ -8,15 +8,12 @@ import styled from 'styled-components';
 import Competitions from '../../components/ContestList/Competitions';
 import ContestHeaderWithModals from '../../components/ContestList/BrodcumHeader';
 const MainContainer = styled.main`
-  
-  margin:75px auto;
- 
-@media (max-width: ${({ theme }) => theme.breakpoints.laptop})
-{
-  margin-top: 0;
-} 
-  
-`
+  /* Nav is in document flow — no offset needed (old fixed-header margin caused the white gap). */
+  margin: 0;
+  padding: 0.35rem 0 0;
+  width: 100%;
+  box-sizing: border-box;
+`;
 
 
 const Contests: React.FC = () => {

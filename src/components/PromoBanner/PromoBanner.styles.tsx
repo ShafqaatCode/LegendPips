@@ -8,9 +8,9 @@ export const BannerWrapper = styled.section`
   align-items: center;
   justify-content: flex-start;
   // height: 100vh;
-  min-height: 600px;
+  min-height: 520px;
 //   border: 2px solid red;
-  padding: 0 3rem;
+  padding: 0 ${({ theme }) => theme.typography.pageGutter};
   background-image: url("${bgImage}");
   background-size: cover;
   background-position: center;
@@ -18,7 +18,7 @@ export const BannerWrapper = styled.section`
   color: ${({ theme }) => theme.colors.WHITE};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: 0 1.5rem;
+    padding: 0 ${({ theme }) => theme.typography.pageGutter};
     justify-content: center;
     /* margin-top: 70px; */
   }
@@ -61,50 +61,40 @@ export const HeroContent = styled.div`
 export const SubheadingWrapper = styled(motion.div)`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 
   img {
-    height: 30px;
-    width: 30px;
+    height: 22px;
+    width: 22px;
   }
-  
 `;
 
 export const HeroSubTitle = styled.p`
   font-family: ${({ theme }) => theme.font.family};
-  font-size: 20px;
-  
+  font-size: ${({ theme }) => theme.typography.bannerUpper};
   font-weight: 600;
-  line-height: 1.5;
-  letter-spacing: -0.6%;
+  line-height: 1.4;
+  letter-spacing: 0.05em;
   color: ${({ theme }) => theme.colors.gold};
+  text-transform: uppercase;
+  margin: 0;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 16px;
+    font-size: 0.75rem;
   }
 `;
 
 export const HeroTitle = styled(motion.div)`
   font-family: ${({ theme }) => theme.font.family};
-  font-size: 48px;
+  font-size: ${({ theme }) => theme.typography.heroTitle};
   font-weight: 600;
-  line-height: 1.4;
-  letter-spacing: -0.6%;
-  margin: 0.5rem 0;
+  line-height: ${({ theme }) => theme.typography.heroTitleLh};
+  letter-spacing: -0.02em;
+  margin: 0.35rem 0 0.5rem;
   text-transform: capitalize;
-  /* border: 2px solid red; */
 
   span {
     color: ${({ theme }) => theme.colors.gold};
-  }
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    font-size: 40px;
-  }
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 32px;
-    line-height: 1.3;
   }
 `;
 
@@ -185,14 +175,15 @@ export const ActionButtons = styled(motion.div)`
 `;
 
 const ButtonBase = styled.button`
-  padding: 0.75rem 2rem;
-  font-size: 1.2rem;
-  /* line-height: 35px; */
+  padding: 0.5rem 1.15rem;
+  font-size: 0.875rem;
   font-weight: 500;
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
-  width: 268px;
+  width: auto;
+  min-width: 10rem;
+  max-width: 15rem;
   border: 1px solid transparent;
   font-family: ${({ theme }) => theme.font.family};
 
@@ -202,7 +193,7 @@ const ButtonBase = styled.button`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     width: 100%;
-    max-width: 320px;
+    max-width: 280px;
   }
 `;
 

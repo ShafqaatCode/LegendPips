@@ -8,6 +8,7 @@ import {
   updateAdminSignal,
   deleteAdminSignal,
 } from '../../../services/signalService';
+import { TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
 
 const Container = styled.div`
   max-width: 1600px;
@@ -275,11 +276,7 @@ const SignalsManagement: React.FC = () => {
             </TableHeaderRow>
           </TableHeader>
           <TableBody>
-            {loading && signals.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8}>Loading…</TableCell>
-              </TableRow>
-            ) : null}
+            {loading && signals.length === 0 ? <TableBodySkeleton rows={6} cols={8} /> : null}
             {!loading && signals.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8}>No signals yet. Create one to publish on the site.</TableCell>

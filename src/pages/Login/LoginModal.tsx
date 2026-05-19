@@ -7,9 +7,10 @@ interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSwitchToRegister?: () => void;
+  onLoginSuccess?: () => void;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegister }) => {
+const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegister, onLoginSuccess }) => {
   
   useEffect(() => {
     if (isOpen) {
@@ -28,7 +29,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegi
     <Overlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
         <CloseButton onClick={onClose}><FaX size={"16px"} /></CloseButton>
-        <LoginForm onSwitchToRegister={onSwitchToRegister}/>
+        <LoginForm onSwitchToRegister={onSwitchToRegister} onLoginSuccess={onLoginSuccess} />
       </ModalContainer>
     </Overlay>
   );
@@ -47,25 +48,21 @@ const Overlay = styled.div`
   z-index: 999;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding: 10vh 0;
-  
+  align-items: center;
+  padding: 1rem;
   overflow-y: auto;
 `;
 
 const ModalContainer = styled.div`
- 
   border-radius: 12px;
- 
-  max-width: 800px;
+  max-width: min(440px, 100%);
+  width: 100%;
   position: relative;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   margin: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  
 `;
 
 const CloseButton = styled.button`

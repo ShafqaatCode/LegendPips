@@ -1,4 +1,5 @@
 import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   CardContainer,
   LogoSection,
@@ -46,6 +47,7 @@ interface BrokerCardProps {
   featured?: boolean;
   title: string;
   description: string;
+  brokerId?: string;
   logoSrc: string;
   rating: number;
   reviewsCount: string;
@@ -56,10 +58,12 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
   featured,
   title,
   description,
+  brokerId,
   logoSrc,
   rating,
   reviewsCount,
 }) => {
+  const navigate = useNavigate();
   return (
     <Container>
       <SlideFadeSection>
@@ -93,10 +97,23 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
 
           <ActionSection>
             <TermsText>Terms & Conditions Apply</TermsText>
-            <PrimaryButton>
+            <PrimaryButton
+              type="button"
+              disabled={!brokerId}
+              onClick={() => brokerId && navigate(`/rebates/broker/${brokerId}`)}
+              style={!brokerId ? { opacity: 0.55, cursor: "not-allowed" } : undefined}
+            >
               View Details <img src={ArrowIcon} alt="Arrow" />
             </PrimaryButton>
-            <SecondaryButton>Broker Reviews</SecondaryButton>
+            {brokerId ? (
+              <SecondaryButton as={Link} to={`/rebates/broker/${brokerId}`}>
+                Broker Reviews
+              </SecondaryButton>
+            ) : (
+              <SecondaryButton as="span" style={{ opacity: 0.55, cursor: "not-allowed", pointerEvents: "none" }}>
+                Broker Reviews
+              </SecondaryButton>
+            )}
           </ActionSection>
         </CardContainer>
       </SlideFadeSection>

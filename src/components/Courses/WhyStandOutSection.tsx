@@ -3,48 +3,38 @@ import styled from 'styled-components';
 
 const SectionWrapper = styled.section`
   background: #fafbfc;
-  padding: 80px 3rem;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 60px 2rem;
-  }
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: 40px 1.5rem;
-  }
+  padding: clamp(2.5rem, 6vw, 3.5rem) ${({ theme }) => theme.typography.pageGutter};
 `;
 
 const ContentWrapper = styled.div`
-  max-width: 1400px;
+  max-width: ${({ theme }) => theme.typography.contentMax};
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4rem;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
   align-items: center;
-  
+
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.75rem;
   }
 `;
 
 const LeftContent = styled.div``;
 
 const Heading = styled.h2`
-  font-size: 36px;
+  font-size: ${({ theme }) => theme.typography.sectionTitle};
+  line-height: ${({ theme }) => theme.typography.sectionTitleLh};
   font-weight: 700;
-  color: #132E58;
-  margin-bottom: 1.5rem;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 28px;
-  }
+  color: #132e58;
+  margin: 0 0 1rem;
 `;
 
 const Description = styled.p`
-  font-size: 16px;
-  line-height: 1.8;
+  font-size: ${({ theme }) => theme.typography.body};
+  line-height: 1.65;
   color: #555;
+  margin: 0;
 `;
 
 const RightContent = styled.div`
@@ -82,7 +72,7 @@ const IconCircle = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 48px;
+  font-size: clamp(1.75rem, 4vw, 2rem);
   border: 2px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
   

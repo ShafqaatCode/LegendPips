@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
-import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiCheck, FiLoader } from "react-icons/fi";
+import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiCheck } from "react-icons/fi";
 import SimpleModal from "../../../components/AdminPanel/SimpleModal";
+import { CourseGridSkeleton } from "../../../components/SharedComponents/Shimmer";
 import {
   adminCreateBroker,
   adminDeleteBroker,
@@ -412,9 +413,7 @@ const BrokersManagement: React.FC = () => {
       {listError && <ErrorBanner>{listError}</ErrorBanner>}
 
       {listLoading ? (
-        <div style={{ textAlign: "center", padding: "3rem", color: "#132e58" }}>
-          <FiLoader style={{ animation: "spin 1s linear infinite", fontSize: "2rem" }} />
-        </div>
+        <CourseGridSkeleton cards={6} />
       ) : (
         <BrokersGrid>
           {filteredBrokers.map((broker) => (
@@ -461,8 +460,6 @@ const BrokersManagement: React.FC = () => {
           ))}
         </BrokersGrid>
       )}
-
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
       <SimpleModal
         isOpen={isModalOpen}

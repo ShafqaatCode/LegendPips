@@ -5,6 +5,7 @@ import BrokerDetailPage from "./BrokerDetailPage";
 import BrokerSetupPage from "./BrokerSetupPage";
 import type { Broker } from "./BrokerListingPage";
 import TradeLogo from "../../assets/TradeMarketBrands/Ellipse 1-1.svg";
+import { BrokerListSkeleton } from "../SharedComponents/Shimmer";
 import { fetchPublicBrokers, mapApiBrokerToBroker } from "../../services/brokerService";
 
 const StatusWrap = styled.div`
@@ -69,7 +70,11 @@ const BrokerList: React.FC = () => {
   };
 
   if (loading) {
-    return <StatusWrap>Loading brokers…</StatusWrap>;
+    return (
+      <StatusWrap>
+        <BrokerListSkeleton rows={4} />
+      </StatusWrap>
+    );
   }
 
   if (error) {

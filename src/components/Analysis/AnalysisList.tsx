@@ -4,6 +4,7 @@ import { fetchAnalysis } from '../../services/analysisService';
 import type { Analysis } from '../../types/analysis.types';
 import AnalysisCard from './AnalysisCard';
 import XMBanner from '../Signals/XMBanner';
+import { ShimmerBar } from '../SharedComponents/Shimmer';
 
 const SectionWrapper = styled.section`
   background: #fafbfc;
@@ -102,13 +103,70 @@ const GridSection = styled.div`
   }
 `;
 
-const LoadingWrapper = styled.div`
+const ShimmerTabsOuter = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 400px;
-  font-size: 18px;
-  color: #666;
+  margin-bottom: 40px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    margin-bottom: 30px;
+  }
+`;
+
+const ShimmerTabsInner = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  background: white;
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+`;
+
+const ShimmerTabPill = styled(ShimmerBar)<{ $w: number }>`
+  height: 40px;
+  border-radius: 6px;
+  width: ${({ $w }) => `${$w}px`};
+  margin-bottom: 0;
+`;
+
+const SkeletonCard = styled.div`
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  min-height: 260px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
+const SkeletonImage = styled(ShimmerBar)`
+  width: 100%;
+  height: 140px;
+  border-radius: 0;
+  margin-bottom: 0;
+`;
+
+const SkeletonBody = styled.div`
+  padding: 1rem 1.25rem 1.25rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+`;
+
+const SkeletonLine = styled(ShimmerBar)<{ $lineH?: number; $mb?: number; $lw?: string }>`
+  height: ${({ $lineH }) => ($lineH != null ? `${$lineH}px` : '14px')};
+  margin-bottom: ${({ $mb }) => ($mb != null ? `${$mb}px` : '10px')};
+  width: ${({ $lw }) => $lw || '100%'};
+  border-radius: 6px;
+
+  &:last-child {
+    margin-bottom: 0;
+    margin-top: auto;
+  }
 `;
 
 const ErrorWrapper = styled.div`
@@ -158,6 +216,36 @@ const PageButton = styled.button<{ active?: boolean; disabled?: boolean }>`
 
 const categories = ['All', 'Market Outlook', 'Forex', 'Gold', 'Crypto', 'Indices', 'Stock'];
 
+const TAB_SHIMMER_WIDTHS = [44, 112, 64, 52, 72, 76, 56];
+
+const AnalysisListSkeleton: React.FC = () => (
+  <SectionWrapper>
+    <ContentWrapper>
+      <ShimmerTabsOuter>
+        <ShimmerTabsInner>
+          {TAB_SHIMMER_WIDTHS.map((w, i) => (
+            <ShimmerTabPill key={i} $w={w} />
+          ))}
+        </ShimmerTabsInner>
+      </ShimmerTabsOuter>
+
+      <GridSection>
+        {Array.from({ length: 8 }).map((_, i) => (
+          <SkeletonCard key={i}>
+            <SkeletonImage />
+            <SkeletonBody>
+              <SkeletonLine $lw="92%" />
+              <SkeletonLine $lw="68%" $mb={14} />
+              <SkeletonLine $lineH={12} $lw="55%" $mb={0} />
+            </SkeletonBody>
+          </SkeletonCard>
+        ))}
+      </GridSection>
+    </ContentWrapper>
+    <XMBanner />
+  </SectionWrapper>
+);
+
 const AnalysisList: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [analysis, setAnalysis] = useState<Analysis[]>([]);
@@ -196,11 +284,7 @@ const AnalysisList: React.FC = () => {
   };
 
   if (loading && analysis.length === 0) {
-    return (
-      <SectionWrapper>
-        <LoadingWrapper>Loading analysis...</LoadingWrapper>
-      </SectionWrapper>
-    );
+    return <AnalysisListSkeleton />;
   }
 
   if (error && analysis.length === 0) {

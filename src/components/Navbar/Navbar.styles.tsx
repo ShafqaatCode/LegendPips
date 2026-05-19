@@ -4,9 +4,11 @@ import { NavLink } from "react-router-dom";
 
 const activeColor = "#fbc113";
 
-// Header Container (No fixed position now)
+// Header: topbar + desktop nav must stay in normal flow so <main> is not covered.
 export const HeaderWrapper = styled.header`
   width: 100%;
+  position: relative;
+  z-index: 100;
   background-color: ${({ theme }) => theme.colors.primary};
   transition: all 0.3s ease;
 `;
@@ -71,18 +73,66 @@ export const SignInButton = styled.button`
   }
 `;
 
+/** Solid pill — desktop topbar when signed in */
+export const UserPanelButton = styled(NavLink)`
+  background-color: ${({ theme }) => theme.colors.WHITE};
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+  text-decoration: none;
+  color: ${({ theme }) => theme.colors.primary};
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 14px;
+
+  &:hover {
+    background-color: ${activeColor};
+    color: #0f172a;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+`;
+
+/** Outline style — mobile bar on dark header when signed in */
+export const PortalOutlineButton = styled(NavLink)`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: ${activeColor};
+    border-color: ${activeColor};
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+`;
+
 export const Navbar = styled.nav`
-  padding: 1.3rem 0;
+  padding: 0.85rem 0 1rem;
   display: flex;
   justify-content: center;
-  position: absolute;
-  top: 67px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  margin:0 auto;
-  background-color: ${({theme}) => theme.colors.primary};
+  align-items: center;
+  background-color: ${({ theme }) => theme.colors.primary};
   width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 
   @media (max-width: 1100px) {
     display: none;

@@ -5,21 +5,24 @@ import bannerBg from '../../assets/banner/BannerBg.jpg';
 
 const HeroWrapper = styled.section`
   position: relative;
-  min-height: 600px;
+  min-height: clamp(380px, 52vh, 480px);
   display: flex;
   align-items: center;
-  padding: 120px 3rem 80px 3rem;
+  padding: clamp(4rem, 9vw, 5.5rem) ${({ theme }) => theme.typography.pageGutter}
+    clamp(2.25rem, 5vw, 3.5rem);
   overflow: hidden;
-  background: linear-gradient(135deg, #0b1b38 0%, #132E58 100%);
-  
+  background: linear-gradient(135deg, #0b1b38 0%, #132e58 100%);
+
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: 100px 2rem 60px 2rem;
-    min-height: 500px;
+    padding: clamp(3.5rem, 8vw, 5rem) ${({ theme }) => theme.typography.pageGutter}
+      clamp(2rem, 4vw, 3rem);
+    min-height: 420px;
   }
-  
+
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: 100px 1.5rem 40px 1.5rem;
-    min-height: 450px;
+    padding: clamp(3.25rem, 8vw, 4.5rem) ${({ theme }) => theme.typography.pageGutter}
+      clamp(1.75rem, 4vw, 2.5rem);
+    min-height: 380px;
   }
 `;
 
@@ -44,17 +47,17 @@ const ChartOverlay = styled.div`
 const ContentWrapper = styled.div`
   position: relative;
   z-index: 2;
-  max-width: 1400px;
+  max-width: ${({ theme }) => theme.typography.contentMax};
   margin: 0 auto;
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4rem;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
   align-items: center;
-  
+
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.75rem;
   }
 `;
 
@@ -63,61 +66,46 @@ const LeftContent = styled.div`
 `;
 
 const MainHeading = styled.h1`
-  font-size: 56px;
+  font-size: ${({ theme }) => theme.typography.heroTitle};
   font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: 1rem;
+  line-height: ${({ theme }) => theme.typography.heroTitleLh};
+  margin: 0 0 0.75rem;
   color: white;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    font-size: 42px;
-  }
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 32px;
-  }
 `;
 
 const HighlightText = styled.span`
-  color: #Fbbf24;
+  color: #fbbf24;
 `;
 
 const Subtitle = styled.p`
-  font-size: 20px;
+  font-size: ${({ theme }) => theme.typography.heroSubtitle};
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 1.5rem;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 18px;
-  }
+  margin: 0 0 1rem;
 `;
 
 const Description = styled.p`
-  font-size: 16px;
-  line-height: 1.7;
+  font-size: ${({ theme }) => theme.typography.body};
+  line-height: 1.65;
   color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 2rem;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 15px;
-  }
+  margin: 0 0 1.5rem;
+  max-width: 36rem;
 `;
 
 const AccessButton = styled.button`
-  background: #Fbbf24;
-  color: #132E58;
+  background: #fbbf24;
+  color: #132e58;
   border: none;
-  padding: 14px 32px;
-  font-size: 16px;
+  padding: 0.55rem 1.25rem;
+  font-size: ${({ theme }) => theme.typography.body};
   font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: #f4b400;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
   }
 `;
 
@@ -134,16 +122,12 @@ const RightContent = styled.div`
 
 const IllustrationWrapper = styled.div`
   width: 100%;
-  max-width: 500px;
-  height: 400px;
+  max-width: min(420px, 100%);
+  height: clamp(240px, 38vh, 320px);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    height: 300px;
-  }
 `;
 
 const EducationIllustration = styled.div`
@@ -156,8 +140,8 @@ const EducationIllustration = styled.div`
 `;
 
 const GraduationCap = styled.div`
-  width: 140px;
-  height: 140px;
+  width: 110px;
+  height: 110px;
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   border-radius: 50%;
   display: flex;
@@ -166,10 +150,10 @@ const GraduationCap = styled.div`
   box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4);
   position: relative;
   z-index: 2;
-  
+
   &::before {
-    content: '📚';
-    font-size: 70px;
+    content: "📚";
+    font-size: 40px;
   }
 `;
 
@@ -179,14 +163,14 @@ const FloatingIcon = styled.div<{ $top?: string; $left?: string; $right?: string
   left: ${({ $left }) => $left || 'auto'};
   right: ${({ $right }) => $right || 'auto'};
   bottom: ${({ $bottom }) => $bottom || 'auto'};
-  width: 70px;
-  height: 70px;
+  width: 56px;
+  height: 56px;
   background: rgba(59, 130, 246, 0.15);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
+  font-size: 1.35rem;
   backdrop-filter: blur(10px);
   border: 2px solid rgba(59, 130, 246, 0.2);
   animation: float 3s ease-in-out infinite;

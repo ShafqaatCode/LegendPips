@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchForumThread, postForumComment, type ForumThreadDetailResponse } from '../../services/forumService';
 import { getAuthToken } from '../../utils/apiConfig';
+import { ForumThreadSkeleton } from '../SharedComponents/Shimmer';
 
 const PageWrapper = styled.section`
   background: #fafbfc;
@@ -478,7 +479,7 @@ const ForumThreadDetail: React.FC = () => {
       <PageWrapper>
         <ContentWrapper>
           <MainContent>
-            <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>Loading thread…</div>
+            <ForumThreadSkeleton />
           </MainContent>
         </ContentWrapper>
       </PageWrapper>

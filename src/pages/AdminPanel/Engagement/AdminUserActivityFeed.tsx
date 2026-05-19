@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FiActivity, FiRefreshCw } from 'react-icons/fi';
 import { fetchAdminActivityFeed, type AdminActivityFeedRow } from '../../../services/adminEngagementService';
+import { TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
 
 const Container = styled.div`
   max-width: 1600px;
@@ -197,11 +198,7 @@ const AdminUserActivityFeed: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {loading && (
-              <tr>
-                <Td colSpan={5}>Loading…</Td>
-              </tr>
-            )}
+            {loading && <TableBodySkeleton rows={6} cols={5} />}
             {!loading &&
               items.map((row) => (
                 <tr key={row.id}>

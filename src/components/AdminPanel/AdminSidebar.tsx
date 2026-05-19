@@ -17,6 +17,7 @@ import {
   FiInbox,
   FiActivity,
   FiDollarSign,
+  FiGlobe,
 } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -299,6 +300,21 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
               </NavLinkStyled>
             </NavItem>
           ))}
+        </NavList>
+      </NavSection>
+
+      <NavSection>
+        <NavList>
+          <NavItem>
+            <NavLinkStyled
+              to="/"
+              end
+              onClick={() => window.innerWidth <= 992 && onToggle()}
+            >
+              <FiGlobe />
+              <span>Back to homepage</span>
+            </NavLinkStyled>
+          </NavItem>
         </NavList>
       </NavSection>
 

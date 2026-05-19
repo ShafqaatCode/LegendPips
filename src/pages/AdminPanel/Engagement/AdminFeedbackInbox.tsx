@@ -7,6 +7,7 @@ import {
   deleteFeedbackAdmin,
   type AdminFeedbackRow,
 } from '../../../services/adminEngagementService';
+import { TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
 
 const Container = styled.div`
   max-width: 1600px;
@@ -237,11 +238,7 @@ const AdminFeedbackInbox: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {loading && (
-              <tr>
-                <Td colSpan={7}>Loading…</Td>
-              </tr>
-            )}
+            {loading && <TableBodySkeleton rows={6} cols={7} />}
             {!loading &&
               items.map((row) => {
                 const id = row._id;

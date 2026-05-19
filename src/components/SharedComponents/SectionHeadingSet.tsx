@@ -17,15 +17,14 @@ const UpperHeadingDiv = styled(motion.div)`
   gap: 0.4rem;
 
   img {
-    height: 24px;
-    width: 24px;
+    height: 20px;
+    width: 20px;
   }
 `;
 
 const HeadingWrapper = styled.div`
   text-align: center;
-  
-  padding: 1rem 0;
+  padding: 0.5rem 0 0.75rem;
 `;
 
 // Animation Variants

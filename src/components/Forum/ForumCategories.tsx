@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import ArrowRight from '../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg';
 import { fetchForumFeed, type ForumFeedSection } from '../../services/forumService';
+import { ForumBrowseSkeleton } from '../SharedComponents/Shimmer';
 
 const SectionWrapper = styled.section`
   background: #fafbfc;
@@ -345,7 +346,7 @@ const ForumCategories: React.FC = () => {
       <SectionWrapper>
         <ContentWrapper>
           <SectionTitle>Trader Community Forums</SectionTitle>
-          <div style={{ textAlign: 'center', color: '#666', padding: '2rem' }}>Loading forums…</div>
+          <ForumBrowseSkeleton />
         </ContentWrapper>
       </SectionWrapper>
     );

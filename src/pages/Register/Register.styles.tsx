@@ -4,44 +4,49 @@ import PhoneInput from "react-phone-input-2";
 
 
 export const Container = styled.div`
-  max-width: 650px;
-  margin: 4rem auto;
-  padding: 3rem 4rem;
+  max-width: 440px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 1.75rem;
   background: white;
-  border-radius: 16px;
+  border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   font-family: "Segoe UI", sans-serif;
   position: relative;
 
   @media (max-width: 768px) {
-    padding: 2rem;
-    width: 90%;
-    // margin: 1rem;
+    padding: 2.25rem 1.25rem 1.5rem;
+    margin: 0 auto;
   }
 `;
 
 export const Heading = styled.h2`
-  font-size: 40px;
-  font-weight: bold;
+  font-size: 1.375rem;
+  font-weight: 600;
   color: ${({ theme }) => theme.colors.primary};
-  margin-bottom: 1.5rem;
+  margin: 0 0 1rem 0;
+  letter-spacing: -0.02em;
 `;
 
 export const GoogleButton = styled.button`
   width: 100%;
   background-color: #1f3b8c;
   color: white;
-  padding: 1rem;
+  padding: 0.6rem 0.85rem;
   border: none;
-  font-size: 20px;
-  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 8px;
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   cursor: pointer;
-  /* font-family: poppins, sans-serif; */
+
+  &:hover {
+    background-color: #173066;
+  }
 `;
 
 export const GoogleIcon = styled.img`
@@ -53,12 +58,13 @@ export const Divider = styled.div`
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 1.8rem 0;
+  margin: 1rem 0;
   span {
-    margin:0 12px;
-    font-size: 20px;
+    margin: 0 10px;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: ${({ theme }) => theme.colors.primary};
+    white-space: nowrap;
   }
 `;
 
@@ -70,12 +76,12 @@ export const Line = styled.hr`
 `;
 
 export const Or = styled.div`
-text-align: center;
-color:${({ theme }) => theme.colors.primary};
-font-weight: 600;
-font-size: 24px;
-
-`
+  text-align: center;
+  color: ${({ theme }) => theme.colors.primary};
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+`;
 
 
 
@@ -88,19 +94,17 @@ font-size: 24px;
 
 export const Input = styled.input`
   width: 100%;
-  padding: 1.2rem;
+  padding: 0.65rem 0.85rem;
   border-radius: 8px;
   border: 1px solid #bfbfd4;
-  font-size: 14px;
-  margin-bottom: 1rem;
-  /* height: 70px; */
-  /* max-width: 600px; */
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+  box-sizing: border-box;
 
   &::placeholder {
     color: ${({ theme }) => theme.colors.primary};
-    font-size: 1rem;
+    font-size: 0.875rem;
     font-weight: 400;
-    
   }
 `;
 
@@ -144,26 +148,29 @@ export const PasswordRow = styled.div`
 
 export const Icon = styled.span`
   position: absolute;
-  right: 20px;
-  top: 20px;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   color: #999;
-  font-size: 16px;
+  font-size: 0.9rem;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 `;
 
 export const Terms = styled.div`
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  font-size: 13px;
-  margin: 1rem 0;
+  gap: 8px;
+  font-size: 0.75rem;
+  margin: 0.75rem 0;
 
   input {
-    margin-top: 5px;
+    margin-top: 3px;
   }
 
   label {
-    line-height: 1.5;
+    line-height: 1.45;
   }
 `;
 
@@ -177,12 +184,16 @@ export const RegisterButton = styled.button`
   width: 100%;
   background-color: ${({ theme }) => theme.colors.primary};
   color: white;
-  padding: 1rem;
-  font-size: 26px;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.875rem;
   border: none;
-  border-radius: 10px;
-  font-weight: 400;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
+
+  &:hover {
+    opacity: 0.92;
+  }
 `;
 
 
@@ -205,4 +216,47 @@ export const CloseBtn = styled.button`
   &:hover {
     color: #ff4444;
   }
+`;
+
+export const EmailOtpWrap = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+  margin-bottom: 0.75rem;
+
+  ${Input} {
+    margin-bottom: 0;
+    flex: 1;
+    min-width: 0;
+  }
+`;
+
+export const SendOtpBtn = styled.button<{ $cooling?: boolean }>`
+  flex-shrink: 0;
+  padding: 0 0.85rem;
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  background: ${({ $cooling }) => ($cooling ? "#e8ecf4" : "#fff")};
+  color: ${({ theme }) => theme.colors.primary};
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: ${({ $cooling }) => ($cooling ? "not-allowed" : "pointer")};
+  white-space: nowrap;
+  max-width: 42%;
+
+  &:hover:not(:disabled) {
+    background: #f0f4ff;
+  }
+
+  &:disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+  }
+`;
+
+export const OtpHint = styled.p`
+  font-size: 0.72rem;
+  color: #64748b;
+  margin: -0.35rem 0 0.65rem;
+  line-height: 1.4;
 `;
