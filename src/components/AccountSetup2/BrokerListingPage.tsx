@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { FaStar } from "react-icons/fa";
@@ -22,6 +22,7 @@ import {
 } from "../Broker/BrokerCard.styles";
 import { Description } from "../Broker/BrokerCard2";
 import TradeLogo from "../../assets/TradeMarketBrands/Ellipse 1-1.svg";
+import ListPagination from "../SharedComponents/ListPagination";
 
 export type Broker = {
   id: string;
@@ -59,9 +60,13 @@ export type Review = {
 type BrokerListingPageProps = {
   brokers: Broker[];
   onBrokerSelect: (broker: Broker) => void;
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  onPageChange: (page: number) => void;
 };
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 60 },
@@ -107,83 +112,14 @@ const ListingLogo: React.FC<{ src: string }> = ({ src }) => {
   );
 };
 
-const BrokerListingPage: React.FC<BrokerListingPageProps> = ({ brokers, onBrokerSelect }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const totalItems = brokers.length;
-  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-
-  const visibleBrokers = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    return brokers.slice(startIndex, endIndex);
-  }, [currentPage, brokers]);
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
-  const renderPaginationButtons = () => {
-    const buttons: React.ReactNode[] = [];
-    const maxVisiblePages = 5;
-
-    if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) {
-        buttons.push(
-          <PaginatorButton
-            key={i}
-            $isActive={i === currentPage}
-            onClick={() => handlePageChange(i)}
-          >
-            {i}
-          </PaginatorButton>
-        );
-      }
-    } else {
-      buttons.push(
-        <PaginatorButton key={1} $isActive={1 === currentPage} onClick={() => handlePageChange(1)}>
-          1
-        </PaginatorButton>
-      );
-
-      if (currentPage > 3) {
-        buttons.push(<Ellipsis key="ellipsis-1">...</Ellipsis>);
-      }
-
-      const start = Math.max(2, currentPage - 1);
-      const end = Math.min(totalPages - 1, currentPage + 1);
-
-      for (let i = start; i <= end; i++) {
-        buttons.push(
-          <PaginatorButton key={i} $isActive={i === currentPage} onClick={() => handlePageChange(i)}>
-            {i}
-          </PaginatorButton>
-        );
-      }
-
-      if (currentPage < totalPages - 2) {
-        buttons.push(<Ellipsis key="ellipsis-2">...</Ellipsis>);
-      }
-
-      buttons.push(
-        <PaginatorButton
-          key={totalPages}
-          $isActive={totalPages === currentPage}
-          onClick={() => handlePageChange(totalPages)}
-        >
-          {totalPages}
-        </PaginatorButton>
-      );
-    }
-
-    return buttons;
-  };
-
-  const shouldShowPagination = totalPages > 1;
-
+const BrokerListingPage: React.FC<BrokerListingPageProps> = ({
+  brokers,
+  onBrokerSelect,
+  currentPage,
+  totalPages,
+  totalItems,
+  onPageChange,
+}) => {
   return (
     <PageWrapper>
       <SectionInner>
@@ -193,7 +129,7 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({ brokers, onBroker
         </Header>
 
         <BrokerStack>
-          {visibleBrokers.map((broker, idx) => {
+          {brokers.map((broker, idx) => {
             const globalIndex = (currentPage - 1) * ITEMS_PER_PAGE + idx + 1;
             const stars = averageReviewStars(broker.reviews);
             const reviewCount = broker.reviews?.length ?? 0;
@@ -271,22 +207,12 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({ brokers, onBroker
           })}
         </BrokerStack>
 
-        {shouldShowPagination && (
-          <PaginationContainer>
-            <PaginatorButton onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-              Previous
-            </PaginatorButton>
-
-            {renderPaginationButtons()}
-
-            <PaginatorButton
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </PaginatorButton>
-          </PaginationContainer>
-        )}
+        <ListPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          onPageChange={onPageChange}
+        />
       </SectionInner>
     </PageWrapper>
   );
@@ -335,48 +261,3 @@ const BrokerStack = styled.div`
   gap: 0.85rem;
 `;
 
-const PaginationContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 2rem;
-  flex-wrap: wrap;
-`;
-
-const PaginatorButton = styled.button<{ $isActive?: boolean }>`
-  background-color: ${(props) => (props.$isActive ? "#132E58" : "transparent")};
-  color: ${(props) => (props.$isActive ? "white" : "#132E58")};
-  border: 1px solid #132e58;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.2s ease, color 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 2.5rem;
-  justify-content: center;
-  font-size: 0.875rem;
-
-  &:hover:not(:disabled) {
-    background-color: ${(props) => (props.$isActive ? "#132E58" : "#f1f5f9")};
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.45;
-  }
-
-  @media (max-width: 768px) {
-    padding: 0.4rem 0.75rem;
-    font-size: 0.8125rem;
-  }
-`;
-
-const Ellipsis = styled.span`
-  color: #6b7280;
-  padding: 0 0.5rem;
-  font-weight: 600;
-`;

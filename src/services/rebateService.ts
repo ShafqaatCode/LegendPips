@@ -6,6 +6,8 @@ export type RebateCreditRow = {
   amountCents: number;
   brokerName?: string;
   notes?: string;
+  rebateCategory?: "forex" | "crypto" | "prop";
+  purchaseType?: "first" | "repeat";
   createdAt?: string;
   userLabel?: string;
   userEmail?: string;
@@ -49,6 +51,8 @@ export async function grantRebateAdmin(body: {
   amountCents?: number;
   brokerName?: string;
   notes?: string;
+  rebateCategory?: "forex" | "crypto" | "prop";
+  purchaseType?: "first" | "repeat";
 }) {
   const res = await fetch(`${API_CONFIG.BASE_URL}/rebates/admin/grant`, {
     method: "POST",

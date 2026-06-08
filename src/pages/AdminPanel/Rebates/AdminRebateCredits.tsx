@@ -137,6 +137,8 @@ const AdminRebateCredits: React.FC = () => {
   const [formUsd, setFormUsd] = useState('25');
   const [formBroker, setFormBroker] = useState('');
   const [formNotes, setFormNotes] = useState('');
+  const [formCategory, setFormCategory] = useState<'forex' | 'crypto' | 'prop' | ''>('');
+  const [formPurchaseType, setFormPurchaseType] = useState<'first' | 'repeat' | ''>('');
   const [saving, setSaving] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -180,6 +182,8 @@ const AdminRebateCredits: React.FC = () => {
         amountUsd: usd,
         brokerName: formBroker.trim() || undefined,
         notes: formNotes.trim() || undefined,
+        rebateCategory: formCategory || undefined,
+        purchaseType: formPurchaseType || undefined,
       });
       setModalOpen(false);
       setFormNotes('');
@@ -246,12 +250,14 @@ const AdminRebateCredits: React.FC = () => {
               <Th>When</Th>
               <Th>User</Th>
               <Th>Amount</Th>
-              <Th>Broker</Th>
+              <Th>Type</Th>
+              <Th>Broker / Firm</Th>
+              <Th>Purchase</Th>
               <Th>Note</Th>
             </tr>
           </thead>
           <tbody>
-            {loading && <TableBodySkeleton rows={6} cols={5} />}
+            {loading && <TableBodySkeleton rows={6} cols={7} />}
             {!loading &&
               items.map((row) => (
                 <tr key={row.id}>
@@ -261,7 +267,9 @@ const AdminRebateCredits: React.FC = () => {
                     <div style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{row.userEmail || row.userId}</div>
                   </Td>
                   <Td style={{ fontWeight: 700, color: '#059669' }}>{formatUsd(row.amountCents)}</Td>
+                  <Td style={{ textTransform: 'capitalize' }}>{row.rebateCategory || '—'}</Td>
                   <Td>{row.brokerName || '—'}</Td>
+                  <Td style={{ textTransform: 'capitalize' }}>{row.purchaseType || '—'}</Td>
                   <Td>{row.notes || '—'}</Td>
                 </tr>
               ))}
@@ -296,8 +304,29 @@ const AdminRebateCredits: React.FC = () => {
           <Field value={formUserId} onChange={(e) => setFormUserId(e.target.value)} placeholder="e.g. 674a…" />
           <Label>Amount (USD)</Label>
           <Field value={formUsd} onChange={(e) => setFormUsd(e.target.value)} placeholder="25.00" />
-          <Label>Broker (optional)</Label>
-          <Field value={formBroker} onChange={(e) => setFormBroker(e.target.value)} placeholder="XM" />
+          <Label>Broker / prop firm (optional)</Label>
+          <Field value={formBroker} onChange={(e) => setFormBroker(e.target.value)} placeholder="OneFunded" />
+          <Label>Rebate type</Label>
+          <select
+            value={formCategory}
+            onChange={(e) => setFormCategory(e.target.value as typeof formCategory)}
+            style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 8, border: '2px solid #e5e7eb', marginBottom: 12 }}
+          >
+            <option value="">—</option>
+            <option value="forex">Forex</option>
+            <option value="crypto">Crypto</option>
+            <option value="prop">Prop trading</option>
+          </select>
+          <Label>Purchase type (prop)</Label>
+          <select
+            value={formPurchaseType}
+            onChange={(e) => setFormPurchaseType(e.target.value as typeof formPurchaseType)}
+            style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 8, border: '2px solid #e5e7eb', marginBottom: 12 }}
+          >
+            <option value="">—</option>
+            <option value="first">First purchase</option>
+            <option value="repeat">Repeat purchase</option>
+          </select>
           <Label>Internal note (optional)</Label>
           <TextArea value={formNotes} onChange={(e) => setFormNotes(e.target.value)} placeholder="January cashback batch" />
         </div>

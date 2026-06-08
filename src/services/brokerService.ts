@@ -1,6 +1,34 @@
 import type { AccountType, Broker, Review } from "../components/AccountSetup2/BrokerListingPage";
 import { API_CONFIG, getAuthHeaders } from "../utils/apiConfig";
 
+export interface RebateCashbackRow {
+  accountType: string;
+  instrument: string;
+  perLot: string;
+}
+
+export interface RebateInfoItem {
+  label: string;
+  value: string;
+}
+
+export interface RebateInfoSection {
+  title: string;
+  items: RebateInfoItem[];
+}
+
+export interface RebateContentSection {
+  title: string;
+  paragraphs: string[];
+}
+
+export interface PropCashbackOffer {
+  label: string;
+  firstPurchaseCashback?: string;
+  repeatPurchaseCashback?: string;
+  discountPercent?: string;
+}
+
 export interface ApiBroker {
   _id: string;
   name: string;
@@ -24,7 +52,33 @@ export interface ApiBroker {
   rebatesStarRating?: number;
   rebatesReviewsLabel?: string;
   rebatesFeatured?: boolean;
+  rebateRows?: RebateCashbackRow[];
+  rebateInfoSections?: RebateInfoSection[];
+  rebateContentSections?: RebateContentSection[];
+  rebateNotes?: string;
+  rebateScheduleUrl?: string;
+  setupUrl?: string;
+  rebateCategory?: "forex" | "crypto" | "prop" | "both";
+  propOffers?: PropCashbackOffer[];
 }
+
+export type RebateTabCategory = "forex" | "crypto" | "prop";
+
+export interface BrokersPagination {
+  totalItems: number;
+  itemsPerPage: number;
+  totalPages: number;
+  currentPage: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface BrokersPageResult {
+  items: ApiBroker[];
+  pagination: BrokersPagination;
+}
+
+const BROKERS_PAGE_SIZE = 10;
 
 export const mapApiBrokerToBroker = (b: ApiBroker, defaultLogo: string): Broker => ({
   id: b._id,
@@ -58,18 +112,67 @@ const fetchJson = async (url: string, options?: RequestInit) => {
 };
 
 export const fetchPublicBrokers = async (search?: string): Promise<ApiBroker[]> => {
-  const qs = new URLSearchParams();
-  if (search?.trim()) qs.set("search", search.trim());
-  const data = await fetchJson(`${API_CONFIG.BASE_URL}/brokers?${qs.toString()}`);
-  return data.items || [];
+  const result = await fetchBrokersPage({ search, page: 1, limit: 50 });
+  return result.items;
 };
 
-/** Brokers for /rebates and home broker strip (same CMS list, optional limit & search). */
-export const fetchRebatesPageBrokers = async (opts?: { limit?: number; search?: string }): Promise<ApiBroker[]> => {
+/** Paginated brokers from backend (`page` + `limit` required for list pages). */
+export const fetchBrokersPage = async (opts: {
+  rebatesPage?: boolean;
+  category?: RebateTabCategory;
+  search?: string;
+  page?: number;
+  limit?: number;
+}): Promise<BrokersPageResult> => {
+  const qs = new URLSearchParams();
+  if (opts.rebatesPage) qs.set("rebatesPage", "1");
+  if (opts.category) qs.set("category", opts.category);
+  if (opts.search?.trim()) qs.set("search", opts.search.trim());
+  qs.set("page", String(opts.page ?? 1));
+  qs.set("limit", String(opts.limit ?? BROKERS_PAGE_SIZE));
+  const data = await fetchJson(`${API_CONFIG.BASE_URL}/brokers?${qs.toString()}`);
+  const items = data.items || [];
+  const limit = opts.limit ?? BROKERS_PAGE_SIZE;
+  const page = opts.page ?? 1;
+
+  let pagination = data.pagination;
+  if (!pagination) {
+    // Legacy API (no server pagination): show one page; deploy updated backend for real paging.
+    const totalItems = items.length;
+    pagination = {
+      totalItems,
+      itemsPerPage: limit,
+      totalPages: Math.max(1, Math.ceil(totalItems / limit)),
+      currentPage: page,
+      hasNextPage: false,
+      hasPreviousPage: page > 1,
+    };
+  }
+
+  return { items, pagination };
+};
+
+/** Brokers for /rebates list (paginated) or home strip preview (`limit` only, no page). */
+export const fetchRebatesPageBrokers = async (opts?: {
+  limit?: number;
+  search?: string;
+  category?: RebateTabCategory;
+  page?: number;
+}): Promise<ApiBroker[] | BrokersPageResult> => {
+  if (opts?.page !== undefined) {
+    return fetchBrokersPage({
+      rebatesPage: true,
+      category: opts.category,
+      search: opts.search,
+      page: opts.page,
+      limit: opts.limit ?? BROKERS_PAGE_SIZE,
+    });
+  }
   const qs = new URLSearchParams();
   qs.set("rebatesPage", "1");
   if (opts?.limit !== undefined) qs.set("limit", String(opts.limit));
   if (opts?.search?.trim()) qs.set("search", opts.search.trim());
+  if (opts?.category) qs.set("category", opts.category);
   const data = await fetchJson(`${API_CONFIG.BASE_URL}/brokers?${qs.toString()}`);
   return data.items || [];
 };

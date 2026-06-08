@@ -6,7 +6,7 @@ import ButtonBase from "../SharedComponents/Button";
 import ArrowIcon from "../../assets/arrow-narrow-circle-broken-up-right-blue.png";
 
 import { Link } from "react-router-dom";
-import { fetchRebatesPageBrokers } from "../../services/brokerService";
+import { fetchBrokersPage } from "../../services/brokerService";
 import { BrokerListSkeleton } from "../SharedComponents/Shimmer";
 import { mapApiBrokerToRebateCardRow } from "../../utils/rebatesBrokersDisplay";
 import type { ApiBroker } from "../../services/brokerService";
@@ -49,7 +49,12 @@ const BrokerSection: React.FC<props> = ({ showAll = false }) => {
     let cancelled = false;
     (async () => {
       try {
-        const list = await fetchRebatesPageBrokers(showAll ? undefined : { limit: 5 });
+        const result = await fetchBrokersPage({
+          rebatesPage: true,
+          page: 1,
+          limit: showAll ? 50 : 5,
+        });
+        const list = result.items;
         if (!cancelled) {
           setItems(list);
           setError(null);

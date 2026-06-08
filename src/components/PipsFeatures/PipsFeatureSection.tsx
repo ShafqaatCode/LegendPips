@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
+import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 
-// Import PNGs from your assets folder
 import clockIcon from "../../assets/FeaturesIcon/clock.png";
 import speedIcon from "../../assets/FeaturesIcon/speed.png";
 import checkIcon from "../../assets/FeaturesIcon/check.png";
@@ -12,66 +12,87 @@ import headsetIcon from "../../assets/FeaturesIcon/headset.png";
 import complaintIcon from "../../assets/FeaturesIcon/complain.png";
 
 const FeaturesWrapper = styled.section`
-  
-  padding: 30px 30px;
+  padding: 2rem 0 2.25rem;
   background-color: #fff;
-  margin: 2rem auto;
-  max-width: 1280px;
 `;
 
-const Title = styled.h2`
-  text-align: center;
-  font-size: 3rem;
-  color: ${({ theme }) => theme.colors.primary};
-  margin-bottom: 50px;
+const Inner = styled.div`
+  max-width: ${({ theme }) => theme.typography.contentMax};
+  margin: 0 auto;
+  padding: 0 ${({ theme }) => theme.typography.pageGutter};
+  box-sizing: border-box;
 `;
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 60px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.25rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 520px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
-const Card = styled.div`
-  // text-align: center;
-  // border: 2px solid green;
-  padding: 10px;
-  
+const Card = styled.article`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.85rem 0.9rem;
+  background: #fff;
+  border: 1px solid #e8eaef;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
-  @media (max-width: 768px) {
-    margin: 0 auto;
-    width: 100%;
+  &:hover {
+    border-color: #d0d7e2;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.07);
+  }
+
+  @media (max-width: 520px) {
+    align-items: center;
     text-align: center;
   }
 `;
 
-const IconWrapper = styled.div`
-  margin-bottom: 0.2rem;
-  text-align: center;
+const IconBadge = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: rgba(19, 46, 88, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
   img {
-    width: 110px;
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
   }
 `;
 
 const Heading = styled.h3`
-  font-size: 1rem;
-  color: ${({theme}) => theme.colors.primary};
-  font-weight: 500;
-  // line-height: 30px;
-  // margin-bottom: 10px;
+  margin: 0;
+  font-size: ${({ theme }) => theme.typography.cardTitle};
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.primary};
+  line-height: 1.35;
+  letter-spacing: -0.01em;
 `;
 
 const Description = styled.p`
-  font-size: 13px;
-  font-weight: 300;
-  // max-width: 225px;
-  color: ${({ theme }) => theme.colors.primary};
-
-  @media (max-width: 768px) {
-    margin: 0 auto;
-    width: 100%;
-    text-align: center;
-  }
+  margin: 0;
+  font-size: ${({ theme }) => theme.typography.caption};
+  font-weight: 400;
+  color: ${({ theme }) => theme.colors.muted};
+  line-height: 1.5;
 `;
 
 const LegendPipsFeatures: React.FC = () => {
@@ -120,18 +141,25 @@ const LegendPipsFeatures: React.FC = () => {
 
   return (
     <FeaturesWrapper>
-      <Title>Legend Pips Features</Title>
-      <Grid>
-        {features.map(({ icon, title, desc }) => (
-          <Card key={title}>
-            <IconWrapper>
-              <img src={icon} alt={title} />
-            </IconWrapper>
-            <Heading>{title}</Heading>
-            <Description>{desc}</Description>
-          </Card>
-        ))}
-      </Grid>
+      <Inner>
+        <SectionHeadingSet
+          upperText="Why traders choose us"
+          mainHeading="Legend Pips Features"
+          subText="Everything you need to trade smarter, earn rebates, and grow with a trusted community."
+        />
+
+        <Grid>
+          {features.map(({ icon, title, desc }) => (
+            <Card key={title}>
+              <IconBadge>
+                <img src={icon} alt="" aria-hidden />
+              </IconBadge>
+              <Heading>{title}</Heading>
+              <Description>{desc}</Description>
+            </Card>
+          ))}
+        </Grid>
+      </Inner>
     </FeaturesWrapper>
   );
 };

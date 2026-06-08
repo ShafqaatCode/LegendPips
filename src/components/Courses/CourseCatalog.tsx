@@ -9,6 +9,9 @@ import {
 } from "../../services/courseService";
 import { getAuthToken } from "../../utils/apiConfig";
 import { CourseGridSkeleton } from "../SharedComponents/Shimmer";
+import ListPagination from "../SharedComponents/ListPagination";
+
+const COURSES_PER_PAGE = 10;
 
 const SectionWrapper = styled.section`
   background: #ffffff;
@@ -241,11 +244,18 @@ const Message = styled.div<{ $error?: boolean }>`
 const CourseCatalog: React.FC = () => {
   const navigate = useNavigate();
   const [category, setCategory] = useState<string>("All");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [items, setItems] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [enrollingId, setEnrollingId] = useState<string | null>(null);
   const [banner, setBanner] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPage(1);
+  }, [category]);
 
   useEffect(() => {
     let cancelled = false;
@@ -254,11 +264,15 @@ const CourseCatalog: React.FC = () => {
       setError(null);
       try {
         const res = await fetchPublishedCourses({
-          page: 1,
-          limit: 24,
+          page,
+          limit: COURSES_PER_PAGE,
           category: category === "All" ? undefined : category,
         });
-        if (!cancelled) setItems(res.items || []);
+        if (!cancelled) {
+          setItems(res.items || []);
+          setTotalPages(Math.max(1, res.pagination?.totalPages ?? 1));
+          setTotalItems(res.pagination?.totalItems ?? res.items?.length ?? 0);
+        }
       } catch (e: any) {
         if (!cancelled) setError(e.message || "Could not load courses.");
       } finally {
@@ -268,7 +282,7 @@ const CourseCatalog: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [category]);
+  }, [category, page]);
 
   const handleEnroll = async (course: Course) => {
     if (!getAuthToken()) {
@@ -299,7 +313,15 @@ const CourseCatalog: React.FC = () => {
 
         <Toolbar>
           {["All", "forex", "crypto", "general"].map((c) => (
-            <FilterBtn key={c} type="button" $active={category === c} onClick={() => setCategory(c)}>
+            <FilterBtn
+              key={c}
+              type="button"
+              $active={category === c}
+              onClick={() => {
+                setCategory(c);
+                setPage(1);
+              }}
+            >
               {c === "All" ? "All courses" : c}
             </FilterBtn>
           ))}
@@ -355,6 +377,15 @@ const CourseCatalog: React.FC = () => {
               );
             })}
           </Grid>
+        )}
+
+        {!loading && !error && items.length > 0 && (
+          <ListPagination
+            currentPage={page}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            onPageChange={setPage}
+          />
         )}
       </ContentWrapper>
     </SectionWrapper>

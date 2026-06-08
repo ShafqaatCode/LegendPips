@@ -8,9 +8,8 @@ import styled from 'styled-components';
 import Competitions from '../../components/ContestList/Competitions';
 import ContestHeaderWithModals from '../../components/ContestList/BrodcumHeader';
 const MainContainer = styled.main`
-  /* Nav is in document flow — no offset needed (old fixed-header margin caused the white gap). */
   margin: 0;
-  padding: 0.35rem 0 0;
+  padding: 0;
   width: 100%;
   box-sizing: border-box;
 `;

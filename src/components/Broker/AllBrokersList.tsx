@@ -7,9 +7,13 @@ import ArrowIcon from "../../assets/arrow-narrow-circle-broken-up-right-blue.png
 
 import { Link } from "react-router-dom";
 import BrokerCard2 from "./BrokerCard2";
+import PropFirmCard from "./PropFirmCard";
 import { BrokerListSkeleton } from "../SharedComponents/Shimmer";
-import { fetchRebatesPageBrokers } from "../../services/brokerService";
+import ListPagination from "../SharedComponents/ListPagination";
+import { fetchBrokersPage, type RebateTabCategory } from "../../services/brokerService";
 import { mapApiBrokerToRebateCardRow, type RebateBrokerCardRow } from "../../utils/rebatesBrokersDisplay";
+
+const BROKERS_PER_PAGE = 10;
 
 const BrokerSectionWrapper = styled.section`
   display: flex;
@@ -43,65 +47,111 @@ interface props {
   showAll?: boolean;
   /** Debounced query for /rebates broker search (optional). */
   search?: string;
+  /** Rebates page tab filter (forex / crypto). */
+  category?: RebateTabCategory;
 }
 
-const AllBrokersList: React.FC<props> = ({ showAll = false, search = "" }) => {
+const AllBrokersList: React.FC<props> = ({ showAll = false, search = "", category = "forex" }) => {
   const [rows, setRows] = useState<RebateBrokerCardRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, category, showAll]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const items = await fetchRebatesPageBrokers(
-          showAll ? { search: search || undefined } : { limit: 5, search: search || undefined }
-        );
-        const mapped = items.map(mapApiBrokerToRebateCardRow);
+        setError(null);
+        if (showAll) setRows(null);
+        const result = await fetchBrokersPage({
+          rebatesPage: true,
+          category: showAll ? category : "forex",
+          search: showAll ? search || undefined : undefined,
+          page: showAll ? page : 1,
+          limit: showAll ? BROKERS_PER_PAGE : 5,
+        });
+        const mapped = result.items.map(mapApiBrokerToRebateCardRow);
         if (!cancelled) {
           setRows(mapped);
-          setError(null);
+          setTotalPages(Math.max(1, result.pagination.totalPages));
+          setTotalItems(result.pagination.totalItems);
         }
       } catch (e) {
         if (!cancelled) {
           setError(e instanceof Error ? e.message : "Failed to load brokers");
           setRows([]);
+          setTotalPages(1);
+          setTotalItems(0);
         }
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [showAll, search]);
+  }, [showAll, search, category, page]);
 
   const visibleRows = rows ?? [];
+  const loading = rows === null && !error;
 
   return (
     <BrokerSectionWrapper>
       {error && <StatusLine>{error}</StatusLine>}
-      {rows === null && !error && <BrokerListSkeleton rows={showAll ? 5 : 3} />}
-      {rows !== null && visibleRows.length === 0 && !error && (
+      {loading && <BrokerListSkeleton rows={showAll ? BROKERS_PER_PAGE : 3} />}
+      {!loading && visibleRows.length === 0 && !error && (
         <StatusLine>
           {search.trim()
             ? "No brokers match your search. Try another name or keyword."
-            : "No rebate brokers are published yet. Run the rebates seed on the server."}
+            : category === "crypto"
+              ? "No crypto rebate brokers are published yet. Add brokers with Crypto category in the admin panel."
+              : category === "prop"
+                ? "No prop trading firms are published yet. Add brokers with Prop Trading category in the admin panel."
+                : "No forex rebate brokers are published yet. Run the rebates seed on the server."}
         </StatusLine>
       )}
       <BrokerWrapper>
-        {visibleRows.map((broker) => (
-          <BrokerCard2
-            key={broker.key}
-            index={broker.index}
-            featured={broker.featured}
-            title={broker.title}
-            brokerId={broker.key}
-            description={broker.description}
-            logoSrc={broker.logoSrc}
-            rating={broker.rating}
-            reviewsCount={broker.reviewsCount}
-            accountTypes={broker.accountTypes}
-          />
-        ))}
+        {visibleRows.map((broker) =>
+          category === "prop" ? (
+            <PropFirmCard
+              key={broker.key}
+              title={broker.title}
+              brokerId={broker.key}
+              logoSrc={broker.logoSrc}
+              rating={broker.rating}
+              reviewsCount={broker.reviewsCount}
+              propOffers={broker.propOffers || []}
+              setupUrl={broker.setupUrl}
+            />
+          ) : (
+            <BrokerCard2
+              key={broker.key}
+              index={broker.index}
+              featured={broker.featured}
+              title={broker.title}
+              brokerId={broker.key}
+              description={broker.description}
+              logoSrc={broker.logoSrc}
+              rating={broker.rating}
+              reviewsCount={broker.reviewsCount}
+              accountTypes={broker.accountTypes}
+            />
+          )
+        )}
       </BrokerWrapper>
+
+      {showAll && !loading && visibleRows.length > 0 && (
+        <ListPagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          onPageChange={setPage}
+        />
+      )}
+
       {!showAll && (
         <ButtonContainer>
           <Link to={"/rebates"} style={{ textDecoration: "none" }}>

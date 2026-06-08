@@ -6,7 +6,9 @@ import BrokerSetupPage from "./BrokerSetupPage";
 import type { Broker } from "./BrokerListingPage";
 import TradeLogo from "../../assets/TradeMarketBrands/Ellipse 1-1.svg";
 import { BrokerListSkeleton } from "../SharedComponents/Shimmer";
-import { fetchPublicBrokers, mapApiBrokerToBroker } from "../../services/brokerService";
+import { fetchBrokersPage, mapApiBrokerToBroker } from "../../services/brokerService";
+
+const BROKERS_PER_PAGE = 10;
 
 const StatusWrap = styled.div`
   text-align: center;
@@ -31,25 +33,36 @@ const BrokerList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageType>("listing");
   const [selectedBroker, setSelectedBroker] = useState<Broker | null>(null);
   const [brokers, setBrokers] = useState<Broker[]>([]);
+  const [listPage, setListPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadBrokers = useCallback(async () => {
+  const loadBrokers = useCallback(async (page: number) => {
     setLoading(true);
     setError(null);
     try {
-      const items = await fetchPublicBrokers();
-      setBrokers(items.map((b) => mapApiBrokerToBroker(b, TradeLogo)));
+      const result = await fetchBrokersPage({ page, limit: BROKERS_PER_PAGE });
+      setBrokers(result.items.map((b) => mapApiBrokerToBroker(b, TradeLogo)));
+      setListPage(result.pagination.currentPage);
+      setTotalPages(Math.max(1, result.pagination.totalPages));
+      setTotalItems(result.pagination.totalItems);
     } catch (e: any) {
       setError(e.message || "Could not load brokers.");
+      setBrokers([]);
+      setTotalPages(1);
+      setTotalItems(0);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    loadBrokers();
-  }, [loadBrokers]);
+    if (currentPage === "listing") {
+      loadBrokers(listPage);
+    }
+  }, [currentPage, listPage, loadBrokers]);
 
   const handleBrokerSelect = (broker: Broker) => {
     setSelectedBroker(broker);
@@ -69,7 +82,11 @@ const BrokerList: React.FC = () => {
     setCurrentPage("detail");
   };
 
-  if (loading) {
+  const handleListPageChange = (page: number) => {
+    setListPage(page);
+  };
+
+  if (loading && currentPage === "listing") {
     return (
       <StatusWrap>
         <BrokerListSkeleton rows={4} />
@@ -77,11 +94,11 @@ const BrokerList: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (error && currentPage === "listing") {
     return (
       <StatusWrap>
         <div>{error}</div>
-        <RetryBtn type="button" onClick={loadBrokers}>
+        <RetryBtn type="button" onClick={() => loadBrokers(listPage)}>
           Retry
         </RetryBtn>
       </StatusWrap>
@@ -91,7 +108,14 @@ const BrokerList: React.FC = () => {
   return (
     <>
       {currentPage === "listing" && (
-        <BrokerListingPage brokers={brokers} onBrokerSelect={handleBrokerSelect} />
+        <BrokerListingPage
+          brokers={brokers}
+          currentPage={listPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          onPageChange={handleListPageChange}
+          onBrokerSelect={handleBrokerSelect}
+        />
       )}
 
       {currentPage === "detail" && selectedBroker && (

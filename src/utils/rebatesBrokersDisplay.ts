@@ -26,6 +26,9 @@ export type RebateBrokerCardRow = {
   rating: number;
   reviewsCount: string;
   accountTypes?: ApiBroker['accountTypes'];
+  rebateCategory?: ApiBroker['rebateCategory'];
+  propOffers?: ApiBroker['propOffers'];
+  setupUrl?: string;
 };
 
 export function mapApiBrokerToRebateCardRow(b: ApiBroker): RebateBrokerCardRow {
@@ -43,5 +46,8 @@ export function mapApiBrokerToRebateCardRow(b: ApiBroker): RebateBrokerCardRow {
     rating,
     reviewsCount,
     accountTypes: b.accountTypes?.length ? b.accountTypes : undefined,
+    rebateCategory: b.rebateCategory,
+    propOffers: b.propOffers,
+    setupUrl: b.setupUrl,
   };
 }

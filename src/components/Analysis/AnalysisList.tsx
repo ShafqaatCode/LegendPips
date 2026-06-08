@@ -5,6 +5,7 @@ import type { Analysis } from '../../types/analysis.types';
 import AnalysisCard from './AnalysisCard';
 import XMBanner from '../Signals/XMBanner';
 import { ShimmerBar } from '../SharedComponents/Shimmer';
+import ListPagination from '../SharedComponents/ListPagination';
 
 const SectionWrapper = styled.section`
   background: #fafbfc;
@@ -253,6 +254,7 @@ const AnalysisList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const limit = 10;
 
   useEffect(() => {
@@ -269,7 +271,8 @@ const AnalysisList: React.FC = () => {
       
       // Show all items in grid (no separate featured section)
       setAnalysis(response.items);
-      setTotalPages(response.totalPages);
+      setTotalPages(Math.max(1, response.totalPages));
+      setTotalItems(response.totalItems);
     } catch (err: any) {
       setError(err.message || 'Failed to load analysis');
       console.error('Error loading analysis:', err);
@@ -327,25 +330,12 @@ const AnalysisList: React.FC = () => {
           </GridSection>
         )}
 
-        {totalPages > 1 && (
-          <PaginationWrapper>
-            <PageButton
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-            >
-              Previous
-            </PageButton>
-            <span>
-              Page {currentPage} of {totalPages}
-            </span>
-            <PageButton
-              disabled={currentPage >= totalPages}
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-            >
-              Next
-            </PageButton>
-          </PaginationWrapper>
-        )}
+        <ListPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          onPageChange={setCurrentPage}
+        />
 
         {analysis.length === 0 && !loading && (
           <ErrorWrapper>

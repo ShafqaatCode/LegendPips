@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import { FiDollarSign, FiRefreshCw } from 'react-icons/fi';
 import { fetchMyRebateCredits, formatUsd, type RebateCreditRow } from '../../../services/rebateService';
 import { TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
@@ -121,6 +122,22 @@ const Empty = styled.p`
   margin: 0;
 `;
 
+const InfoCard = styled.div`
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  color: #0c4a6e;
+  line-height: 1.55;
+
+  a {
+    color: #132e58;
+    font-weight: 600;
+  }
+`;
+
 const MyRebates: React.FC = () => {
   const [items, setItems] = useState<RebateCreditRow[]>([]);
   const [totalCents, setTotalCents] = useState(0);
@@ -149,8 +166,16 @@ const MyRebates: React.FC = () => {
     <Container>
       <Header>
         <Title>My Rebates</Title>
-        <Sub>Cashback credits posted to your account appear here and in your dashboard totals.</Sub>
+        <Sub>
+          Forex, crypto, and prop challenge cashback credits appear here once confirmed by our team.
+        </Sub>
       </Header>
+
+      <InfoCard>
+        <strong>Prop trading rebates:</strong> buy a challenge through our partner links on{' '}
+        <Link to="/rebates">Prop Trading</Link>. First-purchase and repeat-purchase cashback is
+        credited after your purchase is verified.
+      </InfoCard>
 
       {error && <ErrorBox>{error}</ErrorBox>}
 
@@ -176,16 +201,18 @@ const MyRebates: React.FC = () => {
             <tr>
               <Th>Date</Th>
               <Th>Amount</Th>
-              <Th>Broker</Th>
+              <Th>Type</Th>
+              <Th>Firm / Broker</Th>
+              <Th>Purchase</Th>
               <Th>Note</Th>
             </tr>
           </thead>
           <tbody>
-            {loading && <TableBodySkeleton rows={5} cols={4} />}
+            {loading && <TableBodySkeleton rows={5} cols={6} />}
             {!loading && items.length === 0 && (
               <tr>
-                <Td colSpan={4}>
-                  <Empty>No rebate credits yet. Credits are added when your broker cashback is confirmed.</Empty>
+                <Td colSpan={6}>
+                  <Empty>No rebate credits yet. Credits are added when your broker or prop cashback is confirmed.</Empty>
                 </Td>
               </tr>
             )}
@@ -194,7 +221,9 @@ const MyRebates: React.FC = () => {
                 <tr key={row.id}>
                   <Td>{row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}</Td>
                   <Td style={{ fontWeight: 700, color: '#059669' }}>{formatUsd(row.amountCents)}</Td>
+                  <Td style={{ textTransform: 'capitalize' }}>{row.rebateCategory || '—'}</Td>
                   <Td>{row.brokerName || '—'}</Td>
+                  <Td style={{ textTransform: 'capitalize' }}>{row.purchaseType || '—'}</Td>
                   <Td>{row.notes || '—'}</Td>
                 </tr>
               ))}

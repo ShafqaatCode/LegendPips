@@ -17,12 +17,8 @@ import { CenteredBlockSkeleton } from '../SharedComponents/Shimmer';
 
 const Wrapper = styled.section`
   margin: 0;
-  padding: 0.35rem 0 0;
+  padding: 0;
   box-sizing: border-box;
-
-  @media (max-width: 786px) {
-    margin: 0;
-  }
 `;
 
 const Centered = styled.div`

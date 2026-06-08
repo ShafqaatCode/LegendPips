@@ -1,4 +1,5 @@
-
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   BannerWrapper,
   HeroContent,
@@ -20,6 +21,9 @@ import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-sv
 import ArrowIcon2 from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 2.svg";
 
 import type { Variants } from "framer-motion";
+import LoginModal from "../../pages/Login/LoginModal";
+import RegisterModal from "../../pages/Register/RegisterModal";
+import { useAuth } from "../../contexts/AuthContext";
 
 
 
@@ -52,6 +56,23 @@ export const fadeInDown: Variants = {
 
 
 const PromoBanner = () => {
+  const [signinOpen, setSigninOpen] = useState(false);
+  const [signupOpen, setSignupOpen] = useState(false);
+  const { isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleJoinFree = () => {
+    if (isAuthenticated) {
+      navigate(user?.role === "admin" ? "/admin-panel" : "/user-panel");
+      return;
+    }
+    setSigninOpen(true);
+  };
+
+  const handleCompareBrokers = () => {
+    navigate("/rebates");
+  };
+
   return (
     <>
 
@@ -82,15 +103,27 @@ const PromoBanner = () => {
           </BrokersContainer>
 
           <ActionButtons custom={3} variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <JoinButton>Join Free
+            <JoinButton type="button" onClick={handleJoinFree}>
+              Join Free
               <img src={ArrowIcon} alt="Arrow" />
             </JoinButton>
-            <CompareButton>Compare Brokers
+            <CompareButton type="button" onClick={handleCompareBrokers}>
+              Compare Brokers
               <img src={ArrowIcon2} alt="Arrow" />
             </CompareButton>
           </ActionButtons>
         </HeroContent>
       </BannerWrapper>
+
+      <LoginModal
+        isOpen={signinOpen}
+        onClose={() => setSigninOpen(false)}
+        onSwitchToRegister={() => {
+          setSigninOpen(false);
+          setSignupOpen(true);
+        }}
+      />
+      <RegisterModal isOpen={signupOpen} onClose={() => setSignupOpen(false)} />
     </>
   );
 };

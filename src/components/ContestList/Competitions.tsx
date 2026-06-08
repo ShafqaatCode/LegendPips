@@ -4,16 +4,18 @@ import { fetchCompetitions, type Competition } from "../../services/contestServi
 import ContestCard from "./ContestCard";
 import TrophyImg from "../../assets/Group.png";
 import { BrokerListSkeleton } from "../SharedComponents/Shimmer";
+import ListPagination from "../SharedComponents/ListPagination";
 
 const filters = ["All", "Upcoming", "Ongoing", "Ended"];
 
 const Competitions: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
-  const perPage = 6;
+  const perPage = 10;
 
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [refetchTick, setRefetchTick] = useState(0);
@@ -32,6 +34,7 @@ const Competitions: React.FC = () => {
         if (!cancelled) {
           setCompetitions(result.items);
           setTotalPages(Math.max(1, result.totalPages));
+          setTotalItems(result.totalItems);
         }
       } catch (err: any) {
         if (!cancelled) {
@@ -40,6 +43,7 @@ const Competitions: React.FC = () => {
           console.error("Error loading competitions:", err);
           setCompetitions([]);
           setTotalPages(1);
+          setTotalItems(0);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -95,17 +99,12 @@ const Competitions: React.FC = () => {
             ))}
           </CardStack>
 
-          <Pagination>
-            {Array.from({ length: totalPages }, (_, i) => (
-              <PageButton
-                key={i + 1}
-                active={currentPage === i + 1}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </PageButton>
-            ))}
-          </Pagination>
+          <ListPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            onPageChange={setCurrentPage}
+          />
         </>
       )}
     </Wrapper>
@@ -179,23 +178,3 @@ const CardStack = styled.div`
   gap: 0.85rem;
 `;
 
-const Pagination = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 3rem;
-  gap: 0.4rem;
-`;
-
-const PageButton = styled.button<{ active: boolean }>`
-  padding: 0.5rem 0.8rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  background: ${({ active }) => (active ? "#012d5c" : "#fff")};
-  color: ${({ active }) => (active ? "#fff" : "#333")};
-  cursor: pointer;
-  font-weight: 500;
-
-  &:hover {
-    background: ${({ active }) => (active ? "#013e7e" : "#f0f0f0")};
-  }
-`;

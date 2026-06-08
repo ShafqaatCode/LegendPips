@@ -9,7 +9,15 @@ import {
   adminFetchBrokers,
   adminUpdateBroker,
   type ApiBroker,
+  type PropCashbackOffer,
 } from "../../../services/brokerService";
+
+const emptyPropOffer = (): PropCashbackOffer => ({
+  label: "Standard",
+  firstPurchaseCashback: "",
+  repeatPurchaseCashback: "",
+  discountPercent: "",
+});
 
 const Container = styled.div`
   max-width: 1600px;
@@ -266,6 +274,13 @@ const BrokersManagement: React.FC = () => {
   const [formCrypto, setFormCrypto] = useState("No");
   const [formDescription, setFormDescription] = useState("");
   const [formLogoUrl, setFormLogoUrl] = useState("");
+  const [formRebateCategory, setFormRebateCategory] = useState<"forex" | "crypto" | "prop" | "both">("forex");
+  const [formRebatesListOrder, setFormRebatesListOrder] = useState("0");
+  const [formSetupUrl, setFormSetupUrl] = useState("");
+  const [formRebatesStarRating, setFormRebatesStarRating] = useState("4");
+  const [formRebatesReviewsLabel, setFormRebatesReviewsLabel] = useState("");
+  const [formRebatesFeatured, setFormRebatesFeatured] = useState(false);
+  const [formPropOffers, setFormPropOffers] = useState<PropCashbackOffer[]>([emptyPropOffer()]);
 
   const loadBrokers = useCallback(async () => {
     setListLoading(true);
@@ -297,6 +312,13 @@ const BrokersManagement: React.FC = () => {
     setFormCrypto("No");
     setFormDescription("");
     setFormLogoUrl("");
+    setFormRebateCategory("forex");
+    setFormRebatesListOrder("0");
+    setFormSetupUrl("");
+    setFormRebatesStarRating("4");
+    setFormRebatesReviewsLabel("");
+    setFormRebatesFeatured(false);
+    setFormPropOffers([emptyPropOffer()]);
     setModalError(null);
     setIsModalOpen(true);
   };
@@ -314,6 +336,15 @@ const BrokersManagement: React.FC = () => {
     setFormCrypto(b.crypto || "No");
     setFormDescription(b.description || "");
     setFormLogoUrl(b.logoUrl || "");
+    setFormRebateCategory(b.rebateCategory || "forex");
+    setFormRebatesListOrder(String(b.rebatesListOrder ?? 0));
+    setFormSetupUrl(b.setupUrl || "");
+    setFormRebatesStarRating(String(b.rebatesStarRating ?? 4));
+    setFormRebatesReviewsLabel(b.rebatesReviewsLabel || "");
+    setFormRebatesFeatured(!!b.rebatesFeatured);
+    setFormPropOffers(
+      b.propOffers?.length ? b.propOffers.map((o) => ({ ...o })) : [emptyPropOffer()]
+    );
     setModalError(null);
     setIsModalOpen(true);
   };
@@ -336,6 +367,11 @@ const BrokersManagement: React.FC = () => {
       setModalError("Min deposit must be a valid number");
       return;
     }
+    const rebatesListOrder = Number(formRebatesListOrder);
+    if (Number.isNaN(rebatesListOrder) || rebatesListOrder < 0) {
+      setModalError("Rebates list order must be 0 or greater");
+      return;
+    }
 
     setSaving(true);
     setModalError(null);
@@ -351,6 +387,23 @@ const BrokersManagement: React.FC = () => {
         crypto: formCrypto,
         description: formDescription.trim(),
         logoUrl: formLogoUrl.trim() || undefined,
+        rebateCategory: formRebateCategory,
+        rebatesListOrder: rebatesListOrder > 0 ? rebatesListOrder : 0,
+        setupUrl: formSetupUrl.trim() || undefined,
+        rebatesStarRating: Number(formRebatesStarRating) || undefined,
+        rebatesReviewsLabel: formRebatesReviewsLabel.trim() || undefined,
+        rebatesFeatured: formRebatesFeatured,
+        propOffers:
+          formRebateCategory === "prop"
+            ? formPropOffers
+                .filter((o) => o.label.trim())
+                .map((o) => ({
+                  label: o.label.trim(),
+                  firstPurchaseCashback: o.firstPurchaseCashback?.trim() || undefined,
+                  repeatPurchaseCashback: o.repeatPurchaseCashback?.trim() || undefined,
+                  discountPercent: o.discountPercent?.trim() || undefined,
+                }))
+            : [],
       };
 
       if (modalMode === "add") {
@@ -444,6 +497,14 @@ const BrokersManagement: React.FC = () => {
                 <InfoItem>
                   <span>Cashback Rate:</span>
                   <strong>{broker.cashbackRate || "—"}</strong>
+                </InfoItem>
+                <InfoItem>
+                  <span>Rebate Tab:</span>
+                  <strong>{broker.rebateCategory || "forex"}</strong>
+                </InfoItem>
+                <InfoItem>
+                  <span>Rebates Order:</span>
+                  <strong>{broker.rebatesListOrder ?? "—"}</strong>
                 </InfoItem>
               </BrokerInfo>
               <ActionButtons>
@@ -557,6 +618,33 @@ const BrokersManagement: React.FC = () => {
               />
             </label>
             <label>
+              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Rebates page tab</div>
+              <select
+                value={formRebateCategory}
+                onChange={(e) =>
+                  setFormRebateCategory(e.target.value as "forex" | "crypto" | "prop" | "both")
+                }
+                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+              >
+                <option value="forex">Forex Brokers</option>
+                <option value="prop">Prop Trading</option>
+                <option value="crypto">Crypto Brokers</option>
+                <option value="both">Forex + Crypto tabs</option>
+              </select>
+            </label>
+            <label>
+              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>
+                Rebates list order (1+ shows on /rebates; 0 = hidden)
+              </div>
+              <input
+                value={formRebatesListOrder}
+                onChange={(e) => setFormRebatesListOrder(e.target.value)}
+                type="number"
+                min={0}
+                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+              />
+            </label>
+            <label>
               <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Logo URL (optional)</div>
               <input
                 value={formLogoUrl}
@@ -564,6 +652,115 @@ const BrokersManagement: React.FC = () => {
                 placeholder="https://…"
                 style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
               />
+            </label>
+            <label>
+              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>
+                Challenge / signup URL (prop & rebates detail)
+              </div>
+              <input
+                value={formSetupUrl}
+                onChange={(e) => setFormSetupUrl(e.target.value)}
+                placeholder="https://partner-link…"
+                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+              />
+            </label>
+            <label>
+              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Rebates star rating (1–5)</div>
+              <input
+                type="number"
+                min={1}
+                max={5}
+                value={formRebatesStarRating}
+                onChange={(e) => setFormRebatesStarRating(e.target.value)}
+                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+              />
+            </label>
+            <label>
+              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>
+                Reviews label (e.g. 52 traders)
+              </div>
+              <input
+                value={formRebatesReviewsLabel}
+                onChange={(e) => setFormRebatesReviewsLabel(e.target.value)}
+                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+              />
+            </label>
+            {formRebateCategory === "prop" && (
+              <div style={{ border: "2px solid #e5e7eb", borderRadius: 10, padding: "0.75rem", marginBottom: 8 }}>
+                <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 8 }}>Prop cashback tiers</div>
+                {formPropOffers.map((offer, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: "grid",
+                      gap: 8,
+                      marginBottom: 12,
+                      paddingBottom: 12,
+                      borderBottom: idx < formPropOffers.length - 1 ? "1px solid #e5e7eb" : "none",
+                    }}
+                  >
+                    <input
+                      placeholder="Program label (e.g. 1 Phase)"
+                      value={offer.label}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = { ...next[idx], label: e.target.value };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: "2px solid #e5e7eb" }}
+                    />
+                    <input
+                      placeholder="First purchase (e.g. 7%)"
+                      value={offer.firstPurchaseCashback || ""}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = { ...next[idx], firstPurchaseCashback: e.target.value };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: "2px solid #e5e7eb" }}
+                    />
+                    <input
+                      placeholder="Repeat purchase (e.g. 3.5%)"
+                      value={offer.repeatPurchaseCashback || ""}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = { ...next[idx], repeatPurchaseCashback: e.target.value };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: "2px solid #e5e7eb" }}
+                    />
+                    <input
+                      placeholder="Discount (e.g. 25%)"
+                      value={offer.discountPercent || ""}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = { ...next[idx], discountPercent: e.target.value };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: "2px solid #e5e7eb" }}
+                    />
+                    {formPropOffers.length > 1 && (
+                      <Button
+                        type="button"
+                        onClick={() => setFormPropOffers(formPropOffers.filter((_, i) => i !== idx))}
+                      >
+                        Remove tier
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button type="button" onClick={() => setFormPropOffers([...formPropOffers, emptyPropOffer()])}>
+                  Add tier
+                </Button>
+              </div>
+            )}
+            <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <input
+                type="checkbox"
+                checked={formRebatesFeatured}
+                onChange={(e) => setFormRebatesFeatured(e.target.checked)}
+              />
+              <span style={{ fontWeight: 600, color: "#132E58" }}>Featured on rebates list</span>
             </label>
             <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <input type="checkbox" checked={formTopCashback} onChange={(e) => setFormTopCashback(e.target.checked)} />

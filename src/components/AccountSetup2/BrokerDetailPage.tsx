@@ -8,15 +8,49 @@ type BrokerDetailPageProps = {
   broker: Broker;
   onBack: () => void;
   onSetupAccount: () => void;
+  backLabel?: string;
+  setupButtonLabel?: string;
 };
 
-const BrokerDetailPage: React.FC<BrokerDetailPageProps> = ({ broker, onBack, onSetupAccount }) => {
+function buildWhyChooseItems(broker: Broker): string[] {
+  const items: string[] = [];
+  if (broker.spreadFrom) items.push(`Ultra-tight spreads starting from ${broker.spreadFrom}`);
+  if (broker.minDeposit) items.push(`Minimum deposit from $${broker.minDeposit}`);
+  if (broker.regulation) items.push(`Regulated by ${broker.regulation}`);
+  if (broker.crypto) items.push(`Crypto trading: ${broker.crypto}`);
+  if (broker.cashbackRate) items.push(`Legend Pips cashback: ${broker.cashbackRate}`);
+  return items;
+}
+
+function buildHighlightItems(broker: Broker): string[] {
+  if (broker.features?.length) return broker.features;
+  const items: string[] = [];
+  if (broker.regulation) items.push(`Regulated by ${broker.regulation}`);
+  if (broker.spreadFrom) items.push(`Spreads from ${broker.spreadFrom}`);
+  if (broker.minDeposit) items.push(`Min deposit $${broker.minDeposit}`);
+  if (broker.crypto) items.push(`Crypto: ${broker.crypto}`);
+  return items;
+}
+
+const BrokerDetailPage: React.FC<BrokerDetailPageProps> = ({
+  broker,
+  onBack,
+  onSetupAccount,
+  backLabel = "Back to Brokers",
+  setupButtonLabel = "Setup Account",
+}) => {
+  const highlights = buildHighlightItems(broker);
+  const whyChoose = buildWhyChooseItems(broker);
+  const aboutText =
+    broker.description?.trim() ||
+    `${broker.name} is a trusted broker partner on Legend Pips. Compare spreads, regulation, and cashback before you open an account.`;
+
   return (
     <PageWrapper>
       <Container>
-        <BackButton onClick={onBack}>
+        <BackButton type="button" onClick={onBack}>
           <ArrowLeft size={18} />
-          Back to Brokers
+          {backLabel}
         </BackButton>
 
         {/* Header Section */}
@@ -31,8 +65,10 @@ const BrokerDetailPage: React.FC<BrokerDetailPageProps> = ({ broker, onBack, onS
           </HeaderContent>
 
           <HeaderActions>
-            <VerifiedBadge>✓ Verified Broker</VerifiedBadge>
-            <SetupButton onClick={onSetupAccount}>Setup Account</SetupButton>
+            {broker.verified !== false && <VerifiedBadge>✓ Verified Broker</VerifiedBadge>}
+            <SetupButton type="button" onClick={onSetupAccount}>
+              {setupButtonLabel}
+            </SetupButton>
           </HeaderActions>
         </HeaderSection>
 
@@ -47,38 +83,30 @@ const BrokerDetailPage: React.FC<BrokerDetailPageProps> = ({ broker, onBack, onS
             {/* About Section */}
             <Section>
               <SectionTitle>About {broker.name}</SectionTitle>
-              <SectionText>
-                {broker.name} is a leading Australian forex and CFDs broker offering multiple
-                trading platforms and over 60 currency pairs. Long-term reliability and True
-                ECN connectivity. Highly recommended, reliable, and transparent!
-              </SectionText>
+              <SectionText>{aboutText}</SectionText>
             </Section>
 
-            {/* What Traders Love */}
-            <Section>
-              <SectionTitle>What Traders Love About {broker.name}</SectionTitle>
-              <FeatureList>
-                {broker.features.map((feature, i) => (
-                  <FeatureItem key={i}>• {feature}</FeatureItem>
-                ))}
-                <FeatureItem>• Regulated by multiple authorities</FeatureItem>
-                <FeatureItem>• Over 60 currency pairs</FeatureItem>
-                <FeatureItem>• MT4, MT5, and cTrader platforms</FeatureItem>
-                <FeatureItem>• Competitive spreads and low fees</FeatureItem>
-              </FeatureList>
-            </Section>
+            {highlights.length > 0 && (
+              <Section>
+                <SectionTitle>What Traders Love About {broker.name}</SectionTitle>
+                <FeatureList>
+                  {highlights.map((feature, i) => (
+                    <FeatureItem key={i}>• {feature}</FeatureItem>
+                  ))}
+                </FeatureList>
+              </Section>
+            )}
 
-            {/* Why Choose Them */}
-            <Section>
-              <SectionTitle>Why Choose Them?</SectionTitle>
-              <FeatureList>
-                <FeatureItem>• Ultra-tight spreads starting from {broker.spreadFrom}</FeatureItem>
-                <FeatureItem>• Institutional-grade liquidity</FeatureItem>
-                <FeatureItem>• Wide range of instruments</FeatureItem>
-                <FeatureItem>• Advanced trading platforms (MT4, MT5, cTrader)</FeatureItem>
-                <FeatureItem>• Easy mobile trading options</FeatureItem>
-              </FeatureList>
-            </Section>
+            {whyChoose.length > 0 && (
+              <Section>
+                <SectionTitle>Why Choose Them?</SectionTitle>
+                <FeatureList>
+                  {whyChoose.map((item, i) => (
+                    <FeatureItem key={i}>• {item}</FeatureItem>
+                  ))}
+                </FeatureList>
+              </Section>
+            )}
 
 
           </LeftColumn>
@@ -166,8 +194,8 @@ const BrokerDetailPage: React.FC<BrokerDetailPageProps> = ({ broker, onBack, onS
             </TableWrapper>
 
             <CTAGroup>
-              <SetupButton onClick={onSetupAccount} >
-                Setup Account
+              <SetupButton type="button" onClick={onSetupAccount}>
+                {setupButtonLabel}
               </SetupButton>
 
               <VisitWebsiteButton href="#" target="_blank">

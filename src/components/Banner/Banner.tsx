@@ -9,7 +9,7 @@ interface BannerProps {
   bannerHeading: string;
   subText: string;
   buttonText?: string;
-  // onButtonClick?: () => void; // Optional callback for button click
+  onButtonClick?: () => void;
 }
 
 const Banner: React.FC<BannerProps> = ({
@@ -18,6 +18,7 @@ const Banner: React.FC<BannerProps> = ({
   upperText,
   subText,
   buttonText = "Signup For Free",
+  onButtonClick,
 }) => {
   return (
     <BannerWrapper style={{ backgroundImage: `url(${backgroundImage})` }}>
@@ -29,10 +30,12 @@ const Banner: React.FC<BannerProps> = ({
           subText={subText}
         />
         <ButtonBase
+          type="button"
           style={{ margin: "auto" }}
           color="#FBBF24"
           borderColor="#FBBF24"
           bgColor=""
+          onClick={onButtonClick}
         >
           {buttonText}
           <img src={ArrowIcon} alt="" />
