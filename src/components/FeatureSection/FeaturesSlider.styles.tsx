@@ -1,135 +1,177 @@
 import styled from "styled-components";
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
+
+export const SectionShell = styled.section`
+  position: relative;
+  width: 100%;
+  padding: 0 0 clamp(1.75rem, 3vw, 2.25rem);
+  background: linear-gradient(
+    180deg,
+    transparent 0,
+    transparent 72px,
+    #eef1f6 72px,
+    #eef1f6 100%
+  );
+`;
 
 export const SliderWrapper = styled.div`
   position: relative;
-  margin-top: -60px;
   z-index: 10;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 1150px;
-  margin-left: auto;
-  margin-right: auto;
-  
+  max-width: ${({ theme }) => theme.typography.contentMax};
+  margin: -72px auto 0;
+  padding: 0 ${({ theme }) => theme.typography.pageGutter};
+  box-sizing: border-box;
 
   @media (max-width: 768px) {
-    margin-top: 1rem;
+    margin-top: -48px;
   }
 `;
 
-export const CardsContainer = styled.div`
+export const CardsRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 1.2vw, 0.85rem);
+`;
 
+export const CardsViewport = styled.div`
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
-  width: 100%;
-  max-width: 940px;
-//   border: 2px solid red;
-//   margin: 1rem 0.4rem;
+`;
+
+export const CardsSlider = styled(motion.div)`
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 5), minmax(0, 1fr));
+  gap: clamp(0.5rem, 1.2vw, 0.85rem);
+`;
+
+export const Card = styled(motion.article)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: clamp(0.9rem, 1.6vw, 1.15rem) clamp(0.65rem, 1.2vw, 0.85rem);
+  min-height: 108px;
+  border-radius: 14px;
+  background: ${({ theme }) => theme.colors.WHITE};
+  border: 1px solid #e3e7ee;
+  box-shadow:
+    0 1px 2px rgba(19, 46, 88, 0.04),
+    0 8px 24px rgba(19, 46, 88, 0.08);
+  text-align: center;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba(251, 191, 36, 0.45);
+    box-shadow:
+      0 2px 4px rgba(19, 46, 88, 0.06),
+      0 14px 28px rgba(19, 46, 88, 0.12);
+  }
 
   @media (max-width: 768px) {
-    justify-content: center;
+    min-height: 96px;
+    gap: 0.5rem;
+    padding: 0.85rem 0.55rem;
   }
 `;
 
-export const CardsSlider = styled.div<{ translateX: number }>`
-  display: flex;
-  align-items:center;
-  justify-content: center;
-  transition: transform 0.5s ease-in-out;
-  transform: translateX(${(props) => props.translateX}%);
-`;
-
-export const Card = styled(motion.div)`
-  flex: 0 0 auto;
-  width: 170px;
-  height: 155px;
-  margin: 0 0.5rem;
-  background-color: ${({ theme }) => theme.colors.WHITE};
-  border-radius: 8px;
-  text-align: center;
-  padding: 1rem;
-  position: relative;
+export const IconBadge = styled.div`
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
-  transition: transform 0.3s ease;
+  flex-shrink: 0;
+  background: linear-gradient(145deg, rgba(19, 46, 88, 0.06) 0%, rgba(19, 46, 88, 0.03) 100%);
+  border: 1px solid rgba(19, 46, 88, 0.08);
+  transition: background 0.22s ease, border-color 0.22s ease;
+
+  ${Card}:hover & {
+    background: linear-gradient(145deg, rgba(251, 191, 36, 0.18) 0%, rgba(251, 191, 36, 0.08) 100%);
+    border-color: rgba(251, 191, 36, 0.35);
+  }
 
   img {
-    height: 50px;
-    margin-bottom: 0.5rem;
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
   }
 
-  p {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: ${({ theme }) => theme.colors.primary};
-    z-index: 2;
-    position: relative;
-    white-space: nowrap;
-  }
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
 
-  /* .hover-bg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background-color: ${({ theme }) => theme.colors.primary};
-    opacity: 0.08;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    z-index: 0;
-    transition: width 0.4s ease, height 0.4s ease;
-  } */
-/* 
-  &:hover .hover-bg {
-    width: 200%;
-    height: 200%;
-  }
-
-  &:hover {
-    transform: translateY(-3px);
-  } */
-`;
-
-export const ArrowsWrapper = styled.div`
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1rem;
-  margin: 30px;
-
-  @media (min-width: 769px) {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    justify-content: space-between;
-    margin-top: 0;
-    padding: 0 1rem;
+    img {
+      width: 24px;
+      height: 24px;
+    }
   }
 `;
 
-export const ArrowBase = styled.button`
-  border: none;
+export const CardLabel = styled.p`
+  margin: 0;
+  font-size: clamp(0.72rem, 0.55vw + 0.62rem, 0.8125rem);
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.primary};
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+`;
+
+export const NavButton = styled.button`
+  flex-shrink: 0;
+  border: 1px solid #dde2ea;
   background: ${({ theme }) => theme.colors.WHITE};
   color: ${({ theme }) => theme.colors.primary};
-  font-size: 1.35rem;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  padding: 0.5rem 0.65rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: background 0.3s ease;
+  box-shadow: 0 2px 8px rgba(19, 46, 88, 0.08);
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.gold};
-    color: white;
+    background: ${({ theme }) => theme.colors.primary};
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.gold};
+    transform: scale(1.05);
+  }
+
+  @media (max-width: 640px) {
+    width: 34px;
+    height: 34px;
   }
 `;
 
-export const ArrowLeft = styled(ArrowBase)``;
-export const ArrowRight = styled(ArrowBase)``;
+export const DotsRow = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.85rem;
+`;
+
+export const Dot = styled.button<{ $active?: boolean }>`
+  width: ${({ $active }) => ($active ? "18px" : "6px")};
+  height: 6px;
+  border-radius: 999px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: ${({ $active, theme }) =>
+    $active ? theme.colors.gold : "rgba(19, 46, 88, 0.18)"};
+  transition: width 0.22s ease, background 0.22s ease;
+`;

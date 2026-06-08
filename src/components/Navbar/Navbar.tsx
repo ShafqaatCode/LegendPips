@@ -48,8 +48,7 @@ const navLinks = [
 ];
 
 const toolsSubmenu = [
-  
-  { to: "/timer", label: "Timer" },
+  { to: "/calculators", label: "All Calculators" },
   { to: "/pip-calculator", label: "Pip Calculator" },
   { to: "/position-size-calculator", label: "Position Size Calculator" },
   { to: "/margin-calculator", label: "Margin Calculator" },
@@ -94,7 +93,7 @@ const Header: React.FC = () => {
                 <span>Live Chat</span>
               </HeaderItem>
             </NavLink>
-            <NavLink to="/calculator">
+            <NavLink to="/rebate-calculator">
               <HeaderItem>
                 <img src={CalculatorIcon} alt="Calculator" />
                 <span>Rebate Calculator</span>

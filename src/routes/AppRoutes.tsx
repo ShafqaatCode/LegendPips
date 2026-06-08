@@ -1,7 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Layout from "../Layout";
 import HomePage from "../pages/Home/Homepage";
-import Tools from "../pages/Tools/Tools";
 import Brokers from "../pages/Brokers/BrokersPage";
 import Contests from "../pages/Contests/Contestspage";
 import RebateBrokers from "../pages/RebateBrokers/RebateBrokersPage";
@@ -55,6 +54,7 @@ import RebateCalculatorPage from "../pages/RebateCalculator/RebateCalculatorPage
 import PivotPointCalculatorPage from "../pages/PivotPointCalculator/PivotPointCalculatorPage";
 import PositionSizeCalculatorPage from "../pages/PositionSizeCalculator/PositionSizeCalculatorPage";
 import PipCalculatorPage from "../pages/PipCalculator/PipCalculatorPage";
+import CalculatorsPage from "../pages/Calculators/CalculatorsPage";
 
 // 👇 Add these imports
 
@@ -117,7 +117,8 @@ const AppRoutes: React.FC = () => {
       {/* ⬇ Main site layout */}
       <Route path="/" element={<Layout />}>
         <Route index element={<HomePage />} />
-        <Route path="tools" element={<Tools />} />
+        <Route path="tools" element={<CalculatorsPage />} />
+        <Route path="calculators" element={<CalculatorsPage />} />
         <Route path="brokers" element={<Brokers />} />
         
         <Route path="contests" element={<Contests />} />
@@ -143,6 +144,7 @@ const AppRoutes: React.FC = () => {
         <Route path="position-size-calculator" element={<PositionSizeCalculatorPage />} />
         <Route path="margin-calculator" element={<MarginCalculatorPage />} />
         <Route path="rebate-calculator" element={<RebateCalculatorPage />} />
+        <Route path="calculator" element={<RebateCalculatorPage />} />
         <Route path="pivot-point-calculator" element={<PivotPointCalculatorPage />}/>
 
       </Route>

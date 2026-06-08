@@ -1,12 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { AnimatePresence } from "framer-motion";
 import {
+  SectionShell,
   SliderWrapper,
-  CardsContainer,
+  CardsRow,
+  CardsViewport,
   CardsSlider,
   Card,
-  ArrowLeft,
-  ArrowRight,
-  ArrowsWrapper,
+  IconBadge,
+  CardLabel,
+  NavButton,
+  DotsRow,
+  Dot,
 } from "./FeaturesSlider.styles";
 
 import CashbackIcon from "../../assets/icons/cashback.svg";
@@ -14,95 +20,100 @@ import VerifiedIcon from "../../assets/icons/verified.svg";
 import TradingIcon from "../../assets/icons/trading.svg";
 import ContestIcon from "../../assets/icons/contest.svg";
 import ScamIcon from "../../assets/icons/scam.svg";
-import type { Variants } from "framer-motion";
-
-
-
-const fadeInUp: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.3,
-      duration: 0.8,
-      ease: [0.42, 0, 0.58, 1],
-    },
-  }),
-}
-
-
 
 const features = [
+  { icon: ScamIcon, label: "Scam Protection" },
   { icon: CashbackIcon, label: "Cashback Rebates" },
   { icon: VerifiedIcon, label: "Verified Broker" },
   { icon: TradingIcon, label: "Trading Signals" },
   { icon: ContestIcon, label: "Contests & Rewards" },
-  { icon: ScamIcon, label: "Scam Protection" },
-]
+];
+
+function getCardsToShow() {
+  if (typeof window === "undefined") return 4;
+  if (window.innerWidth < 480) return 2;
+  if (window.innerWidth < 768) return 3;
+  return 4;
+}
 
 const FeaturesSlider = () => {
   const [startIndex, setStartIndex] = useState(0);
   const [cardsToShow, setCardsToShow] = useState(getCardsToShow());
   const totalCards = features.length;
 
-  function getCardsToShow() {
-    if (window.innerWidth < 480) return 2;
-    if (window.innerWidth < 768) return 3;
-    if (window.innerWidth < 1024) return 4;
-    return 5;
-  }
+  const nextSlide = useCallback(() => {
+    setStartIndex((prev) => (prev + 1) % totalCards);
+  }, [totalCards]);
+
+  const prevSlide = useCallback(() => {
+    setStartIndex((prev) => (prev - 1 + totalCards) % totalCards);
+  }, [totalCards]);
 
   useEffect(() => {
-    const handleResize = () => {
-      setCardsToShow(getCardsToShow());
-    };
+    const handleResize = () => setCardsToShow(getCardsToShow());
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const nextSlide = () => {
-    setStartIndex((prev) => (prev + 1) % totalCards);
-  };
-
-  const prevSlide = () => {
-    setStartIndex((prev) => (prev - 1 + totalCards) % totalCards);
-  };
-
   useEffect(() => {
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 6000);
+    const interval = setInterval(nextSlide, 6000);
     return () => clearInterval(interval);
-  }, []);
+  }, [nextSlide]);
 
   const visibleCards = [];
-  for (let i = 0; i < cardsToShow; i++) {
+  for (let i = 0; i < cardsToShow; i += 1) {
     const index = (startIndex + i) % totalCards;
-    visibleCards.push(features[index]);
+    visibleCards.push({ ...features[index], index });
   }
 
-  const translateX = 0
-
   return (
-    <SliderWrapper>
-      <CardsContainer>
-        <CardsSlider translateX={translateX}>
-          {visibleCards.map((card, idx) => (
-            <Card key={idx} custom={idx} initial="hidden" whileInView="visible" variants={fadeInUp} viewport={{once: true}}>
-              <div className="hover-bg" />
-              <img src={card.icon} alt={card.label} />
-              <p>{card.label}</p>
-            </Card>
-          ))}
-        </CardsSlider>
-      </CardsContainer>
+    <SectionShell aria-label="Platform features">
+      <SliderWrapper>
+        <CardsRow>
+          <NavButton type="button" onClick={prevSlide} aria-label="Previous features">
+            <FiChevronLeft size={20} />
+          </NavButton>
 
-      <ArrowsWrapper>
-        <ArrowLeft onClick={prevSlide}>←</ArrowLeft>
-        <ArrowRight onClick={nextSlide}>→</ArrowRight>
-      </ArrowsWrapper>
-    </SliderWrapper>
+          <CardsViewport>
+            <AnimatePresence mode="popLayout">
+              <CardsSlider
+                key={startIndex}
+                style={{ ["--cols" as string]: cardsToShow }}
+                initial={{ opacity: 0, x: 16 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -16 }}
+                transition={{ duration: 0.3, ease: [0.42, 0, 0.58, 1] }}
+              >
+                {visibleCards.map((card) => (
+                  <Card key={`${card.index}-${card.label}`} layout>
+                    <IconBadge>
+                      <img src={card.icon} alt="" aria-hidden />
+                    </IconBadge>
+                    <CardLabel>{card.label}</CardLabel>
+                  </Card>
+                ))}
+              </CardsSlider>
+            </AnimatePresence>
+          </CardsViewport>
+
+          <NavButton type="button" onClick={nextSlide} aria-label="Next features">
+            <FiChevronRight size={20} />
+          </NavButton>
+        </CardsRow>
+
+        <DotsRow>
+          {features.map((_, idx) => (
+            <Dot
+              key={idx}
+              type="button"
+              $active={idx === startIndex}
+              aria-label={`Go to slide ${idx + 1}`}
+              onClick={() => setStartIndex(idx)}
+            />
+          ))}
+        </DotsRow>
+      </SliderWrapper>
+    </SectionShell>
   );
 };
 

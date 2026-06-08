@@ -232,6 +232,57 @@ const ErrorBanner = styled.div`
   margin-bottom: 1rem;
 `;
 
+const FormGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const FormField = styled.label<{ $full?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  grid-column: ${({ $full }) => ($full ? "1 / -1" : "auto")};
+  min-width: 0;
+`;
+
+const FormLabel = styled.span`
+  font-weight: 700;
+  color: #132e58;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+`;
+
+const formControlStyle = {
+  width: "100%",
+  padding: "0.6rem 0.75rem",
+  borderRadius: 8,
+  border: "2px solid #e5e7eb",
+  fontSize: "0.875rem",
+  boxSizing: "border-box" as const,
+};
+
+const CheckboxRow = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  grid-column: 1 / -1;
+  font-weight: 600;
+  color: #132e58;
+  font-size: 0.875rem;
+`;
+
+const PropTiersBox = styled.div`
+  grid-column: 1 / -1;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.75rem;
+`;
+
 type ModalMode = "add" | "edit" | "delete";
 
 const defaultBrokerPayload = (): Partial<ApiBroker> => ({
@@ -524,6 +575,7 @@ const BrokersManagement: React.FC = () => {
 
       <SimpleModal
         isOpen={isModalOpen}
+        size="lg"
         title={modalMode === "add" ? "Add New Broker" : modalMode === "edit" ? "Edit Broker" : "Delete Broker"}
         onClose={() => !saving && setIsModalOpen(false)}
         footer={
@@ -556,138 +608,128 @@ const BrokersManagement: React.FC = () => {
             Are you sure you want to delete this broker?
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Broker Name</div>
+          <FormGrid>
+            <FormField>
+              <FormLabel>Broker Name</FormLabel>
               <input
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+                style={formControlStyle}
               />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Min Deposit (number)</div>
+            </FormField>
+            <FormField>
+              <FormLabel>Min Deposit (number)</FormLabel>
               <input
                 value={formMinDeposit}
                 onChange={(e) => setFormMinDeposit(e.target.value)}
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+                style={formControlStyle}
               />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Regulation</div>
+            </FormField>
+            <FormField>
+              <FormLabel>Regulation</FormLabel>
               <input
                 value={formRegulation}
                 onChange={(e) => setFormRegulation(e.target.value)}
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+                style={formControlStyle}
               />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Spread From</div>
+            </FormField>
+            <FormField>
+              <FormLabel>Spread From</FormLabel>
               <input
                 value={formSpreadFrom}
                 onChange={(e) => setFormSpreadFrom(e.target.value)}
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+                style={formControlStyle}
               />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Cashback Rate</div>
+            </FormField>
+            <FormField>
+              <FormLabel>Cashback Rate</FormLabel>
               <input
                 value={formCashbackRate}
                 onChange={(e) => setFormCashbackRate(e.target.value)}
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+                style={formControlStyle}
               />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Crypto</div>
-              <select
-                value={formCrypto}
-                onChange={(e) => setFormCrypto(e.target.value)}
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
-              >
+            </FormField>
+            <FormField>
+              <FormLabel>Crypto</FormLabel>
+              <select value={formCrypto} onChange={(e) => setFormCrypto(e.target.value)} style={formControlStyle}>
                 <option value="No">No</option>
                 <option value="Yes">Yes</option>
               </select>
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Description</div>
+            </FormField>
+            <FormField $full>
+              <FormLabel>Description</FormLabel>
               <textarea
                 value={formDescription}
                 onChange={(e) => setFormDescription(e.target.value)}
                 rows={3}
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+                style={formControlStyle}
               />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Rebates page tab</div>
+            </FormField>
+            <FormField>
+              <FormLabel>Rebates page tab</FormLabel>
               <select
                 value={formRebateCategory}
                 onChange={(e) =>
                   setFormRebateCategory(e.target.value as "forex" | "crypto" | "prop" | "both")
                 }
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+                style={formControlStyle}
               >
                 <option value="forex">Forex Brokers</option>
                 <option value="prop">Prop Trading</option>
                 <option value="crypto">Crypto Brokers</option>
                 <option value="both">Forex + Crypto tabs</option>
               </select>
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>
-                Rebates list order (1+ shows on /rebates; 0 = hidden)
-              </div>
+            </FormField>
+            <FormField>
+              <FormLabel>Rebates list order (1+ on /rebates; 0 = hidden)</FormLabel>
               <input
                 value={formRebatesListOrder}
                 onChange={(e) => setFormRebatesListOrder(e.target.value)}
                 type="number"
                 min={0}
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+                style={formControlStyle}
               />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Logo URL (optional)</div>
+            </FormField>
+            <FormField>
+              <FormLabel>Logo URL (optional)</FormLabel>
               <input
                 value={formLogoUrl}
                 onChange={(e) => setFormLogoUrl(e.target.value)}
                 placeholder="https://…"
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+                style={formControlStyle}
               />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>
-                Challenge / signup URL (prop & rebates detail)
-              </div>
+            </FormField>
+            <FormField>
+              <FormLabel>Challenge / signup URL</FormLabel>
               <input
                 value={formSetupUrl}
                 onChange={(e) => setFormSetupUrl(e.target.value)}
                 placeholder="https://partner-link…"
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+                style={formControlStyle}
               />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Rebates star rating (1–5)</div>
+            </FormField>
+            <FormField>
+              <FormLabel>Rebates star rating (1–5)</FormLabel>
               <input
                 type="number"
                 min={1}
                 max={5}
                 value={formRebatesStarRating}
                 onChange={(e) => setFormRebatesStarRating(e.target.value)}
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+                style={formControlStyle}
               />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>
-                Reviews label (e.g. 52 traders)
-              </div>
+            </FormField>
+            <FormField>
+              <FormLabel>Reviews label (e.g. 52 traders)</FormLabel>
               <input
                 value={formRebatesReviewsLabel}
                 onChange={(e) => setFormRebatesReviewsLabel(e.target.value)}
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
+                style={formControlStyle}
               />
-            </label>
+            </FormField>
             {formRebateCategory === "prop" && (
-              <div style={{ border: "2px solid #e5e7eb", borderRadius: 10, padding: "0.75rem", marginBottom: 8 }}>
-                <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 8 }}>Prop cashback tiers</div>
+              <PropTiersBox>
+                <FormLabel style={{ display: "block", marginBottom: 8 }}>Prop cashback tiers</FormLabel>
                 {formPropOffers.map((offer, idx) => (
                   <div
                     key={idx}
@@ -752,25 +794,25 @@ const BrokersManagement: React.FC = () => {
                 <Button type="button" onClick={() => setFormPropOffers([...formPropOffers, emptyPropOffer()])}>
                   Add tier
                 </Button>
-              </div>
+              </PropTiersBox>
             )}
-            <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <CheckboxRow>
               <input
                 type="checkbox"
                 checked={formRebatesFeatured}
                 onChange={(e) => setFormRebatesFeatured(e.target.checked)}
               />
-              <span style={{ fontWeight: 600, color: "#132E58" }}>Featured on rebates list</span>
-            </label>
-            <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span>Featured on rebates list</span>
+            </CheckboxRow>
+            <CheckboxRow>
               <input type="checkbox" checked={formTopCashback} onChange={(e) => setFormTopCashback(e.target.checked)} />
-              <span style={{ fontWeight: 600, color: "#132E58" }}>Top Cashback</span>
-            </label>
-            <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span>Top Cashback</span>
+            </CheckboxRow>
+            <CheckboxRow>
               <input type="checkbox" checked={formVerified} onChange={(e) => setFormVerified(e.target.checked)} />
-              <span style={{ fontWeight: 600, color: "#132E58" }}>Verified</span>
-            </label>
-          </div>
+              <span>Verified</span>
+            </CheckboxRow>
+          </FormGrid>
         )}
       </SimpleModal>
     </Container>
