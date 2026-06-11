@@ -8,6 +8,9 @@ export interface User {
   email: string;
   role?: string;
   phone?: string;
+  kycStatus?: string;
+  profileImage?: string;
+  bio?: string;
 }
 
 interface AuthContextType {
@@ -15,6 +18,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
+  setUser: (user: User | null) => void;
   isLoading: boolean;
 }
 
@@ -79,6 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticated: !!user,
     login,
     logout,
+    setUser,
     isLoading,
   };
 

@@ -11,7 +11,7 @@ export type EngagementSummary = {
 };
 
 export type PlatformMetrics = {
-  newUsers24h: number;
+  newUsers24h?: number;
   newUsers7d: number;
   contestsTotal: number;
   contestParticipantsTotal: number;
@@ -19,15 +19,86 @@ export type PlatformMetrics = {
   coursesPublished: number;
   brokersPublished: number;
   signalsPublished: number;
-  forumThreads: number;
-  forumComments: number;
-  forumPostsTotal: number;
-  feedbackTotal: number;
+  forumThreads?: number;
+  forumComments?: number;
+  forumPostsTotal?: number;
+  feedbackTotal?: number;
   rebateCents30d: number;
   rebateUsd30d: number;
   activityByTypeLast7d: Record<string, number>;
   activityLast7dTotal: number;
+  userSignupsLast7d: { date: string; label: string; count: number }[];
+  activityDailyLast7d: { date: string; label: string; count: number }[];
+  kycStatusBreakdown: Record<string, number>;
 };
+
+export type DashboardPreviews = {
+  recentUsers: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    kycStatus?: string;
+    status?: string;
+    createdAt?: string;
+  }[];
+  recentContests: {
+    id: string;
+    title: string;
+    status: string;
+    participants: number;
+    entry?: string;
+    createdAt?: string;
+  }[];
+  pendingKyc: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    submittedAt?: string;
+  }[];
+  recentFeedback: {
+    id: string;
+    email: string;
+    status: string;
+    preview: string;
+    name?: string;
+    createdAt?: string;
+  }[];
+  recentActivity: {
+    id: string;
+    userLabel: string;
+    type: string;
+    title: string;
+    time: string;
+  }[];
+};
+
+export async function fetchAdminDashboardCharts() {
+  const res = await fetch(`${base}/dashboard/charts`, { headers: getAuthHeaders() });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed");
+  return data as { success: boolean; platform: Pick<
+    PlatformMetrics,
+    | "activityByTypeLast7d"
+    | "activityLast7dTotal"
+    | "userSignupsLast7d"
+    | "activityDailyLast7d"
+    | "kycStatusBreakdown"
+  > };
+}
+
+export async function fetchAdminDashboard() {
+  const res = await fetch(`${base}/dashboard`, { headers: getAuthHeaders() });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed");
+  return data as {
+    success: boolean;
+    summary: EngagementSummary;
+    platform: PlatformMetrics;
+    previews: DashboardPreviews;
+  };
+}
 
 export async function fetchAdminFullMetrics() {
   const res = await fetch(`${base}/metrics`, { headers: getAuthHeaders() });

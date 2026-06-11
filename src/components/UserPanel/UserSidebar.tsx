@@ -1,64 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { getMyKyc, type KycStatus } from '../../services/kycService';
 import {
-  FiHome,
-  FiUser,
-  FiAward,
-  FiTrendingUp,
-  FiVideo,
-  FiBook,
-  FiFileText,
-  FiMessageSquare,
-  FiSettings,
-  FiLogOut,
-  FiBarChart2,
-  FiCalendar,
-  FiX,
-  FiMenu,
-  FiDollarSign,
-  FiGlobe,
+  FiHome, FiUser, FiAward, FiTrendingUp, FiVideo, FiBook, FiFileText,
+  FiMessageSquare, FiSettings, FiLogOut, FiBarChart2, FiCalendar,
+  FiX, FiDollarSign, FiGlobe, FiShield,
 } from 'react-icons/fi';
 
 const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
   position: fixed;
   left: 0;
   top: 0;
-  width: 280px;
+  width: 240px;
   height: 100vh;
   background: #132E58;
   color: white;
   z-index: 1000;
   overflow-y: auto;
-  transition: transform 0.3s ease;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     transform: translateX(${({ $isOpen }) => ($isOpen ? '0' : '-100%')});
   }
-  
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 3px;
-    
-    &:hover {
-      background: rgba(255, 255, 255, 0.5);
-    }
-  }
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 `;
 
 const SidebarHeader = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -67,8 +43,8 @@ const SidebarHeader = styled.div`
 const Logo = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 1.5rem;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
   font-weight: 700;
   color: #Fbbf24;
 `;
@@ -78,134 +54,131 @@ const CloseButton = styled.button`
   background: transparent;
   border: none;
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: background 0.2s ease;
-  
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    display: block;
-  }
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) { display: block; }
 `;
 
 const UserProfile = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
 `;
 
-const Avatar = styled.div`
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #Fbbf24 0%, #f4b400 100%);
+const Avatar = styled.div<{ $image?: string }>`
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: ${({ $image }) =>
+    $image ? `url(${$image}) center/cover no-repeat` : 'linear-gradient(135deg, #Fbbf24 0%, #f4b400 100%)'};
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: #132E58;
-  margin-bottom: 0.75rem;
+  flex-shrink: 0;
 `;
 
-const UserName = styled.h3`
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-  color: white;
+const ProfileText = styled.div`
+  min-width: 0;
+
+  h3 {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    margin: 0 0 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  p {
+    font-size: 0.6875rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
-const UserEmail = styled.p`
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin: 0;
-`;
+const NavSection = styled.div` padding: 0.5rem 0; `;
 
-const NavSection = styled.div`
-  padding: 1rem 0;
-`;
-
-const SectionTitle = styled.h4`
-  font-size: 0.75rem;
+const SectionTitle = styled.div`
+  font-size: 0.625rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.5);
-  padding: 0 1.5rem;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-`;
-
-const NavList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-`;
-
-const NavItem = styled.li`
-  margin: 0.25rem 0;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 0.5rem 1rem 0.25rem;
+  font-weight: 700;
 `;
 
 const NavLinkStyled = styled(NavLink)`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
+  gap: 0.625rem;
+  padding: 0.5rem 1rem;
+  margin: 1px 0.5rem;
+  border-radius: 7px;
+  color: rgba(255, 255, 255, 0.75);
   text-decoration: none;
-  transition: all 0.2s ease;
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
   font-weight: 500;
-  position: relative;
-  
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-  }
-  
+  transition: all 0.15s;
+
+  svg { font-size: 1rem; flex-shrink: 0; }
+
+  &:hover { background: rgba(255, 255, 255, 0.08); color: white; }
+
   &.active {
-    background: rgba(251, 191, 36, 0.15);
+    background: rgba(251, 191, 36, 0.18);
     color: #Fbbf24;
-    border-left: 3px solid #Fbbf24;
-    
-    svg {
-      color: #Fbbf24;
-    }
+    font-weight: 600;
   }
-  
-  svg {
-    font-size: 1.25rem;
-    transition: color 0.2s ease;
-  }
+`;
+
+const NavBadge = styled.span<{ $variant?: string }>`
+  margin-left: auto;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  background: ${({ $variant }) =>
+    $variant === 'pending' ? 'rgba(251,191,36,0.25)' :
+    $variant === 'rejected' ? 'rgba(239,68,68,0.25)' :
+    $variant === 'approved' ? 'rgba(16,185,129,0.25)' : 'rgba(255,255,255,0.12)'};
+  color: ${({ $variant }) =>
+    $variant === 'pending' ? '#fde68a' :
+    $variant === 'rejected' ? '#fca5a5' :
+    $variant === 'approved' ? '#6ee7b7' : 'rgba(255,255,255,0.6)'};
+`;
+
+const Footer = styled.div`
+  margin-top: auto;
+  padding: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 `;
 
 const LogoutButton = styled.button`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
-  background: transparent;
+  gap: 0.625rem;
+  width: calc(100% - 1rem);
+  margin: 0.25rem 0.5rem;
+  padding: 0.5rem 0.75rem;
   border: none;
-  width: 100%;
-  text-align: left;
+  border-radius: 7px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8125rem;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  margin-top: 1rem;
-  
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #ff6b6b;
-  }
-  
-  svg {
-    font-size: 1.25rem;
-  }
+  text-align: left;
+
+  &:hover { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
+  svg { font-size: 1rem; }
 `;
 
 interface UserSidebarProps {
@@ -216,141 +189,80 @@ interface UserSidebarProps {
 const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
   const navigate = useNavigate();
   const { user, logout: authLogout } = useAuth();
+  const [kycStatus, setKycStatus] = useState<KycStatus | undefined>(
+    user?.kycStatus as KycStatus | undefined
+  );
 
-  const mainMenuItems = [
-    { to: '/user-panel', label: 'Dashboard', icon: FiHome, end: true },
-    { to: '/user-panel/profile', label: 'My Profile', icon: FiUser },
-    { to: '/user-panel/contests', label: 'My Contests', icon: FiAward },
-    { to: '/user-panel/signals', label: 'My Signals', icon: FiTrendingUp },
-    { to: '/user-panel/rebates', label: 'My Rebates', icon: FiDollarSign },
-  ];
+  useEffect(() => {
+    getMyKyc()
+      .then((data) => setKycStatus(data.kycStatus))
+      .catch(() => undefined);
+  }, []);
 
-  const contentMenuItems = [
-    { to: '/user-panel/webinars', label: 'My Webinars', icon: FiVideo },
-    { to: '/user-panel/courses', label: 'My Courses', icon: FiBook },
-    { to: '/user-panel/trading-videos', label: 'Trading Videos', icon: FiVideo },
-    { to: '/user-panel/analysis', label: 'Saved Analysis', icon: FiFileText },
-  ];
+  const link = (to: string, label: string, icon: React.ElementType, end?: boolean, badge?: string) => (
+    <NavLinkStyled
+      key={to}
+      to={to}
+      end={end}
+      onClick={() => window.innerWidth <= 992 && onToggle()}
+    >
+      {React.createElement(icon)}
+      <span>{label}</span>
+      {badge && <NavBadge $variant={badge}>{badge === 'approved' ? '✓' : badge.slice(0, 4)}</NavBadge>}
+    </NavLinkStyled>
+  );
 
-  const communityMenuItems = [
-    { to: '/user-panel/forum', label: 'Forum Posts', icon: FiMessageSquare },
-    { to: '/user-panel/activity', label: 'Activity', icon: FiBarChart2 },
-    { to: '/user-panel/calendar', label: 'Calendar', icon: FiCalendar },
-  ];
-
-  const handleLogout = () => {
-    authLogout();
-    navigate('/');
-    window.location.reload();
-  };
+  const kycBadge = kycStatus && kycStatus !== 'incomplete' ? kycStatus : undefined;
 
   return (
     <SidebarWrapper $isOpen={isOpen}>
       <SidebarHeader>
-        <Logo>
-          <span>LP</span>
-          <span>Panel</span>
-        </Logo>
-        <CloseButton onClick={onToggle}>
-          <FiX />
-        </CloseButton>
+        <Logo><span>LP</span> Panel</Logo>
+        <CloseButton onClick={onToggle}><FiX /></CloseButton>
       </SidebarHeader>
 
       <UserProfile>
-        <Avatar>
-          {user ? `${user.firstName[0]}${user.lastName[0]}` : 'U'}
+        <Avatar $image={user?.profileImage}>
+          {!user?.profileImage && (user ? `${user.firstName[0]}${user.lastName[0]}` : 'U')}
         </Avatar>
-        <UserName>
-          {user ? `${user.firstName} ${user.lastName}` : 'User'}
-        </UserName>
-        <UserEmail>{user?.email || 'user@example.com'}</UserEmail>
+        <ProfileText>
+          <h3>{user ? `${user.firstName} ${user.lastName}` : 'User'}</h3>
+          <p>{user?.email || ''}</p>
+        </ProfileText>
       </UserProfile>
 
       <NavSection>
         <SectionTitle>Main</SectionTitle>
-        <NavList>
-          {mainMenuItems.map((item) => (
-            <NavItem key={item.to}>
-              <NavLinkStyled
-                to={item.to}
-                end={item.end || false}
-                onClick={() => window.innerWidth <= 992 && onToggle()}
-              >
-                <item.icon />
-                <span>{item.label}</span>
-              </NavLinkStyled>
-            </NavItem>
-          ))}
-        </NavList>
+        {link('/user-panel', 'Dashboard', FiHome, true)}
+        {link('/user-panel/profile', 'My Profile', FiUser)}
+        {link('/user-panel/verification', 'Identity Verification', FiShield, false, kycBadge)}
+        {link('/user-panel/contests', 'My Contests', FiAward)}
+        {link('/user-panel/signals', 'My Signals', FiTrendingUp)}
+        {link('/user-panel/rebates', 'My Rebates', FiDollarSign)}
       </NavSection>
 
       <NavSection>
         <SectionTitle>Content</SectionTitle>
-        <NavList>
-          {contentMenuItems.map((item) => (
-            <NavItem key={item.to}>
-              <NavLinkStyled
-                to={item.to}
-                onClick={() => window.innerWidth <= 992 && onToggle()}
-              >
-                <item.icon />
-                <span>{item.label}</span>
-              </NavLinkStyled>
-            </NavItem>
-          ))}
-        </NavList>
+        {link('/user-panel/webinars', 'My Webinars', FiVideo)}
+        {link('/user-panel/courses', 'My Courses', FiBook)}
+        {link('/user-panel/trading-videos', 'Trading Videos', FiVideo)}
+        {link('/user-panel/analysis', 'Saved Analysis', FiFileText)}
       </NavSection>
 
       <NavSection>
         <SectionTitle>Community</SectionTitle>
-        <NavList>
-          {communityMenuItems.map((item) => (
-            <NavItem key={item.to}>
-              <NavLinkStyled
-                to={item.to}
-                onClick={() => window.innerWidth <= 992 && onToggle()}
-              >
-                <item.icon />
-                <span>{item.label}</span>
-              </NavLinkStyled>
-            </NavItem>
-          ))}
-        </NavList>
+        {link('/user-panel/forum', 'Forum Posts', FiMessageSquare)}
+        {link('/user-panel/activity', 'Activity', FiBarChart2)}
+        {link('/user-panel/calendar', 'Calendar', FiCalendar)}
+        {link('/user-panel/settings', 'Settings', FiSettings)}
       </NavSection>
 
-      <NavSection>
-        <NavList>
-          <NavItem>
-            <NavLinkStyled
-              to="/user-panel/settings"
-              onClick={() => window.innerWidth <= 992 && onToggle()}
-            >
-              <FiSettings />
-              <span>Settings</span>
-            </NavLinkStyled>
-          </NavItem>
-        </NavList>
-      </NavSection>
-
-      <NavSection>
-        <NavList>
-          <NavItem>
-            <NavLinkStyled
-              to="/"
-              end
-              onClick={() => window.innerWidth <= 992 && onToggle()}
-            >
-              <FiGlobe />
-              <span>Back to homepage</span>
-            </NavLinkStyled>
-          </NavItem>
-        </NavList>
-      </NavSection>
-
-      <LogoutButton onClick={handleLogout}>
-        <FiLogOut />
-        <span>Logout</span>
-      </LogoutButton>
+      <Footer>
+        {link('/', 'Homepage', FiGlobe, true)}
+        <LogoutButton onClick={() => { authLogout(); navigate('/'); window.location.reload(); }}>
+          <FiLogOut /><span>Logout</span>
+        </LogoutButton>
+      </Footer>
     </SidebarWrapper>
   );
 };

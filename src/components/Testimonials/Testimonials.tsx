@@ -1,30 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import ReviewBox from "./ReviewBox";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { fetchPublicClientReviews, type ClientReview } from "../../services/siteConfigService";
 
-const reviews = [
+const FALLBACK_REVIEWS = [
   {
     name: "Eleanor Pena",
     role: "Medical Assistant",
     rating: 5,
     description:
-      "LegendPips has completely transformed the way I trade. The signals are incredibly accurate, and I've seen a noticeable increase in my  profits. Highly recommended!",
+      "LegendPips has completely transformed the way I trade. The signals are incredibly accurate, and I've seen a noticeable increase in my profits. Highly recommended!",
   },
   {
     name: "Robert Fox",
     role: "Developer",
     rating: 4,
     description:
-      "Our Satisfied clients have experienced success with our services and loan recommendations. Here are some of their testimonials highlighting their positive experiences and the value they received.",
+      "Our Satisfied clients have experienced success with our services and loan recommendations.",
   },
   {
     name: "Jenny Wilson",
     role: "Investor",
-    rating: 3,
-    description:
-      "Legend Pips helps me track my trades better and I’ve noticed improvement in my profits.",
+    rating: 5,
+    description: "Legend Pips helps me track my trades better and I've noticed improvement in my profits.",
   },
 ];
 
@@ -38,7 +38,6 @@ const TestimonialContainer = styled.section`
 
 const SliderWrapper = styled.div`
   width: 100%;
-//   border: 2px solid red;
   max-width: 1000px;
   overflow: hidden;
   position: relative;
@@ -66,7 +65,7 @@ const SlideButtons = styled.div`
   margin-top: 2rem;
 
   button {
-    padding: 1rem 1rem;
+    padding: 1rem;
     border: 1px solid black;
     border-radius: 50%;
     color: black;
@@ -74,38 +73,40 @@ const SlideButtons = styled.div`
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
     background-color: transparent;
 
-    &:hover {
-      background-color: #e49c00;
-    }
+    &:hover { background-color: #e49c00; }
   }
 `;
 
+type ReviewItem = { name: string; role: string; rating: number; description: string };
+
+const mapReview = (r: ClientReview): ReviewItem => ({
+  name: r.name,
+  role: r.role || "Client",
+  rating: r.rating,
+  description: r.body,
+});
+
 const Testimonials: React.FC = () => {
+  const [reviews, setReviews] = useState<ReviewItem[]>(FALLBACK_REVIEWS);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(1);
 
   useEffect(() => {
-    const handleResize = () => {
-      setVisibleCount(window.innerWidth > 1024 ? 2 : 1);
-    };
+    fetchPublicClientReviews()
+      .then((data) => { if (data.length) setReviews(data.map(mapReview)); })
+      .catch(() => {});
+  }, []);
 
-    handleResize(); // initial
+  useEffect(() => {
+    const handleResize = () => setVisibleCount(window.innerWidth > 1024 ? 2 : 1);
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const totalSlides = Math.ceil(reviews.length / visibleCount);
-
-  const goPrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + totalSlides) % totalSlides);
-  };
-
-  const goNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % totalSlides);
-  };
+  const totalSlides = Math.max(1, Math.ceil(reviews.length / visibleCount));
 
   return (
     <TestimonialContainer>
@@ -118,24 +119,17 @@ const Testimonials: React.FC = () => {
         <SlideTrack currentIndex={currentIndex}>
           {reviews.map((review, index) => (
             <Slide key={index} visibleCount={visibleCount}>
-              <ReviewBox
-                name={review.name}
-                role={review.role}
-                rating={review.rating}
-                description={review.description}
-              />
+              <ReviewBox {...review} />
             </Slide>
           ))}
         </SlideTrack>
       </SliderWrapper>
-      <SlideButtons>
-        <button onClick={goPrev}>
-          <FaArrowLeft />
-        </button>
-        <button onClick={goNext}>
-          <FaArrowRight />
-        </button>
-      </SlideButtons>
+      {reviews.length > visibleCount && (
+        <SlideButtons>
+          <button type="button" onClick={() => setCurrentIndex((p) => (p - 1 + totalSlides) % totalSlides)}><FaArrowLeft /></button>
+          <button type="button" onClick={() => setCurrentIndex((p) => (p + 1) % totalSlides)}><FaArrowRight /></button>
+        </SlideButtons>
+      )}
     </TestimonialContainer>
   );
 };

@@ -6,13 +6,16 @@ import { ThemeProvider } from 'styled-components'
 import { theme } from './theme/theme.ts'
 import { GlobalStyles } from './styles/GlobalStyles.ts'
 import { AuthProvider } from './contexts/AuthContext.tsx'
+import { SiteConfigProvider } from './contexts/SiteConfigContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
       <GlobalStyles />
       <AuthProvider>
-        <App />
+        <SiteConfigProvider>
+          <App />
+        </SiteConfigProvider>
       </AuthProvider>
     </ThemeProvider>
   </StrictMode>,

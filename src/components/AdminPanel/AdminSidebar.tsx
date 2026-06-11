@@ -1,64 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
-  FiHome,
-  FiUsers,
-  FiAward,
-  FiFileText,
-  FiVideo,
-  FiSettings,
-  FiLogOut,
-  FiBarChart2,
-  FiTrendingUp,
-  FiShield,
-  FiDatabase,
-  FiX,
-  FiInbox,
-  FiActivity,
-  FiDollarSign,
-  FiGlobe,
+  FiHome, FiUsers, FiAward, FiFileText, FiVideo, FiSettings,
+  FiLogOut, FiBarChart2, FiTrendingUp, FiShield, FiDatabase,
+  FiX, FiInbox, FiActivity, FiDollarSign, FiGlobe, FiChevronDown, FiChevronUp,
 } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
+import { USER_LIST_PRESETS } from '../../utils/userListFilters';
+import { KYC_RECORD_PRESETS } from '../../utils/kycRecordFilters';
 
 const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
   position: fixed;
   left: 0;
   top: 0;
-  width: 280px;
+  width: 240px;
   height: 100vh;
   background: #132E58;
   color: white;
   z-index: 1000;
   overflow-y: auto;
-  transition: transform 0.3s ease;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     transform: translateX(${({ $isOpen }) => ($isOpen ? '0' : '-100%')});
   }
-  
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 3px;
-    
-    &:hover {
-      background: rgba(255, 255, 255, 0.5);
-    }
-  }
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 `;
 
 const SidebarHeader = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -67,10 +44,11 @@ const SidebarHeader = styled.div`
 const Logo = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 1.5rem;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
   font-weight: 700;
   color: #Fbbf24;
+  svg { font-size: 1.125rem; }
 `;
 
 const CloseButton = styled.button`
@@ -78,121 +56,129 @@ const CloseButton = styled.button`
   background: transparent;
   border: none;
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: background 0.2s ease;
-  
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    display: block;
-  }
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) { display: block; }
 `;
 
-const AdminBadge = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(251, 191, 36, 0.1);
-`;
+const NavSection = styled.div` padding: 0.5rem 0; `;
 
-const BadgeText = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #Fbbf24;
-  
-  svg {
-    font-size: 1rem;
-  }
-`;
-
-const NavSection = styled.div`
-  padding: 1rem 0;
-`;
-
-const SectionTitle = styled.h4`
-  font-size: 0.75rem;
+const SectionTitle = styled.div`
+  font-size: 0.625rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.5);
-  padding: 0 1.5rem;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-`;
-
-const NavList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-`;
-
-const NavItem = styled.li`
-  margin: 0.25rem 0;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 0.5rem 1rem 0.25rem;
+  font-weight: 700;
 `;
 
 const NavLinkStyled = styled(NavLink)`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
+  gap: 0.625rem;
+  padding: 0.5rem 1rem;
+  margin: 1px 0.5rem;
+  border-radius: 7px;
+  color: rgba(255, 255, 255, 0.75);
   text-decoration: none;
-  transition: all 0.2s ease;
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
   font-weight: 500;
-  position: relative;
-  
+  transition: all 0.15s;
+  svg { font-size: 1rem; flex-shrink: 0; }
+  &:hover { background: rgba(255, 255, 255, 0.08); color: white; }
+  &.active { background: rgba(251, 191, 36, 0.18); color: #Fbbf24; font-weight: 600; }
+`;
+
+const UsersGroupBtn = styled.button<{ $open?: boolean; $active?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: calc(100% - 1rem);
+  margin: 1px 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 7px;
+  background: ${({ $active }) => ($active ? 'rgba(251, 191, 36, 0.18)' : 'transparent')};
+  color: ${({ $active }) => ($active ? '#Fbbf24' : 'rgba(255, 255, 255, 0.75)')};
+  font-size: 0.8125rem;
+  font-weight: ${({ $active }) => ($active ? 600 : 500)};
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+
+  svg:first-child { font-size: 1rem; }
+  .chevron { margin-left: auto; font-size: 0.875rem; opacity: 0.7; }
+
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
     color: white;
   }
-  
+`;
+
+const SubNav = styled.div`
+  margin: 0.15rem 0.5rem 0.35rem 1.25rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+`;
+
+const SubLink = styled(NavLink)`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.65rem;
+  margin: 1px 0;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.12s;
+
+  &::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.06);
+    &::before { background: #Fbbf24; }
+  }
+
   &.active {
-    background: rgba(251, 191, 36, 0.15);
     color: #Fbbf24;
-    border-left: 3px solid #Fbbf24;
-    
-    svg {
-      color: #Fbbf24;
-    }
+    font-weight: 600;
+    background: rgba(251, 191, 36, 0.1);
+    &::before { background: #Fbbf24; }
   }
-  
-  svg {
-    font-size: 1.25rem;
-    transition: color 0.2s ease;
-  }
+`;
+
+const Footer = styled.div`
+  margin-top: auto;
+  padding: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 `;
 
 const LogoutButton = styled.button`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
-  background: transparent;
+  gap: 0.625rem;
+  width: calc(100% - 1rem);
+  margin: 0.25rem 0.5rem;
+  padding: 0.5rem 0.75rem;
   border: none;
-  width: 100%;
-  text-align: left;
+  border-radius: 7px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8125rem;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  margin-top: 1rem;
-  
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #ff6b6b;
-  }
-  
-  svg {
-    font-size: 1.25rem;
-  }
+  text-align: left;
+  &:hover { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
+  svg { font-size: 1rem; }
 `;
 
 interface AdminSidebarProps {
@@ -202,126 +188,135 @@ interface AdminSidebarProps {
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout: authLogout } = useAuth();
 
-  const mainMenuItems = [
-    { to: '/admin-panel', label: 'Dashboard', icon: FiHome, end: true },
-    { to: '/admin-panel/users', label: 'Users', icon: FiUsers },
-  ];
+  const isUsersSection =
+    location.pathname.startsWith('/admin-panel/users') ||
+    location.pathname.startsWith('/admin-panel/user');
 
-  const contentMenuItems = [
-    { to: '/admin-panel/brokers', label: 'Brokers', icon: FiDatabase },
-    { to: '/admin-panel/contests', label: 'Contests', icon: FiAward },
-    { to: '/admin-panel/signals', label: 'Signals', icon: FiTrendingUp },
-    { to: '/admin-panel/webinars', label: 'Webinars', icon: FiVideo },
-    { to: '/admin-panel/analysis', label: 'Analysis', icon: FiFileText },
-    { to: '/admin-panel/courses', label: 'Courses', icon: FiFileText },
-  ];
+  const isKycSection = location.pathname.startsWith('/admin-panel/kyc-records');
 
-  const systemMenuItems = [
-    { to: '/admin-panel/feedback-inbox', label: 'Feedback inbox', icon: FiInbox },
-    { to: '/admin-panel/user-activity', label: 'User activity', icon: FiActivity },
-    { to: '/admin-panel/rebate-credits', label: 'Rebate credits', icon: FiDollarSign },
-    { to: '/admin-panel/reports', label: 'Reports & Analytics', icon: FiBarChart2 },
-    { to: '/admin-panel/settings', label: 'Settings', icon: FiSettings },
-  ];
+  const [usersOpen, setUsersOpen] = useState(isUsersSection);
+  const [kycOpen, setKycOpen] = useState(isKycSection);
 
-  const handleLogout = () => {
-    authLogout();
-    navigate('/');
-    window.location.reload();
-  };
+  useEffect(() => {
+    if (isUsersSection) setUsersOpen(true);
+  }, [isUsersSection]);
+
+  useEffect(() => {
+    if (isKycSection) setKycOpen(true);
+  }, [isKycSection]);
+
+  const link = (to: string, label: string, icon: React.ElementType, end?: boolean) => (
+    <NavLinkStyled key={to} to={to} end={end} onClick={() => window.innerWidth <= 992 && onToggle()}>
+      {React.createElement(icon)}<span>{label}</span>
+    </NavLinkStyled>
+  );
 
   return (
     <SidebarWrapper $isOpen={isOpen}>
       <SidebarHeader>
-        <Logo>
-          <FiShield />
-          <span>Admin Panel</span>
-        </Logo>
-        <CloseButton onClick={onToggle}>
-          <FiX />
-        </CloseButton>
+        <Logo><FiShield /><span>Admin</span></Logo>
+        <CloseButton onClick={onToggle}><FiX /></CloseButton>
       </SidebarHeader>
-
-      <AdminBadge>
-        <BadgeText>
-          <FiShield />
-          Administrator Access
-        </BadgeText>
-      </AdminBadge>
 
       <NavSection>
         <SectionTitle>Main</SectionTitle>
-        <NavList>
-          {mainMenuItems.map((item) => (
-            <NavItem key={item.to}>
-              <NavLinkStyled
-                to={item.to}
-                end={item.end || false}
+        {link('/admin-panel', 'Dashboard', FiHome, true)}
+
+        <UsersGroupBtn
+          type="button"
+          $open={usersOpen}
+          $active={isUsersSection}
+          onClick={() => setUsersOpen((o) => !o)}
+        >
+          <FiUsers /><span>Users</span>
+          <span className="chevron">{usersOpen ? <FiChevronUp /> : <FiChevronDown />}</span>
+        </UsersGroupBtn>
+
+        {usersOpen && (
+          <SubNav>
+            {USER_LIST_PRESETS.map((preset) => (
+              <SubLink
+                key={preset.id || 'all'}
+                to={preset.id ? `/admin-panel/users?filter=${preset.id}` : '/admin-panel/users'}
+                className={() => {
+                  if (location.pathname !== '/admin-panel/users') return '';
+                  const filter = new URLSearchParams(location.search).get('filter') || '';
+                  return filter === preset.id ? 'active' : '';
+                }}
                 onClick={() => window.innerWidth <= 992 && onToggle()}
               >
-                <item.icon />
-                <span>{item.label}</span>
-              </NavLinkStyled>
-            </NavItem>
-          ))}
-        </NavList>
+                {preset.label}
+              </SubLink>
+            ))}
+            <SubLink
+              to="/admin-panel/users/bulk-email"
+              className={() => (location.pathname === '/admin-panel/users/bulk-email' ? 'active' : '')}
+              onClick={() => window.innerWidth <= 992 && onToggle()}
+            >
+              Bulk Email
+            </SubLink>
+          </SubNav>
+        )}
+
+        <UsersGroupBtn
+          type="button"
+          $open={kycOpen}
+          $active={isKycSection}
+          onClick={() => setKycOpen((o) => !o)}
+        >
+          <FiShield /><span>KYC Records</span>
+          <span className="chevron">{kycOpen ? <FiChevronUp /> : <FiChevronDown />}</span>
+        </UsersGroupBtn>
+
+        {kycOpen && (
+          <SubNav>
+            {KYC_RECORD_PRESETS.map((preset) => (
+              <SubLink
+                key={preset.id || 'all-kyc'}
+                to={preset.id ? `/admin-panel/kyc-records?filter=${preset.id}` : '/admin-panel/kyc-records'}
+                className={() => {
+                  if (!location.pathname.startsWith('/admin-panel/kyc-records')) return '';
+                  if (location.pathname !== '/admin-panel/kyc-records') return '';
+                  const filter = new URLSearchParams(location.search).get('filter') || '';
+                  return filter === preset.id ? 'active' : '';
+                }}
+                onClick={() => window.innerWidth <= 992 && onToggle()}
+              >
+                {preset.label}
+              </SubLink>
+            ))}
+          </SubNav>
+        )}
       </NavSection>
 
       <NavSection>
         <SectionTitle>Content</SectionTitle>
-        <NavList>
-          {contentMenuItems.map((item) => (
-            <NavItem key={item.to}>
-              <NavLinkStyled
-                to={item.to}
-                onClick={() => window.innerWidth <= 992 && onToggle()}
-              >
-                <item.icon />
-                <span>{item.label}</span>
-              </NavLinkStyled>
-            </NavItem>
-          ))}
-        </NavList>
+        {link('/admin-panel/brokers', 'Brokers', FiDatabase)}
+        {link('/admin-panel/contests', 'Contests', FiAward)}
+        {link('/admin-panel/signals', 'Signals', FiTrendingUp)}
+        {link('/admin-panel/webinars', 'Webinars', FiVideo)}
+        {link('/admin-panel/analysis', 'Analysis', FiFileText)}
+        {link('/admin-panel/courses', 'Courses', FiFileText)}
       </NavSection>
 
       <NavSection>
         <SectionTitle>System</SectionTitle>
-        <NavList>
-          {systemMenuItems.map((item) => (
-            <NavItem key={item.to}>
-              <NavLinkStyled
-                to={item.to}
-                onClick={() => window.innerWidth <= 992 && onToggle()}
-              >
-                <item.icon />
-                <span>{item.label}</span>
-              </NavLinkStyled>
-            </NavItem>
-          ))}
-        </NavList>
+        {link('/admin-panel/feedback-inbox', 'Feedback', FiInbox)}
+        {link('/admin-panel/user-activity', 'Activity', FiActivity)}
+        {link('/admin-panel/rebate-credits', 'Rebates', FiDollarSign)}
+        {link('/admin-panel/reports', 'Reports', FiBarChart2)}
+        {link('/admin-panel/settings', 'Settings', FiSettings)}
       </NavSection>
 
-      <NavSection>
-        <NavList>
-          <NavItem>
-            <NavLinkStyled
-              to="/"
-              end
-              onClick={() => window.innerWidth <= 992 && onToggle()}
-            >
-              <FiGlobe />
-              <span>Back to homepage</span>
-            </NavLinkStyled>
-          </NavItem>
-        </NavList>
-      </NavSection>
-
-      <LogoutButton onClick={handleLogout}>
-        <FiLogOut />
-        <span>Logout</span>
-      </LogoutButton>
+      <Footer>
+        {link('/', 'Homepage', FiGlobe, true)}
+        <LogoutButton onClick={() => { authLogout(); navigate('/'); window.location.reload(); }}>
+          <FiLogOut /><span>Logout</span>
+        </LogoutButton>
+      </Footer>
     </SidebarWrapper>
   );
 };

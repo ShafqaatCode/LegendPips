@@ -32,10 +32,14 @@ import Activity from "../pages/UserPanel/Activity/Activity";
 import MyRebates from "../pages/UserPanel/Rebates/MyRebates";
 import Calendar from "../pages/UserPanel/Calendar/Calendar";
 import Settings from "../pages/UserPanel/Settings/Settings";
+import KycVerification from "../pages/UserPanel/Verification/KycVerification";
 import ProtectedRoute from "../components/UserPanel/ProtectedRoute";
 import AdminPanel from "../pages/AdminPanel/AdminPanel";
 import AdminDashboard from "../pages/AdminPanel/Dashboard/AdminDashboard";
 import UsersManagement from "../pages/AdminPanel/Users/UsersManagement";
+import UserDetail from "../pages/AdminPanel/Users/UserDetail";
+import AdminBulkEmail from "../pages/AdminPanel/Users/AdminBulkEmail";
+import KycRecordsManagement from "../pages/AdminPanel/Kyc/KycRecordsManagement";
 import BrokersManagement from "../pages/AdminPanel/Brokers/BrokersManagement";
 import ContestsManagement from "../pages/AdminPanel/Contests/ContestsManagement";
 import SignalsManagement from "../pages/AdminPanel/Signals/SignalsManagement";
@@ -55,6 +59,7 @@ import PivotPointCalculatorPage from "../pages/PivotPointCalculator/PivotPointCa
 import PositionSizeCalculatorPage from "../pages/PositionSizeCalculator/PositionSizeCalculatorPage";
 import PipCalculatorPage from "../pages/PipCalculator/PipCalculatorPage";
 import CalculatorsPage from "../pages/Calculators/CalculatorsPage";
+import AboutPage from "../pages/About/AboutPage";
 
 // 👇 Add these imports
 
@@ -76,7 +81,11 @@ const AppRoutes: React.FC = () => {
         }
       >
         <Route index element={<AdminDashboard />} />
+        <Route path="users/bulk-email" element={<AdminBulkEmail />} />
+        <Route path="kyc-records" element={<KycRecordsManagement />} />
+        <Route path="kyc-records/:id" element={<UserDetail />} />
         <Route path="users" element={<UsersManagement />} />
+        <Route path="users/:id" element={<UserDetail />} />
         <Route path="brokers" element={<BrokersManagement />} />
         <Route path="contests" element={<ContestsManagement />} />
         <Route path="signals" element={<SignalsManagement />} />
@@ -101,6 +110,7 @@ const AppRoutes: React.FC = () => {
       >
         <Route index element={<Dashboard />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="verification" element={<KycVerification />} />
         <Route path="contests" element={<MyContests />} />
         <Route path="signals" element={<MySignals />} />
         <Route path="webinars" element={<MyWebinars />} />
@@ -133,6 +143,7 @@ const AppRoutes: React.FC = () => {
         {/* External/demo articles may include extra path segments; keep this route from breaking. */}
         <Route path="analysis/:id/*" element={<AnalysisDetail />} />
         <Route path="how-it-works" element={<HitWorksPage />} />
+        <Route path="about" element={<AboutPage />} />
 
         <Route path="forum" element={<Forum />} />
         <Route path="forum/thread/:threadId" element={<ForumThreadDetail />} />

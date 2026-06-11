@@ -24,6 +24,7 @@ import { NavLink } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import { FiChevronDown, FiChevronUp, FiShield, FiUser } from "react-icons/fi";
 import { useAuth } from "../../contexts/AuthContext";
+import { useSiteConfig } from "../../contexts/SiteConfigContext";
 import LogoImg from "../../assets/icons/image 2.svg";
 import SupportIcon from "../../assets/icons/SupportIcon.svg";
 import CalculatorIcon from "../../assets/icons/calculator-svgrepo-com (1) 1.svg";
@@ -32,7 +33,7 @@ import LocationIcon from "../../assets/icons/Location marker.svg";
 import LoginModal from "../../pages/Login/LoginModal";
 import RegisterModal from "../../pages/Register/RegisterModal";
 
-const navLinks = [
+const FALLBACK_NAV = [
   { to: "/", label: "Home", end: true },
   { to: "/how-it-works", label: "How It Works?" },
   { to: "/rebates", label: "Rebates Brokers" },
@@ -47,23 +48,31 @@ const navLinks = [
   { to: "/webinars", label: "Webinars" },
 ];
 
-const toolsSubmenu = [
+const FALLBACK_TOOLS = [
   { to: "/calculators", label: "All Calculators" },
   { to: "/pip-calculator", label: "Pip Calculator" },
   { to: "/position-size-calculator", label: "Position Size Calculator" },
   { to: "/margin-calculator", label: "Margin Calculator" },
   { to: "/rebate-calculator", label: "Rebate Calculator" },
   { to: "/pivot-point-calculator", label: "Pivot Point Calculator" },
-
 ];
 
 const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [submenuOpen, setSubmenuOpen] = useState(false); // for desktop
-  const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState(false); // for mobile
+  const [submenuOpen, setSubmenuOpen] = useState(false);
+  const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState(false);
   const [signupOpen, setSignupOpen] = useState(false);
   const [signinOpen, setSigninOpen] = useState(false);
   const { isAuthenticated, user } = useAuth();
+  const { mainNav, toolsNav, config } = useSiteConfig();
+
+  const navLinks = mainNav.length
+    ? mainNav.map((n) => ({ to: n.path, label: n.label, end: n.end }))
+    : FALLBACK_NAV;
+  const toolsSubmenu = toolsNav.length
+    ? toolsNav.map((n) => ({ to: n.path, label: n.label }))
+    : FALLBACK_TOOLS;
+  const logoSrc = config?.siteLogoUrl || LogoImg;
 
   const portalPath = user?.role === "admin" ? "/admin-panel" : "/user-panel";
   const isAdmin = user?.role === "admin";
@@ -83,7 +92,7 @@ const Header: React.FC = () => {
         {/* Topbar */}
         <Topbar>
           <NavLink to="/">
-            <Logo src={LogoImg} alt="LegendPips Logo" />
+            <Logo src={logoSrc} alt={`${config?.siteName || "LegendPips"} Logo`} />
           </NavLink>
 
           <LinkGroup>
@@ -154,7 +163,7 @@ const Header: React.FC = () => {
         {/* Mobile Bar */}
         <MobileBar>
           <NavLink to="/">
-            <Logo src={LogoImg} alt="LegendPips Logo" />
+            <Logo src={logoSrc} alt={`${config?.siteName || "LegendPips"} Logo`} />
           </NavLink>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             {isAuthenticated ? (

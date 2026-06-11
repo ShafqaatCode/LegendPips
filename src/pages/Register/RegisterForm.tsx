@@ -28,6 +28,7 @@ import {
 } from "./Register.styles";
 import { FaX } from "react-icons/fa6";
 import { register as registerUser, sendRegistrationOtp } from "../../services/authService";
+import { fetchRegisterConfig, type RegisterConfig } from "../../services/siteConfigService";
 
 interface Props {
   isOpen?: boolean;
@@ -51,6 +52,13 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const [otpCooldown, setOtpCooldown] = useState(0);
+  const [regConfig, setRegConfig] = useState<RegisterConfig | null>(null);
+
+  useEffect(() => {
+    fetchRegisterConfig().then(setRegConfig).catch(() => setRegConfig(null));
+  }, []);
+
+  const emailVerificationRequired = regConfig?.emailVerificationRequired !== false;
 
   useEffect(() => {
     if (otpCooldown <= 0) return;
@@ -96,7 +104,7 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
     }
 
     const otpRaw = String(data.otp ?? "").trim();
-    if (!/^\d{6}$/.test(otpRaw)) {
+    if (emailVerificationRequired && !/^\d{6}$/.test(otpRaw)) {
       setError("Enter the 6-digit verification code sent to your email.");
       setIsLoading(false);
       return;
@@ -109,7 +117,7 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
         email: data.email.trim(),
         password: data.password,
         phone: phone || undefined,
-        otp: otpRaw,
+        otp: emailVerificationRequired ? otpRaw : undefined,
       });
 
       if (response.success) {
@@ -153,29 +161,37 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
         <Input type="text" placeholder="Last Name" {...register("lastName", { required: true })} />
         {errors.lastName && <ErrorMsg>Last Name is required</ErrorMsg>}
 
-        <EmailOtpWrap>
-          <Input type="email" placeholder="Email address" {...register("email", { required: true })} />
-          <SendOtpBtn
-            type="button"
-            onClick={handleSendOtp}
-            disabled={otpSending || otpCooldown > 0}
-            $cooling={otpCooldown > 0}
-          >
-            {otpSending ? "Sending…" : otpCooldown > 0 ? `${otpCooldown}s` : "Send code"}
-          </SendOtpBtn>
-        </EmailOtpWrap>
-        {errors.email && <ErrorMsg>Email is required</ErrorMsg>}
-        <OtpHint>We&apos;ll email a 6-digit code. Enter it below to verify this address before you register.</OtpHint>
-
-        <Input
-          type="text"
-          inputMode="numeric"
-          autoComplete="one-time-code"
-          maxLength={6}
-          placeholder="6-digit code"
-          {...register("otp", { required: true })}
-        />
-        {errors.otp && <ErrorMsg>Verification code is required</ErrorMsg>}
+        {emailVerificationRequired ? (
+          <>
+            <EmailOtpWrap>
+              <Input type="email" placeholder="Email address" {...register("email", { required: true })} />
+              <SendOtpBtn
+                type="button"
+                onClick={handleSendOtp}
+                disabled={otpSending || otpCooldown > 0}
+                $cooling={otpCooldown > 0}
+              >
+                {otpSending ? "Sending…" : otpCooldown > 0 ? `${otpCooldown}s` : "Send code"}
+              </SendOtpBtn>
+            </EmailOtpWrap>
+            {errors.email && <ErrorMsg>Email is required</ErrorMsg>}
+            <OtpHint>We&apos;ll email a 6-digit code. Enter it below to verify this address before you register.</OtpHint>
+            <Input
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={6}
+              placeholder="6-digit code"
+              {...register("otp", { required: emailVerificationRequired })}
+            />
+            {errors.otp && <ErrorMsg>Verification code is required</ErrorMsg>}
+          </>
+        ) : (
+          <>
+            <Input type="email" placeholder="Email address" {...register("email", { required: true })} />
+            {errors.email && <ErrorMsg>Email is required</ErrorMsg>}
+          </>
+        )}
 
         <PhoneRow>
           <PhoneInputStyled

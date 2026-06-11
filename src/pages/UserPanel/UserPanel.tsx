@@ -7,27 +7,19 @@ import UserHeader from '../../components/UserPanel/UserHeader';
 const PanelWrapper = styled.div`
   display: flex;
   min-height: 100vh;
-  background: #fafbfc;
-  position: relative;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    flex-direction: column;
-  }
+  background: #f4f6f9;
 `;
 
 const Backdrop = styled.div<{ $isOpen: boolean }>`
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
   z-index: 999;
-  transition: opacity 0.3s ease;
   opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
   pointer-events: ${({ $isOpen }) => ($isOpen ? 'auto' : 'none')};
-  
+  transition: opacity 0.2s;
+
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     display: block;
   }
@@ -35,36 +27,34 @@ const Backdrop = styled.div<{ $isOpen: boolean }>`
 
 const MainContent = styled.main`
   flex: 1;
-  margin-left: 280px;
-  padding: 0;
+  margin-left: 240px;
   min-height: 100vh;
-  background: #fafbfc;
-  
+  display: flex;
+  flex-direction: column;
+
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     margin-left: 0;
-    padding-top: 70px;
   }
 `;
 
 const ContentArea = styled.div`
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  
+  flex: 1;
+  padding: 1rem 1.25rem 1.5rem;
+
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 `;
 
 const UserPanel: React.FC = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <PanelWrapper>
       <Backdrop $isOpen={sidebarOpen} onClick={() => setSidebarOpen(false)} />
       <UserSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       <MainContent>
-        <UserHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+        <UserHeader onMenuClick={() => setSidebarOpen(true)} />
         <ContentArea>
           <Outlet />
         </ContentArea>

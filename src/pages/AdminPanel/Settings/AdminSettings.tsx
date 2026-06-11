@@ -1,334 +1,550 @@
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
-import { FiSettings, FiSave, FiGlobe, FiShield, FiDatabase } from "react-icons/fi";
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  fetchAdminPlatformSettings,
-  saveAdminPlatformSettings,
-  requestBackupNote,
-  requestInvalidateCache,
+  FiSettings, FiGlobe, FiImage, FiMenu, FiShield, FiSearch,
+  FiUsers, FiMessageSquare, FiSave, FiPlus, FiEdit2, FiTrash2,
+  FiChevronUp, FiChevronDown, FiUpload,
+} from 'react-icons/fi';
+import {
+  PageWrap, PageHeader, PageTitleGroup, PageTitle, PageSubtitle,
+  PrimaryButton, GhostButton,
+} from '../../../components/AdminPanel/adminUi';
+import {
+  fetchAdminPlatformSettings, saveAdminPlatformSettings,
+  uploadSiteLogo, removeSiteLogo, uploadOgImage,
   type PlatformSettings,
-} from "../../../services/platformSettingsService";
-import { PanelCardListSkeleton } from "../../../components/SharedComponents/Shimmer";
+} from '../../../services/platformSettingsService';
+import type { NavItem } from '../../../services/siteConfigService';
+import {
+  fetchAdminTeamMembers, createTeamMember, updateTeamMember,
+  deleteTeamMember, reorderTeamMembers,
+} from '../../../services/teamMemberService';
+import type { TeamMember, ClientReview } from '../../../services/siteConfigService';
+import {
+  fetchAdminClientReviews, createClientReview, updateClientReview,
+  deleteClientReview, reorderClientReviews,
+} from '../../../services/clientReviewService';
+import {
+  SettingsShell, SettingsNav, SettingsNavBtn, SettingsPanel, PanelHead, PanelBody,
+  FieldGrid, Field, ToggleRow, LogoPreview, NavItemRow, MemberCard, ReviewCard,
+  ModalOverlay, ModalBox, StatusMsg, SectionTabs,
+} from './settingsUi';
 
-const Container = styled.div`
-  max-width: 1000px;
-  margin: 0 auto;
-`;
+type Tab = 'overview' | 'branding' | 'navigation' | 'registration' | 'seo' | 'team' | 'reviews';
 
-const Header = styled.div`
-  margin-bottom: 2rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #132e58;
-  margin: 0;
-`;
-
-const SettingsSection = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e5e7eb;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #132e58;
-  margin: 0 0 1.5rem 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-
-  svg {
-    color: #fbbf24;
-  }
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 1.5rem;
-`;
-
-const Label = styled.label`
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #132e58;
-  margin-bottom: 0.5rem;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 0.875rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: #132e58;
-    box-shadow: 0 0 0 3px rgba(19, 46, 88, 0.1);
-  }
-`;
-
-const Select = styled.select`
-  width: 100%;
-  padding: 0.875rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 1rem;
-  color: #132e58;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: #132e58;
-    box-shadow: 0 0 0 3px rgba(19, 46, 88, 0.1);
-  }
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
-`;
-
-const SaveButton = styled.button`
-  background: #132e58;
-  color: white;
-  border: none;
-  padding: 0.875rem 2rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-
-  &:hover:not(:disabled) {
-    background: #1a4a7a;
-    transform: translateY(-2px);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-`;
-
-const Status = styled.p`
-  margin: 0 0 1rem 0;
-  font-size: 0.9rem;
-  color: #6b7280;
-`;
+const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
+  { id: 'overview', label: 'Overview', icon: <FiGlobe /> },
+  { id: 'branding', label: 'Branding', icon: <FiImage /> },
+  { id: 'navigation', label: 'Navigation', icon: <FiMenu /> },
+  { id: 'registration', label: 'Registration', icon: <FiShield /> },
+  { id: 'seo', label: 'SEO', icon: <FiSearch /> },
+  { id: 'team', label: 'Team Members', icon: <FiUsers /> },
+  { id: 'reviews', label: 'Client Reviews', icon: <FiMessageSquare /> },
+];
 
 const AdminSettings: React.FC = () => {
+  const [tab, setTab] = useState<Tab>('overview');
   const [settings, setSettings] = useState<PlatformSettings | null>(null);
+  const [navSection, setNavSection] = useState<'main' | 'tools'>('main');
+  const [team, setTeam] = useState<TeamMember[]>([]);
+  const [reviews, setReviews] = useState<ClientReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [msg, setMsg] = useState('');
+  const [err, setErr] = useState('');
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        setLoading(true);
-        const s = await fetchAdminPlatformSettings();
-        if (!cancelled) setSettings(s);
-      } catch (e: any) {
-        if (!cancelled) setError(e.message || "Failed to load settings");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
+  const [memberModal, setMemberModal] = useState<TeamMember | 'new' | null>(null);
+  const [reviewModal, setReviewModal] = useState<ClientReview | 'new' | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [s, t, r] = await Promise.all([
+        fetchAdminPlatformSettings(),
+        fetchAdminTeamMembers(),
+        fetchAdminClientReviews(),
+      ]);
+      setSettings(s);
+      setTeam(t);
+      setReviews(r);
+    } catch (e: unknown) {
+      setErr(e instanceof Error ? e.message : 'Failed to load settings');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const persist = async (patch: Partial<PlatformSettings>) => {
+  useEffect(() => { load(); }, [load]);
+
+  const flash = (ok: string) => { setMsg(ok); setErr(''); setTimeout(() => setMsg(''), 3000); };
+  const flashErr = (e: string) => { setErr(e); setMsg(''); };
+
+  const persistSettings = async (patch: Partial<PlatformSettings>) => {
     if (!settings) return;
     setSaving(true);
-    setMessage(null);
-    setError(null);
     try {
       const next = await saveAdminPlatformSettings(patch);
       setSettings(next);
-      setMessage("Saved.");
-    } catch (e: any) {
-      setError(e.message || "Save failed");
+      flash('Settings saved.');
+    } catch (e: unknown) {
+      flashErr(e instanceof Error ? e.message : 'Save failed');
     } finally {
       setSaving(false);
     }
   };
 
+  const navForSection = (section: 'main' | 'tools') =>
+    (settings?.navItems || [])
+      .filter((n) => n.section === section)
+      .sort((a, b) => a.order - b.order);
+
+  const moveNavItem = (section: 'main' | 'tools', index: number, dir: -1 | 1) => {
+    if (!settings) return;
+    const items = navForSection(section);
+    const target = index + dir;
+    if (target < 0 || target >= items.length) return;
+    const swapped = [...items];
+    [swapped[index], swapped[target]] = [swapped[target], swapped[index]];
+    const reordered = swapped.map((n, i) => ({ ...n, order: i }));
+    const other = settings.navItems.filter((n) => n.section !== section);
+    setSettings({ ...settings, navItems: [...other, ...reordered] });
+  };
+
+  const updateNavItem = (key: string, patch: Partial<NavItem>) => {
+    if (!settings) return;
+    setSettings({
+      ...settings,
+      navItems: settings.navItems.map((n) => (n.key === key ? { ...n, ...patch } : n)),
+    });
+  };
+
   if (loading || !settings) {
     return (
-      <Container>
-        <Header>
-          <Title>Admin Settings</Title>
-        </Header>
-        {error ? (
-          <Status style={{ color: "#b91c1c" }}>{error}</Status>
-        ) : (
-          <PanelCardListSkeleton cards={4} />
-        )}
-      </Container>
+      <PageWrap>
+        <PageSubtitle>Loading settings…</PageSubtitle>
+        {err && <StatusMsg>{err}</StatusMsg>}
+      </PageWrap>
     );
   }
 
   return (
-    <Container>
-      <Header>
-        <Title>Admin Settings</Title>
-        <FiSettings style={{ display: "none" }} aria-hidden />
-      </Header>
+    <PageWrap>
+      <PageHeader>
+        <PageTitleGroup>
+          <PageTitle><FiSettings /> Platform Settings</PageTitle>
+          <PageSubtitle>Manage branding, navigation, SEO, team, and client reviews</PageSubtitle>
+        </PageTitleGroup>
+      </PageHeader>
 
-      {message && <Status style={{ color: "#059669" }}>{message}</Status>}
-      {error && <Status style={{ color: "#b91c1c" }}>{error}</Status>}
+      {msg && <StatusMsg $ok>{msg}</StatusMsg>}
+      {err && <StatusMsg>{err}</StatusMsg>}
 
-      <SettingsSection>
-        <SectionTitle>
-          <FiGlobe />
-          General Settings
-        </SectionTitle>
-        <FormGroup>
-          <Label>Site Name</Label>
-          <Input
-            type="text"
-            value={settings.siteName}
-            onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label>Admin Email</Label>
-          <Input
-            type="email"
-            value={settings.siteEmail}
-            onChange={(e) => setSettings({ ...settings, siteEmail: e.target.value })}
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label>Default Language</Label>
-          <Select
-            value={settings.defaultLanguage}
-            onChange={(e) => setSettings({ ...settings, defaultLanguage: e.target.value })}
-          >
-            <option value="en">English</option>
-            <option value="es">Spanish</option>
-            <option value="fr">French</option>
-          </Select>
-        </FormGroup>
-        <ButtonGroup>
-          <SaveButton
-            type="button"
-            disabled={saving}
-            onClick={() =>
-              persist({
-                siteName: settings.siteName,
-                siteEmail: settings.siteEmail,
-                defaultLanguage: settings.defaultLanguage,
-              })
-            }
-          >
-            <FiSave />
-            Save Changes
-          </SaveButton>
-        </ButtonGroup>
-      </SettingsSection>
+      <SettingsShell>
+        <SettingsNav>
+          {TABS.map((t) => (
+            <SettingsNavBtn key={t.id} $active={tab === t.id} onClick={() => setTab(t.id)}>
+              {t.icon}{t.label}
+            </SettingsNavBtn>
+          ))}
+        </SettingsNav>
 
-      <SettingsSection>
-        <SectionTitle>
-          <FiShield />
-          Security Settings
-        </SectionTitle>
-        <FormGroup>
-          <Label>Maintenance Mode</Label>
-          <Select
-            value={settings.maintenanceMode ? "true" : "false"}
-            onChange={(e) => setSettings({ ...settings, maintenanceMode: e.target.value === "true" })}
-          >
-            <option value="false">Disabled</option>
-            <option value="true">Enabled</option>
-          </Select>
-        </FormGroup>
-        <FormGroup>
-          <Label>Allow New Registrations</Label>
-          <Select
-            value={settings.allowRegistrations ? "true" : "false"}
-            onChange={(e) => setSettings({ ...settings, allowRegistrations: e.target.value === "true" })}
-          >
-            <option value="true">Yes</option>
-            <option value="false">No</option>
-          </Select>
-        </FormGroup>
-        <ButtonGroup>
-          <SaveButton
-            type="button"
-            disabled={saving}
-            onClick={() =>
-              persist({
-                maintenanceMode: settings.maintenanceMode,
-                allowRegistrations: settings.allowRegistrations,
-              })
-            }
-          >
-            <FiSave />
-            Save Changes
-          </SaveButton>
-        </ButtonGroup>
-      </SettingsSection>
+        <SettingsPanel>
+          {tab === 'overview' && (
+            <>
+              <PanelHead><div><h2>General Settings</h2><p>Site identity and contact details</p></div></PanelHead>
+              <PanelBody>
+                <FieldGrid>
+                  <Field>Site Name<input value={settings.siteName} onChange={(e) => setSettings({ ...settings, siteName: e.target.value })} /></Field>
+                  <Field>Admin Email<input type="email" value={settings.siteEmail} onChange={(e) => setSettings({ ...settings, siteEmail: e.target.value })} /></Field>
+                  <Field className="full">Tagline<input value={settings.siteTagline || ''} onChange={(e) => setSettings({ ...settings, siteTagline: e.target.value })} placeholder="Short site description" /></Field>
+                  <Field>Default Language
+                    <select value={settings.defaultLanguage} onChange={(e) => setSettings({ ...settings, defaultLanguage: e.target.value })}>
+                      <option value="en">English</option>
+                      <option value="es">Spanish</option>
+                      <option value="fr">French</option>
+                    </select>
+                  </Field>
+                </FieldGrid>
+                <div style={{ marginTop: '0.75rem' }}>
+                  <PrimaryButton disabled={saving} onClick={() => persistSettings({
+                    siteName: settings.siteName, siteEmail: settings.siteEmail,
+                    siteTagline: settings.siteTagline, defaultLanguage: settings.defaultLanguage,
+                  })}><FiSave /> Save</PrimaryButton>
+                </div>
+              </PanelBody>
+            </>
+          )}
 
-      <SettingsSection>
-        <SectionTitle>
-          <FiDatabase />
-          Database Management
-        </SectionTitle>
-        <ButtonGroup>
-          <SaveButton
-            style={{ background: "#10b981" }}
-            type="button"
-            disabled={saving}
-            onClick={async () => {
-              try {
-                const msg = await requestBackupNote();
-                alert(msg);
-              } catch (e: any) {
-                alert(e.message || "Request failed");
-              }
-            }}
-          >
-            <FiDatabase />
-            Backup Database
-          </SaveButton>
-          <SaveButton
-            style={{ background: "#ef4444" }}
-            type="button"
-            disabled={saving}
-            onClick={async () => {
-              try {
-                const msg = await requestInvalidateCache();
-                alert(msg);
-              } catch (e: any) {
-                alert(e.message || "Request failed");
-              }
-            }}
-          >
-            <FiDatabase />
-            Clear Cache
-          </SaveButton>
-        </ButtonGroup>
-      </SettingsSection>
-    </Container>
+          {tab === 'branding' && (
+            <>
+              <PanelHead><div><h2>Branding</h2><p>Website logo shown in the navbar</p></div></PanelHead>
+              <PanelBody>
+                <LogoPreview>
+                  {settings.siteLogoUrl ? <img src={settings.siteLogoUrl} alt="Site logo" /> : <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>No logo uploaded</span>}
+                </LogoPreview>
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
+                  <label style={{ cursor: 'pointer' }}>
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                      padding: '0.45rem 0.75rem', fontSize: '0.75rem', fontWeight: 600,
+                      borderRadius: 8, border: 'none', cursor: 'pointer',
+                      background: '#132E58', color: 'white',
+                    }}>
+                      <FiUpload /> Upload Logo
+                    </span>
+                    <input type="file" accept="image/*" hidden onChange={async (e) => {
+                      const f = e.target.files?.[0];
+                      if (!f) return;
+                      setSaving(true);
+                      try {
+                        const next = await uploadSiteLogo(f);
+                        setSettings(next);
+                        flash('Logo uploaded.');
+                      } catch (ex: unknown) { flashErr(ex instanceof Error ? ex.message : 'Upload failed'); }
+                      finally { setSaving(false); e.target.value = ''; }
+                    }} />
+                  </label>
+                  {settings.siteLogoUrl && (
+                    <GhostButton $sm onClick={async () => {
+                      setSaving(true);
+                      try { setSettings(await removeSiteLogo()); flash('Logo removed.'); }
+                      catch (ex: unknown) { flashErr(ex instanceof Error ? ex.message : 'Failed'); }
+                      finally { setSaving(false); }
+                    }}>Remove</GhostButton>
+                  )}
+                </div>
+              </PanelBody>
+            </>
+          )}
+
+          {tab === 'navigation' && (
+            <>
+              <PanelHead>
+                <div><h2>Navigation Menu</h2><p>Reorder items and show/hide links</p></div>
+                <PrimaryButton $sm disabled={saving} onClick={() => persistSettings({ navItems: settings.navItems })}>
+                  <FiSave /> Save Menu
+                </PrimaryButton>
+              </PanelHead>
+              <PanelBody>
+                <SectionTabs>
+                  <button type="button" className={navSection === 'main' ? 'active' : ''} onClick={() => setNavSection('main')}>Main Menu</button>
+                  <button type="button" className={navSection === 'tools' ? 'active' : ''} onClick={() => setNavSection('tools')}>Tools Submenu</button>
+                </SectionTabs>
+                {navForSection(navSection).map((item, i, arr) => (
+                  <NavItemRow key={item.key}>
+                    <div className="order-btns">
+                      <button type="button" disabled={i === 0} onClick={() => moveNavItem(navSection, i, -1)}><FiChevronUp /></button>
+                      <button type="button" disabled={i === arr.length - 1} onClick={() => moveNavItem(navSection, i, 1)}><FiChevronDown /></button>
+                    </div>
+                    <div className="fields">
+                      <input value={item.label} onChange={(e) => updateNavItem(item.key, { label: e.target.value })} placeholder="Label" />
+                      <input value={item.path} onChange={(e) => updateNavItem(item.key, { path: e.target.value })} placeholder="/path" />
+                      <label className="vis"><input type="checkbox" checked={item.visible} onChange={(e) => updateNavItem(item.key, { visible: e.target.checked })} /> Visible</label>
+                    </div>
+                  </NavItemRow>
+                ))}
+              </PanelBody>
+            </>
+          )}
+
+          {tab === 'registration' && (
+            <>
+              <PanelHead><div><h2>Registration & Access</h2><p>Control sign-ups and email verification</p></div></PanelHead>
+              <PanelBody style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <ToggleRow>
+                  <div className="info"><strong>Allow new registrations</strong><span>When off, the register form is blocked</span></div>
+                  <input type="checkbox" checked={settings.allowRegistrations} onChange={(e) => setSettings({ ...settings, allowRegistrations: e.target.checked })} />
+                </ToggleRow>
+                <ToggleRow>
+                  <div className="info"><strong>Email verification on registration</strong><span>Require OTP code sent to email before account is created</span></div>
+                  <input type="checkbox" checked={settings.emailVerificationEnabled} onChange={(e) => setSettings({ ...settings, emailVerificationEnabled: e.target.checked })} />
+                </ToggleRow>
+                <ToggleRow>
+                  <div className="info"><strong>Maintenance mode</strong><span>Blocks registration and shows maintenance message</span></div>
+                  <input type="checkbox" checked={settings.maintenanceMode} onChange={(e) => setSettings({ ...settings, maintenanceMode: e.target.checked })} />
+                </ToggleRow>
+                <PrimaryButton disabled={saving} style={{ marginTop: '0.5rem', alignSelf: 'flex-start' }} onClick={() => persistSettings({
+                  allowRegistrations: settings.allowRegistrations,
+                  emailVerificationEnabled: settings.emailVerificationEnabled,
+                  maintenanceMode: settings.maintenanceMode,
+                })}><FiSave /> Save</PrimaryButton>
+              </PanelBody>
+            </>
+          )}
+
+          {tab === 'seo' && (
+            <>
+              <PanelHead><div><h2>SEO & Meta Tags</h2><p>Default and per-page search engine settings</p></div></PanelHead>
+              <PanelBody>
+                <FieldGrid>
+                  <Field className="full">Default Meta Title<input value={settings.defaultMetaTitle || ''} onChange={(e) => setSettings({ ...settings, defaultMetaTitle: e.target.value })} /></Field>
+                  <Field className="full">Default Meta Description<textarea value={settings.defaultMetaDescription || ''} onChange={(e) => setSettings({ ...settings, defaultMetaDescription: e.target.value })} /></Field>
+                </FieldGrid>
+                {settings.defaultOgImageUrl && (
+                  <LogoPreview style={{ marginTop: '0.75rem' }}><img src={settings.defaultOgImageUrl} alt="OG" /></LogoPreview>
+                )}
+                <label style={{ display: 'inline-block', marginTop: '0.5rem', cursor: 'pointer' }}>
+                  <span style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+                    padding: '0.4rem 0.65rem', fontSize: '0.75rem', fontWeight: 600,
+                    borderRadius: 7, border: '1px solid #e8ecf1', background: 'white', color: '#132E58',
+                  }}>
+                    <FiUpload /> Upload OG Image
+                  </span>
+                  <input type="file" accept="image/*" hidden onChange={async (e) => {
+                    const f = e.target.files?.[0]; if (!f) return;
+                    setSaving(true);
+                    try { setSettings(await uploadOgImage(f)); flash('OG image uploaded.'); }
+                    catch (ex: unknown) { flashErr(ex instanceof Error ? ex.message : 'Upload failed'); }
+                    finally { setSaving(false); e.target.value = ''; }
+                  }} />
+                </label>
+
+                <h4 style={{ margin: '1.25rem 0 0.5rem', fontSize: '0.8125rem', color: '#132E58' }}>Per-page SEO</h4>
+                {(settings.pageMeta || []).map((p, i) => (
+                  <div key={p.route} style={{ border: '1px solid #e8ecf1', borderRadius: 8, padding: '0.65rem', marginBottom: '0.5rem' }}>
+                    <FieldGrid>
+                      <Field>Route<input value={p.route} onChange={(e) => {
+                        const pageMeta = [...settings.pageMeta];
+                        pageMeta[i] = { ...pageMeta[i], route: e.target.value };
+                        setSettings({ ...settings, pageMeta });
+                      }} /></Field>
+                      <Field>Page Title<input value={p.title} onChange={(e) => {
+                        const pageMeta = [...settings.pageMeta];
+                        pageMeta[i] = { ...pageMeta[i], title: e.target.value };
+                        setSettings({ ...settings, pageMeta });
+                      }} /></Field>
+                      <Field className="full">Description<textarea value={p.description} onChange={(e) => {
+                        const pageMeta = [...settings.pageMeta];
+                        pageMeta[i] = { ...pageMeta[i], description: e.target.value };
+                        setSettings({ ...settings, pageMeta });
+                      }} /></Field>
+                    </FieldGrid>
+                  </div>
+                ))}
+                <GhostButton $sm onClick={() => setSettings({
+                  ...settings,
+                  pageMeta: [...settings.pageMeta, { route: '/', title: '', description: '', noIndex: false }],
+                })}><FiPlus /> Add Page</GhostButton>
+                <div style={{ marginTop: '0.75rem' }}>
+                  <PrimaryButton disabled={saving} onClick={() => persistSettings({
+                    defaultMetaTitle: settings.defaultMetaTitle,
+                    defaultMetaDescription: settings.defaultMetaDescription,
+                    pageMeta: settings.pageMeta,
+                  })}><FiSave /> Save SEO</PrimaryButton>
+                </div>
+              </PanelBody>
+            </>
+          )}
+
+          {tab === 'team' && (
+            <>
+              <PanelHead>
+                <div><h2>Management Team</h2><p>Team members shown on the About page</p></div>
+                <PrimaryButton $sm onClick={() => setMemberModal('new')}><FiPlus /> Add Member</PrimaryButton>
+              </PanelHead>
+              <PanelBody>
+                {team.length === 0 && <p style={{ fontSize: '0.8125rem', color: '#64748b' }}>No team members yet.</p>}
+                {team.map((m, i) => (
+                  <MemberCard key={m._id}>
+                    <div className="avatar">{m.photoUrl ? <img src={m.photoUrl} alt={m.name} /> : m.name.charAt(0)}</div>
+                    <div className="body">
+                      <div className="top"><h3>{m.name}</h3><span className="role">{m.role}</span>{!m.published && <span style={{ fontSize: '0.625rem', color: '#94a3b8' }}>(hidden)</span>}</div>
+                      <p>{m.bio || '—'}</p>
+                    </div>
+                    <div className="actions">
+                      <GhostButton $sm onClick={() => moveTeam(i, -1)} disabled={i === 0}><FiChevronUp /></GhostButton>
+                      <GhostButton $sm onClick={() => moveTeam(i, 1)} disabled={i === team.length - 1}><FiChevronDown /></GhostButton>
+                      <GhostButton $sm onClick={() => setMemberModal(m)}><FiEdit2 /></GhostButton>
+                      <GhostButton $sm $danger onClick={() => removeMember(m._id)}><FiTrash2 /></GhostButton>
+                    </div>
+                  </MemberCard>
+                ))}
+              </PanelBody>
+            </>
+          )}
+
+          {tab === 'reviews' && (
+            <>
+              <PanelHead>
+                <div><h2>Client Reviews</h2><p>Testimonials on the homepage</p></div>
+                <PrimaryButton $sm onClick={() => setReviewModal('new')}><FiPlus /> Add Review</PrimaryButton>
+              </PanelHead>
+              <PanelBody>
+                {reviews.length === 0 && <p style={{ fontSize: '0.8125rem', color: '#64748b' }}>No reviews yet.</p>}
+                {reviews.map((r, i) => (
+                  <ReviewCard key={r._id}>
+                    <div className="avatar">{r.avatarUrl ? <img src={r.avatarUrl} alt={r.name} /> : r.name.charAt(0)}</div>
+                    <div className="body">
+                      <div className="top"><h3>{r.name}</h3><span className="role">{r.role || 'Client'}</span><span className="role" style={{ background: '#fef3c7', color: '#b45309' }}>{'★'.repeat(r.rating)}</span></div>
+                      <p>{r.body}</p>
+                    </div>
+                    <div className="actions">
+                      <GhostButton $sm onClick={() => moveReview(i, -1)} disabled={i === 0}><FiChevronDown style={{ transform: 'rotate(180deg)' }} /></GhostButton>
+                      <GhostButton $sm onClick={() => moveReview(i, 1)} disabled={i === reviews.length - 1}><FiChevronDown /></GhostButton>
+                      <GhostButton $sm onClick={() => setReviewModal(r)}><FiEdit2 /></GhostButton>
+                      <GhostButton $sm $danger onClick={() => removeReview(r._id)}><FiTrash2 /></GhostButton>
+                    </div>
+                  </ReviewCard>
+                ))}
+              </PanelBody>
+            </>
+          )}
+        </SettingsPanel>
+      </SettingsShell>
+
+      {memberModal && (
+        <TeamMemberModal
+          member={memberModal === 'new' ? null : memberModal}
+          onClose={() => setMemberModal(null)}
+          onSaved={(m) => { setTeam((prev) => memberModal === 'new' ? [...prev, m] : prev.map((x) => x._id === m._id ? m : x)); setMemberModal(null); flash('Team member saved.'); }}
+        />
+      )}
+      {reviewModal && (
+        <ReviewModal
+          review={reviewModal === 'new' ? null : reviewModal}
+          onClose={() => setReviewModal(null)}
+          onSaved={(r) => { setReviews((prev) => reviewModal === 'new' ? [...prev, r] : prev.map((x) => x._id === r._id ? r : x)); setReviewModal(null); flash('Review saved.'); }}
+        />
+      )}
+    </PageWrap>
+  );
+
+  async function moveTeam(index: number, dir: -1 | 1) {
+    const target = index + dir;
+    if (target < 0 || target >= team.length) return;
+    const ids = team.map((t) => t._id);
+    [ids[index], ids[target]] = [ids[target], ids[index]];
+    setTeam(await reorderTeamMembers(ids));
+  }
+
+  async function removeMember(id: string) {
+    if (!window.confirm('Delete this team member?')) return;
+    await deleteTeamMember(id);
+    setTeam((t) => t.filter((m) => m._id !== id));
+    flash('Team member deleted.');
+  }
+
+  async function moveReview(index: number, dir: -1 | 1) {
+    const target = index + dir;
+    if (target < 0 || target >= reviews.length) return;
+    const ids = reviews.map((r) => r._id);
+    [ids[index], ids[target]] = [ids[target], ids[index]];
+    setReviews(await reorderClientReviews(ids));
+  }
+
+  async function removeReview(id: string) {
+    if (!window.confirm('Delete this review?')) return;
+    await deleteClientReview(id);
+    setReviews((r) => r.filter((x) => x._id !== id));
+    flash('Review deleted.');
+  }
+};
+
+const TeamMemberModal: React.FC<{
+  member: TeamMember | null;
+  onClose: () => void;
+  onSaved: (m: TeamMember) => void;
+}> = ({ member, onClose, onSaved }) => {
+  const [name, setName] = useState(member?.name || '');
+  const [role, setRole] = useState(member?.role || '');
+  const [bio, setBio] = useState(member?.bio || '');
+  const [linkedIn, setLinkedIn] = useState(member?.linkedIn || '');
+  const [published, setPublished] = useState(member?.published !== false);
+  const [photo, setPhoto] = useState<File | undefined>();
+  const [saving, setSaving] = useState(false);
+
+  const submit = async () => {
+    if (!name.trim() || !role.trim()) return;
+    setSaving(true);
+    try {
+      const result = member
+        ? await updateTeamMember(member._id, { name, role, bio, linkedIn, published }, photo)
+        : await createTeamMember({ name, role, bio, linkedIn, published }, photo);
+      onSaved(result);
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : 'Save failed');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <ModalOverlay onClick={onClose}>
+      <ModalBox onClick={(e) => e.stopPropagation()}>
+        <div className="head"><h3>{member ? 'Edit Team Member' : 'Add Team Member'}</h3></div>
+        <div className="content">
+          <FieldGrid>
+            <Field>Name<input value={name} onChange={(e) => setName(e.target.value)} /></Field>
+            <Field>Role<input value={role} onChange={(e) => setRole(e.target.value)} placeholder="CEO, CTO…" /></Field>
+            <Field className="full">Bio<textarea value={bio} onChange={(e) => setBio(e.target.value)} /></Field>
+            <Field className="full">LinkedIn URL<input value={linkedIn} onChange={(e) => setLinkedIn(e.target.value)} /></Field>
+            <Field>Photo<input type="file" accept="image/*" onChange={(e) => setPhoto(e.target.files?.[0])} /></Field>
+            <Field><span>Published</span><input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} style={{ width: 'auto' }} /></Field>
+          </FieldGrid>
+        </div>
+        <div className="foot">
+          <GhostButton onClick={onClose}>Cancel</GhostButton>
+          <PrimaryButton disabled={saving} onClick={submit}><FiSave /> {saving ? 'Saving…' : 'Save'}</PrimaryButton>
+        </div>
+      </ModalBox>
+    </ModalOverlay>
+  );
+};
+
+const ReviewModal: React.FC<{
+  review: ClientReview | null;
+  onClose: () => void;
+  onSaved: (r: ClientReview) => void;
+}> = ({ review, onClose, onSaved }) => {
+  const [name, setName] = useState(review?.name || '');
+  const [role, setRole] = useState(review?.role || '');
+  const [body, setBody] = useState(review?.body || '');
+  const [rating, setRating] = useState(review?.rating || 5);
+  const [featured, setFeatured] = useState(review?.featured || false);
+  const [published, setPublished] = useState(review?.published !== false);
+  const [avatar, setAvatar] = useState<File | undefined>();
+  const [saving, setSaving] = useState(false);
+
+  const submit = async () => {
+    if (!name.trim() || !body.trim()) return;
+    setSaving(true);
+    try {
+      const result = review
+        ? await updateClientReview(review._id, { name, role, body, rating, featured, published }, avatar)
+        : await createClientReview({ name, role, body, rating, featured, published }, avatar);
+      onSaved(result);
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : 'Save failed');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <ModalOverlay onClick={onClose}>
+      <ModalBox onClick={(e) => e.stopPropagation()}>
+        <div className="head"><h3>{review ? 'Edit Review' : 'Add Review'}</h3></div>
+        <div className="content">
+          <FieldGrid>
+            <Field>Name<input value={name} onChange={(e) => setName(e.target.value)} /></Field>
+            <Field>Role<input value={role} onChange={(e) => setRole(e.target.value)} placeholder="Trader, Investor…" /></Field>
+            <Field>Rating
+              <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+                {[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} stars</option>)}
+              </select>
+            </Field>
+            <Field className="full">Review<textarea value={body} onChange={(e) => setBody(e.target.value)} /></Field>
+            <Field>Avatar<input type="file" accept="image/*" onChange={(e) => setAvatar(e.target.files?.[0])} /></Field>
+            <Field><span>Featured</span><input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} style={{ width: 'auto' }} /></Field>
+            <Field><span>Published</span><input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} style={{ width: 'auto' }} /></Field>
+          </FieldGrid>
+        </div>
+        <div className="foot">
+          <GhostButton onClick={onClose}>Cancel</GhostButton>
+          <PrimaryButton disabled={saving} onClick={submit}><FiSave /> {saving ? 'Saving…' : 'Save'}</PrimaryButton>
+        </div>
+      </ModalBox>
+    </ModalOverlay>
   );
 };
 

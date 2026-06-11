@@ -23,6 +23,9 @@ export interface User {
   role?: string;
   status?: string;
   phone?: string;
+  kycStatus?: string;
+  profileImage?: string;
+  bio?: string;
 }
 
 export interface AuthResponse {
@@ -71,9 +74,11 @@ export const login = async (credentials: LoginRequest): Promise<AuthResponse> =>
 
     if (data.success && data.token) {
       setAuthToken(data.token);
-      // Store user data if needed
       if (data.user) {
-        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("user", JSON.stringify({
+          ...data.user,
+          kycStatus: data.user.kycStatus || "incomplete",
+        }));
       }
     }
 
