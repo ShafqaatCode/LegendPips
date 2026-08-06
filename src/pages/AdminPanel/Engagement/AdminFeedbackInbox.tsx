@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { FiInbox, FiTrash2, FiEye, FiArchive, FiRefreshCw } from 'react-icons/fi';
+import { FiInbox, FiTrash2, FiEye, FiArchive, FiRefreshCw, FiMail } from 'react-icons/fi';
 import {
   fetchAdminFeedback,
   patchFeedbackStatus,
@@ -8,142 +8,52 @@ import {
   type AdminFeedbackRow,
 } from '../../../services/adminEngagementService';
 import { TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
+import {
+  PageWrap, PageHeader, PageTitleGroup, PageTitle, PageSubtitle,
+  GhostButton, FilterBar, FilterSelect, FilterCount,
+  TableCard, DataTable, Th, Td, Tr, Pill, ErrorBanner, adminColors,
+  Pagination, PageButtons, PageBtn, ActionGroup,
+} from '../../../components/AdminPanel/adminUi';
 
-const Container = styled.div`
-  max-width: 1600px;
-  margin: 0 auto;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-`;
-
-const Title = styled.h1`
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #132e58;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const Toolbar = styled.div`
-  display: flex;
+const StatsRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.75rem;
-  flex-wrap: wrap;
-  align-items: center;
+  margin-bottom: 1rem;
+  @media (max-width: 700px) { grid-template-columns: 1fr; }
 `;
 
-const Select = styled.select`
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  border: 2px solid #e5e7eb;
-  font-size: 0.875rem;
-  color: #132e58;
-`;
-
-const Button = styled.button<{ $danger?: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.5rem 0.85rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  border: 2px solid ${({ $danger }) => ($danger ? '#fecaca' : '#e5e7eb')};
-  background: ${({ $danger }) => ($danger ? '#fef2f2' : 'white')};
-  color: ${({ $danger }) => ($danger ? '#b91c1c' : '#132e58')};
-  &:hover {
-    border-color: #132e58;
-  }
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const TableWrap = styled.div`
+const MiniStat = styled.div`
   background: white;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  overflow: auto;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 720px;
-`;
-
-const Th = styled.th`
-  text-align: left;
+  border: 1px solid ${adminColors.border};
+  border-radius: 14px;
   padding: 0.85rem 1rem;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #6b7280;
-  background: #f9fafb;
-  border-bottom: 2px solid #e5e7eb;
-`;
-
-const Td = styled.td`
-  padding: 0.85rem 1rem;
-  font-size: 0.875rem;
-  color: #374151;
-  border-bottom: 1px solid #f3f4f6;
-  vertical-align: top;
-`;
-
-const Badge = styled.span<{ $status: string }>`
-  display: inline-block;
-  padding: 0.2rem 0.5rem;
-  border-radius: 6px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  background: ${({ $status }) =>
-    $status === 'new' ? '#fef3c7' : $status === 'read' ? '#e0f2fe' : '#f3f4f6'};
-  color: ${({ $status }) =>
-    $status === 'new' ? '#b45309' : $status === 'read' ? '#0369a1' : '#4b5563'};
+  box-shadow: ${adminColors.shadow};
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  .icon {
+    width: 40px; height: 40px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.05rem;
+  }
+  .val { font-size: 1.25rem; font-weight: 800; color: ${adminColors.navy}; }
+  .lbl { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: ${adminColors.muted}; }
 `;
 
 const Msg = styled.div`
-  max-width: 360px;
+  max-width: 280px;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: ${adminColors.text};
   white-space: pre-wrap;
   word-break: break-word;
 `;
 
-const RowActions = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-`;
-
-const Pagination = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  font-size: 0.875rem;
-  color: #6b7280;
-`;
-
-const ErrorBox = styled.div`
-  background: #fef2f2;
-  color: #b91c1c;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-`;
+const statusPill = (s: string) => {
+  if (s === 'new') return 'pending';
+  if (s === 'read') return 'user';
+  return 'incomplete';
+};
 
 const AdminFeedbackInbox: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('');
@@ -172,9 +82,7 @@ const AdminFeedbackInbox: React.FC = () => {
     }
   }, [page, statusFilter]);
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  useEffect(() => { refresh(); }, [refresh]);
 
   const setStatus = async (id: string, status: 'new' | 'read' | 'archived') => {
     await patchFeedbackStatus(id, status);
@@ -197,40 +105,60 @@ const AdminFeedbackInbox: React.FC = () => {
     return 'Guest';
   };
 
+  const counts = useMemo(() => ({
+    total: items.length,
+    new: items.filter((i) => i.status === 'new').length,
+    read: items.filter((i) => i.status === 'read').length,
+  }), [items]);
+
   return (
-    <Container>
-      <Header>
-        <Title>
-          <FiInbox /> Feedback inbox
-        </Title>
-        <Toolbar>
-          <Select
-            value={statusFilter}
-            onChange={(e) => {
-              setPage(1);
-              setStatusFilter(e.target.value);
-            }}
-          >
-            <option value="">All statuses</option>
-            <option value="new">New</option>
-            <option value="read">Read</option>
-            <option value="archived">Archived</option>
-          </Select>
-          <Button type="button" onClick={refresh} disabled={loading}>
-            <FiRefreshCw /> Refresh
-          </Button>
-        </Toolbar>
-      </Header>
+    <PageWrap>
+      <PageHeader>
+        <PageTitleGroup>
+          <PageTitle><FiInbox /> Feedback</PageTitle>
+          <PageSubtitle>Review user messages, mark as read, and archive tickets</PageSubtitle>
+        </PageTitleGroup>
+        <GhostButton type="button" onClick={refresh} disabled={loading}>
+          <FiRefreshCw /> Refresh
+        </GhostButton>
+      </PageHeader>
 
-      {error && <ErrorBox>{error}</ErrorBox>}
+      <StatsRow>
+        <MiniStat>
+          <div className="icon" style={{ background: '#ede9fe', color: '#7c3aed' }}><FiInbox /></div>
+          <div><div className="val">{loading ? '…' : counts.total}</div><div className="lbl">On this page</div></div>
+        </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: '#fef3c7', color: '#d97706' }}><FiMail /></div>
+          <div><div className="val">{loading ? '…' : counts.new}</div><div className="lbl">New</div></div>
+        </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: '#dbeafe', color: '#2563eb' }}><FiEye /></div>
+          <div><div className="val">{loading ? '…' : counts.read}</div><div className="lbl">Read</div></div>
+        </MiniStat>
+      </StatsRow>
 
-      <TableWrap>
-        <Table>
+      <FilterBar>
+        <FilterSelect
+          value={statusFilter}
+          onChange={(e) => { setPage(1); setStatusFilter(e.target.value); }}
+        >
+          <option value="">All statuses</option>
+          <option value="new">New</option>
+          <option value="read">Read</option>
+          <option value="archived">Archived</option>
+        </FilterSelect>
+        <FilterCount>{loading ? 'Loading…' : `${items.length} messages`}</FilterCount>
+      </FilterBar>
+
+      {error && <ErrorBanner>{error}</ErrorBanner>}
+
+      <TableCard>
+        <DataTable>
           <thead>
             <tr>
               <Th>When</Th>
-              <Th>Email</Th>
-              <Th>User</Th>
+              <Th>From</Th>
               <Th>Message</Th>
               <Th>Page</Th>
               <Th>Status</Th>
@@ -238,72 +166,56 @@ const AdminFeedbackInbox: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {loading && <TableBodySkeleton rows={6} cols={7} />}
-            {!loading &&
-              items.map((row) => {
-                const id = row._id;
-                return (
-                  <tr key={id}>
-                    <Td>{row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}</Td>
-                    <Td>{row.email}</Td>
-                    <Td>{userLabel(row)}</Td>
-                    <Td>
-                      <Msg>{row.message}</Msg>
-                    </Td>
-                    <Td>{row.page || '—'}</Td>
-                    <Td>
-                      <Badge $status={row.status}>{row.status}</Badge>
-                    </Td>
-                    <Td>
-                      <RowActions>
-                        {row.status !== 'read' && (
-                          <Button type="button" onClick={() => setStatus(id, 'read')}>
-                            <FiEye /> Read
-                          </Button>
-                        )}
-                        {row.status !== 'archived' && (
-                          <Button type="button" onClick={() => setStatus(id, 'archived')}>
-                            <FiArchive /> Archive
-                          </Button>
-                        )}
-                        {row.status !== 'new' && (
-                          <Button type="button" onClick={() => setStatus(id, 'new')}>
-                            New
-                          </Button>
-                        )}
-                        <Button type="button" $danger onClick={() => remove(id)}>
-                          <FiTrash2 /> Delete
-                        </Button>
-                      </RowActions>
-                    </Td>
-                  </tr>
-                );
-              })}
+            {loading && <TableBodySkeleton rows={6} cols={6} />}
+            {!loading && items.map((row) => {
+              const id = row._id;
+              return (
+                <Tr key={id}>
+                  <Td style={{ whiteSpace: 'nowrap', fontSize: '0.75rem', color: adminColors.muted }}>
+                    {row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}
+                  </Td>
+                  <Td>
+                    <div style={{ fontWeight: 700, color: adminColors.navy, fontSize: '0.8125rem' }}>{userLabel(row)}</div>
+                    <div style={{ fontSize: '0.6875rem', color: adminColors.muted }}>{row.email}</div>
+                  </Td>
+                  <Td><Msg>{row.message}</Msg></Td>
+                  <Td style={{ fontSize: '0.75rem' }}>{row.page || '—'}</Td>
+                  <Td><Pill $variant={statusPill(row.status)}>{row.status}</Pill></Td>
+                  <Td>
+                    <ActionGroup style={{ flexWrap: 'wrap' }}>
+                      {row.status !== 'read' && (
+                        <GhostButton $sm type="button" onClick={() => setStatus(id, 'read')}><FiEye /> Read</GhostButton>
+                      )}
+                      {row.status !== 'archived' && (
+                        <GhostButton $sm type="button" onClick={() => setStatus(id, 'archived')}><FiArchive /> Archive</GhostButton>
+                      )}
+                      {row.status !== 'new' && (
+                        <GhostButton $sm type="button" onClick={() => setStatus(id, 'new')}>New</GhostButton>
+                      )}
+                      <GhostButton $sm $danger type="button" onClick={() => remove(id)}><FiTrash2 /></GhostButton>
+                    </ActionGroup>
+                  </Td>
+                </Tr>
+              );
+            })}
+            {!loading && items.length === 0 && (
+              <Tr><Td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: adminColors.muted }}>No feedback messages.</Td></Tr>
+            )}
           </tbody>
-        </Table>
+        </DataTable>
         {pagination && (
           <Pagination>
-            <span>
+            <span style={{ fontSize: '0.75rem', color: adminColors.muted }}>
               Page {pagination.currentPage} / {pagination.totalPages || 1}
             </span>
-            <Button
-              type="button"
-              disabled={!pagination.hasPreviousPage}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-            >
-              Prev
-            </Button>
-            <Button
-              type="button"
-              disabled={!pagination.hasNextPage}
-              onClick={() => setPage((p) => p + 1)}
-            >
-              Next
-            </Button>
+            <PageButtons>
+              <PageBtn type="button" disabled={!pagination.hasPreviousPage} onClick={() => setPage((p) => Math.max(1, p - 1))}>Prev</PageBtn>
+              <PageBtn type="button" disabled={!pagination.hasNextPage} onClick={() => setPage((p) => p + 1)}>Next</PageBtn>
+            </PageButtons>
           </Pagination>
         )}
-      </TableWrap>
-    </Container>
+      </TableCard>
+    </PageWrap>
   );
 };
 

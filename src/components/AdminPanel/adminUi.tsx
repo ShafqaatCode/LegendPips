@@ -5,19 +5,21 @@ export const adminColors = {
   navy: '#132E58',
   navyLight: '#1a4a7a',
   gold: '#Fbbf24',
-  bg: '#f4f6f9',
+  bg: '#eef2f7',
   card: '#ffffff',
-  border: '#e8ecf1',
+  border: '#e2e8f0',
   text: '#1e293b',
   muted: '#64748b',
   success: '#059669',
   danger: '#dc2626',
   warning: '#d97706',
+  shadow: '0 4px 20px rgba(15, 23, 42, 0.06)',
+  shadowHover: '0 10px 28px rgba(15, 23, 42, 0.1)',
 };
 
 /* ── Page header ── */
 export const PageWrap = styled.div`
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
 `;
 
@@ -26,61 +28,76 @@ export const PageHeader = styled.div`
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.35rem;
   flex-wrap: wrap;
 `;
 
 export const PageTitleGroup = styled.div``;
 
 export const PageTitle = styled.h1`
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.375rem;
+  font-weight: 800;
   color: ${adminColors.navy};
-  margin: 0 0 0.2rem;
+  margin: 0 0 0.25rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
+  letter-spacing: -0.02em;
 
-  svg { color: ${adminColors.gold}; font-size: 1.125rem; }
+  svg {
+    color: ${adminColors.navy};
+    font-size: 1.05rem;
+    padding: 0.4rem;
+    border-radius: 10px;
+    background: linear-gradient(145deg, ${adminColors.gold}, #f59e0b);
+    box-sizing: content-box;
+  }
 `;
 
 export const PageSubtitle = styled.p`
   margin: 0;
   font-size: 0.8125rem;
   color: ${adminColors.muted};
+  line-height: 1.45;
 `;
 
 export const PrimaryButton = styled.button<{ $sm?: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: ${({ $sm }) => ($sm ? '0.45rem 0.75rem' : '0.55rem 1rem')};
+  padding: ${({ $sm }) => ($sm ? '0.48rem 0.85rem' : '0.6rem 1.1rem')};
   font-size: ${({ $sm }) => ($sm ? '0.75rem' : '0.8125rem')};
-  font-weight: 600;
-  border-radius: 8px;
+  font-weight: 700;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
-  background: ${adminColors.navy};
+  background: linear-gradient(135deg, ${adminColors.navy} 0%, ${adminColors.navyLight} 100%);
   color: white;
-  transition: background 0.15s;
+  box-shadow: 0 4px 14px rgba(19, 46, 88, 0.22);
+  transition: transform 0.12s, box-shadow 0.15s, filter 0.15s;
 
-  &:hover:not(:disabled) { background: ${adminColors.navyLight}; }
-  &:disabled { opacity: 0.55; cursor: not-allowed; }
+  &:hover:not(:disabled) {
+    filter: brightness(1.06);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(19, 46, 88, 0.28);
+  }
+  &:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
 `;
 
 export const GhostButton = styled.button<{ $danger?: boolean; $sm?: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: ${({ $sm }) => ($sm ? '0.4rem 0.65rem' : '0.5rem 0.85rem')};
+  padding: ${({ $sm }) => ($sm ? '0.42rem 0.7rem' : '0.52rem 0.9rem')};
   font-size: 0.75rem;
   font-weight: 600;
-  border-radius: 7px;
+  border-radius: 9px;
   cursor: pointer;
   background: white;
   color: ${({ $danger }) => ($danger ? adminColors.danger : adminColors.navy)};
   border: 1px solid ${({ $danger }) => ($danger ? '#fecaca' : adminColors.border)};
   transition: all 0.15s;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 
   &:hover:not(:disabled) {
     background: ${({ $danger }) => ($danger ? '#fef2f2' : '#f8fafc')};
@@ -93,8 +110,8 @@ export const GhostButton = styled.button<{ $danger?: boolean; $sm?: boolean }>`
 export const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
+  gap: 0.85rem;
+  margin-bottom: 1.35rem;
 
   @media (max-width: 1100px) { grid-template-columns: repeat(2, 1fr); }
   @media (max-width: 520px) { grid-template-columns: 1fr; }
@@ -103,34 +120,49 @@ export const StatsGrid = styled.div`
 export const StatCard = styled.button<{ $accent?: string }>`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1rem;
+  gap: 0.85rem;
+  padding: 1rem 1.05rem;
   background: ${adminColors.card};
   border: 1px solid ${adminColors.border};
-  border-radius: 10px;
+  border-radius: 14px;
   text-align: left;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.18s ease;
   width: 100%;
+  box-shadow: ${adminColors.shadow};
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: linear-gradient(180deg, ${adminColors.gold}, transparent);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
 
   &:hover {
-    border-color: ${adminColors.gold};
-    box-shadow: 0 2px 8px rgba(19, 46, 88, 0.06);
-    transform: translateY(-1px);
+    border-color: rgba(251, 191, 36, 0.55);
+    box-shadow: ${adminColors.shadowHover};
+    transform: translateY(-2px);
+    &::before { opacity: 1; }
   }
 `;
 
 export const StatIconBox = styled.div<{ $color: string }>`
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
-  background: ${({ $color }) => $color}14;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: ${({ $color }) => $color}18;
   color: ${({ $color }) => $color};
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 1.1rem;
   flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px ${({ $color }) => $color}22;
 `;
 
 export const StatBody = styled.div`
@@ -139,25 +171,27 @@ export const StatBody = styled.div`
 `;
 
 export const StatValue = styled.div`
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.35rem;
+  font-weight: 800;
   color: ${adminColors.navy};
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
 `;
 
 export const StatLabel = styled.div`
   font-size: 0.6875rem;
-  font-weight: 600;
+  font-weight: 700;
   color: ${adminColors.muted};
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-top: 0.1rem;
+  letter-spacing: 0.05em;
+  margin-top: 0.15rem;
 `;
 
 export const StatMeta = styled.div<{ $positive?: boolean }>`
   font-size: 0.6875rem;
+  font-weight: 600;
   color: ${({ $positive }) => ($positive !== false ? adminColors.success : adminColors.danger)};
-  margin-top: 0.15rem;
+  margin-top: 0.2rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -169,11 +203,12 @@ export const FilterBar = styled.div`
   align-items: center;
   gap: 0.5rem;
   flex-wrap: wrap;
-  margin-bottom: 0.875rem;
-  padding: 0.625rem 0.75rem;
+  margin-bottom: 0.9rem;
+  padding: 0.7rem 0.85rem;
   background: ${adminColors.card};
   border: 1px solid ${adminColors.border};
-  border-radius: 10px;
+  border-radius: 14px;
+  box-shadow: ${adminColors.shadow};
 `;
 
 export const SearchInput = styled.div`
@@ -222,8 +257,9 @@ export const FilterCount = styled.span`
 export const TableCard = styled.div`
   background: ${adminColors.card};
   border: 1px solid ${adminColors.border};
-  border-radius: 10px;
+  border-radius: 14px;
   overflow: hidden;
+  box-shadow: ${adminColors.shadow};
 `;
 
 export const DataTable = styled.table`
@@ -253,8 +289,8 @@ export const Td = styled.td`
 `;
 
 export const Tr = styled.tr`
-  transition: background 0.1s;
-  &:hover { background: #fafbfc; }
+  transition: background 0.12s;
+  &:hover { background: #f8fafc; }
   &:last-child td { border-bottom: none; }
 `;
 
@@ -392,61 +428,84 @@ export const PageBtn = styled.button<{ $active?: boolean }>`
 export const SectionCard = styled.div`
   background: ${adminColors.card};
   border: 1px solid ${adminColors.border};
-  border-radius: 10px;
+  border-radius: 14px;
   overflow: hidden;
   margin-bottom: 1rem;
+  box-shadow: ${adminColors.shadow};
 `;
 
 export const SectionHead = styled.div`
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.1rem;
   border-bottom: 1px solid ${adminColors.border};
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: linear-gradient(180deg, #fafbfc 0%, white 100%);
 
   h2 {
     margin: 0;
     font-size: 0.875rem;
-    font-weight: 700;
+    font-weight: 800;
     color: ${adminColors.navy};
+    letter-spacing: -0.01em;
   }
 `;
 
 export const SectionBody = styled.div`
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.1rem;
 `;
 
 export const ErrorBanner = styled.div`
-  padding: 0.625rem 0.875rem;
+  padding: 0.7rem 0.95rem;
   background: #fef2f2;
   border: 1px solid #fecaca;
-  border-radius: 8px;
+  border-radius: 12px;
   color: #b91c1c;
   font-size: 0.8125rem;
-  margin-bottom: 0.875rem;
+  margin-bottom: 0.9rem;
 `;
 
 export const DashboardHero = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.25rem;
-  background: linear-gradient(135deg, ${adminColors.navy} 0%, ${adminColors.navyLight} 100%);
-  border-radius: 10px;
+  gap: 1.25rem;
+  padding: 1.35rem 1.5rem;
+  margin-bottom: 1.35rem;
+  background:
+    radial-gradient(ellipse 70% 120% at 100% 0%, rgba(251, 191, 36, 0.22) 0%, transparent 55%),
+    linear-gradient(125deg, #0c1f3d 0%, ${adminColors.navy} 45%, ${adminColors.navyLight} 100%);
+  border-radius: 16px;
   color: white;
+  box-shadow: 0 12px 32px rgba(12, 31, 61, 0.28);
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    bottom: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(251, 191, 36, 0.08);
+    pointer-events: none;
+  }
 
   h1 {
-    margin: 0 0 0.2rem;
-    font-size: 1.125rem;
-    font-weight: 700;
+    margin: 0 0 0.3rem;
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
   }
 
   p {
     margin: 0;
     font-size: 0.8125rem;
-    opacity: 0.85;
+    opacity: 0.88;
+    max-width: 420px;
+    line-height: 1.45;
   }
 `;
 

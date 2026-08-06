@@ -23,6 +23,20 @@ import {
 import { Description } from "../Broker/BrokerCard2";
 import TradeLogo from "../../assets/TradeMarketBrands/Ellipse 1-1.svg";
 import ListPagination from "../SharedComponents/ListPagination";
+import {
+  BROKER_KIND_COLORS,
+  BROKER_KIND_DESCRIPTIONS,
+  BROKER_KIND_LABELS,
+  BROKER_KIND_ORDER,
+  type BrokerKind,
+} from "../../utils/brokerTypes";
+import { FiGlobe, FiCpu, FiAward } from "react-icons/fi";
+
+const KIND_ICONS: Record<BrokerKind, React.ReactNode> = {
+  forex: <FiGlobe />,
+  crypto: <FiCpu />,
+  prop: <FiAward />,
+};
 
 export type Broker = {
   id: string;
@@ -64,6 +78,8 @@ type BrokerListingPageProps = {
   totalPages: number;
   totalItems: number;
   onPageChange: (page: number) => void;
+  category?: "forex" | "crypto" | "prop";
+  onCategoryChange?: (cat: "forex" | "crypto" | "prop") => void;
 };
 
 const ITEMS_PER_PAGE = 10;
@@ -119,14 +135,38 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({
   totalPages,
   totalItems,
   onPageChange,
+  category = "forex",
+  onCategoryChange,
 }) => {
+  const heading = BROKER_KIND_LABELS[category] || "Brokers";
+  const sub = BROKER_KIND_DESCRIPTIONS[category];
+
   return (
     <PageWrapper>
       <SectionInner>
         <Header>
-          <Heading>Forex Brokers</Heading>
-          <Subheading>Find the best forex brokers with cashback rewards</Subheading>
+          <Heading>{heading}</Heading>
+          <Subheading>{sub}</Subheading>
         </Header>
+
+        {onCategoryChange && (
+          <TypeTabs role="tablist" aria-label="Broker types">
+            {BROKER_KIND_ORDER.map((kind) => (
+              <TypeTab
+                key={kind}
+                type="button"
+                role="tab"
+                aria-selected={category === kind}
+                $active={category === kind}
+                $kind={kind}
+                onClick={() => onCategoryChange(kind)}
+              >
+                <span className="ico">{KIND_ICONS[kind]}</span>
+                {BROKER_KIND_LABELS[kind]}
+              </TypeTab>
+            ))}
+          </TypeTabs>
+        )}
 
         <BrokerStack>
           {brokers.map((broker, idx) => {
@@ -253,6 +293,46 @@ const Subheading = styled.p`
   font-size: 0.95rem;
   color: #64748b;
   margin: 0;
+`;
+
+const TypeTabs = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 1.15rem;
+  padding: 0.35rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+`;
+
+const TypeTab = styled.button<{ $active?: boolean; $kind: BrokerKind }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: none;
+  border-radius: 9px;
+  padding: 0.55rem 0.95rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: ${({ $active, $kind }) =>
+    $active ? BROKER_KIND_COLORS[$kind].color : "#475569"};
+  background: ${({ $active, $kind }) =>
+    $active ? BROKER_KIND_COLORS[$kind].soft : "transparent"};
+  box-shadow: ${({ $active, $kind }) =>
+    $active ? `inset 0 0 0 1.5px ${BROKER_KIND_COLORS[$kind].border}` : "none"};
+  transition: all 0.12s;
+
+  .ico {
+    display: inline-flex;
+    font-size: 0.95rem;
+  }
+
+  &:hover {
+    background: ${({ $kind }) => BROKER_KIND_COLORS[$kind].soft};
+  }
 `;
 
 const BrokerStack = styled.div`

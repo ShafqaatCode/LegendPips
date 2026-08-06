@@ -7,6 +7,8 @@ import type { Broker } from "./BrokerListingPage";
 import TradeLogo from "../../assets/TradeMarketBrands/Ellipse 1-1.svg";
 import { BrokerListSkeleton } from "../SharedComponents/Shimmer";
 import { fetchBrokersPage, mapApiBrokerToBroker } from "../../services/brokerService";
+import type { BrokerKind } from "../../utils/brokerTypes";
+import { BROKER_KIND_DESCRIPTIONS } from "../../utils/brokerTypes";
 
 const BROKERS_PER_PAGE = 10;
 
@@ -38,12 +40,17 @@ const BrokerList: React.FC = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [category, setCategory] = useState<BrokerKind>("forex");
 
-  const loadBrokers = useCallback(async (page: number) => {
+  const loadBrokers = useCallback(async (page: number, cat: BrokerKind) => {
     setLoading(true);
     setError(null);
     try {
-      const result = await fetchBrokersPage({ page, limit: BROKERS_PER_PAGE });
+      const result = await fetchBrokersPage({
+        page,
+        limit: BROKERS_PER_PAGE,
+        category: cat,
+      });
       setBrokers(result.items.map((b) => mapApiBrokerToBroker(b, TradeLogo)));
       setListPage(result.pagination.currentPage);
       setTotalPages(Math.max(1, result.pagination.totalPages));
@@ -60,9 +67,9 @@ const BrokerList: React.FC = () => {
 
   useEffect(() => {
     if (currentPage === "listing") {
-      loadBrokers(listPage);
+      loadBrokers(listPage, category);
     }
-  }, [currentPage, listPage, loadBrokers]);
+  }, [currentPage, listPage, category, loadBrokers]);
 
   const handleBrokerSelect = (broker: Broker) => {
     setSelectedBroker(broker);
@@ -86,6 +93,11 @@ const BrokerList: React.FC = () => {
     setListPage(page);
   };
 
+  const handleCategoryChange = (cat: BrokerKind) => {
+    setCategory(cat);
+    setListPage(1);
+  };
+
   if (loading && currentPage === "listing") {
     return (
       <StatusWrap>
@@ -98,7 +110,7 @@ const BrokerList: React.FC = () => {
     return (
       <StatusWrap>
         <div>{error}</div>
-        <RetryBtn type="button" onClick={() => loadBrokers(listPage)}>
+        <RetryBtn type="button" onClick={() => loadBrokers(listPage, category)}>
           Retry
         </RetryBtn>
       </StatusWrap>
@@ -115,7 +127,18 @@ const BrokerList: React.FC = () => {
           totalItems={totalItems}
           onPageChange={handleListPageChange}
           onBrokerSelect={handleBrokerSelect}
+          category={category}
+          onCategoryChange={handleCategoryChange}
         />
+      )}
+
+      {currentPage === "listing" && !loading && brokers.length === 0 && !error && (
+        <StatusWrap>
+          <div>No {BROKER_KIND_DESCRIPTIONS[category].toLowerCase()} published yet.</div>
+          <div style={{ marginTop: 8, fontSize: 14 }}>
+            Admins can add this type under Admin → Brokers.
+          </div>
+        </StatusWrap>
       )}
 
       {currentPage === "detail" && selectedBroker && (

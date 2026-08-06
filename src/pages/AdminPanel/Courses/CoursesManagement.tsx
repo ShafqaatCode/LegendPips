@@ -1,8 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { FiPlus, FiEdit2, FiTrash2, FiBook } from "react-icons/fi";
+import { FiPlus, FiEdit2, FiTrash2, FiBook, FiSearch, FiUsers, FiClock, FiCheck } from "react-icons/fi";
 import SimpleModal from "../../../components/AdminPanel/SimpleModal";
 import { CourseGridSkeleton } from "../../../components/SharedComponents/Shimmer";
+import {
+  PageWrap, PageHeader, PageTitleGroup, PageTitle, PageSubtitle,
+  PrimaryButton, GhostButton, FilterBar, SearchInput, FilterCount,
+  ErrorBanner, Pill, adminColors,
+} from "../../../components/AdminPanel/adminUi";
 import {
   adminCreateCourse,
   adminDeleteCourse,
@@ -11,217 +16,139 @@ import {
   type Course,
 } from "../../../services/courseService";
 
-const Container = styled.div`
-  max-width: 1600px;
-  margin: 0 auto;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #132e58;
-  margin: 0;
-`;
-
-const Button = styled.button<{ $primary?: boolean }>`
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-  background: ${({ $primary }) => ($primary ? "#132e58" : "white")};
-  color: ${({ $primary }) => ($primary ? "white" : "#132e58")};
-  border: 2px solid ${({ $primary }) => ($primary ? "#132e58" : "#e5e7eb")};
-
-  &:hover {
-    background: ${({ $primary }) => ($primary ? "#1a4a7a" : "#f9fafb")};
-    border-color: ${({ $primary }) => ($primary ? "#1a4a7a" : "#132e58")};
-    transform: translateY(-2px);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
-
-const SearchRow = styled.div`
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-`;
-
-const SearchInput = styled.input`
-  flex: 1;
-  min-width: 200px;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  border: 2px solid #e5e7eb;
-  font-size: 0.9375rem;
-`;
-
-const CoursesGrid = styled.div`
+const StatsRow = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: 1fr;
-  }
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
 `;
 
-const CourseCard = styled.div`
+const MiniStat = styled.div`
   background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e5e7eb;
-  transition: all 0.2s ease;
+  border: 1px solid ${adminColors.border};
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  box-shadow: ${adminColors.shadow};
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  .icon {
+    width: 40px; height: 40px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.05rem;
+  }
+  .val { font-size: 1.25rem; font-weight: 800; color: ${adminColors.navy}; }
+  .lbl { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: ${adminColors.muted}; }
+`;
 
+const Grid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0.9rem;
+`;
+
+const Card = styled.article`
+  background: white;
+  border-radius: 16px;
+  border: 1px solid ${adminColors.border};
+  box-shadow: ${adminColors.shadow};
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    border-color: #fbbf24;
+    transform: translateY(-3px);
+    box-shadow: ${adminColors.shadowHover};
+    border-color: rgba(251, 191, 36, 0.45);
   }
 `;
 
-const CourseThumbnail = styled.div<{ $img?: string }>`
-  width: 100%;
-  height: 180px;
+const Thumb = styled.div<{ $img?: string }>`
+  height: 120px;
   background: ${({ $img }) =>
-    $img ? `url(${$img}) center/cover no-repeat` : "linear-gradient(135deg, #132e58 0%, #1a4a7a 100%)"};
+    $img
+      ? `url(${$img}) center/cover no-repeat`
+      : `radial-gradient(ellipse 80% 120% at 100% 0%, rgba(251, 191, 36, 0.2) 0%, transparent 55%),
+         linear-gradient(125deg, #0c1f3d 0%, ${adminColors.navy} 50%, ${adminColors.navyLight} 100%)`};
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 3rem;
+  color: rgba(255,255,255,0.9);
+  font-size: 2rem;
   position: relative;
 `;
 
-const PremiumBadge = styled.span`
+const BadgeFloat = styled.div`
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  padding: 0.375rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: #fbbf24;
-  color: #132e58;
-`;
-
-const DraftBadge = styled.span`
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  padding: 0.375rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: #e5e7eb;
-  color: #374151;
-`;
-
-const CardContent = styled.div`
-  padding: 1.5rem;
-`;
-
-const CourseTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #132e58;
-  margin: 0 0 0.75rem 0;
-  line-height: 1.4;
-`;
-
-const CourseInfo = styled.div`
+  top: 0.75rem;
+  left: 0.75rem;
+  right: 0.75rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  justify-content: space-between;
+  gap: 0.35rem;
+  pointer-events: none;
 `;
 
-const InfoItem = styled.div`
+const Body = styled.div` padding: 0.95rem 1rem 0.65rem; flex: 1; `;
+
+const Title = styled.h3`
+  margin: 0 0 0.65rem;
+  font-size: 0.975rem;
+  font-weight: 800;
+  color: ${adminColors.navy};
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+`;
+
+const Metrics = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+`;
+
+const Metric = styled.div`
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 0.45rem 0.55rem;
+  .k {
+    font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+    color: ${adminColors.muted}; margin-bottom: 0.1rem; display: flex; align-items: center; gap: 0.2rem;
+    svg { color: ${adminColors.gold}; font-size: 0.7rem; }
+  }
+  .v { font-size: 0.78rem; font-weight: 700; color: ${adminColors.navy}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+`;
+
+const Footer = styled.div`
+  padding: 0.7rem 1rem;
+  border-top: 1px solid #f1f5f9;
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #6b7280;
-  font-size: 0.875rem;
-
-  svg {
-    color: #fbbf24;
-  }
-
-  strong {
-    color: #132e58;
-    font-weight: 600;
-  }
+  gap: 0.45rem;
+  background: #fafbfc;
 `;
 
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+const Empty = styled.div`
+  grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem;
+  background: white; border: 1px dashed ${adminColors.border}; border-radius: 16px; color: ${adminColors.muted};
+  strong { display: block; color: ${adminColors.navy}; margin-bottom: 0.35rem; }
 `;
 
-const IconButton = styled.button<{ $danger?: boolean }>`
-  flex: 1;
-  padding: 0.625rem;
-  border-radius: 8px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-  background: ${({ $danger }) => ($danger ? "#fee2e2" : "#f3f4f6")};
-  color: ${({ $danger }) => ($danger ? "#ef4444" : "#132e58")};
-
-  &:hover {
-    background: ${({ $danger }) => ($danger ? "#fecaca" : "#e5e7eb")};
+const FormField = styled.label`
+  display: flex; flex-direction: column; gap: 0.35rem;
+  font-size: 0.6875rem; font-weight: 700; color: ${adminColors.navy}; margin-bottom: 0.7rem;
+  input, select, textarea {
+    width: 100%; padding: 0.55rem 0.7rem; border-radius: 9px; border: 1px solid ${adminColors.border};
+    font-size: 0.8125rem; font-weight: 400; outline: none; background: #fafbfc; box-sizing: border-box;
+    &:focus { border-color: ${adminColors.navy}; box-shadow: 0 0 0 3px rgba(19, 46, 88, 0.08); background: white; }
   }
+  textarea { min-height: 72px; resize: vertical; }
 `;
 
-const ModalFooterBtn = styled.button<{ $danger?: boolean }>`
-  padding: 0.625rem 1rem;
-  border-radius: 8px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  background: ${({ $danger }) => ($danger ? "#ef4444" : "#f3f4f6")};
-  color: ${({ $danger }) => ($danger ? "white" : "#132e58")};
-
-  &:hover {
-    opacity: 0.92;
-  }
-`;
-
-const ErrorBanner = styled.div`
-  background: #fee2e2;
-  color: #b91c1c;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
+const CheckRow = styled.label`
+  display: flex; align-items: center; gap: 0.55rem; font-weight: 600; color: ${adminColors.navy};
+  font-size: 0.8125rem; margin-bottom: 0.7rem; cursor: pointer;
+  padding: 0.5rem 0.65rem; border-radius: 9px; background: #f8fafc; border: 1px solid #f1f5f9;
+  input { accent-color: ${adminColors.navy}; }
 `;
 
 type ModalMode = "add" | "edit" | "delete";
@@ -264,6 +191,13 @@ const CoursesManagement: React.FC = () => {
   useEffect(() => {
     loadCourses();
   }, [loadCourses]);
+
+  const stats = useMemo(() => ({
+    total: courses.length,
+    published: courses.filter((c) => c.published !== false).length,
+    premium: courses.filter((c) => c.premium).length,
+    enrolled: courses.reduce((s, c) => s + (c.enrolled ?? 0), 0),
+  }), [courses]);
 
   const openAdd = () => {
     setModalMode("add");
@@ -372,202 +306,169 @@ const CoursesManagement: React.FC = () => {
   };
 
   return (
-    <Container>
-      <Header>
-        <Title>Courses Management</Title>
-        <Button $primary type="button" onClick={openAdd}>
-          <FiPlus />
-          Create Course
-        </Button>
-      </Header>
+    <PageWrap>
+      <PageHeader>
+        <PageTitleGroup>
+          <PageTitle><FiBook /> Courses</PageTitle>
+          <PageSubtitle>Publish learning paths, track enrollment, and control premium access</PageSubtitle>
+        </PageTitleGroup>
+        <PrimaryButton type="button" onClick={openAdd}>
+          <FiPlus /> Create course
+        </PrimaryButton>
+      </PageHeader>
 
-      <SearchRow>
-        <SearchInput
-          placeholder="Search courses…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") loadCourses();
-          }}
-        />
-        <Button type="button" onClick={loadCourses}>
-          Search
-        </Button>
-      </SearchRow>
+      <StatsRow>
+        <MiniStat>
+          <div className="icon" style={{ background: "#dbeafe", color: "#2563eb" }}><FiBook /></div>
+          <div><div className="val">{listLoading ? "…" : stats.total}</div><div className="lbl">Courses</div></div>
+        </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: "#d1fae5", color: "#059669" }}><FiCheck /></div>
+          <div><div className="val">{listLoading ? "…" : stats.published}</div><div className="lbl">Published</div></div>
+        </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: "#fef3c7", color: "#d97706" }}><FiBook /></div>
+          <div><div className="val">{listLoading ? "…" : stats.premium}</div><div className="lbl">Premium</div></div>
+        </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: "#ede9fe", color: "#7c3aed" }}><FiUsers /></div>
+          <div><div className="val">{listLoading ? "…" : stats.enrolled}</div><div className="lbl">Enrolled</div></div>
+        </MiniStat>
+      </StatsRow>
+
+      <FilterBar>
+        <SearchInput style={{ maxWidth: 320, flex: 1 }}>
+          <FiSearch />
+          <input
+            placeholder="Search courses…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") loadCourses(); }}
+          />
+        </SearchInput>
+        <GhostButton $sm type="button" onClick={loadCourses}>Search</GhostButton>
+        <FilterCount>{listLoading ? "Loading…" : `${courses.length} shown`}</FilterCount>
+      </FilterBar>
 
       {listError && <ErrorBanner>{listError}</ErrorBanner>}
 
       {listLoading ? (
         <CourseGridSkeleton cards={6} />
       ) : (
-        <CoursesGrid>
-          {courses.map((course) => (
-            <CourseCard key={course._id}>
-              <CourseThumbnail $img={course.thumbnailUrl}>
-                {!course.thumbnailUrl && <FiBook />}
-                {course.premium && <PremiumBadge>Premium</PremiumBadge>}
-                {!course.published && <DraftBadge>Draft</DraftBadge>}
-              </CourseThumbnail>
-              <CardContent>
-                <CourseTitle>{course.title}</CourseTitle>
-                <CourseInfo>
-                  <InfoItem>
-                    <FiBook />
-                    <span>
-                      <strong>{course.lessons}</strong> Lessons · {course.category}
-                    </span>
-                  </InfoItem>
-                  <InfoItem>
-                    <span>
-                      Duration: <strong>{course.duration}</strong>
-                    </span>
-                  </InfoItem>
-                  <InfoItem>
-                    <span>
-                      Enrolled: <strong>{course.enrolled ?? 0}</strong> students
-                    </span>
-                  </InfoItem>
-                  <InfoItem>
-                    <span>
-                      Status: <strong>{course.published ? "Published" : "Draft"}</strong>
-                    </span>
-                  </InfoItem>
-                </CourseInfo>
-                <ActionButtons>
-                  <IconButton type="button" onClick={() => openEdit(course)}>
-                    <FiEdit2 />
-                    Edit
-                  </IconButton>
-                  <IconButton type="button" $danger onClick={() => openDelete(course._id)}>
-                    <FiTrash2 />
-                    Delete
-                  </IconButton>
-                </ActionButtons>
-              </CardContent>
-            </CourseCard>
-          ))}
-        </CoursesGrid>
+        <Grid>
+          {courses.length === 0 ? (
+            <Empty>
+              <strong>No courses yet</strong>
+              Create your first course to get started.
+            </Empty>
+          ) : (
+            courses.map((course) => (
+              <Card key={course._id}>
+                <Thumb $img={course.thumbnailUrl || undefined}>
+                  {!course.thumbnailUrl && <FiBook />}
+                  <BadgeFloat>
+                    {!course.published ? <Pill $variant="incomplete">Draft</Pill> : <span />}
+                    {course.premium && <Pill $variant="admin">Premium</Pill>}
+                  </BadgeFloat>
+                </Thumb>
+                <Body>
+                  <Title>{course.title}</Title>
+                  <Metrics>
+                    <Metric>
+                      <div className="k"><FiBook /> Lessons</div>
+                      <div className="v">{course.lessons} · {course.category}</div>
+                    </Metric>
+                    <Metric>
+                      <div className="k"><FiClock /> Duration</div>
+                      <div className="v">{course.duration || "—"}</div>
+                    </Metric>
+                    <Metric>
+                      <div className="k"><FiUsers /> Enrolled</div>
+                      <div className="v">{course.enrolled ?? 0}</div>
+                    </Metric>
+                    <Metric>
+                      <div className="k">Status</div>
+                      <div className="v">{course.published ? "Published" : "Draft"}</div>
+                    </Metric>
+                  </Metrics>
+                </Body>
+                <Footer>
+                  <GhostButton $sm type="button" style={{ flex: 1, justifyContent: "center" }} onClick={() => openEdit(course)}>
+                    <FiEdit2 /> Edit
+                  </GhostButton>
+                  <GhostButton $sm $danger type="button" style={{ flex: 1, justifyContent: "center" }} onClick={() => openDelete(course._id)}>
+                    <FiTrash2 /> Delete
+                  </GhostButton>
+                </Footer>
+              </Card>
+            ))
+          )}
+        </Grid>
       )}
 
       <SimpleModal
         isOpen={isModalOpen}
-        title={
-          modalMode === "add" ? "Create Course" : modalMode === "edit" ? "Edit Course" : "Delete Course"
-        }
+        title={modalMode === "add" ? "Create Course" : modalMode === "edit" ? "Edit Course" : "Delete Course"}
         onClose={() => !saving && setIsModalOpen(false)}
         footer={
           modalMode === "delete" ? (
             <>
-              <ModalFooterBtn type="button" onClick={() => setIsModalOpen(false)} disabled={saving}>
-                Cancel
-              </ModalFooterBtn>
-              <ModalFooterBtn type="button" $danger onClick={confirmDelete} disabled={saving}>
-                <FiTrash2 />
-                {saving ? "…" : "Delete"}
-              </ModalFooterBtn>
+              <GhostButton type="button" onClick={() => setIsModalOpen(false)} disabled={saving}>Cancel</GhostButton>
+              <GhostButton type="button" $danger onClick={confirmDelete} disabled={saving}>
+                <FiTrash2 /> {saving ? "Deleting…" : "Delete"}
+              </GhostButton>
             </>
           ) : (
             <>
-              <ModalFooterBtn type="button" onClick={() => setIsModalOpen(false)} disabled={saving}>
-                Cancel
-              </ModalFooterBtn>
-              <ModalFooterBtn type="button" onClick={submitForm} disabled={saving}>
-                <FiEdit2 />
-                {saving ? "…" : "Save"}
-              </ModalFooterBtn>
+              <GhostButton type="button" onClick={() => setIsModalOpen(false)} disabled={saving}>Cancel</GhostButton>
+              <PrimaryButton type="button" onClick={submitForm} disabled={saving}>
+                <FiCheck /> {saving ? "Saving…" : "Save course"}
+              </PrimaryButton>
             </>
           )
         }
       >
         {modalError && (
-          <div style={{ color: "#b91c1c", marginBottom: 12, fontSize: 14 }}>{modalError}</div>
+          <div style={{ color: "#b91c1c", marginBottom: 12, fontSize: 13, fontWeight: 600 }}>{modalError}</div>
         )}
         {modalMode === "delete" ? (
-          <div style={{ color: "#6b7280", fontSize: 14, lineHeight: 1.6 }}>
-            Are you sure you want to delete this course? All student enrollments for this course will be removed.
+          <div style={{ color: adminColors.muted, fontSize: 14, lineHeight: 1.6 }}>
+            Delete this course? All student enrollments for it will be removed.
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Title</div>
-              <input
-                value={formTitle}
-                onChange={(e) => setFormTitle(e.target.value)}
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
-              />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Description</div>
-              <textarea
-                value={formDescription}
-                onChange={(e) => setFormDescription(e.target.value)}
-                rows={3}
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
-              />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Category</div>
-              <select
-                value={formCategory}
-                onChange={(e) => setFormCategory(e.target.value as typeof formCategory)}
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
-              >
+          <div>
+            <FormField>Title<input value={formTitle} onChange={(e) => setFormTitle(e.target.value)} /></FormField>
+            <FormField>Description<textarea value={formDescription} onChange={(e) => setFormDescription(e.target.value)} rows={3} /></FormField>
+            <FormField>
+              Category
+              <select value={formCategory} onChange={(e) => setFormCategory(e.target.value as typeof formCategory)}>
                 <option value="general">general</option>
                 <option value="forex">forex</option>
                 <option value="crypto">crypto</option>
               </select>
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Lessons</div>
-              <input
-                value={formLessons}
-                onChange={(e) => setFormLessons(e.target.value)}
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
-              />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Duration</div>
-              <input
-                value={formDuration}
-                onChange={(e) => setFormDuration(e.target.value)}
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
-              />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Thumbnail URL (optional)</div>
-              <input
-                value={formThumbnailUrl}
-                onChange={(e) => setFormThumbnailUrl(e.target.value)}
-                placeholder="https://…"
-                style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
-              />
-            </label>
-            <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            </FormField>
+            <FormField>Lessons<input value={formLessons} onChange={(e) => setFormLessons(e.target.value)} /></FormField>
+            <FormField>Duration<input value={formDuration} onChange={(e) => setFormDuration(e.target.value)} /></FormField>
+            <FormField>Thumbnail URL (optional)
+              <input value={formThumbnailUrl} onChange={(e) => setFormThumbnailUrl(e.target.value)} placeholder="https://…" />
+            </FormField>
+            <CheckRow>
               <input type="checkbox" checked={formPremium} onChange={(e) => setFormPremium(e.target.checked)} />
-              <span style={{ fontWeight: 600, color: "#132E58" }}>Premium</span>
-            </label>
+              Premium
+            </CheckRow>
             {formPremium && (
-              <label>
-                <div style={{ fontWeight: 700, color: "#132E58", marginBottom: 6 }}>Price (optional)</div>
-                <input
-                  value={formPrice}
-                  onChange={(e) => setFormPrice(e.target.value)}
-                  style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 10, border: "2px solid #e5e7eb" }}
-                />
-              </label>
+              <FormField>Price (optional)
+                <input value={formPrice} onChange={(e) => setFormPrice(e.target.value)} />
+              </FormField>
             )}
-            <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <input
-                type="checkbox"
-                checked={formPublished}
-                onChange={(e) => setFormPublished(e.target.checked)}
-              />
-              <span style={{ fontWeight: 600, color: "#132E58" }}>Published (visible on site)</span>
-            </label>
+            <CheckRow>
+              <input type="checkbox" checked={formPublished} onChange={(e) => setFormPublished(e.target.checked)} />
+              Published (visible on site)
+            </CheckRow>
           </div>
         )}
       </SimpleModal>
-    </Container>
+    </PageWrap>
   );
 };
 

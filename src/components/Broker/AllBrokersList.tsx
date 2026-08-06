@@ -107,10 +107,10 @@ const AllBrokersList: React.FC<props> = ({ showAll = false, search = "", categor
           {search.trim()
             ? "No brokers match your search. Try another name or keyword."
             : category === "crypto"
-              ? "No crypto rebate brokers are published yet. Add brokers with Crypto category in the admin panel."
+              ? "No crypto exchanges published for this tab yet. Add brokers with Crypto Exchange type in the admin panel (rebates list order ≥ 1)."
               : category === "prop"
-                ? "No prop trading firms are published yet. Add brokers with Prop Trading category in the admin panel."
-                : "No forex rebate brokers are published yet. Run the rebates seed on the server."}
+                ? "No prop firms published for this tab yet. Add brokers with Prop Firms type in the admin panel (rebates list order ≥ 1)."
+                : "No forex brokers published for this tab yet. Add brokers with Forex Broker type in the admin panel (rebates list order ≥ 1)."}
         </StatusLine>
       )}
       <BrokerWrapper>

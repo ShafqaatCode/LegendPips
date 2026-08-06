@@ -6,23 +6,26 @@ import { getMyKyc, type KycStatus } from '../../services/kycService';
 import {
   FiHome, FiUser, FiAward, FiTrendingUp, FiVideo, FiBook, FiFileText,
   FiMessageSquare, FiSettings, FiLogOut, FiBarChart2, FiCalendar,
-  FiX, FiDollarSign, FiGlobe, FiShield,
+  FiX, FiDollarSign, FiGlobe, FiShield, FiUserPlus, FiShuffle,
 } from 'react-icons/fi';
 
 const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
   position: fixed;
   left: 0;
   top: 0;
-  width: 240px;
+  width: 248px;
   height: 100vh;
-  background: #132E58;
+  background:
+    radial-gradient(ellipse 90% 40% at 0% 0%, rgba(251, 191, 36, 0.14) 0%, transparent 55%),
+    linear-gradient(180deg, #0c1f3d 0%, #132E58 45%, #0f2448 100%);
   color: white;
   z-index: 1000;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   transition: transform 0.25s ease;
-  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 4px 0 24px rgba(12, 31, 61, 0.18);
+  border-right: 1px solid rgba(251, 191, 36, 0.12);
 
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     transform: translateX(${({ $isOpen }) => ($isOpen ? '0' : '-100%')});
@@ -119,23 +122,27 @@ const NavLinkStyled = styled(NavLink)`
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  padding: 0.5rem 1rem;
-  margin: 1px 0.5rem;
-  border-radius: 7px;
-  color: rgba(255, 255, 255, 0.75);
+  padding: 0.55rem 0.85rem;
+  margin: 2px 0.55rem;
+  border-radius: 9px;
+  color: rgba(255, 255, 255, 0.78);
   text-decoration: none;
   font-size: 0.8125rem;
   font-weight: 500;
   transition: all 0.15s;
 
-  svg { font-size: 1rem; flex-shrink: 0; }
+  svg { font-size: 1rem; flex-shrink: 0; opacity: 0.9; }
 
-  &:hover { background: rgba(255, 255, 255, 0.08); color: white; }
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
 
   &.active {
-    background: rgba(251, 191, 36, 0.18);
+    background: linear-gradient(90deg, rgba(251, 191, 36, 0.22) 0%, rgba(251, 191, 36, 0.08) 100%);
     color: #Fbbf24;
     font-weight: 600;
+    box-shadow: inset 3px 0 0 #Fbbf24;
   }
 `;
 
@@ -239,6 +246,8 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
         {link('/user-panel/contests', 'My Contests', FiAward)}
         {link('/user-panel/signals', 'My Signals', FiTrendingUp)}
         {link('/user-panel/rebates', 'My Rebates', FiDollarSign)}
+        {link('/user-panel/invite', 'Invite a friend', FiUserPlus)}
+        {link('/user-panel/ib-change', 'IB change', FiShuffle)}
       </NavSection>
 
       <NavSection>

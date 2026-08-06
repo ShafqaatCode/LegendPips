@@ -19,6 +19,7 @@ import {
 } from "./Login.styles";
 import ForgetPasswordModal from "./ForgetPasswordModal";
 import { useAuth } from "../../contexts/AuthContext";
+import { firstAdminPath } from "../../utils/adminPermissions";
 
 interface LoginFormProps {
   onSwitchToRegister?: () => void;
@@ -56,11 +57,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onLoginSucces
         setTimeout(() => {
           const userData = JSON.parse(localStorage.getItem('user') || '{}');
           if (userData.role === 'admin') {
-            navigate('/admin-panel');
+            navigate(firstAdminPath(userData));
           } else {
             navigate('/user-panel');
           }
-          // Reload to ensure all state is fresh
           window.location.reload();
         }, 200);
       } else {

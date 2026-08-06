@@ -2,12 +2,18 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import GirlImage from "../../assets/bannerGirl.png";
 import { FaPen } from "react-icons/fa";
+import { FiGlobe, FiCpu, FiAward } from "react-icons/fi";
 import type { RebateTabCategory } from "../../services/brokerService";
+import {
+  BROKER_KIND_COLORS,
+  BROKER_KIND_DESCRIPTIONS,
+  REBATE_TAB_LABELS,
+} from "../../utils/brokerTypes";
 
-const TAB_LABELS: Record<RebateTabCategory, string> = {
-  forex: "Forex Brokers",
-  prop: "Prop Trading",
-  crypto: "Crypto Brokers",
+const TAB_ICONS: Record<RebateTabCategory, React.ReactNode> = {
+  forex: <FiGlobe />,
+  prop: <FiAward />,
+  crypto: <FiCpu />,
 };
 
 export interface RebatesBannerSearchProps {
@@ -51,10 +57,10 @@ const TAB_COPY: Record<
     ],
   },
   crypto: {
-    subtitle: "How does cryptocurrency cashback work for you?",
+    subtitle: "How does crypto exchange cashback work for you?",
     descriptions: [
-      "Trade crypto pairs through partnered brokers and earn cashback on every qualified trade. Rebates are credited based on your broker's crypto rebate schedule — whether you trade spot, CFDs, or other crypto instruments listed by the broker.",
-      "As an example, active crypto traders placing 20 round-turn trades per week with a $1.50 per-lot rebate could earn over $120 a month in cashback, on top of your regular trading results.",
+      "Trade crypto through partnered exchanges and platforms and earn cashback on every qualified trade. Rebates are credited based on each exchange’s cashback schedule — spot, CFDs, or other listed instruments.",
+      "As an example, active traders placing 20 round-turn trades per week with a $1.50 per-lot rebate could earn over $120 a month in cashback, on top of your regular trading results.",
     ],
   },
 };
@@ -81,9 +87,9 @@ const RebatesBrokersSection = ({
       <Inner>
         <Content>
           <Left>
-            <Title>Rebates Brokers</Title>
+            <Title>Partner platforms</Title>
 
-            <Tabs role="tablist" aria-label="Rebate broker categories">
+            <Tabs role="tablist" aria-label="Broker categories">
               {(["forex", "prop", "crypto"] as RebateTabCategory[]).map((tab) => (
                 <Tab
                   key={tab}
@@ -91,23 +97,32 @@ const RebatesBrokersSection = ({
                   role="tab"
                   aria-selected={activeTab === tab}
                   $active={activeTab === tab}
+                  $kind={tab}
                   onClick={() => onTabChange(tab)}
                 >
-                  {TAB_LABELS[tab]}
+                  <span className="ico">{TAB_ICONS[tab]}</span>
+                  {REBATE_TAB_LABELS[tab]}
                 </Tab>
               ))}
             </Tabs>
 
-            <FeatureBox>
+            <TypeHint>{BROKER_KIND_DESCRIPTIONS[activeTab]}</TypeHint>
+
+            <FeatureBox $kind={activeTab}>
               {isProp ? (
                 <>
                   Featuring partnered <Highlight>prop firms</Highlight> with challenge{" "}
-                  <Highlight>cashback</Highlight> on first & repeat purchases
+                  <Highlight>cashback</Highlight> on first &amp; repeat purchases
+                </>
+              ) : activeTab === "crypto" ? (
+                <>
+                  Featuring curated <Highlight>crypto exchanges</Highlight> with trading{" "}
+                  <Highlight>cashback</Highlight> on eligible volume
                 </>
               ) : (
                 <>
-                  Featuring <Highlight>36,828</Highlight> brokers and{" "}
-                  <Highlight>48</Highlight> different regulatory bodies
+                  Featuring partnered <Highlight>forex brokers</Highlight> with real{" "}
+                  <Highlight>rebates</Highlight> on every trade
                 </>
               )}
             </FeatureBox>
@@ -157,9 +172,21 @@ const RebatesBrokersSection = ({
             name="brokerSearch"
             value={searchValue}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder={isProp ? "Type the name of prop firm..." : "Search your broker"}
+            placeholder={
+              isProp
+                ? "Search prop firms…"
+                : activeTab === "crypto"
+                  ? "Search crypto exchanges…"
+                  : "Search forex brokers…"
+            }
             autoComplete="off"
-            aria-label={isProp ? "Search prop firms" : "Search brokers"}
+            aria-label={
+              isProp
+                ? "Search prop firms"
+                : activeTab === "crypto"
+                  ? "Search crypto exchanges"
+                  : "Search forex brokers"
+            }
           />
           <ReportButton type="button">
             Report
@@ -234,12 +261,12 @@ const Title = styled.h1`
 
 const Tabs = styled.div`
   display: inline-flex;
-  gap: 0.5rem;
-  padding: 4px;
-  border-radius: 8px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  margin-bottom: 1rem;
+  gap: 0.45rem;
+  padding: 5px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 0.75rem;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   flex-wrap: wrap;
 
@@ -249,43 +276,65 @@ const Tabs = styled.div`
   }
 `;
 
-const Tab = styled.button<{ $active?: boolean }>`
+const Tab = styled.button<{ $active?: boolean; $kind: RebateTabCategory }>`
   border: none;
-  border-radius: 6px;
-  padding: 0.45rem 0.9rem;
+  border-radius: 9px;
+  padding: 0.5rem 0.95rem;
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  color: #132e58;
-  background: ${({ $active }) => ($active ? "rgba(19, 46, 88, 0.08)" : "transparent")};
-  box-shadow: ${({ $active }) => ($active ? "inset 0 0 0 1px #fbbf24" : "none")};
-  transition: background 0.15s ease, box-shadow 0.15s ease;
+  color: ${({ $active, $kind }) =>
+    $active ? BROKER_KIND_COLORS[$kind].color : "#475569"};
+  background: ${({ $active, $kind }) =>
+    $active ? BROKER_KIND_COLORS[$kind].soft : "transparent"};
+  box-shadow: ${({ $active, $kind }) =>
+    $active ? `inset 0 0 0 1.5px ${BROKER_KIND_COLORS[$kind].border}` : "none"};
+  transition: background 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  .ico {
+    display: inline-flex;
+    font-size: 0.95rem;
+  }
 
   &:hover {
-    background: rgba(19, 46, 88, 0.06);
+    background: ${({ $kind }) => BROKER_KIND_COLORS[$kind].soft};
   }
 
   @media (max-width: 640px) {
     flex: 1;
     min-width: 0;
-    text-align: center;
+    justify-content: center;
     white-space: normal;
+    text-align: center;
   }
 `;
 
-const FeatureBox = styled.div`
+const TypeHint = styled.p`
+  margin: 0 0 0.85rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+  font-weight: 500;
+  line-height: 1.4;
+`;
+
+const FeatureBox = styled.div<{ $kind?: RebateTabCategory }>`
   display: inline-block;
-  background-color: #132e58;
+  background: linear-gradient(125deg, #0c1f3d 0%, #132e58 55%, #1a4a7a 100%);
   color: #fff;
-  padding: 0.55rem 1rem;
-  border-radius: 8px 8px 8px 2px;
+  padding: 0.6rem 1.05rem;
+  border-radius: 10px 10px 10px 3px;
   font-size: ${({ theme }) => theme.typography.body};
   line-height: 1.45;
   font-weight: 500;
   margin-bottom: 1rem;
   max-width: 100%;
-  box-shadow: 0 2px 8px rgba(19, 46, 88, 0.15);
+  box-shadow: 0 4px 14px rgba(19, 46, 88, 0.18);
+  border-left: 3px solid
+    ${({ $kind }) => ($kind ? BROKER_KIND_COLORS[$kind].border : "#fbbf24")};
 `;
 
 const Highlight = styled.span`

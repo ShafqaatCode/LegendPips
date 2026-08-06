@@ -11,6 +11,9 @@ export interface User {
   kycStatus?: string;
   profileImage?: string;
   bio?: string;
+  isFullAdmin?: boolean;
+  isStaffAdmin?: boolean;
+  adminPermissions?: string[];
 }
 
 interface AuthContextType {

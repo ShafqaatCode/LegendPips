@@ -93,6 +93,19 @@ export const deleteUser = async (userId: string) => {
   return data;
 };
 
+export const impersonateUser = async (userId: string) => {
+  const response = await fetchWithTimeout(
+    `${API_CONFIG.BASE_URL}/admin/users/${userId}/impersonate`,
+    {
+      method: "POST",
+      headers: getAuthHeaders(),
+    }
+  );
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to sign in as user");
+  return data as { success: boolean; message: string; user: AdminUser; token: string };
+};
+
 export type BulkEmailAudience =
   | "all"
   | "kyc-verified"

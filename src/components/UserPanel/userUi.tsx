@@ -46,26 +46,28 @@ export const DashboardHero = styled.div`
 `;
 
 export const PageHeader = styled.div`
-  margin-bottom: 1rem;
+  margin-bottom: 1.15rem;
 `;
 
 export const PageTitle = styled.h1`
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-size: 1.2rem;
+  font-weight: 800;
   color: ${userColors.navy};
-  margin: 0 0 0.2rem;
+  margin: 0 0 0.3rem;
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.5rem;
+  letter-spacing: -0.02em;
 
-  svg { color: ${userColors.gold}; font-size: 1rem; }
+  svg { color: ${userColors.gold}; font-size: 1.1rem; }
 `;
 
 export const PageSubtitle = styled.p`
   margin: 0;
   font-size: 0.8125rem;
   color: ${userColors.muted};
-  line-height: 1.5;
+  line-height: 1.55;
+  max-width: 560px;
 `;
 
 export const StatsGrid = styled.div`
@@ -149,25 +151,30 @@ export const ErrorBanner = styled.div`
 export const SectionCard = styled.section`
   background: ${userColors.card};
   border: 1px solid ${userColors.border};
-  border-radius: 10px;
-  margin-bottom: 0.75rem;
+  border-radius: 14px;
+  margin-bottom: 0.85rem;
   overflow: hidden;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
 `;
 
 export const SectionHead = styled.div`
-  padding: 0.625rem 0.875rem;
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid ${userColors.border};
-  background: #fafbfc;
+  background: linear-gradient(180deg, #fafbfc 0%, #f8fafc 100%);
 
   h2 {
     margin: 0;
-    font-size: 0.8125rem;
-    font-weight: 700;
+    font-size: 0.875rem;
+    font-weight: 800;
     color: ${userColors.navy};
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
   }
 `;
 
-export const SectionBody = styled.div` padding: 0.875rem; `;
+export const SectionBody = styled.div` padding: 1rem; `;
 
 export const Pill = styled.span<{ $variant?: string }>`
   display: inline-flex;

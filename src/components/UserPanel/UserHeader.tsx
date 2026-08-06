@@ -4,15 +4,17 @@ import { FiMenu, FiBell } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 
 const HeaderWrapper = styled.header`
-  background: white;
-  border-bottom: 1px solid #e8ecf1;
-  padding: 0.625rem 1.25rem;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(232, 236, 241, 0.95);
+  padding: 0.7rem 1.35rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.03);
 `;
 
 const MenuButton = styled.button`

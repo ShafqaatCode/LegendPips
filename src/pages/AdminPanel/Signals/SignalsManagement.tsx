@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
-import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiTrendingUp, FiTrendingDown, FiLock, FiUnlock } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiTrendingUp, FiTrendingDown, FiCheck } from 'react-icons/fi';
 import SimpleModal from '../../../components/AdminPanel/SimpleModal';
 import {
   fetchAdminSignals,
@@ -9,154 +9,81 @@ import {
   deleteAdminSignal,
 } from '../../../services/signalService';
 import { TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
+import {
+  PageWrap, PageHeader, PageTitleGroup, PageTitle, PageSubtitle,
+  PrimaryButton, GhostButton, FilterCount, ErrorBanner,
+  TableCard, DataTable, Th, Td, Tr, Pill, IconBtn, ActionGroup, adminColors,
+} from '../../../components/AdminPanel/adminUi';
 
-const Container = styled.div`
-  max-width: 1600px;
-  margin: 0 auto;
+const StatsRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
 `;
 
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #132E58;
-  margin: 0;
-`;
-
-const Button = styled.button<{ $primary?: boolean }>`
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-  background: ${({ $primary }) => ($primary ? '#132E58' : 'white')};
-  color: ${({ $primary }) => ($primary ? 'white' : '#132E58')};
-  border: 2px solid ${({ $primary }) => ($primary ? '#132E58' : '#e5e7eb')};
-  
-  &:hover {
-    background: ${({ $primary }) => ($primary ? '#1a4a7a' : '#f9fafb')};
-    border-color: ${({ $primary }) => ($primary ? '#1a4a7a' : '#132E58')};
-    transform: translateY(-2px);
-  }
-`;
-
-const SignalsTable = styled.div`
+const MiniStat = styled.div`
   background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e5e7eb;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-`;
-
-const TableHeader = styled.thead`
-  background: #f9fafb;
-  border-bottom: 2px solid #e5e7eb;
-`;
-
-const TableHeaderRow = styled.tr``;
-
-const TableHeaderCell = styled.th`
-  padding: 1rem;
-  text-align: left;
-  font-weight: 600;
-  color: #132E58;
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-`;
-
-const TableBody = styled.tbody``;
-
-const TableRow = styled.tr`
-  border-bottom: 1px solid #e5e7eb;
-  transition: background 0.2s ease;
-  
-  &:hover {
-    background: #f9fafb;
+  border: 1px solid ${adminColors.border};
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  box-shadow: ${adminColors.shadow};
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  .icon {
+    width: 40px; height: 40px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.05rem;
   }
-`;
-
-const TableCell = styled.td`
-  padding: 1rem;
-  color: #132E58;
-  font-size: 0.9375rem;
+  .val { font-size: 1.25rem; font-weight: 800; color: ${adminColors.navy}; }
+  .lbl { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: ${adminColors.muted}; }
 `;
 
 const PairBadge = styled.span`
-  background: #132E58;
-  color: white;
-  padding: 0.375rem 0.75rem;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.875rem;
-`;
-
-const TypeButton = styled.button<{ $type: 'buy' | 'sell' }>`
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: ${({ $type }) => ($type === 'buy' ? '#10b981' : '#ef4444')};
-  color: white;
-`;
-
-const StatusBadge = styled.span<{ $status: string }>`
-  padding: 0.375rem 0.75rem;
-  border-radius: 20px;
+  display: inline-flex;
+  padding: 0.3rem 0.55rem;
+  border-radius: 8px;
+  font-weight: 800;
   font-size: 0.75rem;
-  font-weight: 600;
-  background: ${({ $status }) => {
-    if ($status === 'active' || $status === 'open') return '#10b98115';
-    if ($status === 'closed') return '#6b728015';
-    if ($status === 'pending') return '#Fbbf2415';
-    return '#Fbbf2415';
-  }};
-  color: ${({ $status }) => {
-    if ($status === 'active' || $status === 'open') return '#10b981';
-    if ($status === 'closed') return '#6b7280';
-    if ($status === 'pending') return '#Fbbf24';
-    return '#Fbbf24';
-  }};
+  background: linear-gradient(135deg, ${adminColors.navy}, ${adminColors.navyLight});
+  color: white;
 `;
 
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 0.5rem;
+const DirBadge = styled.span<{ $buy?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 0.6875rem;
+  background: ${({ $buy }) => ($buy ? '#ecfdf5' : '#fef2f2')};
+  color: ${({ $buy }) => ($buy ? '#059669' : '#dc2626')};
 `;
 
-const IconButton = styled.button<{ $danger?: boolean }>`
-  background: transparent;
-  border: none;
-  color: ${({ $danger }) => ($danger ? '#ef4444' : '#132E58')};
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background: ${({ $danger }) => ($danger ? '#fee2e2' : '#f3f4f6')};
+const FormField = styled.label`
+  display: flex; flex-direction: column; gap: 0.35rem;
+  font-size: 0.6875rem; font-weight: 700; color: ${adminColors.navy}; margin-bottom: 0.7rem;
+  input, select {
+    width: 100%; padding: 0.55rem 0.7rem; border-radius: 9px; border: 1px solid ${adminColors.border};
+    font-size: 0.8125rem; outline: none; background: #fafbfc; box-sizing: border-box;
+    &:focus { border-color: ${adminColors.navy}; box-shadow: 0 0 0 3px rgba(19, 46, 88, 0.08); background: white; }
   }
 `;
+
+const CheckRow = styled.label`
+  display: flex; align-items: center; gap: 0.55rem; font-weight: 600; color: ${adminColors.navy};
+  font-size: 0.8125rem; margin-bottom: 0.7rem; cursor: pointer;
+  padding: 0.5rem 0.65rem; border-radius: 9px; background: #f8fafc; border: 1px solid #f1f5f9;
+  input { accent-color: ${adminColors.navy}; }
+`;
+
+const statusPill = (s: string) => {
+  if (s === 'active' || s === 'open') return 'approved';
+  if (s === 'pending') return 'pending';
+  return 'incomplete';
+};
 
 const SignalsManagement: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -217,366 +144,203 @@ const SignalsManagement: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  useEffect(() => { refresh(); }, [refresh]);
+
+  const stats = useMemo(() => ({
+    total: signals.length,
+    active: signals.filter((s) => s.status === 'active').length,
+    buy: signals.filter((s) => s.type === 'buy').length,
+    premium: signals.filter((s) => s.premium).length,
+  }), [signals]);
 
   return (
-    <Container>
-      <Header>
-        <Title>Signals Management</Title>
-        <Button
-          $primary
-          onClick={() => {
-            setModalMode('add');
-            setSelectedSignalId(null);
-            setFormPair('EUR/USD');
-            setFormType('buy');
-            setFormEntry('1.0850');
-            setFormTp('1.0900');
-            setFormSl('1.0820');
-            setFormStatus('active');
-            setFormPremium(false);
-            setFormAssetClass('forex');
-            setIsModalOpen(true);
-          }}
-        >
-          <FiPlus />
-          Create Signal
-        </Button>
-      </Header>
+    <PageWrap>
+      <PageHeader>
+        <PageTitleGroup>
+          <PageTitle><FiTrendingUp /> Signals</PageTitle>
+          <PageSubtitle>Publish trading setups, TP/SL levels, and premium access control</PageSubtitle>
+        </PageTitleGroup>
+        <PrimaryButton type="button" onClick={() => {
+          setModalMode('add'); setSelectedSignalId(null);
+          setFormPair('EUR/USD'); setFormType('buy'); setFormEntry('1.0850');
+          setFormTp('1.0900'); setFormSl('1.0820'); setFormStatus('active');
+          setFormPremium(false); setFormAssetClass('forex'); setIsModalOpen(true);
+        }}>
+          <FiPlus /> Create signal
+        </PrimaryButton>
+      </PageHeader>
 
-      {loadError && (
-        <div
-          style={{
-            marginBottom: '1rem',
-            padding: '0.75rem 1rem',
-            borderRadius: 8,
-            background: '#fef2f2',
-            color: '#b91c1c',
-            border: '1px solid #fecaca',
-          }}
-        >
-          {loadError}
-        </div>
-      )}
+      <StatsRow>
+        <MiniStat>
+          <div className="icon" style={{ background: '#dbeafe', color: '#2563eb' }}><FiTrendingUp /></div>
+          <div><div className="val">{loading ? '…' : stats.total}</div><div className="lbl">Total</div></div>
+        </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: '#d1fae5', color: '#059669' }}><FiCheck /></div>
+          <div><div className="val">{loading ? '…' : stats.active}</div><div className="lbl">Active</div></div>
+        </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: '#ecfdf5', color: '#059669' }}><FiTrendingUp /></div>
+          <div><div className="val">{loading ? '…' : stats.buy}</div><div className="lbl">Buy</div></div>
+        </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: '#fef3c7', color: '#d97706' }}><FiTrendingUp /></div>
+          <div><div className="val">{loading ? '…' : stats.premium}</div><div className="lbl">Premium</div></div>
+        </MiniStat>
+      </StatsRow>
 
-      <SignalsTable>
-        <Table>
-          <TableHeader>
-            <TableHeaderRow>
-              <TableHeaderCell>Asset</TableHeaderCell>
-              <TableHeaderCell>Pair</TableHeaderCell>
-              <TableHeaderCell>Type</TableHeaderCell>
-              <TableHeaderCell>Entry / TP / SL</TableHeaderCell>
-              <TableHeaderCell>Status</TableHeaderCell>
-              <TableHeaderCell>Premium</TableHeaderCell>
-              <TableHeaderCell>Created</TableHeaderCell>
-              <TableHeaderCell>Actions</TableHeaderCell>
-            </TableHeaderRow>
-          </TableHeader>
-          <TableBody>
+      {loadError && <ErrorBanner>{loadError}</ErrorBanner>}
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
+        <FilterCount>{loading ? 'Loading…' : `${signals.length} signals`}</FilterCount>
+      </div>
+
+      <TableCard>
+        <DataTable>
+          <thead>
+            <tr>
+              <Th>Asset</Th>
+              <Th>Pair</Th>
+              <Th>Type</Th>
+              <Th>Entry / TP / SL</Th>
+              <Th>Status</Th>
+              <Th>Access</Th>
+              <Th>Created</Th>
+              <Th>Actions</Th>
+            </tr>
+          </thead>
+          <tbody>
             {loading && signals.length === 0 ? <TableBodySkeleton rows={6} cols={8} /> : null}
             {!loading && signals.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8}>No signals yet. Create one to publish on the site.</TableCell>
-              </TableRow>
+              <Tr><Td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: adminColors.muted }}>No signals yet. Create one to publish on the site.</Td></Tr>
             ) : null}
             {signals.map((signal) => (
-              <TableRow key={signal.id}>
-                <TableCell>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#374151' }}>{signal.assetClass}</span>
-                </TableCell>
-                <TableCell>
-                  <PairBadge>{signal.pair}</PairBadge>
-                </TableCell>
-                <TableCell>
-                  <TypeButton $type={signal.type as "buy" | "sell"}>
+              <Tr key={signal.id}>
+                <Td style={{ textTransform: 'capitalize', fontWeight: 600, fontSize: '0.8125rem' }}>{signal.assetClass}</Td>
+                <Td><PairBadge>{signal.pair}</PairBadge></Td>
+                <Td>
+                  <DirBadge $buy={signal.type === 'buy'}>
                     {signal.type === 'buy' ? <FiTrendingUp /> : <FiTrendingDown />}
                     {signal.type.toUpperCase()}
-                  </TypeButton>
-                </TableCell>
-                <TableCell>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem' }}>
-                    <span>Entry: <strong>{signal.entry}</strong></span>
-                    <span>TP: <strong>{signal.tp}</strong></span>
-                    <span>SL: <strong>{signal.sl}</strong></span>
+                  </DirBadge>
+                </Td>
+                <Td>
+                  <div style={{ fontSize: '0.75rem', lineHeight: 1.45, color: adminColors.muted }}>
+                    <div>Entry <strong style={{ color: adminColors.navy }}>{signal.entry}</strong></div>
+                    <div>TP <strong style={{ color: '#059669' }}>{signal.tp}</strong></div>
+                    <div>SL <strong style={{ color: '#dc2626' }}>{signal.sl}</strong></div>
                   </div>
-                </TableCell>
-                <TableCell>
-                  <StatusBadge $status={signal.status}>
-                    {signal.status.charAt(0).toUpperCase() + signal.status.slice(1)}
-                  </StatusBadge>
-                </TableCell>
-                <TableCell>
-                  {signal.premium ? (
-                    <Badge $type="premium">Premium</Badge>
-                  ) : (
-                    <Badge $type="free">Free</Badge>
-                  )}
-                </TableCell>
-                <TableCell>{signal.createdAt}</TableCell>
-                <TableCell>
-                  <ActionButtons>
-                    <IconButton
-                      title="Edit Signal"
-                      onClick={() => {
-                        setModalMode('edit');
-                        setSelectedSignalId(signal.id);
-                        setFormPair(signal.pair);
-                        setFormType(signal.type as any);
-                        setFormEntry(signal.entry);
-                        setFormTp(signal.tp);
-                        setFormSl(signal.sl);
-                        setFormStatus(signal.status as any);
-                        setFormPremium(!!signal.premium);
-                        setFormAssetClass(signal.assetClass);
-                        setIsModalOpen(true);
-                      }}
-                    >
-                      <FiEdit2 />
-                    </IconButton>
-                    <IconButton
-                      $danger
-                      title="Delete Signal"
-                      onClick={() => {
-                        setModalMode('delete');
-                        setSelectedSignalId(signal.id);
-                        setIsModalOpen(true);
-                      }}
-                    >
-                      <FiTrash2 />
-                    </IconButton>
-                  </ActionButtons>
-                </TableCell>
-              </TableRow>
+                </Td>
+                <Td><Pill $variant={statusPill(signal.status)}>{signal.status}</Pill></Td>
+                <Td>
+                  <Pill $variant={signal.premium ? 'admin' : 'approved'}>
+                    {signal.premium ? 'Premium' : 'Free'}
+                  </Pill>
+                </Td>
+                <Td style={{ fontSize: '0.75rem', color: adminColors.muted }}>{signal.createdAt}</Td>
+                <Td>
+                  <ActionGroup>
+                    <IconBtn title="Edit" type="button" onClick={() => {
+                      setModalMode('edit'); setSelectedSignalId(signal.id);
+                      setFormPair(signal.pair); setFormType(signal.type);
+                      setFormEntry(signal.entry); setFormTp(signal.tp); setFormSl(signal.sl);
+                      setFormStatus(signal.status); setFormPremium(!!signal.premium);
+                      setFormAssetClass(signal.assetClass); setIsModalOpen(true);
+                    }}><FiEdit2 /></IconBtn>
+                    <IconBtn $danger title="Delete" type="button" onClick={() => {
+                      setModalMode('delete'); setSelectedSignalId(signal.id); setIsModalOpen(true);
+                    }}><FiTrash2 /></IconBtn>
+                  </ActionGroup>
+                </Td>
+              </Tr>
             ))}
-          </TableBody>
-        </Table>
-      </SignalsTable>
+          </tbody>
+        </DataTable>
+      </TableCard>
 
       <SimpleModal
         isOpen={isModalOpen}
-        title={
-          modalMode === 'add'
-            ? 'Create Signal'
-            : modalMode === 'edit'
-              ? 'Edit Signal'
-              : 'Delete Signal'
-        }
+        title={modalMode === 'add' ? 'Create Signal' : modalMode === 'edit' ? 'Edit Signal' : 'Delete Signal'}
         onClose={() => setIsModalOpen(false)}
         footer={
           modalMode === 'delete' ? (
             <>
-              <IconButton onClick={() => setIsModalOpen(false)}>Cancel</IconButton>
-              <IconButton
-                $danger
-                onClick={async () => {
-                  if (!selectedSignalId) return;
-                  try {
-                    await deleteAdminSignal(selectedSignalId);
-                    setIsModalOpen(false);
-                    await refresh();
-                  } catch (e) {
-                    alert(e instanceof Error ? e.message : 'Delete failed');
-                  }
-                }}
-              >
-                <FiTrash2 />
-                Delete
-              </IconButton>
+              <GhostButton type="button" onClick={() => setIsModalOpen(false)}>Cancel</GhostButton>
+              <GhostButton $danger type="button" onClick={async () => {
+                if (!selectedSignalId) return;
+                try {
+                  await deleteAdminSignal(selectedSignalId);
+                  setIsModalOpen(false);
+                  await refresh();
+                } catch (e) {
+                  alert(e instanceof Error ? e.message : 'Delete failed');
+                }
+              }}><FiTrash2 /> Delete</GhostButton>
             </>
           ) : (
             <>
-              <IconButton onClick={() => setIsModalOpen(false)}>Cancel</IconButton>
-              <IconButton
-                onClick={async () => {
-                  try {
-                    if (modalMode === 'add') {
-                      await createAdminSignal({
-                        pair: formPair,
-                        type: formType,
-                        entry: formEntry,
-                        tp: formTp,
-                        sl: formSl,
-                        status: formStatus,
-                        premium: formPremium,
-                        assetClass: formAssetClass,
-                      });
-                    } else if (modalMode === 'edit' && selectedSignalId) {
-                      await updateAdminSignal(selectedSignalId, {
-                        pair: formPair,
-                        type: formType,
-                        entry: formEntry,
-                        tp: formTp,
-                        sl: formSl,
-                        status: formStatus,
-                        premium: formPremium,
-                        assetClass: formAssetClass,
-                      });
-                    }
-                    setIsModalOpen(false);
-                    await refresh();
-                  } catch (e) {
-                    alert(e instanceof Error ? e.message : 'Save failed');
+              <GhostButton type="button" onClick={() => setIsModalOpen(false)}>Cancel</GhostButton>
+              <PrimaryButton type="button" onClick={async () => {
+                try {
+                  if (modalMode === 'add') {
+                    await createAdminSignal({
+                      pair: formPair, type: formType, entry: formEntry, tp: formTp, sl: formSl,
+                      status: formStatus, premium: formPremium, assetClass: formAssetClass,
+                    });
+                  } else if (modalMode === 'edit' && selectedSignalId) {
+                    await updateAdminSignal(selectedSignalId, {
+                      pair: formPair, type: formType, entry: formEntry, tp: formTp, sl: formSl,
+                      status: formStatus, premium: formPremium, assetClass: formAssetClass,
+                    });
                   }
-                }}
-              >
-                <FiEdit2 />
-                Save
-              </IconButton>
+                  setIsModalOpen(false);
+                  await refresh();
+                } catch (e) {
+                  alert(e instanceof Error ? e.message : 'Save failed');
+                }
+              }}><FiCheck /> Save</PrimaryButton>
             </>
           )
         }
       >
         {modalMode === 'delete' ? (
-          <div style={{ color: '#6b7280', fontSize: 14, lineHeight: 1.6 }}>
-            Are you sure you want to delete this signal?
-          </div>
+          <div style={{ color: adminColors.muted, fontSize: 14 }}>Delete this signal permanently?</div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <label>
-              <div style={{ fontWeight: 700, color: '#132E58', marginBottom: 6 }}>Pair</div>
-              <input
-                value={formPair}
-                onChange={(e) => setFormPair(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 0.9rem',
-                  borderRadius: 10,
-                  border: '2px solid #e5e7eb',
-                  outline: 'none',
-                }}
-              />
-            </label>
-
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontWeight: 700, color: '#132E58' }}>Market</span>
-              <select
-                value={formAssetClass}
-                onChange={(e) => setFormAssetClass(e.target.value as typeof formAssetClass)}
-                style={{
-                  flex: 1,
-                  padding: '0.75rem 0.9rem',
-                  borderRadius: 10,
-                  border: '2px solid #e5e7eb',
-                  outline: 'none',
-                  background: 'white',
-                }}
-              >
+          <div>
+            <FormField>Pair<input value={formPair} onChange={(e) => setFormPair(e.target.value)} /></FormField>
+            <FormField>Market
+              <select value={formAssetClass} onChange={(e) => setFormAssetClass(e.target.value as typeof formAssetClass)}>
                 <option value="forex">Forex</option>
                 <option value="crypto">Crypto</option>
                 <option value="commodities">Commodities</option>
                 <option value="other">Other</option>
               </select>
-            </label>
-
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontWeight: 700, color: '#132E58' }}>Type</span>
-              <select
-                value={formType}
-                onChange={(e) => setFormType(e.target.value as any)}
-                style={{
-                  flex: 1,
-                  padding: '0.75rem 0.9rem',
-                  borderRadius: 10,
-                  border: '2px solid #e5e7eb',
-                  outline: 'none',
-                  background: 'white',
-                }}
-              >
+            </FormField>
+            <FormField>Type
+              <select value={formType} onChange={(e) => setFormType(e.target.value as 'buy' | 'sell')}>
                 <option value="buy">Buy</option>
                 <option value="sell">Sell</option>
               </select>
-            </label>
-
-            <label>
-              <div style={{ fontWeight: 700, color: '#132E58', marginBottom: 6 }}>Entry</div>
-              <input
-                value={formEntry}
-                onChange={(e) => setFormEntry(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 0.9rem',
-                  borderRadius: 10,
-                  border: '2px solid #e5e7eb',
-                  outline: 'none',
-                }}
-              />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: '#132E58', marginBottom: 6 }}>TP</div>
-              <input
-                value={formTp}
-                onChange={(e) => setFormTp(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 0.9rem',
-                  borderRadius: 10,
-                  border: '2px solid #e5e7eb',
-                  outline: 'none',
-                }}
-              />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: '#132E58', marginBottom: 6 }}>SL</div>
-              <input
-                value={formSl}
-                onChange={(e) => setFormSl(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 0.9rem',
-                  borderRadius: 10,
-                  border: '2px solid #e5e7eb',
-                  outline: 'none',
-                }}
-              />
-            </label>
-
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontWeight: 700, color: '#132E58' }}>Status</span>
-              <select
-                value={formStatus}
-                onChange={(e) => setFormStatus(e.target.value as any)}
-                style={{
-                  flex: 1,
-                  padding: '0.75rem 0.9rem',
-                  borderRadius: 10,
-                  border: '2px solid #e5e7eb',
-                  outline: 'none',
-                  background: 'white',
-                }}
-              >
+            </FormField>
+            <FormField>Entry<input value={formEntry} onChange={(e) => setFormEntry(e.target.value)} /></FormField>
+            <FormField>TP<input value={formTp} onChange={(e) => setFormTp(e.target.value)} /></FormField>
+            <FormField>SL<input value={formSl} onChange={(e) => setFormSl(e.target.value)} /></FormField>
+            <FormField>Status
+              <select value={formStatus} onChange={(e) => setFormStatus(e.target.value as typeof formStatus)}>
                 <option value="active">active</option>
                 <option value="closed">closed</option>
                 <option value="pending">pending</option>
               </select>
-            </label>
-
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            </FormField>
+            <CheckRow>
               <input type="checkbox" checked={formPremium} onChange={(e) => setFormPremium(e.target.checked)} />
-              <span style={{ fontWeight: 600, color: '#132E58' }}>Premium</span>
-            </label>
+              Premium
+            </CheckRow>
           </div>
         )}
       </SimpleModal>
-    </Container>
+    </PageWrap>
   );
 };
-
-const Badge = styled.span<{ $type: string }>`
-  padding: 0.375rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: ${({ $type }) => {
-    if ($type === 'premium') return '#Fbbf2415';
-    return '#10b98115';
-  }};
-  color: ${({ $type }) => {
-    if ($type === 'premium') return '#Fbbf24';
-    return '#10b981';
-  }};
-`;
 
 export default SignalsManagement;

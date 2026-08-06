@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { FiArrowLeft, FiCheck, FiX, FiSlash, FiCheckCircle, FiTrash2 } from 'react-icons/fi';
+import { FiArrowLeft, FiCheck, FiX, FiSlash, FiCheckCircle, FiTrash2, FiLogIn } from 'react-icons/fi';
 import {
   getAdminUserDetail, reviewKyc, KYC_STATUS_LABELS, DOCUMENT_LABELS,
   type KycStatus, type KycDocumentType,
 } from '../../../services/kycService';
-import { blockOrUnblockUser, deleteUser } from '../../../services/userService';
+import { blockOrUnblockUser, deleteUser, impersonateUser } from '../../../services/userService';
+import { applyAuthSession } from '../../../services/authService';
+import { useAuth } from '../../../contexts/AuthContext';
 import SimpleModal from '../../../components/AdminPanel/SimpleModal';
 import {
   PageWrap, Pill, SectionCard, SectionHead, SectionBody,
@@ -112,6 +114,7 @@ const UserDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { setUser: setAuthUser } = useAuth();
   const fromKyc = location.pathname.startsWith('/admin-panel/kyc-records');
   const kycFilter = (location.state as { kycFilter?: string } | null)?.kycFilter;
   const backPath = fromKyc
@@ -124,6 +127,7 @@ const UserDetail: React.FC = () => {
   const [rejectionReason, setRejectionReason] = useState('');
   const [reviewing, setReviewing] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [impersonating, setImpersonating] = useState(false);
 
   const loadUser = async () => {
     if (!id) return;
@@ -177,6 +181,23 @@ const UserDetail: React.FC = () => {
     }
   };
 
+  const handleLoginAsUser = async () => {
+    if (!id || !user) return;
+    if (user.role === 'admin') return;
+    if (!window.confirm(`Sign in as ${user.firstName} ${user.lastName}? You will be taken to their user panel.`)) return;
+    setImpersonating(true);
+    setError('');
+    try {
+      const data = await impersonateUser(id);
+      applyAuthSession(data.token, data.user);
+      setAuthUser(data.user);
+      window.location.href = '/user-panel';
+    } catch (e: any) {
+      setError(e.message);
+      setImpersonating(false);
+    }
+  };
+
   if (loading) return <PageWrap><p style={{ fontSize: '0.8125rem', color: '#64748b' }}>Loading…</p></PageWrap>;
   if (!user) return (
     <PageWrap>
@@ -206,6 +227,15 @@ const UserDetail: React.FC = () => {
           <Pill $variant={kycStatus}>{KYC_STATUS_LABELS[kycStatus]}</Pill>
         </BadgeRow>
         <ActionGroup>
+          <PrimaryButton
+            $sm
+            type="button"
+            onClick={handleLoginAsUser}
+            disabled={user.role === 'admin' || impersonating}
+            title={user.role === 'admin' ? 'Cannot sign in as admin' : 'Open user panel as this user'}
+          >
+            <FiLogIn /> {impersonating ? 'Signing in…' : 'Login as user'}
+          </PrimaryButton>
           <GhostButton $sm type="button" onClick={handleBlockToggle} disabled={user.role === 'admin'}>
             {user.status === 'blocked' ? <><FiCheckCircle /> Unban</> : <><FiSlash /> Ban</>}
           </GhostButton>

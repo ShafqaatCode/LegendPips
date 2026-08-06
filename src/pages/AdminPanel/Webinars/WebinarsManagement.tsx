@@ -1,482 +1,353 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiVideo, FiCalendar, FiUser, FiUsers, FiDollarSign } from 'react-icons/fi';
+import {
+  FiPlus, FiEdit2, FiTrash2, FiVideo, FiCalendar, FiUser, FiUsers, FiDollarSign, FiCheck,
+} from 'react-icons/fi';
 import SimpleModal from '../../../components/AdminPanel/SimpleModal';
+import {
+  PageWrap, PageHeader, PageTitleGroup, PageTitle, PageSubtitle,
+  PrimaryButton, GhostButton, FilterBar, FilterCount, Pill, adminColors,
+} from '../../../components/AdminPanel/adminUi';
 
-const Container = styled.div`
-  max-width: 1600px;
-  margin: 0 auto;
+type WebinarStatus = 'live' | 'upcoming' | 'recorded';
+
+type Webinar = {
+  id: string;
+  title: string;
+  instructor: string;
+  date: string;
+  time: string;
+  status: WebinarStatus;
+  premium: boolean;
+  price: number;
+  participants: number;
+};
+
+const StatsRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
 `;
 
-const Header = styled.div`
+const MiniStat = styled.div`
+  background: white;
+  border: 1px solid ${adminColors.border};
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  box-shadow: ${adminColors.shadow};
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #132E58;
-  margin: 0;
-`;
-
-const Button = styled.button<{ $primary?: boolean }>`
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-  background: ${({ $primary }) => ($primary ? '#132E58' : 'white')};
-  color: ${({ $primary }) => ($primary ? 'white' : '#132E58')};
-  border: 2px solid ${({ $primary }) => ($primary ? '#132E58' : '#e5e7eb')};
-  
-  &:hover {
-    background: ${({ $primary }) => ($primary ? '#1a4a7a' : '#f9fafb')};
-    border-color: ${({ $primary }) => ($primary ? '#1a4a7a' : '#132E58')};
-    transform: translateY(-2px);
+  gap: 0.75rem;
+  .icon {
+    width: 40px; height: 40px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.05rem; flex-shrink: 0;
   }
+  .val { font-size: 1.25rem; font-weight: 800; color: ${adminColors.navy}; letter-spacing: -0.02em; }
+  .lbl { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: ${adminColors.muted}; }
 `;
 
-const FilterTabs = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-`;
+const Tabs = styled.div` display: flex; gap: 0.4rem; flex-wrap: wrap; flex: 1; `;
 
 const Tab = styled.button<{ $active?: boolean }>`
-  padding: 0.75rem 1.5rem;
-  border: 2px solid ${({ $active }) => ($active ? '#132E58' : '#e5e7eb')};
-  background: ${({ $active }) => ($active ? '#132E58' : 'white')};
-  color: ${({ $active }) => ($active ? 'white' : '#132E58')};
-  border-radius: 8px;
-  font-weight: 600;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    border-color: #132E58;
-    background: ${({ $active }) => ($active ? '#132E58' : '#f9fafb')};
-  }
+  border: 1px solid ${({ $active }) => ($active ? adminColors.navy : adminColors.border)};
+  background: ${({ $active }) =>
+    $active ? `linear-gradient(135deg, ${adminColors.navy}, ${adminColors.navyLight})` : 'white'};
+  color: ${({ $active }) => ($active ? 'white' : adminColors.navy)};
+  box-shadow: ${({ $active }) => ($active ? '0 4px 12px rgba(19, 46, 88, 0.2)' : 'none')};
+  &:hover { border-color: ${adminColors.navy}; }
 `;
 
-const WebinarsGrid = styled.div`
+const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: 1fr;
-  }
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0.9rem;
 `;
 
-const WebinarCard = styled.div`
+const Card = styled.article`
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
+  border: 1px solid ${adminColors.border};
+  box-shadow: ${adminColors.shadow};
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e5e7eb;
-  transition: all 0.2s ease;
-  
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    border-color: #Fbbf24;
+    transform: translateY(-3px);
+    box-shadow: ${adminColors.shadowHover};
+    border-color: rgba(251, 191, 36, 0.45);
   }
 `;
 
-const Thumbnail = styled.div`
-  width: 100%;
-  height: 180px;
-  background: linear-gradient(135deg, #132E58 0%, #1a4a7a 100%);
+const Thumb = styled.div`
+  height: 120px;
+  background:
+    radial-gradient(ellipse 80% 120% at 100% 0%, rgba(251, 191, 36, 0.2) 0%, transparent 55%),
+    linear-gradient(125deg, #0c1f3d 0%, ${adminColors.navy} 50%, ${adminColors.navyLight} 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 3rem;
+  color: rgba(255,255,255,0.9);
+  font-size: 2rem;
   position: relative;
 `;
 
-const StatusBadge = styled.span<{ $status: string }>`
+const BadgeFloat = styled.div`
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  padding: 0.375rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: ${({ $status }) => {
-    if ($status === 'live') return '#ef4444';
-    if ($status === 'upcoming') return '#10b981';
-    return '#6b7280';
-  }};
-  color: white;
-`;
-
-const PremiumBadge = styled.span`
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  padding: 0.375rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: #Fbbf24;
-  color: #132E58;
-`;
-
-const CardContent = styled.div`
-  padding: 1.5rem;
-`;
-
-const WebinarTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #132E58;
-  margin: 0 0 0.75rem 0;
-  line-height: 1.4;
-`;
-
-const WebinarMeta = styled.div`
+  top: 0.75rem;
+  left: 0.75rem;
+  right: 0.75rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  justify-content: space-between;
+  gap: 0.35rem;
+  pointer-events: none;
 `;
 
-const MetaItem = styled.div`
-  display: flex;
-  align-items: center;
+const Body = styled.div` padding: 0.95rem 1rem 0.65rem; flex: 1; `;
+
+const Title = styled.h3`
+  margin: 0 0 0.65rem;
+  font-size: 0.975rem;
+  font-weight: 800;
+  color: ${adminColors.navy};
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+`;
+
+const Metrics = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
-  color: #6b7280;
-  font-size: 0.875rem;
-  
-  svg {
-    color: #Fbbf24;
+`;
+
+const Metric = styled.div`
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 0.45rem 0.55rem;
+  .k {
+    font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+    color: ${adminColors.muted}; margin-bottom: 0.1rem; display: flex; align-items: center; gap: 0.2rem;
+    svg { color: ${adminColors.gold}; font-size: 0.7rem; }
+  }
+  .v { font-size: 0.78rem; font-weight: 700; color: ${adminColors.navy}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+`;
+
+const Footer = styled.div`
+  padding: 0.7rem 1rem;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  gap: 0.45rem;
+  background: #fafbfc;
+`;
+
+const FormField = styled.label`
+  display: flex; flex-direction: column; gap: 0.35rem;
+  font-size: 0.6875rem; font-weight: 700; color: ${adminColors.navy}; margin-bottom: 0.75rem;
+  input, select {
+    padding: 0.55rem 0.7rem; border-radius: 9px; border: 1px solid ${adminColors.border};
+    font-size: 0.8125rem; font-weight: 400; outline: none; background: #fafbfc;
+    &:focus { border-color: ${adminColors.navy}; box-shadow: 0 0 0 3px rgba(19, 46, 88, 0.08); background: white; }
   }
 `;
 
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+const CheckRow = styled.label`
+  display: flex; align-items: center; gap: 0.55rem; font-weight: 600; color: ${adminColors.navy};
+  font-size: 0.8125rem; margin-bottom: 0.75rem; cursor: pointer;
+  input { accent-color: ${adminColors.navy}; }
 `;
 
-const IconButton = styled.button<{ $danger?: boolean }>`
-  flex: 1;
-  padding: 0.625rem;
-  border-radius: 8px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-  background: ${({ $danger }) => ($danger ? '#fee2e2' : '#f3f4f6')};
-  color: ${({ $danger }) => ($danger ? '#ef4444' : '#132E58')};
-  
-  &:hover {
-    background: ${({ $danger }) => ($danger ? '#fecaca' : '#e5e7eb')};
-  }
-`;
+const statusVariant = (s: WebinarStatus) => {
+  if (s === 'live') return 'rejected';
+  if (s === 'upcoming') return 'approved';
+  return 'incomplete';
+};
 
 const WebinarsManagement: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState('all');
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit' | 'delete'>('add');
   const [selectedWebinarId, setSelectedWebinarId] = useState<string | null>(null);
-
   const [formTitle, setFormTitle] = useState('');
   const [formInstructor, setFormInstructor] = useState('');
   const [formDate, setFormDate] = useState('2024-01-20');
   const [formTime, setFormTime] = useState('14:00');
-  const [formStatus, setFormStatus] = useState<'live' | 'upcoming' | 'recorded'>('upcoming');
+  const [formStatus, setFormStatus] = useState<WebinarStatus>('upcoming');
   const [formPremium, setFormPremium] = useState(false);
   const [formPrice, setFormPrice] = useState('49');
 
-  const [webinars, setWebinars] = useState([
-    {
-      id: '1',
-      title: 'Advanced Forex Trading Strategies',
-      instructor: 'John Smith',
-      date: '2024-01-20',
-      time: '14:00',
-      status: 'upcoming',
-      premium: false,
-      price: 0,
-      participants: 45,
-    },
-    {
-      id: '2',
-      title: 'Crypto Market Analysis Masterclass',
-      instructor: 'Jane Doe',
-      date: '2024-01-18',
-      time: '16:00',
-      status: 'live',
-      premium: true,
-      price: 49,
-      participants: 120,
-    },
-    {
-      id: '3',
-      title: 'Risk Management Fundamentals',
-      instructor: 'Mike Johnson',
-      date: '2024-01-15',
-      time: '10:00',
-      status: 'recorded',
-      premium: false,
-      price: 0,
-      participants: 89,
-    },
+  const [webinars, setWebinars] = useState<Webinar[]>([
+    { id: '1', title: 'Advanced Forex Trading Strategies', instructor: 'John Smith', date: '2024-01-20', time: '14:00', status: 'upcoming', premium: false, price: 0, participants: 45 },
+    { id: '2', title: 'Crypto Market Analysis Masterclass', instructor: 'Jane Doe', date: '2024-01-18', time: '16:00', status: 'live', premium: true, price: 49, participants: 120 },
+    { id: '3', title: 'Risk Management Fundamentals', instructor: 'Mike Johnson', date: '2024-01-15', time: '10:00', status: 'recorded', premium: false, price: 0, participants: 89 },
   ]);
 
-  const filteredWebinars = webinars.filter((webinar) => {
-    if (activeFilter === 'all') return true;
-    return webinar.status === activeFilter;
-  });
+  const filtered = webinars.filter((w) => activeFilter === 'all' || w.status === activeFilter);
+
+  const counts = useMemo(() => ({
+    all: webinars.length,
+    upcoming: webinars.filter((w) => w.status === 'upcoming').length,
+    live: webinars.filter((w) => w.status === 'live').length,
+    recorded: webinars.filter((w) => w.status === 'recorded').length,
+    seats: webinars.reduce((s, w) => s + w.participants, 0),
+  }), [webinars]);
 
   return (
-    <Container>
-      <Header>
-        <Title>Webinars Management</Title>
-        <Button
-          $primary
-          onClick={() => {
-            setModalMode('add');
-            setSelectedWebinarId(null);
-            setFormTitle('');
-            setFormInstructor('');
-            setFormDate('2024-01-20');
-            setFormTime('14:00');
-            setFormStatus('upcoming');
-            setFormPremium(false);
-            setFormPrice('49');
-            setIsModalOpen(true);
-          }}
-        >
-          <FiPlus />
-          Create Webinar
-        </Button>
-      </Header>
+    <PageWrap>
+      <PageHeader>
+        <PageTitleGroup>
+          <PageTitle><FiVideo /> Webinars</PageTitle>
+          <PageSubtitle>Schedule live sessions, manage recordings, and premium access</PageSubtitle>
+        </PageTitleGroup>
+        <PrimaryButton type="button" onClick={() => {
+          setModalMode('add'); setSelectedWebinarId(null);
+          setFormTitle(''); setFormInstructor(''); setFormDate('2024-01-20'); setFormTime('14:00');
+          setFormStatus('upcoming'); setFormPremium(false); setFormPrice('49'); setIsModalOpen(true);
+        }}>
+          <FiPlus /> Create webinar
+        </PrimaryButton>
+      </PageHeader>
 
-      <FilterTabs>
-        <Tab $active={activeFilter === 'all'} onClick={() => setActiveFilter('all')}>
-          All Webinars
-        </Tab>
-        <Tab $active={activeFilter === 'upcoming'} onClick={() => setActiveFilter('upcoming')}>
-          Upcoming
-        </Tab>
-        <Tab $active={activeFilter === 'live'} onClick={() => setActiveFilter('live')}>
-          Live
-        </Tab>
-        <Tab $active={activeFilter === 'recorded'} onClick={() => setActiveFilter('recorded')}>
-          Recorded
-        </Tab>
-      </FilterTabs>
+      <StatsRow>
+        <MiniStat>
+          <div className="icon" style={{ background: '#ede9fe', color: '#7c3aed' }}><FiVideo /></div>
+          <div><div className="val">{counts.all}</div><div className="lbl">Total</div></div>
+        </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: '#d1fae5', color: '#059669' }}><FiCalendar /></div>
+          <div><div className="val">{counts.upcoming}</div><div className="lbl">Upcoming</div></div>
+        </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: '#fee2e2', color: '#dc2626' }}><FiVideo /></div>
+          <div><div className="val">{counts.live}</div><div className="lbl">Live now</div></div>
+        </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: '#dbeafe', color: '#2563eb' }}><FiUsers /></div>
+          <div><div className="val">{counts.seats}</div><div className="lbl">Attendees</div></div>
+        </MiniStat>
+      </StatsRow>
 
-      <WebinarsGrid>
-        {filteredWebinars.map((webinar) => (
-          <WebinarCard key={webinar.id}>
-            <Thumbnail>
+      <FilterBar>
+        <Tabs>
+          {(['all', 'upcoming', 'live', 'recorded'] as const).map((f) => (
+            <Tab key={f} type="button" $active={activeFilter === f} onClick={() => setActiveFilter(f)}>
+              {f === 'all' ? `All (${counts.all})` : `${f[0].toUpperCase()}${f.slice(1)} (${counts[f]})`}
+            </Tab>
+          ))}
+        </Tabs>
+        <FilterCount>{filtered.length} shown</FilterCount>
+      </FilterBar>
+
+      <Grid>
+        {filtered.map((w) => (
+          <Card key={w.id}>
+            <Thumb>
               <FiVideo />
-              <StatusBadge $status={webinar.status}>
-                {webinar.status === 'live' ? 'LIVE' : webinar.status === 'upcoming' ? 'Upcoming' : 'Recorded'}
-              </StatusBadge>
-              {webinar.premium && <PremiumBadge>Premium</PremiumBadge>}
-            </Thumbnail>
-            <CardContent>
-              <WebinarTitle>{webinar.title}</WebinarTitle>
-              <WebinarMeta>
-                <MetaItem>
-                  <FiUser />
-                  {webinar.instructor}
-                </MetaItem>
-                <MetaItem>
-                  <FiCalendar />
-                  {webinar.date} at {webinar.time}
-                </MetaItem>
-                <MetaItem>
-                  <FiUsers />
-                  {webinar.participants} Participants
-                </MetaItem>
-                {webinar.premium && (
-                  <MetaItem>
-                    <FiDollarSign />
-                    ${webinar.price}
-                  </MetaItem>
-                )}
-              </WebinarMeta>
-              <ActionButtons>
-                <IconButton
-                  onClick={() => {
-                    setModalMode('edit');
-                    setSelectedWebinarId(webinar.id);
-                    setFormTitle(webinar.title);
-                    setFormInstructor(webinar.instructor);
-                    setFormDate(webinar.date);
-                    setFormTime(webinar.time);
-                    setFormStatus(webinar.status as any);
-                    setFormPremium(!!webinar.premium);
-                    setFormPrice(String(webinar.price || 0));
-                    setIsModalOpen(true);
-                  }}
-                >
-                  <FiEdit2 />
-                  Edit
-                </IconButton>
-                <IconButton
-                  $danger
-                  onClick={() => {
-                    setModalMode('delete');
-                    setSelectedWebinarId(webinar.id);
-                    setIsModalOpen(true);
-                  }}
-                >
-                  <FiTrash2 />
-                  Delete
-                </IconButton>
-              </ActionButtons>
-            </CardContent>
-          </WebinarCard>
+              <BadgeFloat>
+                {w.premium ? <Pill $variant="admin">Premium</Pill> : <span />}
+                <Pill $variant={statusVariant(w.status)}>
+                  {w.status === 'live' ? 'LIVE' : w.status === 'upcoming' ? 'Upcoming' : 'Recorded'}
+                </Pill>
+              </BadgeFloat>
+            </Thumb>
+            <Body>
+              <Title>{w.title}</Title>
+              <Metrics>
+                <Metric><div className="k"><FiUser /> Instructor</div><div className="v">{w.instructor}</div></Metric>
+                <Metric><div className="k"><FiUsers /> Seats</div><div className="v">{w.participants}</div></Metric>
+                <Metric><div className="k"><FiCalendar /> Date</div><div className="v">{w.date}</div></Metric>
+                <Metric>
+                  <div className="k"><FiDollarSign /> Price</div>
+                  <div className="v">{w.premium ? `$${w.price}` : 'Free'}</div>
+                </Metric>
+              </Metrics>
+            </Body>
+            <Footer>
+              <GhostButton $sm type="button" style={{ flex: 1, justifyContent: 'center' }} onClick={() => {
+                setModalMode('edit'); setSelectedWebinarId(w.id);
+                setFormTitle(w.title); setFormInstructor(w.instructor); setFormDate(w.date);
+                setFormTime(w.time); setFormStatus(w.status); setFormPremium(w.premium);
+                setFormPrice(String(w.price || 0)); setIsModalOpen(true);
+              }}>
+                <FiEdit2 /> Edit
+              </GhostButton>
+              <GhostButton $sm $danger type="button" style={{ flex: 1, justifyContent: 'center' }} onClick={() => {
+                setModalMode('delete'); setSelectedWebinarId(w.id); setIsModalOpen(true);
+              }}>
+                <FiTrash2 /> Delete
+              </GhostButton>
+            </Footer>
+          </Card>
         ))}
-      </WebinarsGrid>
+      </Grid>
 
       <SimpleModal
         isOpen={isModalOpen}
-        title={
-          modalMode === 'add'
-            ? 'Create Webinar'
-            : modalMode === 'edit'
-              ? 'Edit Webinar'
-              : 'Delete Webinar'
-        }
+        title={modalMode === 'add' ? 'Create Webinar' : modalMode === 'edit' ? 'Edit Webinar' : 'Delete Webinar'}
         onClose={() => setIsModalOpen(false)}
         footer={
           modalMode === 'delete' ? (
             <>
-              <IconButton onClick={() => setIsModalOpen(false)}>Cancel</IconButton>
-              <IconButton
-                $danger
-                onClick={() => {
-                  if (!selectedWebinarId) return;
-                  setWebinars((prev) => prev.filter((w) => w.id !== selectedWebinarId));
-                  setIsModalOpen(false);
-                }}
-              >
-                <FiTrash2 />
-                Delete
-              </IconButton>
+              <GhostButton type="button" onClick={() => setIsModalOpen(false)}>Cancel</GhostButton>
+              <GhostButton type="button" $danger onClick={() => {
+                if (!selectedWebinarId) return;
+                setWebinars((p) => p.filter((x) => x.id !== selectedWebinarId));
+                setIsModalOpen(false);
+              }}><FiTrash2 /> Delete</GhostButton>
             </>
           ) : (
             <>
-              <IconButton onClick={() => setIsModalOpen(false)}>Cancel</IconButton>
-              <IconButton
-                onClick={() => {
-                  if (modalMode === 'add') {
-                    const id = String(Date.now());
-                    setWebinars((prev) => [
-                      {
-                        id,
-                        title: formTitle || 'New Webinar',
-                        instructor: formInstructor || 'Instructor',
-                        date: formDate,
-                        time: formTime,
-                        status: formStatus,
-                        premium: formPremium,
-                        price: formPremium ? Number(formPrice) || 0 : 0,
-                        participants: 0,
-                      },
-                      ...prev,
-                    ]);
-                  } else if (modalMode === 'edit' && selectedWebinarId) {
-                    setWebinars((prev) =>
-                      prev.map((w) =>
-                        w.id === selectedWebinarId
-                          ? {
-                              ...w,
-                              title: formTitle,
-                              instructor: formInstructor,
-                              date: formDate,
-                              time: formTime,
-                              status: formStatus,
-                              premium: formPremium,
-                              price: formPremium ? Number(formPrice) || 0 : 0,
-                            }
-                          : w
-                      )
-                    );
-                  }
-                  setIsModalOpen(false);
-                }}
-              >
-                <FiEdit2 />
-                Save
-              </IconButton>
+              <GhostButton type="button" onClick={() => setIsModalOpen(false)}>Cancel</GhostButton>
+              <PrimaryButton type="button" onClick={() => {
+                if (modalMode === 'add') {
+                  setWebinars((p) => [{
+                    id: String(Date.now()),
+                    title: formTitle || 'New Webinar',
+                    instructor: formInstructor || 'Instructor',
+                    date: formDate, time: formTime, status: formStatus,
+                    premium: formPremium, price: formPremium ? Number(formPrice) || 0 : 0, participants: 0,
+                  }, ...p]);
+                } else if (modalMode === 'edit' && selectedWebinarId) {
+                  setWebinars((p) => p.map((w) => w.id === selectedWebinarId ? {
+                    ...w, title: formTitle, instructor: formInstructor, date: formDate, time: formTime,
+                    status: formStatus, premium: formPremium, price: formPremium ? Number(formPrice) || 0 : 0,
+                  } : w));
+                }
+                setIsModalOpen(false);
+              }}><FiCheck /> Save</PrimaryButton>
             </>
           )
         }
       >
         {modalMode === 'delete' ? (
-          <div style={{ color: '#6b7280', fontSize: 14, lineHeight: 1.6 }}>
-            Are you sure you want to delete this webinar?
-          </div>
+          <div style={{ color: adminColors.muted, fontSize: 14 }}>Delete this webinar permanently?</div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <label>
-              <div style={{ fontWeight: 700, color: '#132E58', marginBottom: 6 }}>Title</div>
-              <input
-                value={formTitle}
-                onChange={(e) => setFormTitle(e.target.value)}
-                style={{ width: '100%', padding: '0.75rem 0.9rem', borderRadius: 10, border: '2px solid #e5e7eb', outline: 'none' }}
-              />
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: '#132E58', marginBottom: 6 }}>Instructor</div>
-              <input
-                value={formInstructor}
-                onChange={(e) => setFormInstructor(e.target.value)}
-                style={{ width: '100%', padding: '0.75rem 0.9rem', borderRadius: 10, border: '2px solid #e5e7eb', outline: 'none' }}
-              />
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontWeight: 700, color: '#132E58' }}>Status</span>
-              <select
-                value={formStatus}
-                onChange={(e) => setFormStatus(e.target.value as any)}
-                style={{ flex: 1, padding: '0.75rem 0.9rem', borderRadius: 10, border: '2px solid #e5e7eb', outline: 'none', background: 'white' }}
-              >
+          <div>
+            <FormField>Title<input value={formTitle} onChange={(e) => setFormTitle(e.target.value)} /></FormField>
+            <FormField>Instructor<input value={formInstructor} onChange={(e) => setFormInstructor(e.target.value)} /></FormField>
+            <FormField>Status
+              <select value={formStatus} onChange={(e) => setFormStatus(e.target.value as WebinarStatus)}>
                 <option value="upcoming">upcoming</option>
                 <option value="live">live</option>
                 <option value="recorded">recorded</option>
               </select>
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            </FormField>
+            <CheckRow>
               <input type="checkbox" checked={formPremium} onChange={(e) => setFormPremium(e.target.checked)} />
-              <span style={{ fontWeight: 600, color: '#132E58' }}>Premium</span>
-            </label>
-            <label>
-              <div style={{ fontWeight: 700, color: '#132E58', marginBottom: 6 }}>Price</div>
-              <input
-                value={formPrice}
-                onChange={(e) => setFormPrice(e.target.value)}
-                style={{ width: '100%', padding: '0.75rem 0.9rem', borderRadius: 10, border: '2px solid #e5e7eb', outline: 'none' }}
-              />
-            </label>
+              Premium
+            </CheckRow>
+            <FormField>Price<input value={formPrice} onChange={(e) => setFormPrice(e.target.value)} /></FormField>
           </div>
         )}
       </SimpleModal>
-    </Container>
+    </PageWrap>
   );
 };
 

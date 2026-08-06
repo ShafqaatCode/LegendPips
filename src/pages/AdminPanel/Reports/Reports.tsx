@@ -1,155 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { FiBarChart2, FiTrendingUp, FiTrendingDown, FiDownload, FiCalendar, FiUsers, FiActivity, FiDollarSign, FiAward } from 'react-icons/fi';
+import {
+  FiBarChart2, FiTrendingUp, FiDownload, FiCalendar, FiUsers, FiActivity, FiDollarSign, FiAward, FiFileText,
+} from 'react-icons/fi';
 import { fetchAdminFullMetrics, type PlatformMetrics, type EngagementSummary } from '../../../services/adminEngagementService';
 import { ShimmerBar, TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
+import {
+  PageWrap, PageHeader, PageTitleGroup, PageTitle, PageSubtitle,
+  PrimaryButton, StatsGrid, StatCard, StatIconBox, StatBody, StatValue, StatLabel, StatMeta,
+  SectionCard, SectionHead, SectionBody, DataTable, Th, Td, Tr,
+  ErrorBanner, adminColors,
+} from '../../../components/AdminPanel/adminUi';
 
-const Container = styled.div`
-  max-width: 1600px;
-  margin: 0 auto;
-`;
-
-const Header = styled.div`
+const ExportCard = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 2rem;
-`;
+  padding: 1rem 1.1rem;
+  background: linear-gradient(180deg, #f8fafc 0%, white 100%);
+  border: 1px solid ${adminColors.border};
+  border-radius: 14px;
+  flex-wrap: wrap;
 
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #132E58;
-  margin: 0;
-`;
-
-const Button = styled.button`
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-  background: #132E58;
-  color: white;
-  
-  &:hover {
-    background: #1a4a7a;
-    transform: translateY(-2px);
+  h3 { margin: 0 0 0.25rem; font-size: 0.9375rem; font-weight: 800; color: ${adminColors.navy}; }
+  p { margin: 0; font-size: 0.8125rem; color: ${adminColors.muted}; line-height: 1.4; }
+  .date {
+    display: flex; align-items: center; gap: 0.35rem;
+    margin-top: 0.45rem; font-size: 0.75rem; color: ${adminColors.muted}; font-weight: 600;
   }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e5e7eb;
-`;
-
-const StatHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-`;
-
-const StatIcon = styled.div<{ $color: string }>`
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: ${({ $color }) => $color}15;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${({ $color }) => $color};
-  font-size: 1.5rem;
-`;
-
-const StatValue = styled.div`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #132E58;
-  margin-bottom: 0.25rem;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 500;
-`;
-
-const StatChange = styled.div<{ $positive?: boolean }>`
-  font-size: 0.875rem;
-  color: ${({ $positive }) => ($positive ? '#10b981' : '#ef4444')};
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-`;
-
-const ReportsSection = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e5e7eb;
-  margin-bottom: 2rem;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #132E58;
-  margin-bottom: 1.5rem;
-`;
-
-const ErrorBox = styled.div`
-  background: #fef2f2;
-  color: #b91c1c;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-`;
-
-const Th = styled.th`
-  text-align: left;
-  padding: 0.75rem 0.5rem;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #6b7280;
-  border-bottom: 2px solid #e5e7eb;
-`;
-
-const Td = styled.td`
-  padding: 0.75rem 0.5rem;
-  font-size: 0.9rem;
-  color: #374151;
-  border-bottom: 1px solid #f3f4f6;
-`;
-
-const Meta = styled.p`
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin: 0 0 1rem 0;
 `;
 
 const Reports: React.FC = () => {
@@ -175,9 +54,7 @@ const Reports: React.FC = () => {
         if (!cancelled) setLoading(false);
       }
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
   const exportJson = () => {
@@ -193,48 +70,18 @@ const Reports: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const stats =
-    loading || !summary || !platform
-      ? [
-          { icon: FiBarChart2, label: 'Loading…', value: '—', change: '…', positive: true, color: '#e5e7eb' },
-          { icon: FiUsers, label: '…', value: '—', change: '…', positive: true, color: '#e5e7eb' },
-          { icon: FiActivity, label: '…', value: '—', change: '…', positive: true, color: '#e5e7eb' },
-          { icon: FiDollarSign, label: '…', value: '—', change: '…', positive: true, color: '#e5e7eb' },
-        ]
-      : [
-          {
-            icon: FiUsers,
-            label: 'Registered users',
-            value: String(summary.totalUsers),
-            change: `${platform.newUsers7d} new (7 days)`,
-            positive: true,
-            color: '#3b82f6',
-          },
-          {
-            icon: FiActivity,
-            label: 'Activity events (7 days)',
-            value: String(platform.activityLast7dTotal),
-            change: `${summary.activity24h} in last 24 hours`,
-            positive: true,
-            color: '#0ea5e9',
-          },
-          {
-            icon: FiAward,
-            label: 'Contest joins (all time)',
-            value: String(platform.contestParticipantsTotal),
-            change: `${platform.contestsTotal} contests in CMS`,
-            positive: true,
-            color: '#Fbbf24',
-          },
-          {
-            icon: FiDollarSign,
-            label: 'Rebates credited (30 days)',
-            value: `$${platform.rebateUsd30d.toFixed(2)}`,
-            change: 'ledger total',
-            positive: true,
-            color: '#059669',
-          },
-        ];
+  const ready = !loading && summary && platform;
+
+  const stats = ready
+    ? [
+        { icon: FiUsers, label: 'Registered users', value: String(summary!.totalUsers), meta: `${platform!.newUsers7d} new (7d)`, color: '#3b82f6' },
+        { icon: FiActivity, label: 'Activity (7 days)', value: String(platform!.activityLast7dTotal), meta: `${summary!.activity24h} last 24h`, color: '#0ea5e9' },
+        { icon: FiAward, label: 'Contest joins', value: String(platform!.contestParticipantsTotal), meta: `${platform!.contestsTotal} contests`, color: '#Fbbf24' },
+        { icon: FiDollarSign, label: 'Rebates (30d)', value: `$${platform!.rebateUsd30d.toFixed(2)}`, meta: 'ledger total', color: '#059669' },
+      ]
+    : Array.from({ length: 4 }).map((_, i) => ({
+        icon: FiBarChart2, label: '…', value: '—', meta: '', color: '#e2e8f0', key: i,
+      }));
 
   const breakdownRows = platform
     ? Object.entries(platform.activityByTypeLast7d)
@@ -243,189 +90,113 @@ const Reports: React.FC = () => {
     : [];
 
   return (
-    <Container>
-      <Header>
-        <Title>Reports & Analytics</Title>
-        <Button type="button" onClick={exportJson} disabled={loading || !summary || !platform}>
-          <FiDownload />
-          Export metrics (JSON)
-        </Button>
-      </Header>
+    <PageWrap>
+      <PageHeader>
+        <PageTitleGroup>
+          <PageTitle><FiBarChart2 /> Reports</PageTitle>
+          <PageSubtitle>Platform metrics, content snapshot, and exportable analytics</PageSubtitle>
+        </PageTitleGroup>
+        <PrimaryButton type="button" onClick={exportJson} disabled={!ready}>
+          <FiDownload /> Export JSON
+        </PrimaryButton>
+      </PageHeader>
 
-      {error && <ErrorBox>{error}</ErrorBox>}
+      {error && <ErrorBanner>{error}</ErrorBanner>}
 
       <StatsGrid>
-        {stats.map((stat, index) => (
-          <StatCard key={index}>
-            <StatHeader>
-              <StatIcon $color={stat.color}>
-                <stat.icon />
-              </StatIcon>
-            </StatHeader>
-            <StatValue>
-              {loading || !summary || !platform ? <ShimmerBar $h="32px" $w="48%" /> : stat.value}
-            </StatValue>
-            <StatLabel>
-              {loading || !summary || !platform ? <ShimmerBar $h="14px" $w="70%" /> : stat.label}
-            </StatLabel>
-            <StatChange $positive={stat.positive}>
-              {loading || !summary || !platform ? (
-                <ShimmerBar $h="12px" $w="85%" />
-              ) : (
-                <>
-                  {stat.positive ? <FiTrendingUp /> : <FiTrendingDown />}
-                  {stat.change}
-                </>
-              )}
-            </StatChange>
-          </StatCard>
+        {stats.map((stat: any, index) => (
+          <div key={stat.label + index} style={{ display: 'contents' }}>
+            <StatCard type="button" disabled style={{ cursor: 'default', pointerEvents: 'none' }}>
+              <StatIconBox $color={stat.color}><stat.icon /></StatIconBox>
+              <StatBody>
+                <StatValue>{!ready ? <ShimmerBar $h="22px" $w="48%" /> : stat.value}</StatValue>
+                <StatLabel>{!ready ? '…' : stat.label}</StatLabel>
+                {ready && <StatMeta $positive><FiTrendingUp style={{ display: 'inline', marginRight: 4 }} />{stat.meta}</StatMeta>}
+              </StatBody>
+            </StatCard>
+          </div>
         ))}
       </StatsGrid>
 
-      <ReportsSection>
-        <SectionTitle>Activity by type (last 7 days)</SectionTitle>
-        <Meta>Based on the unified activity log (same source as the user activity feed).</Meta>
-        {!platform || loading ? (
-          <Table>
+      <SectionCard>
+        <SectionHead><h2>Activity by type (last 7 days)</h2></SectionHead>
+        <SectionBody style={{ padding: 0 }}>
+          <DataTable>
             <thead>
-              <tr>
-                <Th>Type</Th>
-                <Th>Events</Th>
-              </tr>
+              <tr><Th>Type</Th><Th>Events</Th></tr>
             </thead>
             <tbody>
-              <TableBodySkeleton rows={6} cols={2} />
-            </tbody>
-          </Table>
-        ) : (
-          <Table>
-            <thead>
-              <tr>
-                <Th>Type</Th>
-                <Th>Events</Th>
-              </tr>
-            </thead>
-            <tbody>
-              {breakdownRows && breakdownRows.length > 0 ? (
+              {!ready ? (
+                <TableBodySkeleton rows={5} cols={2} />
+              ) : breakdownRows.length > 0 ? (
                 breakdownRows.map((row) => (
-                  <tr key={row.type}>
-                    <Td style={{ fontWeight: 600 }}>{row.type}</Td>
+                  <Tr key={row.type}>
+                    <Td style={{ fontWeight: 700, color: adminColors.navy }}>{row.type}</Td>
                     <Td>{row.count}</Td>
-                  </tr>
+                  </Tr>
                 ))
               ) : (
-                <tr>
-                  <Td colSpan={2}>No activity in the last 7 days.</Td>
-                </tr>
+                <Tr><Td colSpan={2} style={{ color: adminColors.muted }}>No activity in the last 7 days.</Td></Tr>
               )}
             </tbody>
-          </Table>
-        )}
-      </ReportsSection>
+          </DataTable>
+        </SectionBody>
+      </SectionCard>
 
-      <ReportsSection>
-        <SectionTitle>Content catalog snapshot</SectionTitle>
-        {!platform || !summary || loading ? (
-          <Table>
+      <SectionCard>
+        <SectionHead><h2>Content catalog snapshot</h2></SectionHead>
+        <SectionBody style={{ padding: 0 }}>
+          <DataTable>
             <thead>
-              <tr>
-                <Th>Metric</Th>
-                <Th>Value</Th>
-              </tr>
+              <tr><Th>Metric</Th><Th>Value</Th></tr>
             </thead>
             <tbody>
-              <TableBodySkeleton rows={10} cols={2} />
+              {!ready ? (
+                <TableBodySkeleton rows={8} cols={2} />
+              ) : (
+                <>
+                  {[
+                    ['Published signals', platform!.signalsPublished],
+                    ['Webinars', platform!.webinarsTotal],
+                    ['Published courses', platform!.coursesPublished],
+                    ['Published brokers', platform!.brokersPublished],
+                    ['Forum threads', platform!.forumThreads],
+                    ['Forum comments', platform!.forumComments],
+                    ['Feedback messages (all time)', platform!.feedbackTotal],
+                    ['New users (24 hours)', platform!.newUsers24h],
+                    ['Open feedback tickets', summary!.newFeedbackOpen],
+                    ['Feedback (last 7 days)', summary!.newFeedbackWeek],
+                  ].map(([label, value]) => (
+                    <Tr key={String(label)}>
+                      <Td style={{ color: adminColors.muted }}>{label}</Td>
+                      <Td style={{ fontWeight: 700, color: adminColors.navy }}>{value}</Td>
+                    </Tr>
+                  ))}
+                </>
+              )}
             </tbody>
-          </Table>
-        ) : (
-          <Table>
-            <thead>
-              <tr>
-                <Th>Metric</Th>
-                <Th>Value</Th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <Td>Published signals</Td>
-                <Td>{platform.signalsPublished}</Td>
-              </tr>
-              <tr>
-                <Td>Webinars</Td>
-                <Td>{platform.webinarsTotal}</Td>
-              </tr>
-              <tr>
-                <Td>Published courses</Td>
-                <Td>{platform.coursesPublished}</Td>
-              </tr>
-              <tr>
-                <Td>Published brokers</Td>
-                <Td>{platform.brokersPublished}</Td>
-              </tr>
-              <tr>
-                <Td>Forum threads</Td>
-                <Td>{platform.forumThreads}</Td>
-              </tr>
-              <tr>
-                <Td>Forum comments</Td>
-                <Td>{platform.forumComments}</Td>
-              </tr>
-              <tr>
-                <Td>Feedback messages (all time)</Td>
-                <Td>{platform.feedbackTotal}</Td>
-              </tr>
-              <tr>
-                <Td>New users (24 hours)</Td>
-                <Td>{platform.newUsers24h}</Td>
-              </tr>
-              <tr>
-                <Td>Open feedback tickets</Td>
-                <Td>{summary.newFeedbackOpen}</Td>
-              </tr>
-              <tr>
-                <Td>Feedback (last 7 days)</Td>
-                <Td>{summary.newFeedbackWeek}</Td>
-              </tr>
-            </tbody>
-          </Table>
-        )}
-      </ReportsSection>
+          </DataTable>
+        </SectionBody>
+      </SectionCard>
 
-      <ReportsSection>
-        <SectionTitle>Report history</SectionTitle>
-        <Meta>Automated downloadable snapshots are not stored on the server yet. Use Export to save metrics locally.</Meta>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '1rem',
-              background: '#f9fafb',
-              borderRadius: 8,
-              border: '1px solid #e5e7eb',
-            }}
-          >
+      <SectionCard>
+        <SectionHead>
+          <h2><FiFileText style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle' }} />Export</h2>
+        </SectionHead>
+        <SectionBody>
+          <ExportCard>
             <div>
-              <h3 style={{ margin: '0 0 0.25rem 0', fontSize: '1rem', fontWeight: 600, color: '#132E58' }}>
-                Platform metrics export
-              </h3>
-              <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
-                JSON bundle: engagement summary + platform counts + 7-day activity breakdown
-              </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem', fontSize: '0.875rem', color: '#6b7280' }}>
-                <FiCalendar />
-                {new Date().toLocaleDateString()}
-              </div>
+              <h3>Platform metrics export</h3>
+              <p>JSON bundle: engagement summary + platform counts + 7-day activity breakdown</p>
+              <div className="date"><FiCalendar /> {new Date().toLocaleDateString()}</div>
             </div>
-            <Button type="button" onClick={exportJson} disabled={loading || !summary || !platform}>
-              <FiDownload />
-              Download
-            </Button>
-          </div>
-        </div>
-      </ReportsSection>
-    </Container>
+            <PrimaryButton type="button" onClick={exportJson} disabled={!ready}>
+              <FiDownload /> Download
+            </PrimaryButton>
+          </ExportCard>
+        </SectionBody>
+      </SectionCard>
+    </PageWrap>
   );
 };
 

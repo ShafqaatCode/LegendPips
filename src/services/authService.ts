@@ -26,6 +26,9 @@ export interface User {
   kycStatus?: string;
   profileImage?: string;
   bio?: string;
+  isFullAdmin?: boolean;
+  isStaffAdmin?: boolean;
+  adminPermissions?: string[];
 }
 
 export interface AuthResponse {
@@ -163,6 +166,18 @@ export const register = async (userData: RegisterRequest): Promise<AuthResponse>
 export const logout = (): void => {
   removeAuthToken();
   localStorage.removeItem("user");
+};
+
+/** Store token + user after login or admin impersonation */
+export const applyAuthSession = (token: string, user: User): void => {
+  setAuthToken(token);
+  localStorage.setItem(
+    "user",
+    JSON.stringify({
+      ...user,
+      kycStatus: user.kycStatus || "incomplete",
+    })
+  );
 };
 
 // Get current user from localStorage

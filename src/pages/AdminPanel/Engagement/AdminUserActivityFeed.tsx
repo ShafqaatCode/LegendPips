@@ -1,128 +1,32 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { FiActivity, FiRefreshCw } from 'react-icons/fi';
+import { FiActivity, FiRefreshCw, FiSearch } from 'react-icons/fi';
 import { fetchAdminActivityFeed, type AdminActivityFeedRow } from '../../../services/adminEngagementService';
 import { TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
+import {
+  PageWrap, PageHeader, PageTitleGroup, PageTitle, PageSubtitle,
+  GhostButton, FilterBar, SearchInput, FilterCount,
+  TableCard, DataTable, Th, Td, Tr, Pill, ErrorBanner, adminColors,
+  Pagination, PageButtons, PageBtn,
+} from '../../../components/AdminPanel/adminUi';
 
-const Container = styled.div`
-  max-width: 1600px;
-  margin: 0 auto;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-`;
-
-const Title = styled.h1`
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #132e58;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const Toolbar = styled.div`
-  display: flex;
+const StatsRow = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 0.75rem;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-const Input = styled.input`
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  border: 2px solid #e5e7eb;
-  font-size: 0.875rem;
-  min-width: 220px;
-`;
-
-const Button = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.5rem 0.85rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  border: 2px solid #e5e7eb;
-  background: white;
-  color: #132e58;
-  &:hover {
-    border-color: #132e58;
-  }
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const TableWrap = styled.div`
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  overflow: auto;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 800px;
-`;
-
-const Th = styled.th`
-  text-align: left;
-  padding: 0.85rem 1rem;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #6b7280;
-  background: #f9fafb;
-  border-bottom: 2px solid #e5e7eb;
-`;
-
-const Td = styled.td`
-  padding: 0.85rem 1rem;
-  font-size: 0.875rem;
-  color: #374151;
-  border-bottom: 1px solid #f3f4f6;
-  vertical-align: top;
-`;
-
-const TypeBadge = styled.span`
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #0369a1;
-  background: #e0f2fe;
-  padding: 0.2rem 0.45rem;
-  border-radius: 6px;
-`;
-
-const Pagination = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  font-size: 0.875rem;
-  color: #6b7280;
-`;
-
-const ErrorBox = styled.div`
-  background: #fef2f2;
-  color: #b91c1c;
-  padding: 1rem;
-  border-radius: 8px;
   margin-bottom: 1rem;
+`;
+
+const HeroNote = styled.div`
+  background:
+    radial-gradient(ellipse 70% 120% at 100% 0%, rgba(251, 191, 36, 0.12) 0%, transparent 55%),
+    linear-gradient(125deg, #0c1f3d 0%, ${adminColors.navy} 50%, ${adminColors.navyLight} 100%);
+  border-radius: 16px;
+  padding: 1.1rem 1.25rem;
+  color: white;
+  box-shadow: 0 10px 28px rgba(12, 31, 61, 0.22);
+  h3 { margin: 0 0 0.25rem; font-size: 1rem; font-weight: 800; }
+  p { margin: 0; font-size: 0.8125rem; opacity: 0.88; }
 `;
 
 const AdminUserActivityFeed: React.FC = () => {
@@ -153,41 +57,55 @@ const AdminUserActivityFeed: React.FC = () => {
     }
   }, [page, appliedUserId]);
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  useEffect(() => { refresh(); }, [refresh]);
 
   return (
-    <Container>
-      <Header>
-        <Title>
-          <FiActivity /> User activity feed
-        </Title>
-        <Toolbar>
-          <Input
+    <PageWrap>
+      <PageHeader>
+        <PageTitleGroup>
+          <PageTitle><FiActivity /> Activity</PageTitle>
+          <PageSubtitle>Live timeline of platform events and user actions</PageSubtitle>
+        </PageTitleGroup>
+        <GhostButton type="button" onClick={refresh} disabled={loading}>
+          <FiRefreshCw /> Refresh
+        </GhostButton>
+      </PageHeader>
+
+      <StatsRow>
+        <HeroNote>
+          <h3>Unified activity log</h3>
+          <p>Filter by MongoDB user id to audit a single account — contests, enrollment, sign-ins, and more.</p>
+        </HeroNote>
+      </StatsRow>
+
+      <FilterBar>
+        <SearchInput style={{ maxWidth: 360, flex: 1 }}>
+          <FiSearch />
+          <input
             placeholder="Filter by user MongoDB id"
             value={userIdFilter}
             onChange={(e) => setUserIdFilter(e.target.value)}
           />
-          <Button
-            type="button"
-            onClick={() => {
-              setPage(1);
-              setAppliedUserId(userIdFilter.trim());
-            }}
-          >
-            Apply filter
-          </Button>
-          <Button type="button" onClick={refresh} disabled={loading}>
-            <FiRefreshCw /> Refresh
-          </Button>
-        </Toolbar>
-      </Header>
+        </SearchInput>
+        <GhostButton
+          $sm
+          type="button"
+          onClick={() => { setPage(1); setAppliedUserId(userIdFilter.trim()); }}
+        >
+          Apply filter
+        </GhostButton>
+        {appliedUserId && (
+          <GhostButton $sm type="button" onClick={() => { setUserIdFilter(''); setAppliedUserId(''); setPage(1); }}>
+            Clear
+          </GhostButton>
+        )}
+        <FilterCount>{loading ? 'Loading…' : `${items.length} events`}</FilterCount>
+      </FilterBar>
 
-      {error && <ErrorBox>{error}</ErrorBox>}
+      {error && <ErrorBanner>{error}</ErrorBanner>}
 
-      <TableWrap>
-        <Table>
+      <TableCard>
+        <DataTable>
           <thead>
             <tr>
               <Th>When</Th>
@@ -199,46 +117,36 @@ const AdminUserActivityFeed: React.FC = () => {
           </thead>
           <tbody>
             {loading && <TableBodySkeleton rows={6} cols={5} />}
-            {!loading &&
-              items.map((row) => (
-                <tr key={row.id}>
-                  <Td>{row.time}</Td>
-                  <Td>
-                    <div style={{ fontWeight: 600 }}>{row.userLabel}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{row.userId || '—'}</div>
-                  </Td>
-                  <Td>
-                    <TypeBadge>{row.type}</TypeBadge>
-                  </Td>
-                  <Td>{row.title}</Td>
-                  <Td>{row.description}</Td>
-                </tr>
-              ))}
+            {!loading && items.map((row) => (
+              <Tr key={row.id}>
+                <Td style={{ whiteSpace: 'nowrap', fontSize: '0.75rem', color: adminColors.muted }}>{row.time}</Td>
+                <Td>
+                  <div style={{ fontWeight: 700, color: adminColors.navy, fontSize: '0.8125rem' }}>{row.userLabel}</div>
+                  <div style={{ fontSize: '0.6875rem', color: adminColors.muted }}>{row.userId || '—'}</div>
+                </Td>
+                <Td><Pill $variant="user">{row.type}</Pill></Td>
+                <Td style={{ fontWeight: 600, color: adminColors.navy }}>{row.title}</Td>
+                <Td style={{ fontSize: '0.8125rem', color: adminColors.muted, maxWidth: 320 }}>{row.description}</Td>
+              </Tr>
+            ))}
+            {!loading && items.length === 0 && (
+              <Tr><Td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: adminColors.muted }}>No activity events found.</Td></Tr>
+            )}
           </tbody>
-        </Table>
+        </DataTable>
         {pagination && (
           <Pagination>
-            <span>
+            <span style={{ fontSize: '0.75rem', color: adminColors.muted }}>
               Page {pagination.currentPage} / {pagination.totalPages || 1}
             </span>
-            <Button
-              type="button"
-              disabled={!pagination.hasPreviousPage}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-            >
-              Prev
-            </Button>
-            <Button
-              type="button"
-              disabled={!pagination.hasNextPage}
-              onClick={() => setPage((p) => p + 1)}
-            >
-              Next
-            </Button>
+            <PageButtons>
+              <PageBtn type="button" disabled={!pagination.hasPreviousPage} onClick={() => setPage((p) => Math.max(1, p - 1))}>Prev</PageBtn>
+              <PageBtn type="button" disabled={!pagination.hasNextPage} onClick={() => setPage((p) => p + 1)}>Next</PageBtn>
+            </PageButtons>
           </Pagination>
         )}
-      </TableWrap>
-    </Container>
+      </TableCard>
+    </PageWrap>
   );
 };
 

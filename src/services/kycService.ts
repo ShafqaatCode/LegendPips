@@ -102,7 +102,7 @@ export const submitKyc = async (payload: KycSubmitPayload): Promise<KycData & { 
   );
   const data = await parseJsonResponse<{ message?: string } & KycData>(response);
   if (!response.ok) throw new Error(data.message || "Failed to submit verification");
-  return data;
+  return { ...data, message: data.message || "Verification submitted successfully" };
 };
 
 export const reviewKyc = async (
@@ -120,7 +120,7 @@ export const reviewKyc = async (
   );
   const data = await parseJsonResponse<{ message?: string } & KycData>(response);
   if (!response.ok) throw new Error(data.message || "Failed to review verification");
-  return data;
+  return { ...data, message: data.message || "Review saved successfully" };
 };
 
 export const getAdminUserDetail = async (userId: string) => {

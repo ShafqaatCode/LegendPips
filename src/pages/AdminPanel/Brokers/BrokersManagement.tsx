@@ -1,8 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
-import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiCheck } from "react-icons/fi";
+import {
+  FiPlus, FiEdit2, FiTrash2, FiSearch, FiCheck, FiDatabase,
+  FiShield, FiStar, FiDollarSign, FiTrendingUp, FiGlobe, FiCpu, FiAward,
+} from "react-icons/fi";
 import SimpleModal from "../../../components/AdminPanel/SimpleModal";
 import { CourseGridSkeleton } from "../../../components/SharedComponents/Shimmer";
+import {
+  PageWrap, PageHeader, PageTitleGroup, PageTitle, PageSubtitle,
+  PrimaryButton, GhostButton, FilterBar, SearchInput, FilterCount,
+  ErrorBanner, Pill, adminColors,
+} from "../../../components/AdminPanel/adminUi";
 import {
   adminCreateBroker,
   adminDeleteBroker,
@@ -11,6 +19,16 @@ import {
   type ApiBroker,
   type PropCashbackOffer,
 } from "../../../services/brokerService";
+import {
+  BROKER_KIND_COLORS,
+  BROKER_KIND_DESCRIPTIONS,
+  BROKER_KIND_LABELS,
+  BROKER_KIND_ORDER,
+  brokerKindLabel,
+  matchesBrokerKind,
+  type BrokerCategoryValue,
+  type BrokerKind,
+} from "../../../utils/brokerTypes";
 
 const emptyPropOffer = (): PropCashbackOffer => ({
   label: "Standard",
@@ -19,223 +37,329 @@ const emptyPropOffer = (): PropCashbackOffer => ({
   discountPercent: "",
 });
 
-const Container = styled.div`
-  max-width: 1600px;
-  margin: 0 auto;
+const StatsRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 520px) { grid-template-columns: 1fr; }
 `;
 
-const Header = styled.div`
+const MiniStat = styled.div`
+  background: white;
+  border: 1px solid ${adminColors.border};
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  box-shadow: ${adminColors.shadow};
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  gap: 0.75rem;
+
+  .icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    flex-shrink: 0;
+  }
+  .val {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: ${adminColors.navy};
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .lbl {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: ${adminColors.muted};
+    margin-top: 0.1rem;
+  }
+`;
+
+const TypeFilterBar = styled.div`
+  display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
 `;
 
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #132e58;
-  margin: 0;
-`;
-
-const Button = styled.button<{ $primary?: boolean }>`
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  display: flex;
+const TypeFilterBtn = styled.button<{ $active?: boolean; $tone?: BrokerKind }>`
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-  background: ${({ $primary }) => ($primary ? "#132e58" : "white")};
-  color: ${({ $primary }) => ($primary ? "white" : "#132e58")};
-  border: 2px solid ${({ $primary }) => ($primary ? "#132e58" : "#e5e7eb")};
+  gap: 0.4rem;
+  padding: 0.48rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid
+    ${({ $active, $tone }) =>
+      $active
+        ? $tone
+          ? BROKER_KIND_COLORS[$tone].border
+          : adminColors.navy
+        : adminColors.border};
+  background: ${({ $active, $tone }) =>
+    $active
+      ? $tone
+        ? BROKER_KIND_COLORS[$tone].soft
+        : adminColors.navy
+      : "white"};
+  color: ${({ $active, $tone }) =>
+    $active
+      ? $tone
+        ? BROKER_KIND_COLORS[$tone].color
+        : "white"
+      : adminColors.navy};
+  transition: all 0.12s;
 
   &:hover {
-    background: ${({ $primary }) => ($primary ? "#1a4a7a" : "#f9fafb")};
-    border-color: ${({ $primary }) => ($primary ? "#1a4a7a" : "#132e58")};
-    transform: translateY(-2px);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
+    border-color: ${({ $tone }) =>
+      $tone ? BROKER_KIND_COLORS[$tone].border : adminColors.navy};
   }
 `;
 
-const SearchBar = styled.div`
-  display: flex;
+const TypeBadge = styled.span<{ $kind: BrokerKind | "both" }>`
+  display: inline-flex;
   align-items: center;
-  background: white;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  max-width: 400px;
-
-  input {
-    border: none;
-    background: transparent;
-    outline: none;
-    font-size: 0.9375rem;
-    color: #132e58;
-    width: 100%;
-  }
-
-  svg {
-    color: #9ca3af;
-  }
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: ${({ $kind }) =>
+    $kind === "both"
+      ? "#e0f2fe"
+      : BROKER_KIND_COLORS[$kind].bg};
+  color: ${({ $kind }) =>
+    $kind === "both" ? "#0369a1" : BROKER_KIND_COLORS[$kind].color};
 `;
 
-const BrokersGrid = styled.div`
+const TypePicker = styled.div`
+  grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.55rem;
+  margin-bottom: 0.25rem;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+  @media (max-width: 640px) {
     grid-template-columns: 1fr;
   }
 `;
 
-const BrokerCard = styled.div`
-  background: white;
+const TypeCard = styled.button<{ $active?: boolean; $kind: BrokerKind }>`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: 0.85rem 0.9rem;
   border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e5e7eb;
-  transition: all 0.2s ease;
+  cursor: pointer;
+  text-align: left;
+  border: 2px solid
+    ${({ $active, $kind }) =>
+      $active ? BROKER_KIND_COLORS[$kind].border : adminColors.border};
+  background: ${({ $active, $kind }) =>
+    $active ? BROKER_KIND_COLORS[$kind].soft : "white"};
+  transition: all 0.12s;
+  box-shadow: ${({ $active }) =>
+    $active ? "0 4px 14px rgba(15, 23, 42, 0.08)" : "none"};
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    border-color: #fbbf24;
+    border-color: ${({ $kind }) => BROKER_KIND_COLORS[$kind].border};
+  }
+
+  .icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: ${({ $kind }) => BROKER_KIND_COLORS[$kind].bg};
+    color: ${({ $kind }) => BROKER_KIND_COLORS[$kind].color};
+    font-size: 1rem;
+  }
+
+  .title {
+    font-size: 0.8125rem;
+    font-weight: 800;
+    color: ${adminColors.navy};
+  }
+
+  .desc {
+    font-size: 0.6875rem;
+    color: ${adminColors.muted};
+    line-height: 1.35;
   }
 `;
 
-const BrokerHeader = styled.div`
+const BothOption = styled.label`
+  grid-column: 1 / -1;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: ${adminColors.muted};
+  cursor: pointer;
+  padding: 0.35rem 0.15rem;
+
+  input { accent-color: ${adminColors.navy}; }
 `;
 
-const BrokerLogo = styled.div<{ $img?: string }>`
-  width: 80px;
-  height: 80px;
-  border-radius: 12px;
+const KIND_ICONS: Record<BrokerKind, React.ReactNode> = {
+  forex: <FiGlobe />,
+  crypto: <FiCpu />,
+  prop: <FiAward />,
+};
+
+const BrokersGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0.9rem;
+`;
+
+const BrokerCard = styled.article`
+  background: white;
+  border-radius: 16px;
+  border: 1px solid ${adminColors.border};
+  box-shadow: ${adminColors.shadow};
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: ${adminColors.shadowHover};
+    border-color: rgba(251, 191, 36, 0.45);
+  }
+`;
+
+const CardTop = styled.div`
+  padding: 1rem 1rem 0.85rem;
+  background:
+    radial-gradient(ellipse 80% 100% at 100% 0%, rgba(251, 191, 36, 0.1) 0%, transparent 55%),
+    linear-gradient(180deg, #f8fafc 0%, white 100%);
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+`;
+
+const LogoBox = styled.div<{ $img?: string }>`
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  flex-shrink: 0;
   background: ${({ $img }) =>
-    $img ? `url(${$img}) center/cover no-repeat` : "linear-gradient(135deg, #132e58 0%, #1a4a7a 100%)"};
+    $img
+      ? `url(${$img}) center/contain no-repeat #fff`
+      : `linear-gradient(145deg, ${adminColors.navy} 0%, ${adminColors.navyLight} 100%)`};
+  border: 1px solid ${adminColors.border};
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-`;
-
-const BrokerName = styled.h3`
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #132e58;
-  margin: 0 0 0.5rem 0;
-`;
-
-const BrokerInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
-const InfoItem = styled.div`
-  display: flex;
-  justify-content: space-between;
   font-size: 0.875rem;
-  color: #6b7280;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(19, 46, 88, 0.12);
+`;
+
+const CardTitle = styled.div`
+  flex: 1;
+  min-width: 0;
+
+  h3 {
+    margin: 0 0 0.35rem;
+    font-size: 1rem;
+    font-weight: 800;
+    color: ${adminColors.navy};
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+`;
+
+const BadgeRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+`;
+
+const CardBody = styled.div`
+  padding: 0.85rem 1rem;
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+`;
+
+const Metric = styled.div`
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 0.5rem 0.6rem;
+
+  .k {
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: ${adminColors.muted};
+    margin-bottom: 0.15rem;
+  }
+  .v {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: ${adminColors.navy};
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+`;
+
+const CardFooter = styled.div`
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  gap: 0.45rem;
+  background: #fafbfc;
+`;
+
+const EmptyState = styled.div`
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: white;
+  border: 1px dashed ${adminColors.border};
+  border-radius: 16px;
+  color: ${adminColors.muted};
 
   strong {
-    color: #132e58;
-    font-weight: 600;
+    display: block;
+    color: ${adminColors.navy};
+    font-size: 1rem;
+    margin-bottom: 0.35rem;
   }
-`;
-
-const Badge = styled.span<{ $type: string }>`
-  padding: 0.375rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: ${({ $type }) => {
-    if ($type === "verified") return "#10b98115";
-    if ($type === "top") return "#Fbbf2415";
-    return "#6b728015";
-  }};
-  color: ${({ $type }) => {
-    if ($type === "verified") return "#10b981";
-    if ($type === "top") return "#Fbbf24";
-    return "#6b7280";
-  }};
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
-`;
-
-const IconButton = styled.button<{ $danger?: boolean }>`
-  flex: 1;
-  padding: 0.625rem;
-  border-radius: 8px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-  background: ${({ $danger }) => ($danger ? "#fee2e2" : "#f3f4f6")};
-  color: ${({ $danger }) => ($danger ? "#ef4444" : "#132e58")};
-
-  &:hover {
-    background: ${({ $danger }) => ($danger ? "#fecaca" : "#e5e7eb")};
-  }
-`;
-
-const ModalFooterBtn = styled.button<{ $danger?: boolean }>`
-  padding: 0.625rem 1rem;
-  border-radius: 8px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  background: ${({ $danger }) => ($danger ? "#ef4444" : "#f3f4f6")};
-  color: ${({ $danger }) => ($danger ? "white" : "#132e58")};
-
-  &:hover {
-    opacity: 0.92;
-  }
-`;
-
-const ErrorBanner = styled.div`
-  background: #fee2e2;
-  color: #b91c1c;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
 `;
 
 const FormGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 0.75rem;
 
   @media (max-width: 640px) {
     grid-template-columns: 1fr;
@@ -245,42 +369,66 @@ const FormGrid = styled.div`
 const FormField = styled.label<{ $full?: boolean }>`
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0.35rem;
   grid-column: ${({ $full }) => ($full ? "1 / -1" : "auto")};
   min-width: 0;
-`;
-
-const FormLabel = styled.span`
+  font-size: 0.6875rem;
   font-weight: 700;
-  color: #132e58;
-  font-size: 0.8125rem;
-  line-height: 1.35;
-`;
+  color: ${adminColors.navy};
 
-const formControlStyle = {
-  width: "100%",
-  padding: "0.6rem 0.75rem",
-  borderRadius: 8,
-  border: "2px solid #e5e7eb",
-  fontSize: "0.875rem",
-  boxSizing: "border-box" as const,
-};
+  input, select, textarea {
+    width: 100%;
+    padding: 0.55rem 0.7rem;
+    border-radius: 9px;
+    border: 1px solid ${adminColors.border};
+    font-size: 0.8125rem;
+    font-weight: 400;
+    box-sizing: border-box;
+    outline: none;
+    background: #fafbfc;
+    transition: border-color 0.12s, box-shadow 0.12s;
+
+    &:focus {
+      border-color: ${adminColors.navy};
+      box-shadow: 0 0 0 3px rgba(19, 46, 88, 0.08);
+      background: white;
+    }
+  }
+
+  textarea { min-height: 72px; resize: vertical; }
+`;
 
 const CheckboxRow = styled.label`
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.55rem;
   grid-column: 1 / -1;
   font-weight: 600;
-  color: #132e58;
-  font-size: 0.875rem;
+  color: ${adminColors.navy};
+  font-size: 0.8125rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 9px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  cursor: pointer;
+
+  input { accent-color: ${adminColors.navy}; width: 16px; height: 16px; }
 `;
 
 const PropTiersBox = styled.div`
   grid-column: 1 / -1;
-  border: 2px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 0.75rem;
+  border: 1px solid ${adminColors.border};
+  border-radius: 12px;
+  padding: 0.85rem;
+  background: #fafbfc;
+`;
+
+const TypeSectionTitle = styled.div`
+  grid-column: 1 / -1;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: ${adminColors.navy};
+  margin-bottom: -0.15rem;
 `;
 
 type ModalMode = "add" | "edit" | "delete";
@@ -308,6 +456,7 @@ const BrokersManagement: React.FC = () => {
   const [listLoading, setListLoading] = useState(true);
   const [listError, setListError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [listTypeFilter, setListTypeFilter] = useState<"all" | BrokerKind>("all");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>("add");
@@ -325,13 +474,20 @@ const BrokersManagement: React.FC = () => {
   const [formCrypto, setFormCrypto] = useState("No");
   const [formDescription, setFormDescription] = useState("");
   const [formLogoUrl, setFormLogoUrl] = useState("");
-  const [formRebateCategory, setFormRebateCategory] = useState<"forex" | "crypto" | "prop" | "both">("forex");
-  const [formRebatesListOrder, setFormRebatesListOrder] = useState("0");
+  const [formRebateCategory, setFormRebateCategory] = useState<BrokerCategoryValue>("forex");
+  const [formBothTabs, setFormBothTabs] = useState(false);
+  const [formRebatesListOrder, setFormRebatesListOrder] = useState("1");
   const [formSetupUrl, setFormSetupUrl] = useState("");
   const [formRebatesStarRating, setFormRebatesStarRating] = useState("4");
   const [formRebatesReviewsLabel, setFormRebatesReviewsLabel] = useState("");
   const [formRebatesFeatured, setFormRebatesFeatured] = useState(false);
   const [formPropOffers, setFormPropOffers] = useState<PropCashbackOffer[]>([emptyPropOffer()]);
+
+  const setPrimaryType = (kind: BrokerKind) => {
+    setFormBothTabs(false);
+    setFormRebateCategory(kind);
+    if (kind === "crypto") setFormCrypto("Yes");
+  };
 
   const loadBrokers = useCallback(async () => {
     setListLoading(true);
@@ -364,7 +520,8 @@ const BrokersManagement: React.FC = () => {
     setFormDescription("");
     setFormLogoUrl("");
     setFormRebateCategory("forex");
-    setFormRebatesListOrder("0");
+    setFormBothTabs(false);
+    setFormRebatesListOrder("1");
     setFormSetupUrl("");
     setFormRebatesStarRating("4");
     setFormRebatesReviewsLabel("");
@@ -387,7 +544,9 @@ const BrokersManagement: React.FC = () => {
     setFormCrypto(b.crypto || "No");
     setFormDescription(b.description || "");
     setFormLogoUrl(b.logoUrl || "");
-    setFormRebateCategory(b.rebateCategory || "forex");
+    const cat = b.rebateCategory || "forex";
+    setFormBothTabs(cat === "both");
+    setFormRebateCategory(cat === "both" ? "forex" : cat);
     setFormRebatesListOrder(String(b.rebatesListOrder ?? 0));
     setFormSetupUrl(b.setupUrl || "");
     setFormRebatesStarRating(String(b.rebatesStarRating ?? 4));
@@ -427,6 +586,9 @@ const BrokersManagement: React.FC = () => {
     setSaving(true);
     setModalError(null);
     try {
+      const rebateCategory: BrokerCategoryValue =
+        formBothTabs && formRebateCategory !== "prop" ? "both" : formRebateCategory;
+
       const base = {
         name,
         minDeposit,
@@ -438,14 +600,14 @@ const BrokersManagement: React.FC = () => {
         crypto: formCrypto,
         description: formDescription.trim(),
         logoUrl: formLogoUrl.trim() || undefined,
-        rebateCategory: formRebateCategory,
+        rebateCategory,
         rebatesListOrder: rebatesListOrder > 0 ? rebatesListOrder : 0,
         setupUrl: formSetupUrl.trim() || undefined,
         rebatesStarRating: Number(formRebatesStarRating) || undefined,
         rebatesReviewsLabel: formRebatesReviewsLabel.trim() || undefined,
         rebatesFeatured: formRebatesFeatured,
         propOffers:
-          formRebateCategory === "prop"
+          rebateCategory === "prop"
             ? formPropOffers
                 .filter((o) => o.label.trim())
                 .map((o) => ({
@@ -490,29 +652,98 @@ const BrokersManagement: React.FC = () => {
     }
   };
 
-  const filteredBrokers = brokers.filter((broker) =>
-    broker.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredBrokers = brokers.filter((broker) => {
+    const matchesSearch = broker.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType =
+      listTypeFilter === "all" || matchesBrokerKind(broker.rebateCategory, listTypeFilter);
+    return matchesSearch && matchesType;
+  });
+
+  const countByKind = (kind: BrokerKind) =>
+    brokers.filter((b) => matchesBrokerKind(b.rebateCategory, kind)).length;
 
   return (
-    <Container>
-      <Header>
-        <Title>Brokers Management</Title>
-        <Button $primary type="button" onClick={openAdd}>
-          <FiPlus />
-          Add New Broker
-        </Button>
-      </Header>
+    <PageWrap>
+      <PageHeader>
+        <PageTitleGroup>
+          <PageTitle><FiDatabase /> Brokers</PageTitle>
+          <PageSubtitle>
+            Manage Forex brokers, Crypto exchanges, and Prop firms — shown on matching website tabs
+          </PageSubtitle>
+        </PageTitleGroup>
+        <PrimaryButton type="button" onClick={openAdd}>
+          <FiPlus /> Add broker
+        </PrimaryButton>
+      </PageHeader>
 
-      <SearchBar>
-        <FiSearch />
-        <input
-          type="text"
-          placeholder="Search brokers..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </SearchBar>
+      <StatsRow>
+        <MiniStat>
+          <div className="icon" style={{ background: "#dbeafe", color: "#2563eb" }}><FiDatabase /></div>
+          <div>
+            <div className="val">{listLoading ? "…" : brokers.length}</div>
+            <div className="lbl">Total</div>
+          </div>
+        </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: BROKER_KIND_COLORS.forex.bg, color: BROKER_KIND_COLORS.forex.color }}><FiGlobe /></div>
+          <div>
+            <div className="val">{listLoading ? "…" : countByKind("forex")}</div>
+            <div className="lbl">Forex</div>
+          </div>
+        </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: BROKER_KIND_COLORS.crypto.bg, color: BROKER_KIND_COLORS.crypto.color }}><FiCpu /></div>
+          <div>
+            <div className="val">{listLoading ? "…" : countByKind("crypto")}</div>
+            <div className="lbl">Crypto</div>
+          </div>
+        </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: BROKER_KIND_COLORS.prop.bg, color: BROKER_KIND_COLORS.prop.color }}><FiAward /></div>
+          <div>
+            <div className="val">{listLoading ? "…" : countByKind("prop")}</div>
+            <div className="lbl">Prop firms</div>
+          </div>
+        </MiniStat>
+      </StatsRow>
+
+      <TypeFilterBar>
+        <TypeFilterBtn
+          type="button"
+          $active={listTypeFilter === "all"}
+          onClick={() => setListTypeFilter("all")}
+        >
+          All types
+        </TypeFilterBtn>
+        {BROKER_KIND_ORDER.map((kind) => (
+          <TypeFilterBtn
+            key={kind}
+            type="button"
+            $active={listTypeFilter === kind}
+            $tone={kind}
+            onClick={() => setListTypeFilter(kind)}
+          >
+            {KIND_ICONS[kind]}
+            {BROKER_KIND_LABELS[kind]}
+            <span style={{ opacity: 0.7 }}>({listLoading ? "…" : countByKind(kind)})</span>
+          </TypeFilterBtn>
+        ))}
+      </TypeFilterBar>
+
+      <FilterBar>
+        <SearchInput style={{ maxWidth: 320, flex: 1 }}>
+          <FiSearch />
+          <input
+            type="text"
+            placeholder="Search brokers…"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </SearchInput>
+        <FilterCount>
+          {listLoading ? "Loading…" : `${filteredBrokers.length} shown`}
+        </FilterCount>
+      </FilterBar>
 
       {listError && <ErrorBanner>{listError}</ErrorBanner>}
 
@@ -520,56 +751,78 @@ const BrokersManagement: React.FC = () => {
         <CourseGridSkeleton cards={6} />
       ) : (
         <BrokersGrid>
-          {filteredBrokers.map((broker) => (
-            <BrokerCard key={broker._id}>
-              <BrokerHeader>
-                <div>
-                  <BrokerLogo $img={broker.logoUrl}>{broker.logoUrl ? "" : broker.name.slice(0, 2).toUpperCase()}</BrokerLogo>
-                  <BrokerName>{broker.name}</BrokerName>
-                  <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
-                    {broker.verified && <Badge $type="verified">Verified</Badge>}
-                    {broker.topCashback && <Badge $type="top">Top Cashback</Badge>}
-                  </div>
-                </div>
-              </BrokerHeader>
-              <BrokerInfo>
-                <InfoItem>
-                  <span>Min Deposit:</span>
-                  <strong>${broker.minDeposit}</strong>
-                </InfoItem>
-                <InfoItem>
-                  <span>Regulation:</span>
-                  <strong>{broker.regulation}</strong>
-                </InfoItem>
-                <InfoItem>
-                  <span>Spread From:</span>
-                  <strong>{broker.spreadFrom}</strong>
-                </InfoItem>
-                <InfoItem>
-                  <span>Cashback Rate:</span>
-                  <strong>{broker.cashbackRate || "—"}</strong>
-                </InfoItem>
-                <InfoItem>
-                  <span>Rebate Tab:</span>
-                  <strong>{broker.rebateCategory || "forex"}</strong>
-                </InfoItem>
-                <InfoItem>
-                  <span>Rebates Order:</span>
-                  <strong>{broker.rebatesListOrder ?? "—"}</strong>
-                </InfoItem>
-              </BrokerInfo>
-              <ActionButtons>
-                <IconButton type="button" onClick={() => openEdit(broker)}>
-                  <FiEdit2 />
-                  Edit
-                </IconButton>
-                <IconButton type="button" $danger onClick={() => openDelete(broker._id)}>
-                  <FiTrash2 />
-                  Delete
-                </IconButton>
-              </ActionButtons>
-            </BrokerCard>
-          ))}
+          {filteredBrokers.length === 0 ? (
+            <EmptyState>
+              <strong>No brokers found</strong>
+              {searchTerm ? "Try a different search." : "Add your first broker to get started."}
+            </EmptyState>
+          ) : (
+            filteredBrokers.map((broker) => (
+              <BrokerCard key={broker._id}>
+                <CardTop>
+                  <LogoBox $img={broker.logoUrl || undefined}>
+                    {!broker.logoUrl && broker.name.slice(0, 2).toUpperCase()}
+                  </LogoBox>
+                  <CardTitle>
+                    <h3 title={broker.name}>{broker.name}</h3>
+                    <BadgeRow>
+                      <TypeBadge
+                        $kind={
+                          broker.rebateCategory === "both"
+                            ? "both"
+                            : broker.rebateCategory === "crypto" ||
+                                broker.rebateCategory === "prop"
+                              ? broker.rebateCategory
+                              : "forex"
+                        }
+                      >
+                        {brokerKindLabel(broker.rebateCategory)}
+                      </TypeBadge>
+                      {broker.verified && <Pill $variant="approved">Verified</Pill>}
+                      {broker.topCashback && <Pill $variant="pending">Top cashback</Pill>}
+                      {broker.rebatesFeatured && <Pill $variant="admin">Featured</Pill>}
+                    </BadgeRow>
+                  </CardTitle>
+                </CardTop>
+
+                <CardBody>
+                  <Metric>
+                    <div className="k"><FiDollarSign style={{ display: "inline", marginRight: 2 }} />Min deposit</div>
+                    <div className="v">${broker.minDeposit}</div>
+                  </Metric>
+                  <Metric>
+                    <div className="k"><FiShield style={{ display: "inline", marginRight: 2 }} />Regulation</div>
+                    <div className="v">{broker.regulation || "—"}</div>
+                  </Metric>
+                  <Metric>
+                    <div className="k"><FiTrendingUp style={{ display: "inline", marginRight: 2 }} />Spread</div>
+                    <div className="v">{broker.spreadFrom || "—"}</div>
+                  </Metric>
+                  <Metric>
+                    <div className="k"><FiStar style={{ display: "inline", marginRight: 2 }} />Cashback</div>
+                    <div className="v">{broker.cashbackRate || "—"}</div>
+                  </Metric>
+                  <Metric>
+                    <div className="k">Rebates order</div>
+                    <div className="v">{broker.rebatesListOrder ?? "—"}</div>
+                  </Metric>
+                  <Metric>
+                    <div className="k">Crypto</div>
+                    <div className="v">{broker.crypto || "No"}</div>
+                  </Metric>
+                </CardBody>
+
+                <CardFooter>
+                  <GhostButton $sm type="button" onClick={() => openEdit(broker)} style={{ flex: 1, justifyContent: "center" }}>
+                    <FiEdit2 /> Edit
+                  </GhostButton>
+                  <GhostButton $sm $danger type="button" onClick={() => openDelete(broker._id)} style={{ flex: 1, justifyContent: "center" }}>
+                    <FiTrash2 /> Delete
+                  </GhostButton>
+                </CardFooter>
+              </BrokerCard>
+            ))
+          )}
         </BrokersGrid>
       )}
 
@@ -581,155 +834,144 @@ const BrokersManagement: React.FC = () => {
         footer={
           modalMode === "delete" ? (
             <>
-              <ModalFooterBtn type="button" onClick={() => setIsModalOpen(false)} disabled={saving}>
+              <GhostButton type="button" onClick={() => setIsModalOpen(false)} disabled={saving}>
                 Cancel
-              </ModalFooterBtn>
-              <ModalFooterBtn type="button" $danger onClick={confirmDelete} disabled={saving}>
+              </GhostButton>
+              <GhostButton type="button" $danger onClick={confirmDelete} disabled={saving}>
                 <FiTrash2 />
-                {saving ? "…" : "Delete"}
-              </ModalFooterBtn>
+                {saving ? "Deleting…" : "Delete"}
+              </GhostButton>
             </>
           ) : (
             <>
-              <ModalFooterBtn type="button" onClick={() => setIsModalOpen(false)} disabled={saving}>
+              <GhostButton type="button" onClick={() => setIsModalOpen(false)} disabled={saving}>
                 Cancel
-              </ModalFooterBtn>
-              <ModalFooterBtn type="button" onClick={submitForm} disabled={saving}>
+              </GhostButton>
+              <PrimaryButton type="button" onClick={submitForm} disabled={saving}>
                 <FiCheck />
-                {saving ? "…" : "Save"}
-              </ModalFooterBtn>
+                {saving ? "Saving…" : "Save broker"}
+              </PrimaryButton>
             </>
           )
         }
       >
-        {modalError && <div style={{ color: "#b91c1c", marginBottom: 12, fontSize: 14 }}>{modalError}</div>}
+        {modalError && (
+          <div style={{ color: "#b91c1c", marginBottom: 12, fontSize: 13, fontWeight: 600 }}>{modalError}</div>
+        )}
         {modalMode === "delete" ? (
-          <div style={{ color: "#6b7280", fontSize: 14, lineHeight: 1.6 }}>
-            Are you sure you want to delete this broker?
+          <div style={{ color: adminColors.muted, fontSize: 14, lineHeight: 1.6 }}>
+            Are you sure you want to permanently delete this broker? This cannot be undone.
           </div>
         ) : (
           <FormGrid>
+            <TypeSectionTitle>Broker type</TypeSectionTitle>
+            <TypePicker>
+              {BROKER_KIND_ORDER.map((kind) => (
+                <TypeCard
+                  key={kind}
+                  type="button"
+                  $kind={kind}
+                  $active={
+                    formBothTabs
+                      ? kind === "forex" || kind === "crypto"
+                      : formRebateCategory === kind
+                  }
+                  onClick={() => setPrimaryType(kind)}
+                >
+                  <span className="icon">{KIND_ICONS[kind]}</span>
+                  <span className="title">{BROKER_KIND_LABELS[kind]}</span>
+                  <span className="desc">{BROKER_KIND_DESCRIPTIONS[kind]}</span>
+                </TypeCard>
+              ))}
+            </TypePicker>
+            {formRebateCategory !== "prop" && (
+              <BothOption>
+                <input
+                  type="checkbox"
+                  checked={formBothTabs}
+                  onChange={(e) => setFormBothTabs(e.target.checked)}
+                />
+                Also show on both Forex and Crypto website tabs
+              </BothOption>
+            )}
             <FormField>
-              <FormLabel>Broker Name</FormLabel>
-              <input
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-                style={formControlStyle}
-              />
+              Broker Name
+              <input value={formName} onChange={(e) => setFormName(e.target.value)} />
             </FormField>
             <FormField>
-              <FormLabel>Min Deposit (number)</FormLabel>
-              <input
-                value={formMinDeposit}
-                onChange={(e) => setFormMinDeposit(e.target.value)}
-                style={formControlStyle}
-              />
+              Min Deposit (number)
+              <input value={formMinDeposit} onChange={(e) => setFormMinDeposit(e.target.value)} />
             </FormField>
             <FormField>
-              <FormLabel>Regulation</FormLabel>
-              <input
-                value={formRegulation}
-                onChange={(e) => setFormRegulation(e.target.value)}
-                style={formControlStyle}
-              />
+              Regulation
+              <input value={formRegulation} onChange={(e) => setFormRegulation(e.target.value)} />
             </FormField>
             <FormField>
-              <FormLabel>Spread From</FormLabel>
-              <input
-                value={formSpreadFrom}
-                onChange={(e) => setFormSpreadFrom(e.target.value)}
-                style={formControlStyle}
-              />
+              Spread From
+              <input value={formSpreadFrom} onChange={(e) => setFormSpreadFrom(e.target.value)} />
             </FormField>
             <FormField>
-              <FormLabel>Cashback Rate</FormLabel>
-              <input
-                value={formCashbackRate}
-                onChange={(e) => setFormCashbackRate(e.target.value)}
-                style={formControlStyle}
-              />
+              Cashback Rate
+              <input value={formCashbackRate} onChange={(e) => setFormCashbackRate(e.target.value)} />
             </FormField>
             <FormField>
-              <FormLabel>Crypto</FormLabel>
-              <select value={formCrypto} onChange={(e) => setFormCrypto(e.target.value)} style={formControlStyle}>
+              Crypto instruments
+              <select value={formCrypto} onChange={(e) => setFormCrypto(e.target.value)}>
                 <option value="No">No</option>
                 <option value="Yes">Yes</option>
               </select>
             </FormField>
             <FormField $full>
-              <FormLabel>Description</FormLabel>
-              <textarea
-                value={formDescription}
-                onChange={(e) => setFormDescription(e.target.value)}
-                rows={3}
-                style={formControlStyle}
-              />
+              Description
+              <textarea value={formDescription} onChange={(e) => setFormDescription(e.target.value)} rows={3} />
             </FormField>
             <FormField>
-              <FormLabel>Rebates page tab</FormLabel>
-              <select
-                value={formRebateCategory}
-                onChange={(e) =>
-                  setFormRebateCategory(e.target.value as "forex" | "crypto" | "prop" | "both")
-                }
-                style={formControlStyle}
-              >
-                <option value="forex">Forex Brokers</option>
-                <option value="prop">Prop Trading</option>
-                <option value="crypto">Crypto Brokers</option>
-                <option value="both">Forex + Crypto tabs</option>
-              </select>
-            </FormField>
-            <FormField>
-              <FormLabel>Rebates list order (1+ on /rebates; 0 = hidden)</FormLabel>
+              Website list order (1+ shows on /rebates; 0 = hide from rebates)
               <input
                 value={formRebatesListOrder}
                 onChange={(e) => setFormRebatesListOrder(e.target.value)}
                 type="number"
                 min={0}
-                style={formControlStyle}
               />
             </FormField>
             <FormField>
-              <FormLabel>Logo URL (optional)</FormLabel>
+              Logo URL (optional)
               <input
                 value={formLogoUrl}
                 onChange={(e) => setFormLogoUrl(e.target.value)}
                 placeholder="https://…"
-                style={formControlStyle}
               />
             </FormField>
             <FormField>
-              <FormLabel>Challenge / signup URL</FormLabel>
+              Challenge / signup URL
               <input
                 value={formSetupUrl}
                 onChange={(e) => setFormSetupUrl(e.target.value)}
                 placeholder="https://partner-link…"
-                style={formControlStyle}
               />
             </FormField>
             <FormField>
-              <FormLabel>Rebates star rating (1–5)</FormLabel>
+              Star rating (1–5)
               <input
                 type="number"
                 min={1}
                 max={5}
                 value={formRebatesStarRating}
                 onChange={(e) => setFormRebatesStarRating(e.target.value)}
-                style={formControlStyle}
               />
             </FormField>
             <FormField>
-              <FormLabel>Reviews label (e.g. 52 traders)</FormLabel>
+              Reviews label (e.g. 52 traders)
               <input
                 value={formRebatesReviewsLabel}
                 onChange={(e) => setFormRebatesReviewsLabel(e.target.value)}
-                style={formControlStyle}
               />
             </FormField>
-            {formRebateCategory === "prop" && (
+            {formRebateCategory === "prop" && !formBothTabs && (
               <PropTiersBox>
-                <FormLabel style={{ display: "block", marginBottom: 8 }}>Prop cashback tiers</FormLabel>
+                <div style={{ fontWeight: 800, color: adminColors.navy, fontSize: "0.8125rem", marginBottom: 10 }}>
+                  Prop cashback tiers
+                </div>
                 {formPropOffers.map((offer, idx) => (
                   <div
                     key={idx}
@@ -738,7 +980,7 @@ const BrokersManagement: React.FC = () => {
                       gap: 8,
                       marginBottom: 12,
                       paddingBottom: 12,
-                      borderBottom: idx < formPropOffers.length - 1 ? "1px solid #e5e7eb" : "none",
+                      borderBottom: idx < formPropOffers.length - 1 ? `1px solid ${adminColors.border}` : "none",
                     }}
                   >
                     <input
@@ -749,7 +991,7 @@ const BrokersManagement: React.FC = () => {
                         next[idx] = { ...next[idx], label: e.target.value };
                         setFormPropOffers(next);
                       }}
-                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: "2px solid #e5e7eb" }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
                     />
                     <input
                       placeholder="First purchase (e.g. 7%)"
@@ -759,7 +1001,7 @@ const BrokersManagement: React.FC = () => {
                         next[idx] = { ...next[idx], firstPurchaseCashback: e.target.value };
                         setFormPropOffers(next);
                       }}
-                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: "2px solid #e5e7eb" }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
                     />
                     <input
                       placeholder="Repeat purchase (e.g. 3.5%)"
@@ -769,7 +1011,7 @@ const BrokersManagement: React.FC = () => {
                         next[idx] = { ...next[idx], repeatPurchaseCashback: e.target.value };
                         setFormPropOffers(next);
                       }}
-                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: "2px solid #e5e7eb" }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
                     />
                     <input
                       placeholder="Discount (e.g. 25%)"
@@ -779,21 +1021,23 @@ const BrokersManagement: React.FC = () => {
                         next[idx] = { ...next[idx], discountPercent: e.target.value };
                         setFormPropOffers(next);
                       }}
-                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: "2px solid #e5e7eb" }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
                     />
                     {formPropOffers.length > 1 && (
-                      <Button
+                      <GhostButton
+                        $sm
+                        $danger
                         type="button"
                         onClick={() => setFormPropOffers(formPropOffers.filter((_, i) => i !== idx))}
                       >
                         Remove tier
-                      </Button>
+                      </GhostButton>
                     )}
                   </div>
                 ))}
-                <Button type="button" onClick={() => setFormPropOffers([...formPropOffers, emptyPropOffer()])}>
-                  Add tier
-                </Button>
+                <GhostButton type="button" $sm onClick={() => setFormPropOffers([...formPropOffers, emptyPropOffer()])}>
+                  <FiPlus /> Add tier
+                </GhostButton>
               </PropTiersBox>
             )}
             <CheckboxRow>
@@ -815,7 +1059,7 @@ const BrokersManagement: React.FC = () => {
           </FormGrid>
         )}
       </SimpleModal>
-    </Container>
+    </PageWrap>
   );
 };
 
