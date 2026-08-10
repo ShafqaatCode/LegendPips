@@ -8,9 +8,10 @@ const PanelWrapper = styled.div`
   display: flex;
   min-height: 100vh;
   background:
-    radial-gradient(ellipse 80% 50% at 100% 0%, rgba(251, 191, 36, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 40% at 0% 100%, rgba(19, 46, 88, 0.06) 0%, transparent 45%),
-    linear-gradient(165deg, #eef2f7 0%, #f7f9fc 45%, #f0f4f8 100%);
+    radial-gradient(ellipse 70% 45% at 100% -5%, rgba(251, 191, 36, 0.14) 0%, transparent 52%),
+    radial-gradient(ellipse 50% 40% at 0% 100%, rgba(19, 46, 88, 0.08) 0%, transparent 48%),
+    radial-gradient(ellipse 40% 30% at 50% 50%, rgba(255, 255, 255, 0.55) 0%, transparent 60%),
+    linear-gradient(165deg, #e8eef6 0%, #f4f7fb 40%, #eef3f8 100%);
 `;
 
 const Backdrop = styled.div<{ $isOpen: boolean }>`
@@ -42,10 +43,10 @@ const MainContent = styled.main`
 
 const ContentArea = styled.div`
   flex: 1;
-  padding: 1.15rem 1.5rem 2rem;
+  padding: 1.35rem 1.65rem 2.5rem;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: 0.85rem 0.85rem 1.5rem;
+    padding: 0.95rem 0.9rem 1.75rem;
   }
 `;
 

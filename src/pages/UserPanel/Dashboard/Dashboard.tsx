@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { FiTrendingUp, FiAward, FiVideo, FiBook, FiUsers, FiDollarSign, FiChevronRight } from 'react-icons/fi';
+import {
+  FiTrendingUp, FiAward, FiVideo, FiBook, FiUsers, FiDollarSign, FiChevronRight,
+  FiUserPlus, FiShield, FiShuffle, FiSettings,
+} from 'react-icons/fi';
 import { useAuth } from '../../../contexts/AuthContext';
 import { fetchMyDashboard, type DashboardStat } from '../../../services/userInsightService';
 import { getMyKyc, KYC_STATUS_LABELS, type KycStatus } from '../../../services/kycService';
@@ -7,6 +10,7 @@ import { ShimmerBar } from '../../../components/SharedComponents/Shimmer';
 import {
   PageWrap, DashboardHero, StatsGrid, StatCard, StatIconBox, StatBody,
   StatValue, StatLabel, StatMeta, HintBar, ErrorBanner, KycStrip, Pill, GhostNavLink,
+  QuickLinksGrid, QuickLinkCard, SectionLabel,
 } from '../../../components/UserPanel/userUi';
 
 const iconByKey: Record<string, React.ElementType> = {
@@ -24,6 +28,13 @@ const kycHint: Record<KycStatus, string> = {
   approved: 'Your identity is verified. Full access is enabled.',
   rejected: 'Verification was declined. Review feedback and resubmit.',
 };
+
+const quickLinks = [
+  { to: '/user-panel/rebates', title: 'My Rebates', desc: 'Cashback & credits', icon: FiDollarSign },
+  { to: '/user-panel/invite', title: 'Invite friends', desc: 'Earn referral rewards', icon: FiUserPlus },
+  { to: '/user-panel/verification', title: 'Verification', desc: 'KYC status', icon: FiShield },
+  { to: '/user-panel/ib-change', title: 'IB change', desc: 'Broker / IB help', icon: FiShuffle },
+];
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
@@ -62,7 +73,7 @@ const Dashboard: React.FC = () => {
       <DashboardHero>
         <div>
           <h1>Welcome back, {user?.firstName || 'User'}</h1>
-          <p>Your trading activity overview</p>
+          <p>Track contests, rebates, signals, and verification — all in one place.</p>
         </div>
         <Pill $variant={kycStatus}>{KYC_STATUS_LABELS[kycStatus]}</Pill>
       </DashboardHero>
@@ -89,6 +100,7 @@ const Dashboard: React.FC = () => {
         </HintBar>
       )}
 
+      <SectionLabel>Overview</SectionLabel>
       <StatsGrid>
         {loading
           ? Array.from({ length: 6 }).map((_, i) => (
@@ -114,6 +126,26 @@ const Dashboard: React.FC = () => {
               );
             })}
       </StatsGrid>
+
+      <SectionLabel>Quick actions</SectionLabel>
+      <QuickLinksGrid>
+        {quickLinks.map((item) => {
+          const Icon = item.icon;
+          return (
+            <QuickLinkCard key={item.to} to={item.to}>
+              <span className="icon"><Icon /></span>
+              <span className="title">{item.title}</span>
+              <span className="desc">{item.desc}</span>
+            </QuickLinkCard>
+          );
+        })}
+      </QuickLinksGrid>
+
+      <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
+        <GhostNavLink to="/user-panel/settings">
+          <FiSettings /> Preferences
+        </GhostNavLink>
+      </div>
     </PageWrap>
   );
 };

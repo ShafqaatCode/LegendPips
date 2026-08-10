@@ -46,10 +46,25 @@ const SidebarHeader = styled.div`
 const Logo = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9375rem;
-  font-weight: 700;
+  gap: 0.55rem;
+  font-size: 0.95rem;
+  font-weight: 800;
   color: #Fbbf24;
+  letter-spacing: -0.02em;
+
+  span.mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #Fbbf24 0%, #f59e0b 100%);
+    color: #0c1f3d;
+    font-size: 0.72rem;
+    font-weight: 900;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.35);
+  }
 `;
 
 const CloseButton = styled.button`
@@ -71,27 +86,28 @@ const UserProfile = styled.div`
 `;
 
 const Avatar = styled.div<{ $image?: string }>`
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   background: ${({ $image }) =>
     $image ? `url(${$image}) center/cover no-repeat` : 'linear-gradient(135deg, #Fbbf24 0%, #f4b400 100%)'};
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 800;
   color: #132E58;
   flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.45);
 `;
 
 const ProfileText = styled.div`
   min-width: 0;
 
   h3 {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    margin: 0 0 1px;
+    font-size: 0.8375rem;
+    font-weight: 700;
+    margin: 0 0 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -99,7 +115,7 @@ const ProfileText = styled.div`
 
   p {
     font-size: 0.6875rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.55);
     margin: 0;
     white-space: nowrap;
     overflow: hidden;
@@ -121,10 +137,10 @@ const SectionTitle = styled.div`
 const NavLinkStyled = styled(NavLink)`
   display: flex;
   align-items: center;
-  gap: 0.625rem;
-  padding: 0.55rem 0.85rem;
+  gap: 0.65rem;
+  padding: 0.58rem 0.85rem;
   margin: 2px 0.55rem;
-  border-radius: 9px;
+  border-radius: 10px;
   color: rgba(255, 255, 255, 0.78);
   text-decoration: none;
   font-size: 0.8125rem;
@@ -139,10 +155,12 @@ const NavLinkStyled = styled(NavLink)`
   }
 
   &.active {
-    background: linear-gradient(90deg, rgba(251, 191, 36, 0.22) 0%, rgba(251, 191, 36, 0.08) 100%);
+    background: linear-gradient(90deg, rgba(251, 191, 36, 0.26) 0%, rgba(251, 191, 36, 0.08) 100%);
     color: #Fbbf24;
-    font-weight: 600;
-    box-shadow: inset 3px 0 0 #Fbbf24;
+    font-weight: 700;
+    box-shadow:
+      inset 3px 0 0 #Fbbf24,
+      0 4px 14px rgba(0, 0, 0, 0.12);
   }
 `;
 
@@ -224,7 +242,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
   return (
     <SidebarWrapper $isOpen={isOpen}>
       <SidebarHeader>
-        <Logo><span>LP</span> Panel</Logo>
+        <Logo><span className="mark">LP</span> Member</Logo>
         <CloseButton onClick={onToggle}><FiX /></CloseButton>
       </SidebarHeader>
 

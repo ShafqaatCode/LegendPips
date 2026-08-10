@@ -1,171 +1,22 @@
-// PositionSizeCalculator.tsx
 import React, { useState } from "react";
-import styled from "styled-components";
+import {
+  CalcPage,
+  CalcContainer,
+  CalcCard,
+  CalcHeader,
+  CalcDescription,
+  CalcFormRow,
+  CalcFormGroup,
+  CalcField,
+  CalcLabel,
+  CalcInput,
+  CalcSelect,
+  CalcButtonRow,
+  CalcButton,
+  CalcResult,
+  CalcResultsGrid,
+} from "../calculatorStyles";
 
-// ===== Styled Components =====
-const Container = styled.section`
-  max-width: 1250px;
-  margin: 80px auto 40px;
-  padding: 24px;
-  border-radius: 12px;
-  background: #ffffff;
-
-   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    margin: 40px auto 20px;
-    padding: 20px;
-  }
-`;
-
-const Header = styled.h2`
-  background: #de992f;
-  color: #ffffff;
-  font-weight: 600;
-  padding: 10px 16px;
-  border-radius: 8px;
-  display: inline-block;
-  font-size: 24px;
-`;
-
-const Description = styled.p`
-  margin: 16px 0 50px;
-  color: #132e58;
-  font-size: 20px;
-  line-height: 1.6;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 16px;
-    margin: 12px 0 30px;
-  }
-`;
-
-const FormRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 16px;
-  margin: 0 20px 20px 20px;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    margin: 0 0 20px 0;
-  }
-`;
-
-const FormGroup = styled.div`
-  flex: 1;
-  min-width: 250px;
-  max-width: 500px;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    min-width: 100%;
-    max-width: 100%;
-  }
-`;
-
-const Label = styled.label`
-  font-size: 20px;
-  margin-bottom: 6px;
-  display: block;
-  color: #132e58;
-  
-  font-weight: 500;
-`;
-
-const OuterBox = styled.div`
-  border: 2px solid #132e58;
-  border-radius: 8px;
-  padding: 5px 10px;
-  background: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-`;
-
-const InnerInput = styled.input`
-  width: 160px;
-  padding: 10px;
-  border-radius: 6px;
-  border: none;
-  font-size: 20px;
-  background: #132e58;
-  color: #fff;
-  text-align: center;
-
-  &:focus {
-    outline: none;
-  }
-`;
-
-const InnerSelect = styled.select`
-  width: 160px;
-  padding: 10px;
-  border-radius: 6px;
-  border: none;
-  font-size: 20px;
-  background: #132e58;
-  color: #fff;
-  text-align: center;
-
-  &:focus {
-    outline: none;
-  }
-`;
-
-const ButtonRow = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px;
-  margin-top: 20px;
-`;
-
-const Button = styled.button`
-  background: #132e58;
-  color: #fff;
-  font-size: 24px;
-  font-weight: 600;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-
-  &:hover {
-    background: #173a6a;
-  }
-`;
-
-const ResultsGrid = styled.div`
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-top: 24px;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    flex-direction: column;
-    gap: 12px;
-  }
-`;
-
-const ResultBox = styled.div`
-  background: #de992f;
-  color: #ffffff;
-  font-weight: 600;
-  padding: 16px 40px;
-  border-radius: 8px;
-  font-size: 20px;
-  text-align: center;
-  white-space: nowrap;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: 12px 24px;
-    font-size: 16px;
-    width: 100%;
-  }
-`;
-
-// ===== Component =====
 const PositionSizeCalculator: React.FC = () => {
   const [instrument, setInstrument] = useState("XAU/USD");
   const [currency, setCurrency] = useState("USD");
@@ -183,139 +34,132 @@ const PositionSizeCalculator: React.FC = () => {
 
   const calculate = () => {
     let moneyRisk = 0;
-
     if (riskMode === "%") {
       moneyRisk = (accountSize * riskValue) / 100;
     } else {
       moneyRisk = riskValue;
     }
-
-    // Formula for units
     const units = stopLoss > 0 ? moneyRisk / stopLoss : 0;
-    // Lots calculation (units / contract size)
     const lots = contractSize > 0 ? units / contractSize : 0;
-
-    setResults({
-      money: moneyRisk,
-      units,
-      lots,
-    });
+    setResults({ money: moneyRisk, units, lots });
   };
 
   return (
-    <Container>
-      <Header>Position Size Calculator</Header>
-      <Description>
-        The Lot Size Calculator is an essential risk management tool for determining optimal position size, factoring in currency pair, risk tolerance, and stop-loss level to manage risk and maximize gains.
-      </Description>
+    <CalcPage>
+      <CalcContainer>
+        <CalcCard>
+          <CalcHeader>Position Size Calculator</CalcHeader>
+          <CalcDescription>
+            Determine optimal lot size from your account balance, risk tolerance, and
+            stop-loss — so you can manage risk and size trades with confidence.
+          </CalcDescription>
 
-      <form onSubmit={(e) => e.preventDefault()}>
-        <FormRow>
-          <FormGroup>
-            <OuterBox>
-              <Label>Instrument</Label>
-              <InnerSelect
-                value={instrument}
-                onChange={(e) => setInstrument(e.target.value)}
-              >
-                <option>XAU/USD</option>
-                <option>EUR/USD</option>
-                <option>GBP/USD</option>
-              </InnerSelect>
-            </OuterBox>
-          </FormGroup>
+          <form onSubmit={(e) => e.preventDefault()}>
+            <CalcFormRow>
+              <CalcFormGroup>
+                <CalcField>
+                  <CalcLabel>Instrument</CalcLabel>
+                  <CalcSelect
+                    value={instrument}
+                    onChange={(e) => setInstrument(e.target.value)}
+                  >
+                    <option>XAU/USD</option>
+                    <option>EUR/USD</option>
+                    <option>GBP/USD</option>
+                  </CalcSelect>
+                </CalcField>
+              </CalcFormGroup>
 
-          <FormGroup>
-            <OuterBox>
-              <Label>Deposit Currency</Label>
-              <InnerSelect
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-              >
-                <option>USD</option>
-                <option>EUR</option>
-                <option>GBP</option>
-              </InnerSelect>
-            </OuterBox>
-          </FormGroup>
-        </FormRow>
+              <CalcFormGroup>
+                <CalcField>
+                  <CalcLabel>Deposit Currency</CalcLabel>
+                  <CalcSelect value={currency} onChange={(e) => setCurrency(e.target.value)}>
+                    <option>USD</option>
+                    <option>EUR</option>
+                    <option>GBP</option>
+                  </CalcSelect>
+                </CalcField>
+              </CalcFormGroup>
+            </CalcFormRow>
 
-        <FormRow>
-          <FormGroup>
-            <OuterBox>
-              <Label>Account Size</Label>
-              <InnerInput
-                type="number"
-                value={accountSize}
-                onChange={(e) => setAccountSize(parseFloat(e.target.value) || 0)}
-              />
-            </OuterBox>
-          </FormGroup>
+            <CalcFormRow>
+              <CalcFormGroup>
+                <CalcField>
+                  <CalcLabel>Account Size</CalcLabel>
+                  <CalcInput
+                    type="number"
+                    value={accountSize}
+                    onChange={(e) => setAccountSize(parseFloat(e.target.value) || 0)}
+                  />
+                </CalcField>
+              </CalcFormGroup>
 
-          <FormGroup>
-            <OuterBox>
-              <Label>Stop-Loss (Pips)</Label>
-              <InnerInput
-                type="number"
-                value={stopLoss}
-                onChange={(e) => setStopLoss(parseFloat(e.target.value) || 0)}
-              />
-            </OuterBox>
-          </FormGroup>
-        </FormRow>
+              <CalcFormGroup>
+                <CalcField>
+                  <CalcLabel>Stop-Loss (Pips)</CalcLabel>
+                  <CalcInput
+                    type="number"
+                    value={stopLoss}
+                    onChange={(e) => setStopLoss(parseFloat(e.target.value) || 0)}
+                  />
+                </CalcField>
+              </CalcFormGroup>
+            </CalcFormRow>
 
-        <FormRow>
-          <FormGroup>
-            <OuterBox>
-              <Label>Contract Size (Units)</Label>
-              <InnerInput
-                type="number"
-                value={contractSize}
-                onChange={(e) =>
-                  setContractSize(parseFloat(e.target.value) || 0)
-                }
-              />
-            </OuterBox>
-          </FormGroup>
+            <CalcFormRow>
+              <CalcFormGroup>
+                <CalcField>
+                  <CalcLabel>Contract Size (Units)</CalcLabel>
+                  <CalcInput
+                    type="number"
+                    value={contractSize}
+                    onChange={(e) => setContractSize(parseFloat(e.target.value) || 0)}
+                  />
+                </CalcField>
+              </CalcFormGroup>
 
-          <FormGroup>
-            <OuterBox>
-              <Label>Risk Ratio / Money</Label>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <InnerInput
-                  type="number"
-                  value={riskValue}
-                  onChange={(e) =>
-                    setRiskValue(parseFloat(e.target.value) || 0)
-                  }
-                />
-                <InnerSelect
-                  value={riskMode}
-                  onChange={(e) => setRiskMode(e.target.value)}
-                >
-                  <option value="%">%</option>
-                  <option value="$">$</option>
-                </InnerSelect>
-              </div>
-            </OuterBox>
-          </FormGroup>
-        </FormRow>
+              <CalcFormGroup>
+                <CalcField>
+                  <CalcLabel>Risk Ratio / Money</CalcLabel>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <CalcInput
+                      type="number"
+                      value={riskValue}
+                      onChange={(e) => setRiskValue(parseFloat(e.target.value) || 0)}
+                      style={{ width: "5.5rem" }}
+                    />
+                    <CalcSelect
+                      value={riskMode}
+                      onChange={(e) => setRiskMode(e.target.value)}
+                      style={{ width: "4rem" }}
+                    >
+                      <option value="%">%</option>
+                      <option value="$">$</option>
+                    </CalcSelect>
+                  </div>
+                </CalcField>
+              </CalcFormGroup>
+            </CalcFormRow>
 
-        <ButtonRow>
-          <Button type="button" onClick={calculate}>
-            Calculate
-          </Button>
-        </ButtonRow>
-      </form>
+            <CalcButtonRow>
+              <CalcButton type="button" onClick={calculate}>
+                Calculate
+              </CalcButton>
+            </CalcButtonRow>
+          </form>
 
-      {results.money > 0 && (
-        <ResultsGrid>
-          <ResultBox>Money, {currency}: ${results.money.toFixed(2)}</ResultBox>
-          <ResultBox>Units: {results.units.toFixed(0)}</ResultBox>
-          <ResultBox>Lots: {results.lots.toFixed(3)}</ResultBox>
-        </ResultsGrid>
-      )}
-    </Container>
+          {results.money > 0 && (
+            <CalcResultsGrid>
+              <CalcResult>
+                Money ({currency}): ${results.money.toFixed(2)}
+              </CalcResult>
+              <CalcResult $muted>Units: {results.units.toFixed(0)}</CalcResult>
+              <CalcResult $muted>Lots: {results.lots.toFixed(3)}</CalcResult>
+            </CalcResultsGrid>
+          )}
+        </CalcCard>
+      </CalcContainer>
+    </CalcPage>
   );
 };
 

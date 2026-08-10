@@ -4,92 +4,139 @@ import { FiMenu, FiBell } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 
 const HeaderWrapper = styled.header`
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(232, 236, 241, 0.95);
-  padding: 0.7rem 1.35rem;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+  padding: 0.75rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.03);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #Fbbf24 0%, rgba(251, 191, 36, 0.15) 35%, transparent 70%);
+  }
 `;
 
 const MenuButton = styled.button`
   display: none;
-  background: transparent;
-  border: none;
-  font-size: 1.25rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  font-size: 1.15rem;
   color: #132E58;
   cursor: pointer;
-  padding: 0.35rem;
-  border-radius: 6px;
+  padding: 0.4rem;
+  border-radius: 10px;
+  transition: background 0.15s, border-color 0.15s;
 
-  &:hover { background: #f1f5f9; }
+  &:hover {
+    background: #fffbeb;
+    border-color: rgba(251, 191, 36, 0.45);
+  }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 `;
 
 const PageHint = styled.div`
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+
+  .title {
+    font-size: 0.875rem;
+    font-weight: 800;
+    color: #132E58;
+    letter-spacing: -0.02em;
+  }
+
+  .sub {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #94a3b8;
+  }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    display: none;
+    .sub { display: none; }
   }
 `;
 
 const RightSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
 `;
 
 const IconButton = styled.button`
   position: relative;
-  background: transparent;
-  border: none;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   color: #132E58;
-  font-size: 1.0625rem;
+  font-size: 1.05rem;
   cursor: pointer;
-  padding: 0.4rem;
-  border-radius: 7px;
+  padding: 0.45rem;
+  border-radius: 10px;
+  transition: all 0.15s;
 
-  &:hover { background: #f1f5f9; }
+  &:hover {
+    background: #fffbeb;
+    border-color: rgba(251, 191, 36, 0.45);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #Fbbf24;
+    box-shadow: 0 0 0 2px white;
+  }
 `;
 
 const UserChip = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.35rem 0.65rem;
-  background: #f8fafc;
-  border: 1px solid #e8ecf1;
-  border-radius: 8px;
+  gap: 0.55rem;
+  padding: 0.35rem 0.7rem 0.35rem 0.4rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 `;
 
 const Avatar = styled.div<{ $image?: string }>`
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
   background: ${({ $image }) =>
     $image ? `url(${$image}) center/cover no-repeat` : 'linear-gradient(135deg, #Fbbf24 0%, #f4b400 100%)'};
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: 800;
   color: #132E58;
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.35);
 `;
 
 const UserName = styled.span`
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #132E58;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
@@ -107,8 +154,11 @@ const UserHeader: React.FC<UserHeaderProps> = ({ onMenuClick }) => {
   return (
     <HeaderWrapper>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <MenuButton onClick={onMenuClick}><FiMenu /></MenuButton>
-        <PageHint>Member Panel</PageHint>
+        <MenuButton onClick={onMenuClick} type="button" aria-label="Open menu"><FiMenu /></MenuButton>
+        <PageHint>
+          <span className="title">Member Panel</span>
+          <span className="sub">LegendPips workspace</span>
+        </PageHint>
       </div>
 
       <RightSection>

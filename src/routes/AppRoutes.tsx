@@ -61,6 +61,7 @@ import ProtectedAdminRoute from "../components/AdminPanel/ProtectedAdminRoute";
 import MarginCalculatorPage from "../pages/MarginCalculator/MarginCalculatorPage";
 import RebateCalculatorPage from "../pages/RebateCalculator/RebateCalculatorPage";
 import PivotPointCalculatorPage from "../pages/PivotPointCalculator/PivotPointCalculatorPage";
+import FibonacciCalculatorPage from "../pages/FibonacciCalculator/FibonacciCalculatorPage";
 import PositionSizeCalculatorPage from "../pages/PositionSizeCalculator/PositionSizeCalculatorPage";
 import PipCalculatorPage from "../pages/PipCalculator/PipCalculatorPage";
 import CalculatorsPage from "../pages/Calculators/CalculatorsPage";
@@ -167,6 +168,7 @@ const AppRoutes: React.FC = () => {
         <Route path="rebate-calculator" element={<RebateCalculatorPage />} />
         <Route path="calculator" element={<RebateCalculatorPage />} />
         <Route path="pivot-point-calculator" element={<PivotPointCalculatorPage />}/>
+        <Route path="fibonacci-calculator" element={<FibonacciCalculatorPage />}/>
 
       </Route>
     </Routes>

@@ -43,11 +43,13 @@ const PropFirmCard: React.FC<PropFirmCardProps> = ({
   const summary = formatPropCardSummary(propOffers);
 
   const openAccount = () => {
-    if (setupUrl?.trim()) {
-      window.open(setupUrl.trim(), "_blank", "noopener,noreferrer");
+    if (brokerId) {
+      navigate(`/rebates/broker/${brokerId}?setup=1`);
       return;
     }
-    if (brokerId) navigate(`/rebates/broker/${brokerId}`);
+    if (setupUrl?.trim()) {
+      window.open(setupUrl.trim(), "_blank", "noopener,noreferrer");
+    }
   };
 
   const moreInfo = () => {

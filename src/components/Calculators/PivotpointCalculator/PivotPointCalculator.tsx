@@ -1,170 +1,22 @@
-// PivotPointCalculator.tsx
 import React, { useState } from "react";
-import styled from "styled-components";
+import {
+  CalcPage,
+  CalcContainer,
+  CalcCard,
+  CalcHeader,
+  CalcDescription,
+  CalcFormRow,
+  CalcFormGroup,
+  CalcField,
+  CalcLabel,
+  CalcInput,
+  CalcSelect,
+  CalcButtonRow,
+  CalcButton,
+  CalcResultsGrid,
+  CalcResultTile,
+} from "../calculatorStyles";
 
-// ===== Styled Components =====
-const Container = styled.section`
-  max-width: 1250px;
- margin: 80px auto 40px;
-  padding: 24px;
-  border-radius: 12px;
-  background: #ffffff;
-
-   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    margin: 40px auto 20px;
-    padding: 20px;
-  }
-`;
-
-const Header = styled.h2`
-  background: #de992f;
-  color: #ffffff;
-  font-weight: 600;
-  padding: 10px 16px;
-  border-radius: 8px;
-  display: inline-block;
-  font-size: 24px;
-`;
-
-const Description = styled.p`
-  margin: 16px 0 50px;
-  color: #132e58;
-  font-size: 20px;
-  line-height: 1.6;
-`;
-
-const FormRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 16px;
-  margin: 0 20px 20px 20px;
-
-  @media (max-width: 600px) {
-    margin: auto;
-  }
-`;
-
-const FormGroup = styled.div`
-  flex: 1;
-  min-width: 220px;
-  max-width: 500px;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    min-width: 100%;
-    max-width: 100%;
-  }
-`;
-
-const Label = styled.label`
-  font-size: 20px;
-  margin-bottom: 6px;
-  display: block;
-  color: #132e58;
-  font-weight: 500;
-`;
-
-const OuterBox = styled.div`
-  border: 2px solid #132e58;
-  border-radius: 8px;
-  padding: 5px 10px;
-  background: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const InnerInput = styled.input`
-  width: 160px;
-  padding: 10px;
-  border-radius: 6px;
-  border: none;
-  font-size: 20px;
-  background: #132e58;
-  color: #fff;
-  text-align: center;
-
-  &:focus {
-    outline: none;
-  }
-`;
-
-const InnerSelect = styled.select`
-  width: 160px;
-  padding: 10px;
-  border-radius: 6px;
-  border: none;
-  font-size: 20px;
-  background: #132e58;
-  color: #fff;
-  text-align: center;
-
-  &:focus {
-    outline: none;
-  }
-`;
-
-const ButtonRow = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px;
-  margin-top: 20px;
-`;
-
-const Button = styled.button`
-  background: #132e58;
-  color: #fff;
-  font-size: 24px;
-  font-weight: 600;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-
-  &:hover {
-    background: #173a6a;
-  }
-`;
-
-const ResultsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-top: 24px;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const ResultBox = styled.div<{ highlight?: boolean }>`
-  background: ${({ highlight }) => (highlight ? "#de992f" : "#D9D9D9")};
-  color: ${({ highlight }) => (highlight ? "#ffffff" : "#132e58")};
-  font-weight: 600;
-  padding: 16px;
-  border-radius: 8px;
-  font-size: 20px;
-  text-align: center;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 18px;
-    padding: 12px;
-  }
-
-  span {
-    margin-left: 10px;
-    font-weight: 700;
-  }
-`;
-
-// ===== Component =====
 const PivotPointCalculator: React.FC = () => {
   const [type, setType] = useState("Standard");
   const [high, setHigh] = useState<string>("3000");
@@ -188,7 +40,12 @@ const PivotPointCalculator: React.FC = () => {
     const c = parseFloat(close) || 0;
 
     let pivot = 0;
-    let r1 = 0, r2 = 0, r3 = 0, s1 = 0, s2 = 0, s3 = 0;
+    let r1 = 0,
+      r2 = 0,
+      r3 = 0,
+      s1 = 0,
+      s2 = 0,
+      s3 = 0;
 
     switch (type) {
       case "Standard":
@@ -200,7 +57,6 @@ const PivotPointCalculator: React.FC = () => {
         r3 = h + 2 * (pivot - l);
         s3 = l - 2 * (h - pivot);
         break;
-
       case "Woodie":
         pivot = (h + l + 2 * o) / 4;
         r1 = 2 * pivot - l;
@@ -208,119 +64,145 @@ const PivotPointCalculator: React.FC = () => {
         r2 = pivot + (h - l);
         s2 = pivot - (h - l);
         break;
-
       case "Camarilla":
         pivot = (h + l + c) / 3;
-        r1 = c + (h - l) * 1.1 / 12;
-        r2 = c + (h - l) * 1.1 / 6;
-        r3 = c + (h - l) * 1.1 / 4;
-        s1 = c - (h - l) * 1.1 / 12;
-        s2 = c - (h - l) * 1.1 / 6;
-        s3 = c - (h - l) * 1.1 / 4;
+        r1 = c + ((h - l) * 1.1) / 12;
+        r2 = c + ((h - l) * 1.1) / 6;
+        r3 = c + ((h - l) * 1.1) / 4;
+        s1 = c - ((h - l) * 1.1) / 12;
+        s2 = c - ((h - l) * 1.1) / 6;
+        s3 = c - ((h - l) * 1.1) / 4;
         break;
-
-      case "DeMark":
-        let x = c < o ? (h + 2 * l + c) : (2 * h + l + c);
+      case "DeMark": {
+        const x = c < o ? h + 2 * l + c : 2 * h + l + c;
         pivot = x / 4;
         r1 = x / 2 - l;
         s1 = x / 2 - h;
         break;
+      }
     }
 
     setResults({ pivot, r1, r2, r3, s1, s2, s3 });
   };
 
+  const fmt = (n: number) => n.toFixed(2);
+
   return (
-    <Container>
-      <Header>Pivot Point Calculator</Header>
-      <Description>
-        The LegendPips Pivot Point Calculator is a powerful tool for identifying potential support and resistance levels in the market, it calculates four different pivot point types Camarilla, Woodie's, Floor, and DeMark's using OHLC data (open, high, low, and close). For each method, the calculator generates multiple support and resistance levels, helping traders pinpoint key price zones for entries, exits, and stop-loss placements. This tool enhances decision-making and provides a structured approach to trading around critical market levels.
-      </Description>
+    <CalcPage>
+      <CalcContainer>
+        <CalcCard>
+          <CalcHeader>Pivot Point Calculator</CalcHeader>
+          <CalcDescription>
+            Calculate Standard, Camarilla, Woodie, and DeMark pivot levels from OHLC data to
+            map support and resistance for entries, exits, and stop placement.
+          </CalcDescription>
 
-      <form onSubmit={(e) => e.preventDefault()}>
-        <FormRow>
-          <FormGroup>
-            <OuterBox>
-              <Label htmlFor="type">Type</Label>
-              <InnerSelect id="type" value={type} onChange={(e) => setType(e.target.value)}>
-                <option>Standard</option>
-                <option>Woodie</option>
-                <option>Camarilla</option>
-                <option>DeMark</option>
-              </InnerSelect>
-            </OuterBox>
-          </FormGroup>
+          <form onSubmit={(e) => e.preventDefault()}>
+            <CalcFormRow>
+              <CalcFormGroup>
+                <CalcField>
+                  <CalcLabel htmlFor="type">Type</CalcLabel>
+                  <CalcSelect
+                    id="type"
+                    value={type}
+                    onChange={(e) => setType(e.target.value)}
+                  >
+                    <option>Standard</option>
+                    <option>Woodie</option>
+                    <option>Camarilla</option>
+                    <option>DeMark</option>
+                  </CalcSelect>
+                </CalcField>
+              </CalcFormGroup>
 
-          <FormGroup>
-            <OuterBox>
-              <Label htmlFor="high">High Price</Label>
-              <InnerInput
-                id="high"
-                type="number"
-                value={high}
-                onChange={(e) => setHigh(e.target.value)}
-              />
-            </OuterBox>
-          </FormGroup>
-        </FormRow>
+              <CalcFormGroup>
+                <CalcField>
+                  <CalcLabel htmlFor="high">High Price</CalcLabel>
+                  <CalcInput
+                    id="high"
+                    type="number"
+                    value={high}
+                    onChange={(e) => setHigh(e.target.value)}
+                  />
+                </CalcField>
+              </CalcFormGroup>
+            </CalcFormRow>
 
-        <FormRow>
-          <FormGroup>
-            <OuterBox>
-              <Label htmlFor="low">Low Price</Label>
-              <InnerInput
-                id="low"
-                type="number"
-                value={low}
-                onChange={(e) => setLow(e.target.value)}
-              />
-            </OuterBox>
-          </FormGroup>
+            <CalcFormRow>
+              <CalcFormGroup>
+                <CalcField>
+                  <CalcLabel htmlFor="low">Low Price</CalcLabel>
+                  <CalcInput
+                    id="low"
+                    type="number"
+                    value={low}
+                    onChange={(e) => setLow(e.target.value)}
+                  />
+                </CalcField>
+              </CalcFormGroup>
 
-          <FormGroup>
-            <OuterBox>
-              <Label htmlFor="open">Open Price</Label>
-              <InnerInput
-                id="open"
-                type="number"
-                value={open}
-                onChange={(e) => setOpen(e.target.value)}
-              />
-            </OuterBox>
-          </FormGroup>
-        </FormRow>
+              <CalcFormGroup>
+                <CalcField>
+                  <CalcLabel htmlFor="open">Open Price</CalcLabel>
+                  <CalcInput
+                    id="open"
+                    type="number"
+                    value={open}
+                    onChange={(e) => setOpen(e.target.value)}
+                  />
+                </CalcField>
+              </CalcFormGroup>
+            </CalcFormRow>
 
-        <FormRow>
-          <FormGroup>
-            <OuterBox>
-              <Label htmlFor="close">Close Price</Label>
-              <InnerInput
-                id="close"
-                type="number"
-                value={close}
-                onChange={(e) => setClose(e.target.value)}
-              />
-            </OuterBox>
-          </FormGroup>
-        </FormRow>
+            <CalcFormRow>
+              <CalcFormGroup>
+                <CalcField>
+                  <CalcLabel htmlFor="close">Close Price</CalcLabel>
+                  <CalcInput
+                    id="close"
+                    type="number"
+                    value={close}
+                    onChange={(e) => setClose(e.target.value)}
+                  />
+                </CalcField>
+              </CalcFormGroup>
+            </CalcFormRow>
 
-        <ButtonRow>
-          <Button type="button" onClick={calculate}>Calculate</Button>
-        </ButtonRow>
-      </form>
+            <CalcButtonRow>
+              <CalcButton type="button" onClick={calculate}>
+                Calculate
+              </CalcButton>
+            </CalcButtonRow>
+          </form>
 
-      {results.pivot > 0 && (
-        <ResultsGrid>
-          <ResultBox>Resistance 3: <span>{results.r3.toFixed(0)}</span></ResultBox>
-          <ResultBox>Resistance 2: <span>{results.r2.toFixed(0)}</span></ResultBox>
-          <ResultBox>Resistance 1: <span>{results.r1.toFixed(0)}</span></ResultBox>
-          <ResultBox highlight>Pivot Point: <span>{results.pivot.toFixed(0)}</span></ResultBox>
-          <ResultBox>Support 1: <span>{results.s1.toFixed(0)}</span></ResultBox>
-          <ResultBox>Support 2: <span>{results.s2.toFixed(0)}</span></ResultBox>
-          <ResultBox>Support 3: <span>{results.s3.toFixed(0)}</span></ResultBox>
-        </ResultsGrid>
-      )}
-    </Container>
+          {results.pivot > 0 && (
+            <CalcResultsGrid>
+              <CalcResultTile>
+                Resistance 3 <span>{fmt(results.r3)}</span>
+              </CalcResultTile>
+              <CalcResultTile>
+                Resistance 2 <span>{fmt(results.r2)}</span>
+              </CalcResultTile>
+              <CalcResultTile>
+                Resistance 1 <span>{fmt(results.r1)}</span>
+              </CalcResultTile>
+              <CalcResultTile $highlight>
+                Pivot Point <span>{fmt(results.pivot)}</span>
+              </CalcResultTile>
+              <CalcResultTile>
+                Support 1 <span>{fmt(results.s1)}</span>
+              </CalcResultTile>
+              <CalcResultTile>
+                Support 2 <span>{fmt(results.s2)}</span>
+              </CalcResultTile>
+              <CalcResultTile>
+                Support 3 <span>{fmt(results.s3)}</span>
+              </CalcResultTile>
+            </CalcResultsGrid>
+          )}
+        </CalcCard>
+      </CalcContainer>
+    </CalcPage>
   );
 };
 

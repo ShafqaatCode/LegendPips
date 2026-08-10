@@ -6,6 +6,7 @@ import {
   FiBarChart2,
   FiDollarSign,
   FiGift,
+  FiGitBranch,
   FiLayers,
   FiTrendingUp,
 } from "react-icons/fi";
@@ -21,6 +22,7 @@ const ICONS: Record<string, React.ReactNode> = {
   pip: <FiTrendingUp size={22} />,
   margin: <FiDollarSign size={22} />,
   pivot: <FiBarChart2 size={22} />,
+  fibonacci: <FiGitBranch size={22} />,
   rebate: <FiGift size={22} />,
 };
 

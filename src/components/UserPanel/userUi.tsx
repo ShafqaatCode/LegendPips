@@ -1,70 +1,118 @@
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import { Link } from 'react-router-dom';
 
 export const userColors = {
   navy: '#132E58',
   navyLight: '#1a4a7a',
   gold: '#Fbbf24',
-  bg: '#f4f6f9',
+  goldSoft: '#fde68a',
+  bg: '#eef2f7',
   card: '#ffffff',
-  border: '#e8ecf1',
-  text: '#1e293b',
+  border: '#e2e8f0',
+  text: '#0f172a',
   muted: '#64748b',
   success: '#059669',
   danger: '#dc2626',
   warning: '#d97706',
 };
 
+const fadeUp = keyframes`
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
 export const PageWrap = styled.div`
-  max-width: 1200px;
+  max-width: 1140px;
   margin: 0 auto;
+  animation: ${fadeUp} 0.4s ease both;
 `;
 
 export const DashboardHero = styled.div`
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.875rem 1rem;
-  margin-bottom: 0.875rem;
-  background: linear-gradient(135deg, ${userColors.navy} 0%, ${userColors.navyLight} 100%);
-  border-radius: 10px;
+  gap: 1.15rem;
+  padding: 1.35rem 1.45rem;
+  margin-bottom: 1.15rem;
+  background:
+    radial-gradient(ellipse 55% 120% at 100% -20%, rgba(251, 191, 36, 0.32) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 80% at 0% 100%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+    linear-gradient(128deg, #0a1830 0%, ${userColors.navy} 48%, ${userColors.navyLight} 100%);
+  border-radius: 18px;
   color: white;
   flex-wrap: wrap;
+  box-shadow: 0 14px 36px rgba(12, 31, 61, 0.22);
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 3px;
+    background: linear-gradient(90deg, ${userColors.gold}, transparent 70%);
+  }
 
   h1 {
-    margin: 0 0 0.15rem;
-    font-size: 1.0625rem;
-    font-weight: 700;
+    margin: 0 0 0.3rem;
+    font-size: clamp(1.15rem, 2vw, 1.4rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
   }
 
   p {
     margin: 0;
-    font-size: 0.75rem;
-    opacity: 0.85;
+    font-size: 0.8125rem;
+    opacity: 0.9;
+    line-height: 1.5;
+    max-width: 420px;
   }
 `;
 
 export const PageHeader = styled.div`
-  margin-bottom: 1.15rem;
+  position: relative;
+  margin-bottom: 1.25rem;
+  padding: 1.15rem 1.25rem 1.2rem;
+  border-radius: 16px;
+  background:
+    radial-gradient(ellipse 70% 100% at 100% 0%, rgba(251, 191, 36, 0.1) 0%, transparent 55%),
+    linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid ${userColors.border};
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, ${userColors.gold}, ${userColors.navy});
+    border-radius: 4px 0 0 4px;
+  }
 `;
 
 export const PageTitle = styled.h1`
-  font-size: 1.2rem;
+  font-size: clamp(1.15rem, 2vw, 1.35rem);
   font-weight: 800;
   color: ${userColors.navy};
-  margin: 0 0 0.3rem;
+  margin: 0 0 0.35rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  letter-spacing: -0.02em;
+  gap: 0.55rem;
+  letter-spacing: -0.03em;
 
-  svg { color: ${userColors.gold}; font-size: 1.1rem; }
+  svg {
+    color: ${userColors.gold};
+    font-size: 1.15rem;
+    filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.35));
+  }
 `;
 
 export const PageSubtitle = styled.p`
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: 0.8375rem;
   color: ${userColors.muted};
   line-height: 1.55;
   max-width: 560px;
@@ -73,8 +121,8 @@ export const PageSubtitle = styled.p`
 export const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.625rem;
-  margin-bottom: 0.875rem;
+  gap: 0.85rem;
+  margin-bottom: 1.1rem;
 
   @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
   @media (max-width: 480px) { grid-template-columns: 1fr; }
@@ -83,120 +131,165 @@ export const StatsGrid = styled.div`
 export const StatCard = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.75rem 0.875rem;
+  gap: 0.85rem;
+  padding: 1rem 1.05rem;
   background: ${userColors.card};
   border: 1px solid ${userColors.border};
-  border-radius: 10px;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: linear-gradient(180deg, ${userColors.gold}, transparent);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(19, 46, 88, 0.1);
+    border-color: rgba(251, 191, 36, 0.45);
+    &::before { opacity: 1; }
+  }
 `;
 
 export const StatIconBox = styled.div<{ $color: string }>`
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  background: ${({ $color }) => $color}14;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: ${({ $color }) => `linear-gradient(145deg, ${$color}22 0%, ${$color}0a 100%)`};
   color: ${({ $color }) => $color};
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9375rem;
+  font-size: 1.1rem;
   flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px ${({ $color }) => `${$color}28`};
 `;
 
 export const StatBody = styled.div` flex: 1; min-width: 0; `;
 
 export const StatValue = styled.div`
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 800;
   color: ${userColors.navy};
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
 `;
 
 export const StatLabel = styled.div`
   font-size: 0.6875rem;
-  font-weight: 600;
+  font-weight: 700;
   color: ${userColors.muted};
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.05em;
+  margin-top: 0.15rem;
 `;
 
 export const StatMeta = styled.div<{ $positive?: boolean }>`
   font-size: 0.6875rem;
+  font-weight: 600;
   color: ${({ $positive }) => ($positive !== false ? userColors.success : userColors.danger)};
-  margin-top: 0.1rem;
+  margin-top: 0.15rem;
 `;
 
 export const HintBar = styled.div`
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: ${userColors.text};
-  padding: 0.55rem 0.75rem;
-  background: #f0f9ff;
-  border: 1px solid #bae6fd;
-  border-radius: 8px;
-  margin-bottom: 0.875rem;
-
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.06);
   strong { color: ${userColors.navy}; }
 `;
 
 export const ErrorBanner = styled.div`
-  background: #fef2f2;
+  background: linear-gradient(135deg, #fef2f2 0%, #fff1f2 100%);
   color: #b91c1c;
-  padding: 0.625rem 0.75rem;
-  border-radius: 8px;
-  margin-bottom: 0.875rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
   border: 1px solid #fecaca;
   font-size: 0.8125rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.06);
 `;
 
 export const SectionCard = styled.section`
   background: ${userColors.card};
   border: 1px solid ${userColors.border};
-  border-radius: 14px;
-  margin-bottom: 0.85rem;
+  border-radius: 16px;
+  margin-bottom: 1rem;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.045);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  &:hover {
+    box-shadow: 0 8px 28px rgba(15, 23, 42, 0.07);
+    border-color: #d1d9e6;
+  }
 `;
 
 export const SectionHead = styled.div`
-  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem 1.15rem;
   border-bottom: 1px solid ${userColors.border};
-  background: linear-gradient(180deg, #fafbfc 0%, #f8fafc 100%);
+  background: linear-gradient(180deg, #fbfcfe 0%, #f4f7fb 100%);
 
   h2 {
     margin: 0;
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     font-weight: 800;
     color: ${userColors.navy};
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.25rem;
+    gap: 0.35rem;
+    letter-spacing: -0.01em;
+    svg { color: ${userColors.gold}; }
   }
 `;
 
-export const SectionBody = styled.div` padding: 1rem; `;
+export const SectionBody = styled.div`
+  padding: 1.1rem 1.15rem 1.2rem;
+`;
 
 export const Pill = styled.span<{ $variant?: string }>`
   display: inline-flex;
   align-items: center;
-  padding: 0.2rem 0.5rem;
+  padding: 0.28rem 0.65rem;
   border-radius: 999px;
   font-size: 0.6875rem;
   font-weight: 700;
   text-transform: capitalize;
+  letter-spacing: 0.02em;
 
   ${({ $variant }) => {
     switch ($variant) {
       case 'approved':
-        return css`background: #ecfdf5; color: #059669;`;
+      case 'active':
+      case 'completed':
+        return css`background: #ecfdf5; color: #059669; box-shadow: inset 0 0 0 1px #a7f3d0;`;
       case 'pending':
-        return css`background: #fffbeb; color: #d97706;`;
+        return css`background: #fffbeb; color: #d97706; box-shadow: inset 0 0 0 1px #fde68a;`;
       case 'rejected':
-        return css`background: #fef2f2; color: #dc2626;`;
+        return css`background: #fef2f2; color: #dc2626; box-shadow: inset 0 0 0 1px #fecaca;`;
       case 'incomplete':
-        return css`background: #f1f5f9; color: #64748b;`;
+        return css`background: #f1f5f9; color: #64748b; box-shadow: inset 0 0 0 1px #e2e8f0;`;
+      case 'user':
+        return css`background: #eff6ff; color: #2563eb; box-shadow: inset 0 0 0 1px #bfdbfe;`;
       default:
-        return css`background: #f1f5f9; color: #64748b;`;
+        return css`background: #f1f5f9; color: #64748b; box-shadow: inset 0 0 0 1px #e2e8f0;`;
     }
   }}
 `;
@@ -204,39 +297,47 @@ export const Pill = styled.span<{ $variant?: string }>`
 export const PrimaryButton = styled.button<{ $sm?: boolean }>`
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: ${({ $sm }) => ($sm ? '0.45rem 0.75rem' : '0.55rem 1rem')};
+  justify-content: center;
+  gap: 0.4rem;
+  padding: ${({ $sm }) => ($sm ? '0.48rem 0.85rem' : '0.62rem 1.15rem')};
   font-size: ${({ $sm }) => ($sm ? '0.75rem' : '0.8125rem')};
-  font-weight: 600;
-  border-radius: 8px;
+  font-weight: 700;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
-  background: ${userColors.navy};
+  background: linear-gradient(135deg, ${userColors.navy} 0%, ${userColors.navyLight} 100%);
   color: white;
   text-decoration: none;
-  transition: background 0.15s;
+  box-shadow: 0 4px 14px rgba(19, 46, 88, 0.22);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 
-  &:hover:not(:disabled) { background: ${userColors.navyLight}; }
-  &:disabled { opacity: 0.55; cursor: not-allowed; }
+  &:hover:not(:disabled) {
+    filter: brightness(1.06);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(19, 46, 88, 0.28);
+  }
+  &:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
 `;
 
 export const GhostNavLink = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.45rem 0.75rem;
+  padding: 0.5rem 0.85rem;
   font-size: 0.75rem;
-  font-weight: 600;
-  border-radius: 7px;
+  font-weight: 700;
+  border-radius: 9px;
   background: white;
   color: ${userColors.navy};
   border: 1px solid ${userColors.border};
   text-decoration: none;
   transition: all 0.15s;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 
   &:hover {
-    background: #f8fafc;
-    border-color: ${userColors.navy};
+    background: #fffbeb;
+    border-color: rgba(251, 191, 36, 0.55);
+    color: ${userColors.navy};
   }
 `;
 
@@ -244,10 +345,10 @@ export const GhostLink = styled.a`
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.45rem 0.75rem;
+  padding: 0.5rem 0.85rem;
   font-size: 0.75rem;
-  font-weight: 600;
-  border-radius: 7px;
+  font-weight: 700;
+  border-radius: 9px;
   background: white;
   color: ${userColors.navy};
   border: 1px solid ${userColors.border};
@@ -264,30 +365,31 @@ export const KycStrip = styled.div<{ $variant: string }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.625rem 0.875rem;
-  border-radius: 9px;
-  margin-bottom: 0.875rem;
+  gap: 0.85rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 14px;
+  margin-bottom: 1rem;
   flex-wrap: wrap;
   font-size: 0.8125rem;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
   border: 1px solid ${({ $variant }) =>
     $variant === 'approved' ? '#a7f3d0' :
     $variant === 'pending' ? '#fde68a' :
     $variant === 'rejected' ? '#fecaca' : '#bfdbfe'};
   background: ${({ $variant }) =>
-    $variant === 'approved' ? '#ecfdf5' :
-    $variant === 'pending' ? '#fffbeb' :
-    $variant === 'rejected' ? '#fef2f2' : '#eff6ff'};
+    $variant === 'approved' ? 'linear-gradient(135deg, #ecfdf5, #f0fdf4)' :
+    $variant === 'pending' ? 'linear-gradient(135deg, #fffbeb, #fefce8)' :
+    $variant === 'rejected' ? 'linear-gradient(135deg, #fef2f2, #fff1f2)' :
+    'linear-gradient(135deg, #eff6ff, #f0f9ff)'};
 
-  .label { font-weight: 700; color: ${userColors.navy}; }
-  .desc { font-size: 0.75rem; color: ${userColors.muted}; margin-top: 2px; }
+  .label { font-weight: 800; color: ${userColors.navy}; }
+  .desc { font-size: 0.75rem; color: ${userColors.muted}; margin-top: 3px; line-height: 1.4; }
 `;
 
 export const InfoGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem 1rem;
-
   @media (max-width: 640px) { grid-template-columns: 1fr; }
 `;
 
@@ -295,43 +397,122 @@ export const InfoRow = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.4rem 0;
+  padding: 0.55rem 0;
   border-bottom: 1px solid #f1f5f9;
   font-size: 0.8125rem;
-
   &:last-child { border-bottom: none; }
-  span:first-child { color: ${userColors.muted}; }
-  span:last-child { color: ${userColors.navy}; font-weight: 600; text-align: right; }
+  span:first-child { color: ${userColors.muted}; font-weight: 500; }
+  span:last-child { color: ${userColors.navy}; font-weight: 700; text-align: right; }
 `;
 
 export const FormGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-
+  gap: 0.85rem;
   @media (max-width: 640px) { grid-template-columns: 1fr; }
 `;
 
 export const Field = styled.label`
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   color: ${userColors.navy};
-
   &.full { grid-column: 1 / -1; }
 
-  input, select {
-    font-weight: 400;
-    padding: 0.55rem 0.65rem;
+  input, select, textarea {
+    font-weight: 500;
+    padding: 0.62rem 0.8rem;
     border: 1px solid ${userColors.border};
-    border-radius: 7px;
+    border-radius: 10px;
     outline: none;
     font-size: 0.8125rem;
+    background: #f8fafc;
+    color: ${userColors.navy};
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    &:focus {
+      border-color: ${userColors.navy};
+      box-shadow: 0 0 0 3px rgba(19, 46, 88, 0.1);
+      background: white;
+    }
+    &:disabled { background: #f1f5f9; color: ${userColors.muted}; cursor: not-allowed; }
+  }
+`;
 
-    &:focus { border-color: ${userColors.navy}; }
-    &:disabled { background: #f8fafc; color: ${userColors.muted}; cursor: not-allowed; }
+export const QuickLinksGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+`;
+
+export const QuickLinkCard = styled(Link)`
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 1rem 1.05rem;
+  background: ${userColors.card};
+  border: 1px solid ${userColors.border};
+  border-radius: 14px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s;
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: rgba(251, 191, 36, 0.5);
+    box-shadow: 0 12px 28px rgba(19, 46, 88, 0.1);
+  }
+
+  .icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    background: linear-gradient(145deg, rgba(251, 191, 36, 0.22) 0%, rgba(251, 191, 36, 0.08) 100%);
+    color: ${userColors.navy};
+    box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.25);
+  }
+
+  .title {
+    font-size: 0.8375rem;
+    font-weight: 800;
+    color: ${userColors.navy};
+    letter-spacing: -0.01em;
+  }
+
+  .desc {
+    font-size: 0.72rem;
+    color: ${userColors.muted};
+    line-height: 1.4;
+  }
+`;
+
+export const SectionLabel = styled.h2`
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: ${userColors.navy};
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, ${userColors.border}, transparent);
   }
 `;
 
@@ -382,11 +563,12 @@ export const ProgressTrack = styled.div`
   align-items: flex-start;
   gap: 0;
   margin-bottom: 1rem;
-  padding: 0.875rem;
-  background: ${userColors.card};
+  padding: 1rem 1.1rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
   border: 1px solid ${userColors.border};
-  border-radius: 10px;
+  border-radius: 16px;
   overflow-x: auto;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
 `;
 
 export const ProgressStep = styled.div<{ $state: 'done' | 'current' | 'upcoming' | 'failed' }>`
@@ -450,18 +632,20 @@ export const ProgressStep = styled.div<{ $state: 'done' | 'current' | 'upcoming'
 export const StatusHero = styled.div<{ $variant: string }>`
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
-  padding: 0.875rem;
-  border-radius: 10px;
-  margin-bottom: 0.75rem;
+  gap: 0.85rem;
+  padding: 1.05rem 1.15rem;
+  border-radius: 14px;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
   border: 1px solid ${({ $variant }) =>
     $variant === 'approved' ? '#a7f3d0' :
     $variant === 'pending' ? '#fde68a' :
-    $variant === 'rejected' ? '#fecaca' : '#e2e8f0'};
+    $variant === 'rejected' ? '#fecaca' : '#bfdbfe'};
   background: ${({ $variant }) =>
-    $variant === 'approved' ? '#ecfdf5' :
-    $variant === 'pending' ? '#fffbeb' :
-    $variant === 'rejected' ? '#fef2f2' : '#f8fafc'};
+    $variant === 'approved' ? 'linear-gradient(135deg, #ecfdf5, #f0fdf4)' :
+    $variant === 'pending' ? 'linear-gradient(135deg, #fffbeb, #fefce8)' :
+    $variant === 'rejected' ? 'linear-gradient(135deg, #fef2f2, #fff1f2)' :
+    'linear-gradient(135deg, #eff6ff, #f8fafc)'};
 
   .icon {
     width: 36px;
@@ -537,19 +721,28 @@ export const FilterTabs = styled.div`
 `;
 
 export const FilterTab = styled.button<{ $active?: boolean }>`
-  padding: 0.4rem 0.75rem;
-  border: 1px solid ${({ $active }) => ($active ? userColors.navy : userColors.border)};
-  background: ${({ $active }) => ($active ? userColors.navy : userColors.card)};
+  padding: 0.45rem 0.85rem;
+  border: 1px solid ${({ $active }) => ($active ? 'transparent' : userColors.border)};
+  background: ${({ $active }) => (
+    $active
+      ? `linear-gradient(135deg, ${userColors.navy} 0%, ${userColors.navyLight} 100%)`
+      : userColors.card
+  )};
   color: ${({ $active }) => ($active ? 'white' : userColors.navy)};
-  border-radius: 7px;
+  border-radius: 999px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.12s;
+  transition: all 0.15s;
+  box-shadow: ${({ $active }) => ($active ? '0 4px 12px rgba(19, 46, 88, 0.2)' : '0 1px 2px rgba(15, 23, 42, 0.03)')};
 
   &:hover {
-    border-color: ${userColors.navy};
-    background: ${({ $active }) => ($active ? userColors.navy : '#f8fafc')};
+    border-color: ${({ $active }) => ($active ? 'transparent' : 'rgba(251, 191, 36, 0.5)')};
+    background: ${({ $active }) => (
+      $active
+        ? `linear-gradient(135deg, ${userColors.navy} 0%, ${userColors.navyLight} 100%)`
+        : '#fffbeb'
+    )};
   }
 `;
 
@@ -557,19 +750,20 @@ export const GhostButton = styled.button<{ $sm?: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: ${({ $sm }) => ($sm ? '0.4rem 0.65rem' : '0.5rem 0.85rem')};
+  padding: ${({ $sm }) => ($sm ? '0.42rem 0.7rem' : '0.55rem 0.9rem')};
   font-size: 0.75rem;
-  font-weight: 600;
-  border-radius: 7px;
+  font-weight: 700;
+  border-radius: 10px;
   cursor: pointer;
   background: white;
   color: ${userColors.navy};
   border: 1px solid ${userColors.border};
-  transition: all 0.12s;
+  transition: all 0.15s;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 
   &:hover:not(:disabled) {
-    background: #f8fafc;
-    border-color: ${userColors.navy};
+    background: #fffbeb;
+    border-color: rgba(251, 191, 36, 0.55);
   }
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 `;
@@ -577,8 +771,9 @@ export const GhostButton = styled.button<{ $sm?: boolean }>`
 export const TableCard = styled.div`
   background: ${userColors.card};
   border: 1px solid ${userColors.border};
-  border-radius: 10px;
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.045);
 `;
 
 export const DataTable = styled.table`
@@ -589,27 +784,28 @@ export const DataTable = styled.table`
 
 export const Th = styled.th`
   text-align: left;
-  padding: 0.55rem 0.75rem;
+  padding: 0.7rem 0.9rem;
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: ${userColors.muted};
-  background: #fafbfc;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
   border-bottom: 1px solid ${userColors.border};
   white-space: nowrap;
 `;
 
 export const Td = styled.td`
-  padding: 0.55rem 0.75rem;
+  padding: 0.7rem 0.9rem;
   color: ${userColors.text};
   border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
 `;
 
 export const Tr = styled.tr`
+  transition: background 0.12s;
   &:last-child td { border-bottom: none; }
-  &:hover td { background: #fafbfc; }
+  &:hover td { background: #f8fafc; }
 `;
 
 export const EmptyCell = styled.td`
@@ -622,7 +818,7 @@ export const EmptyCell = styled.td`
 export const CardsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 0.625rem;
+  gap: 0.85rem;
 
   @media (max-width: 480px) { grid-template-columns: 1fr; }
 `;
@@ -630,32 +826,40 @@ export const CardsGrid = styled.div`
 export const MediaCard = styled.div`
   background: ${userColors.card};
   border: 1px solid ${userColors.border};
-  border-radius: 10px;
+  border-radius: 14px;
   overflow: hidden;
-  transition: border-color 0.12s;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 
-  &:hover { border-color: ${userColors.gold}; }
+  &:hover {
+    border-color: rgba(251, 191, 36, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(19, 46, 88, 0.1);
+  }
 `;
 
 export const MediaThumb = styled.div`
-  height: 96px;
-  background: linear-gradient(135deg, ${userColors.navy} 0%, ${userColors.navyLight} 100%);
+  height: 110px;
+  background:
+    radial-gradient(ellipse 70% 80% at 100% 0%, rgba(251, 191, 36, 0.28) 0%, transparent 55%),
+    linear-gradient(135deg, #0a1830 0%, ${userColors.navy} 50%, ${userColors.navyLight} 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.65rem;
   position: relative;
 `;
 
-export const CardBody = styled.div` padding: 0.75rem; `;
+export const CardBody = styled.div` padding: 0.9rem 1rem 1rem; `;
 
 export const CardTitle = styled.h3`
-  margin: 0 0 0.35rem;
-  font-size: 0.8125rem;
-  font-weight: 700;
+  margin: 0 0 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 800;
   color: ${userColors.navy};
   line-height: 1.35;
+  letter-spacing: -0.01em;
 `;
 
 export const MetaLine = styled.div`
@@ -678,38 +882,54 @@ export const ListStack = styled.div`
 export const ListCard = styled.div`
   background: ${userColors.card};
   border: 1px solid ${userColors.border};
-  border-radius: 10px;
-  padding: 0.75rem;
+  border-radius: 14px;
+  padding: 1rem 1.05rem;
   cursor: pointer;
-  transition: all 0.12s;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s;
 
   &:hover {
-    border-color: ${userColors.gold};
-    box-shadow: 0 2px 6px rgba(19, 46, 88, 0.05);
+    border-color: rgba(251, 191, 36, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(19, 46, 88, 0.09);
   }
 `;
 
 export const EmptyState = styled.div`
   text-align: center;
-  padding: 2rem 1rem;
-  background: ${userColors.card};
-  border: 1px dashed ${userColors.border};
-  border-radius: 10px;
+  padding: 2.25rem 1.25rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px dashed #cbd5e1;
+  border-radius: 16px;
   color: ${userColors.muted};
-  font-size: 0.8125rem;
-  line-height: 1.5;
+  font-size: 0.8375rem;
+  line-height: 1.55;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
 `;
 
 export const ProfileBanner = styled.div`
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.875rem;
-  padding: 0.875rem;
-  margin-bottom: 0.75rem;
-  background: linear-gradient(135deg, ${userColors.navy} 0%, ${userColors.navyLight} 100%);
-  border-radius: 10px;
+  gap: 1rem;
+  padding: 1.25rem 1.35rem;
+  margin-bottom: 1.1rem;
+  background:
+    radial-gradient(ellipse 55% 120% at 100% -20%, rgba(251, 191, 36, 0.32) 0%, transparent 55%),
+    linear-gradient(128deg, #0a1830 0%, ${userColors.navy} 48%, ${userColors.navyLight} 100%);
+  border-radius: 18px;
   color: white;
   flex-wrap: wrap;
+  box-shadow: 0 14px 36px rgba(12, 31, 61, 0.22);
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 3px;
+    background: linear-gradient(90deg, ${userColors.gold}, transparent 70%);
+  }
 `;
 
 export const ProfileAvatar = styled.div<{ $image?: string; $clickable?: boolean }>`
@@ -838,23 +1058,24 @@ export const SettingRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.625rem 0;
+  gap: 1rem;
+  padding: 0.9rem 0.15rem;
   border-bottom: 1px solid #f1f5f9;
 
   &:last-child { border-bottom: none; }
 
   h4 {
-    margin: 0 0 0.1rem;
-    font-size: 0.8125rem;
-    font-weight: 600;
+    margin: 0 0 0.2rem;
+    font-size: 0.8375rem;
+    font-weight: 700;
     color: ${userColors.navy};
   }
 
   p {
     margin: 0;
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     color: ${userColors.muted};
+    line-height: 1.4;
   }
 `;
 

@@ -55,6 +55,7 @@ const FALLBACK_TOOLS = [
   { to: "/margin-calculator", label: "Margin Calculator" },
   { to: "/rebate-calculator", label: "Rebate Calculator" },
   { to: "/pivot-point-calculator", label: "Pivot Point Calculator" },
+  { to: "/fibonacci-calculator", label: "Fibonacci Calculator" },
 ];
 
 const Header: React.FC = () => {

@@ -43,6 +43,14 @@ export const CALCULATORS_CATALOG: CalculatorItem[] = [
       "Calculate Camarilla, Woodie's, Floor, and DeMark pivot points from OHLC data. Generates multiple support and resistance levels to help you plan entries, exits, and stop placements.",
   },
   {
+    id: "fibonacci",
+    title: "Fibonacci Calculator",
+    shortLabel: "Retracements & extensions",
+    path: "/fibonacci-calculator",
+    description:
+      "Identify potential Fibonacci retracement and extension levels from a swing high and low. Switch between uptrend and downtrend to map key zones for entries, exits, and profit targets.",
+  },
+  {
     id: "rebate",
     title: "Rebate Calculator",
     shortLabel: "Cashback estimate",

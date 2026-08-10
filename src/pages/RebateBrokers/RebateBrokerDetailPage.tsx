@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { resolveRebateContentSections, resolveRebateNotes } from "../../utils/rebateDetailContent";
 import styled from "styled-components";
 import { FiMinus, FiPlus, FiArrowLeft } from "react-icons/fi";
@@ -14,6 +14,7 @@ import {
 import { formatPropOfferLines } from "../../utils/propTradingDisplay";
 import { REBATES_BROKER_FALLBACK_LOGOS } from "../../utils/rebatesBrokersDisplay";
 import ICLogo from "../../assets/icons/Ellipse 2.png";
+import BrokerSetupPage from "../../components/AccountSetup2/BrokerSetupPage";
 
 const PageShell = styled.main`
   background: #eef1f6;
@@ -503,13 +504,18 @@ function fallbackInfoSections(broker: ApiBroker): RebateInfoSection[] {
 
 const RebateBrokerDetailPage: React.FC = () => {
   const { brokerId } = useParams<{ brokerId: string }>();
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [broker, setBroker] = useState<ApiBroker | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showSetup, setShowSetup] = useState(() => searchParams.get("setup") === "1");
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     "General Information": true,
   });
+
+  useEffect(() => {
+    setShowSetup(searchParams.get("setup") === "1");
+  }, [brokerId, searchParams]);
 
   useEffect(() => {
     if (!brokerId) {
@@ -598,11 +604,14 @@ const RebateBrokerDetailPage: React.FC = () => {
   const hasTable = isProp ? propOffers.length > 0 : tableRows.length > 0;
 
   const handleSetup = () => {
-    if (broker?.setupUrl?.trim()) {
-      window.open(broker.setupUrl, "_blank", "noopener,noreferrer");
-      return;
-    }
-    navigate("/register");
+    setShowSetup(true);
+    setSearchParams({ setup: "1" }, { replace: false });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleBackFromSetup = () => {
+    setShowSetup(false);
+    setSearchParams({}, { replace: true });
   };
 
   const toggleSection = (title: string) => {
@@ -624,6 +633,28 @@ const RebateBrokerDetailPage: React.FC = () => {
       <PageShell>
         <PageInner>
           <Err>{error || "Broker not found."}</Err>
+        </PageInner>
+      </PageShell>
+    );
+  }
+
+  if (showSetup) {
+    return (
+      <PageShell>
+        <PageInner>
+          <BrokerSetupPage
+            broker={{
+              id: broker._id,
+              name: broker.name,
+              logo: logoSrc,
+              setupUrl: broker.setupUrl,
+              description: broker.description,
+              features: broker.features || [],
+              verified: broker.verified,
+            }}
+            onBack={handleBackFromSetup}
+            backLabel="Back to rebate details"
+          />
         </PageInner>
       </PageShell>
     );

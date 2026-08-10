@@ -68,18 +68,19 @@ const Control = styled.div`
 const Input = styled.input`
   width: 100%;
   box-sizing: border-box;
-  padding: 0.6rem 0.75rem;
-  border-radius: 9px;
+  padding: 0.62rem 0.8rem;
+  border-radius: 10px;
   border: 1px solid ${userColors.border};
   font-size: 0.8125rem;
-  font-weight: 400;
+  font-weight: 500;
   outline: none;
-  background: #fafbfc;
+  background: #f8fafc;
   color: ${userColors.navy};
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
 
   &:focus {
     border-color: ${userColors.navy};
-    box-shadow: 0 0 0 3px rgba(19, 46, 88, 0.08);
+    box-shadow: 0 0 0 3px rgba(19, 46, 88, 0.1);
     background: white;
   }
 
@@ -167,9 +168,9 @@ const Actions = styled.div`
 `;
 
 const SuccessBanner = styled.div`
-  padding: 0.65rem 0.85rem;
-  border-radius: 10px;
-  background: #ecfdf5;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
   border: 1px solid #a7f3d0;
   color: #047857;
   font-size: 0.8125rem;
@@ -178,6 +179,7 @@ const SuccessBanner = styled.div`
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  box-shadow: 0 2px 10px rgba(5, 150, 105, 0.08);
 `;
 
 const HistoryRow = styled.div`
