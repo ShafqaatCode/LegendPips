@@ -13,6 +13,7 @@ export type AdminPermission =
   | "activity"
   | "referrals"
   | "ib_change"
+  | "live_accounts"
   | "rebates"
   | "reports"
   | "settings"
@@ -37,6 +38,11 @@ export const ADMIN_PERMISSION_META: {
   { key: "activity", label: "User activity", description: "View platform activity feed" },
   { key: "referrals", label: "Referrals", description: "Track friend invites members have sent" },
   { key: "ib_change", label: "IB change", description: "Handle broker / IB change requests" },
+  {
+    key: "live_accounts",
+    label: "Live accounts",
+    description: "Approve or reject live broker account setup submissions",
+  },
   { key: "rebates", label: "Rebates", description: "Grant and view rebate credits" },
   { key: "reports", label: "Reports", description: "View and export reports" },
   { key: "settings", label: "Settings", description: "Platform branding, SEO, CMS" },
@@ -86,6 +92,7 @@ export function firstAdminPath(user: AuthUserLike | null | undefined): string {
     ["activity", "/admin-panel/user-activity"],
     ["referrals", "/admin-panel/referrals"],
     ["ib_change", "/admin-panel/ib-change"],
+    ["live_accounts", "/admin-panel/live-accounts"],
     ["rebates", "/admin-panel/rebate-credits"],
     ["reports", "/admin-panel/reports"],
     ["settings", "/admin-panel/settings"],
@@ -112,6 +119,7 @@ export const PERM_ROUTE_MAP: { pathPrefix: string; permissions: string[] }[] = [
   { pathPrefix: "/admin-panel/user-activity", permissions: ["activity"] },
   { pathPrefix: "/admin-panel/referrals", permissions: ["referrals"] },
   { pathPrefix: "/admin-panel/ib-change", permissions: ["ib_change"] },
+  { pathPrefix: "/admin-panel/live-accounts", permissions: ["live_accounts"] },
   { pathPrefix: "/admin-panel/rebate-credits", permissions: ["rebates"] },
   { pathPrefix: "/admin-panel/reports", permissions: ["reports"] },
   { pathPrefix: "/admin-panel/settings", permissions: ["settings"] },

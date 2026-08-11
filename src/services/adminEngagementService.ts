@@ -344,3 +344,67 @@ export async function patchAdminIbChangeRequest(
   if (!res.ok) throw new Error(data.message || "Failed");
   return data;
 }
+
+export type AdminLiveAccountRow = {
+  id: string;
+  userId: string;
+  userEmail: string;
+  userName: string;
+  brokerId?: string;
+  brokerName: string;
+  accountNumber: string;
+  status: string;
+  adminNote?: string;
+  createdAt?: string;
+  time?: string;
+};
+
+export type AdminLiveAccountStats = {
+  total: number;
+  pending: number;
+  inProgress: number;
+  last24h: number;
+  approved?: number;
+  rejected?: number;
+};
+
+export async function fetchAdminLiveAccountRequests(
+  page = 1,
+  limit = 25,
+  q?: string,
+  status?: string
+) {
+  const qs = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (q?.trim()) qs.set("q", q.trim());
+  if (status?.trim()) qs.set("status", status.trim());
+  const res = await fetch(`${base}/live-accounts?${qs}`, { headers: getAuthHeaders() });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed");
+  return data as {
+    success: boolean;
+    items: AdminLiveAccountRow[];
+    stats: AdminLiveAccountStats;
+    pagination: {
+      totalItems: number;
+      itemsPerPage: number;
+      totalPages: number;
+      currentPage: number;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
+  };
+}
+
+export async function patchAdminLiveAccountRequest(
+  id: string,
+  body: { status?: string; adminNote?: string }
+) {
+  const res = await fetch(`${base}/live-accounts/${id}`, {
+    method: "PATCH",
+    headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed");
+  return data;
+}

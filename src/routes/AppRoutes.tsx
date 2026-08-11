@@ -54,9 +54,11 @@ import AdminFeedbackInbox from "../pages/AdminPanel/Engagement/AdminFeedbackInbo
 import AdminUserActivityFeed from "../pages/AdminPanel/Engagement/AdminUserActivityFeed";
 import AdminReferralsProgress from "../pages/AdminPanel/Engagement/AdminReferralsProgress";
 import AdminIbChangeRequests from "../pages/AdminPanel/Engagement/AdminIbChangeRequests";
+import AdminLiveAccountRequests from "../pages/AdminPanel/Engagement/AdminLiveAccountRequests";
 import AdminRebateCredits from "../pages/AdminPanel/Rebates/AdminRebateCredits";
 import AdminTeamManagement from "../pages/AdminPanel/Team/AdminTeamManagement";
 import ProtectedAdminRoute from "../components/AdminPanel/ProtectedAdminRoute";
+import MyLiveAccounts from "../pages/UserPanel/LiveAccounts/MyLiveAccounts";
 
 import MarginCalculatorPage from "../pages/MarginCalculator/MarginCalculatorPage";
 import RebateCalculatorPage from "../pages/RebateCalculator/RebateCalculatorPage";
@@ -103,6 +105,7 @@ const AppRoutes: React.FC = () => {
         <Route path="user-activity" element={<AdminUserActivityFeed />} />
         <Route path="referrals" element={<AdminReferralsProgress />} />
         <Route path="ib-change" element={<AdminIbChangeRequests />} />
+        <Route path="live-accounts" element={<AdminLiveAccountRequests />} />
         <Route path="rebate-credits" element={<AdminRebateCredits />} />
         <Route path="settings" element={<AdminSettings />} />
         <Route path="team" element={<AdminTeamManagement />} />
@@ -129,6 +132,7 @@ const AppRoutes: React.FC = () => {
         <Route path="forum" element={<ForumPosts />} />
         <Route path="activity" element={<Activity />} />
         <Route path="rebates" element={<MyRebates />} />
+        <Route path="live-accounts" element={<MyLiveAccounts />} />
         <Route path="invite" element={<InviteFriends />} />
         <Route path="ib-change" element={<RequestIbChange />} />
         <Route path="calendar" element={<Calendar />} />

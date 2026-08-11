@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   FiTrendingUp, FiAward, FiVideo, FiBook, FiUsers, FiDollarSign, FiChevronRight,
-  FiUserPlus, FiShield, FiShuffle, FiSettings,
+  FiUserPlus, FiShield, FiSettings, FiLink,
 } from 'react-icons/fi';
 import { useAuth } from '../../../contexts/AuthContext';
 import { fetchMyDashboard, type DashboardStat } from '../../../services/userInsightService';
@@ -31,9 +31,9 @@ const kycHint: Record<KycStatus, string> = {
 
 const quickLinks = [
   { to: '/user-panel/rebates', title: 'My Rebates', desc: 'Cashback & credits', icon: FiDollarSign },
+  { to: '/user-panel/live-accounts', title: 'Live accounts', desc: 'Track setup requests', icon: FiLink },
   { to: '/user-panel/invite', title: 'Invite friends', desc: 'Earn referral rewards', icon: FiUserPlus },
   { to: '/user-panel/verification', title: 'Verification', desc: 'KYC status', icon: FiShield },
-  { to: '/user-panel/ib-change', title: 'IB change', desc: 'Broker / IB help', icon: FiShuffle },
 ];
 
 const Dashboard: React.FC = () => {

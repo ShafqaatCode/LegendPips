@@ -5,7 +5,7 @@ import {
   FiHome, FiUsers, FiAward, FiFileText, FiVideo, FiSettings,
   FiLogOut, FiBarChart2, FiTrendingUp, FiShield, FiDatabase,
   FiX, FiInbox, FiActivity, FiDollarSign, FiGlobe, FiChevronDown, FiChevronUp,
-  FiUserPlus, FiShuffle,
+  FiUserPlus, FiShuffle, FiLink,
 } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { USER_LIST_PRESETS } from '../../utils/userListFilters';
@@ -388,13 +388,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
         </NavSection>
       )}
 
-      {(show('feedback') || show('activity') || show('rebates') || show('reports') || show('settings') || full) && (
+      {(show('feedback') || show('activity') || show('rebates') || show('live_accounts') || show('reports') || show('settings') || full) && (
         <NavSection>
           <SectionTitle>System</SectionTitle>
           {show('feedback') && link('/admin-panel/feedback-inbox', 'Feedback', FiInbox)}
           {show('activity') && link('/admin-panel/user-activity', 'Activity', FiActivity)}
           {show('referrals') && link('/admin-panel/referrals', 'Referrals', FiUserPlus)}
           {show('ib_change') && link('/admin-panel/ib-change', 'IB change', FiShuffle)}
+          {show('live_accounts') && link('/admin-panel/live-accounts', 'Live accounts', FiLink)}
           {show('rebates') && link('/admin-panel/rebate-credits', 'Rebates', FiDollarSign)}
           {show('reports') && link('/admin-panel/reports', 'Reports', FiBarChart2)}
           {show('settings') && link('/admin-panel/settings', 'Settings', FiSettings)}

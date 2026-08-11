@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { CheckCircle2, ArrowLeft, Loader2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { submitLiveAccountRequest } from '../../services/liveAccountService';
 
 export type BrokerSetupBroker = {
   id: string;
@@ -23,18 +25,21 @@ type BrokerSetupPageProps = {
  * PaybackFX-style vertical 3-step live account setup:
  * 1) Open live account (IB / referral link)
  * 2) Account number + terms
- * 3) Submit
+ * 3) Submit → admin approve / reject queue
  */
 const BrokerSetupPage: React.FC<BrokerSetupPageProps> = ({
   broker,
   onBack,
   backLabel = 'Back to Broker Details',
 }) => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [accountNumber, setAccountNumber] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submittedStatus, setSubmittedStatus] = useState('pending');
 
   const openLiveUrl = broker.setupUrl?.trim() || '';
 
@@ -49,6 +54,11 @@ const BrokerSetupPage: React.FC<BrokerSetupPageProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!isAuthenticated) {
+      setError('Please sign in to submit your live account for admin review.');
+      return;
+    }
 
     const num = accountNumber.trim();
     if (!num) {
@@ -66,11 +76,16 @@ const BrokerSetupPage: React.FC<BrokerSetupPageProps> = ({
 
     setLoading(true);
     try {
-      // Client acknowledgement for now (staff handle IB linking offline / via support)
-      await new Promise((r) => setTimeout(r, 900));
+      const res = await submitLiveAccountRequest({
+        brokerId: broker.id,
+        brokerName: broker.name,
+        accountNumber: num,
+        termsAccepted: true,
+      });
+      setSubmittedStatus(res.item?.status || 'pending');
       setSubmitted(true);
-    } catch {
-      setError('Something went wrong. Please try again.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -86,17 +101,20 @@ const BrokerSetupPage: React.FC<BrokerSetupPageProps> = ({
           </BackButton>
           <SuccessCard>
             <CheckCircle2 size={56} color="#059669" />
-            <SuccessTitle>Account submitted</SuccessTitle>
+            <SuccessTitle>Request sent to admin</SuccessTitle>
             <SuccessText>
               Your <strong>{broker.name}</strong> account number <strong>{accountNumber.trim()}</strong> was
-              received. Our team will review the IB link and cashback eligibility. Check your email if we need
-              more details.
+              submitted for review (status: <strong>{submittedStatus}</strong>). Our team will approve or
+              reject it — track progress in the member panel.
             </SuccessText>
             <SuccessActions>
               <GhostBtn type="button" onClick={onBack}>
                 Back to broker
               </GhostBtn>
-              <PrimaryBtn
+              <PrimaryBtn type="button" onClick={() => navigate('/user-panel/live-accounts')}>
+                Track my request
+              </PrimaryBtn>
+              <GhostBtn
                 type="button"
                 onClick={() => {
                   setSubmitted(false);
@@ -105,7 +123,7 @@ const BrokerSetupPage: React.FC<BrokerSetupPageProps> = ({
                 }}
               >
                 Submit another account
-              </PrimaryBtn>
+              </GhostBtn>
             </SuccessActions>
           </SuccessCard>
         </Shell>
@@ -134,6 +152,13 @@ const BrokerSetupPage: React.FC<BrokerSetupPageProps> = ({
               {broker.verified !== false && <VerifiedPill>Verified partner</VerifiedPill>}
             </HeaderText>
           </HeaderRow>
+
+          {!isAuthenticated && (
+            <LoginBanner>
+              Sign in first so we can send this request to admin and show you approval status.
+              <TermsLink to="/signin">Sign in</TermsLink>
+            </LoginBanner>
+          )}
 
           <form onSubmit={handleSubmit}>
             <Steps>
@@ -233,19 +258,21 @@ const BrokerSetupPage: React.FC<BrokerSetupPageProps> = ({
                   <StepCard>
                     <StepHeading>Submit your account</StepHeading>
                     {error && <ErrorBanner role="alert">{error}</ErrorBanner>}
-                    <SubmitBtn type="submit" disabled={loading}>
+                    <SubmitBtn type="submit" disabled={loading || !isAuthenticated}>
                       {loading ? (
                         <>
                           <Loader2 size={18} className="spin" />
                           Submitting…
                         </>
                       ) : (
-                        'Submit'
+                        'Submit for review'
                       )}
                     </SubmitBtn>
                     <Hint>
-                      After submit, our team links eligible accounts for cashback. Trading terms with the
-                      broker do not change.
+                      After submit, our team reviews the account and will <strong>approve or reject</strong> it.
+                      Track status under{' '}
+                      <TermsLink to="/user-panel/live-accounts">My live accounts</TermsLink>. Trading terms
+                      with the broker do not change.
                     </Hint>
                   </StepCard>
                 </StepBody>
@@ -368,6 +395,20 @@ const VerifiedPill = styled.span`
   border-radius: 999px;
   background: #ecfdf5;
   color: #047857;
+`;
+
+const LoginBanner = styled.div`
+  margin: 0 1.25rem 0.75rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  font-size: 0.8125rem;
+  color: #1e40af;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.75rem;
 `;
 
 const Steps = styled.div`
