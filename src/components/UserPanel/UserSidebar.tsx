@@ -5,8 +5,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { getMyKyc, type KycStatus } from '../../services/kycService';
 import {
   FiHome, FiUser, FiAward, FiTrendingUp, FiVideo, FiBook, FiFileText,
-  FiMessageSquare, FiSettings, FiLogOut, FiBarChart2, FiCalendar,
-  FiX, FiDollarSign, FiGlobe, FiShield, FiUserPlus, FiShuffle, FiLink, FiStar, FiAlertTriangle,
+  FiMessageSquare, FiSettings, FiLogOut, FiBarChart2, FiCalendar, FiX,
+  FiDollarSign, FiGlobe, FiShield, FiUserPlus, FiShuffle, FiLink, FiStar, FiAlertTriangle, FiUsers, FiShare2,
 } from 'react-icons/fi';
 
 const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
@@ -267,6 +267,8 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
         {link('/user-panel/live-accounts', 'My live accounts', FiLink)}
         {link('/user-panel/invite', 'Invite a friend', FiUserPlus)}
         {link('/user-panel/ib-change', 'IB change', FiShuffle)}
+        {link('/user-panel/trader-profile', 'Trader profile', FiUsers)}
+        {link('/user-panel/copy-trading', 'Copy trading', FiShare2)}
       </NavSection>
 
       <NavSection>

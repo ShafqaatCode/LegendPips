@@ -27,6 +27,9 @@ export interface PropCashbackOffer {
   firstPurchaseCashback?: string;
   repeatPurchaseCashback?: string;
   discountPercent?: string;
+  evaluationType?: "1-step" | "2-step" | "instant" | "funded";
+  profitSplit?: string;
+  accountSize?: string;
 }
 
 export interface ApiBroker {

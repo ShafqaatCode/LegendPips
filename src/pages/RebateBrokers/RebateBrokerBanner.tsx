@@ -3,6 +3,7 @@ import styled from "styled-components";
 import GirlImage from "../../assets/bannerGirl.png";
 import { FaPen } from "react-icons/fa";
 import { FiGlobe, FiCpu, FiAward } from "react-icons/fi";
+import { Link } from "react-router-dom";
 import type { RebateTabCategory } from "../../services/brokerService";
 import {
   BROKER_KIND_COLORS,
@@ -107,6 +108,11 @@ const RebatesBrokersSection = ({
             </Tabs>
 
             <TypeHint>{BROKER_KIND_DESCRIPTIONS[activeTab]}</TypeHint>
+            {isProp && (
+              <TypeHint>
+                Prefer a dedicated hub? <Link to="/prop-firms">Open the Prop Firm Hub</Link> for comparison tables and filters.
+              </TypeHint>
+            )}
 
             <FeatureBox $kind={activeTab}>
               {isProp ? (
@@ -319,6 +325,7 @@ const TypeHint = styled.p`
   color: #64748b;
   font-weight: 500;
   line-height: 1.4;
+  a { color: #132e58; font-weight: 700; }
 `;
 
 const FeatureBox = styled.div<{ $kind?: RebateTabCategory }>`

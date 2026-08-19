@@ -35,6 +35,9 @@ const emptyPropOffer = (): PropCashbackOffer => ({
   firstPurchaseCashback: "",
   repeatPurchaseCashback: "",
   discountPercent: "",
+  evaluationType: undefined,
+  profitSplit: "",
+  accountSize: "",
 });
 
 const StatsRow = styled.div`
@@ -615,6 +618,9 @@ const BrokersManagement: React.FC = () => {
                   firstPurchaseCashback: o.firstPurchaseCashback?.trim() || undefined,
                   repeatPurchaseCashback: o.repeatPurchaseCashback?.trim() || undefined,
                   discountPercent: o.discountPercent?.trim() || undefined,
+                  evaluationType: o.evaluationType || undefined,
+                  profitSplit: o.profitSplit?.trim() || undefined,
+                  accountSize: o.accountSize?.trim() || undefined,
                 }))
             : [],
       };
@@ -1019,6 +1025,44 @@ const BrokersManagement: React.FC = () => {
                       onChange={(e) => {
                         const next = [...formPropOffers];
                         next[idx] = { ...next[idx], discountPercent: e.target.value };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    />
+                    <select
+                      value={offer.evaluationType || ""}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = {
+                          ...next[idx],
+                          evaluationType: (e.target.value || undefined) as PropCashbackOffer["evaluationType"],
+                        };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    >
+                      <option value="">Evaluation type</option>
+                      <option value="1-step">1-step</option>
+                      <option value="2-step">2-step</option>
+                      <option value="instant">Instant funded</option>
+                      <option value="funded">Funded account</option>
+                    </select>
+                    <input
+                      placeholder="Profit split (e.g. 80%)"
+                      value={offer.profitSplit || ""}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = { ...next[idx], profitSplit: e.target.value };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    />
+                    <input
+                      placeholder="Account size (e.g. $100k)"
+                      value={offer.accountSize || ""}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = { ...next[idx], accountSize: e.target.value };
                         setFormPropOffers(next);
                       }}
                       style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}

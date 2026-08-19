@@ -705,6 +705,9 @@ const RebateBrokerDetailPage: React.FC = () => {
                         <thead>
                           <tr>
                             <th>Program</th>
+                            <th>Type</th>
+                            <th>Size</th>
+                            <th>Split</th>
                             <th>First purchase</th>
                             <th>Repeat purchase</th>
                             <th>Discount</th>
@@ -714,6 +717,9 @@ const RebateBrokerDetailPage: React.FC = () => {
                           {propOffers.map((offer, idx) => (
                             <tr key={`${offer.label}-${idx}`}>
                               <td className="account-type">{offer.label}</td>
+                              <td>{offer.evaluationType || "—"}</td>
+                              <td>{offer.accountSize || "—"}</td>
+                              <td>{offer.profitSplit || "—"}</td>
                               <td>{offer.firstPurchaseCashback || "—"}</td>
                               <td>{offer.repeatPurchaseCashback || "—"}</td>
                               <td>{offer.discountPercent ? `+${offer.discountPercent}` : "—"}</td>

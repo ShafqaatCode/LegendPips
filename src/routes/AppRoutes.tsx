@@ -73,6 +73,12 @@ import CalculatorsPage from "../pages/Calculators/CalculatorsPage";
 import AboutPage from "../pages/About/AboutPage";
 import ComplaintsPage from "../pages/Complaints/ComplaintsPage";
 import ComparePage from "../pages/Compare/ComparePage";
+import PropFirmHubPage from "../pages/PropFirms/PropFirmHubPage";
+import TradersPage, { CopyTradingPage } from "../pages/Traders/TradersPage";
+import TraderDetailPage from "../pages/Traders/TraderDetailPage";
+import MyTraderProfile from "../pages/UserPanel/Traders/MyTraderProfile";
+import MyCopyTrading from "../pages/UserPanel/Traders/MyCopyTrading";
+import AdminTraderProfiles from "../pages/AdminPanel/Traders/AdminTraderProfiles";
 
 // 👇 Add these imports
 
@@ -114,6 +120,7 @@ const AppRoutes: React.FC = () => {
         <Route path="ib-change" element={<AdminIbChangeRequests />} />
         <Route path="live-accounts" element={<AdminLiveAccountRequests />} />
         <Route path="rebate-credits" element={<AdminRebateCredits />} />
+        <Route path="traders" element={<AdminTraderProfiles />} />
         <Route path="settings" element={<AdminSettings />} />
         <Route path="team" element={<AdminTeamManagement />} />
       </Route>
@@ -144,6 +151,8 @@ const AppRoutes: React.FC = () => {
         <Route path="live-accounts" element={<MyLiveAccounts />} />
         <Route path="invite" element={<InviteFriends />} />
         <Route path="ib-change" element={<RequestIbChange />} />
+        <Route path="trader-profile" element={<MyTraderProfile />} />
+        <Route path="copy-trading" element={<MyCopyTrading />} />
         <Route path="calendar" element={<Calendar />} />
         <Route path="settings" element={<Settings />} />
       </Route>
@@ -170,6 +179,10 @@ const AppRoutes: React.FC = () => {
         <Route path="about" element={<AboutPage />} />
         <Route path="complaints" element={<ComplaintsPage />} />
         <Route path="compare" element={<ComparePage />} />
+        <Route path="prop-firms" element={<PropFirmHubPage />} />
+        <Route path="traders/:id" element={<TraderDetailPage />} />
+        <Route path="traders" element={<TradersPage />} />
+        <Route path="copy-trading" element={<CopyTradingPage />} />
 
         <Route path="forum" element={<Forum />} />
         <Route path="forum/thread/:threadId" element={<ForumThreadDetail />} />

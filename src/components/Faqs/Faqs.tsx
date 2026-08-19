@@ -121,6 +121,11 @@ const faqsData = {
       answer:
         "Open the Compare page, pick 2–4 brokers, and share the URL. You can also tap Add to compare on any broker card.",
     },
+    {
+      question: "Where is the Prop Firm Hub?",
+      answer:
+        "Open /prop-firms to compare challenge cashback, evaluation types, and partnered prop firms. The Prop tab on Rebates lists the same firms.",
+    },
   ],
   "Education and Tutorials": [
     {

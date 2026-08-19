@@ -15,6 +15,7 @@ export type AdminPermission =
   | "ib_change"
   | "live_accounts"
   | "rebates"
+  | "traders"
   | "reports"
   | "settings"
   | "team";
@@ -44,6 +45,7 @@ export const ADMIN_PERMISSION_META: {
     description: "Approve or reject live broker account setup submissions",
   },
   { key: "rebates", label: "Rebates", description: "Grant and view rebate credits" },
+  { key: "traders", label: "Traders", description: "Verify trader profiles and copy requests" },
   { key: "reports", label: "Reports", description: "View and export reports" },
   { key: "settings", label: "Settings", description: "Platform branding, SEO, CMS" },
   { key: "team", label: "Admin team", description: "Add and manage staff access" },
@@ -94,6 +96,7 @@ export function firstAdminPath(user: AuthUserLike | null | undefined): string {
     ["ib_change", "/admin-panel/ib-change"],
     ["live_accounts", "/admin-panel/live-accounts"],
     ["rebates", "/admin-panel/rebate-credits"],
+    ["traders", "/admin-panel/traders"],
     ["reports", "/admin-panel/reports"],
     ["settings", "/admin-panel/settings"],
     ["team", "/admin-panel/team"],
@@ -123,6 +126,7 @@ export const PERM_ROUTE_MAP: { pathPrefix: string; permissions: string[] }[] = [
   { pathPrefix: "/admin-panel/ib-change", permissions: ["ib_change"] },
   { pathPrefix: "/admin-panel/live-accounts", permissions: ["live_accounts"] },
   { pathPrefix: "/admin-panel/rebate-credits", permissions: ["rebates"] },
+  { pathPrefix: "/admin-panel/traders", permissions: ["traders"] },
   { pathPrefix: "/admin-panel/reports", permissions: ["reports"] },
   { pathPrefix: "/admin-panel/settings", permissions: ["settings"] },
   { pathPrefix: "/admin-panel/team", permissions: ["team"] },

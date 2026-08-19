@@ -389,7 +389,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
         </NavSection>
       )}
 
-      {(show('feedback') || show('activity') || show('rebates') || show('live_accounts') || show('reports') || show('settings') || show('brokers') || full) && (
+      {(show('feedback') || show('activity') || show('rebates') || show('traders') || show('live_accounts') || show('reports') || show('settings') || show('brokers') || full) && (
         <NavSection>
           <SectionTitle>System</SectionTitle>
           {show('feedback') && link('/admin-panel/feedback-inbox', 'Feedback', FiInbox)}
@@ -399,6 +399,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
           {show('ib_change') && link('/admin-panel/ib-change', 'IB change', FiShuffle)}
           {show('live_accounts') && link('/admin-panel/live-accounts', 'Live accounts', FiLink)}
           {show('rebates') && link('/admin-panel/rebate-credits', 'Rebates', FiDollarSign)}
+          {show('traders') && link('/admin-panel/traders', 'Traders', FiUsers)}
           {show('reports') && link('/admin-panel/reports', 'Reports', FiBarChart2)}
           {show('settings') && link('/admin-panel/settings', 'Settings', FiSettings)}
           {full && link('/admin-panel/team', 'Admin team', FiUsers)}

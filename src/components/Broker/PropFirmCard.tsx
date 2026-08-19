@@ -42,6 +42,13 @@ const PropFirmCard: React.FC<PropFirmCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const summary = formatPropCardSummary(propOffers);
+  const extras = [
+    ...new Set(
+      propOffers.flatMap((o) =>
+        [o.evaluationType, o.profitSplit, o.accountSize].filter((x): x is string => Boolean(x))
+      )
+    ),
+  ];
 
   const openAccount = () => {
     if (brokerId) {
@@ -73,6 +80,7 @@ const PropFirmCard: React.FC<PropFirmCardProps> = ({
             <CashbackLabel>Cashback</CashbackLabel>
             <CashbackValue>{summary}</CashbackValue>
           </CashbackBlock>
+          {extras.length > 0 && <MetaLine>{extras.join(" · ")}</MetaLine>}
         </InfoSection>
 
         <RatingBox>
@@ -125,6 +133,13 @@ const CashbackLabel = styled.span`
 const CashbackValue = styled.span`
   color: rgba(15, 23, 42, 0.78);
   font-weight: 500;
+`;
+
+const MetaLine = styled.p`
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: capitalize;
 `;
 
 const OutlineBtn = styled.button`
