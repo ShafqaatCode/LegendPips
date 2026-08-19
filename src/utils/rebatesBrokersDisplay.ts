@@ -33,8 +33,13 @@ export type RebateBrokerCardRow = {
 
 export function mapApiBrokerToRebateCardRow(b: ApiBroker): RebateBrokerCardRow {
   const logoSrc = (b.logoUrl && b.logoUrl.trim()) || REBATES_BROKER_FALLBACK_LOGOS[b.name] || ICLogo;
-  const rating = b.rebatesStarRating ?? 4;
-  const reviewsCount = b.rebatesReviewsLabel?.trim() || '—';
+  const liveCount = b.reviewStats?.count || 0;
+  const rating = liveCount
+    ? Math.round(b.reviewStats?.average || 0)
+    : b.rebatesStarRating ?? 4;
+  const reviewsCount = liveCount
+    ? `${liveCount}`
+    : b.rebatesReviewsLabel?.trim() || '—';
   const index = b.rebatesListOrder ?? b.sortOrder ?? 1;
   return {
     key: b._id,

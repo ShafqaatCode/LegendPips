@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 168 48" role="img" aria-label="USDT TRC20">
+  <polygon points="24,5 40,14.5 40,33.5 24,43 8,33.5 8,14.5" fill="#26A17B"/>
+  <text x="24" y="30" text-anchor="middle" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700">T</text>
+  <text x="52" y="22" fill="#132E58" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="800">USDT</text>
+  <text x="52" y="38" fill="#26A17B" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" letter-spacing="0.08em">TRC20</text>
+</svg>

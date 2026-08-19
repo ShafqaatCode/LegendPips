@@ -22,6 +22,7 @@ import { FaStar } from "react-icons/fa";
 import { motion } from "framer-motion";
 import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 import styled from "styled-components";
+import CompareToggle from "./CompareToggle";
 
 export const Description = styled.div`
   font-size: 0.8125rem;
@@ -183,7 +184,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
               View Details <img src={ArrowIcon} alt="Arrow" />
             </PrimaryButton>
             {brokerId ? (
-              <SecondaryButton as={Link} to={`/rebates/broker/${brokerId}`}>
+              <SecondaryButton as={Link} to={`/rebates/broker/${brokerId}#reviews`}>
                 Broker Reviews
               </SecondaryButton>
             ) : (
@@ -191,6 +192,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
                 Broker Reviews
               </SecondaryButton>
             )}
+            <CompareToggle brokerId={brokerId} />
           </ActionSection>
 
 

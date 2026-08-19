@@ -1,8 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { ArrowLeft, Star, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { Broker } from './BrokerListingPage';
 import customerLogo from '../../assets/JessicaComment.png';
+import BrokerReviewsSection from '../Broker/BrokerReviewsSection';
 
 type BrokerDetailPageProps = {
   broker: Broker;
@@ -69,6 +71,7 @@ const BrokerDetailPage: React.FC<BrokerDetailPageProps> = ({
             <SetupButton type="button" onClick={onSetupAccount}>
               {setupButtonLabel}
             </SetupButton>
+            <ReportLink to={`/complaints?broker=${broker.id}`}>Report this broker</ReportLink>
           </HeaderActions>
         </HeaderSection>
 
@@ -117,7 +120,7 @@ const BrokerDetailPage: React.FC<BrokerDetailPageProps> = ({
             {broker.reviews && broker.reviews.length > 0 && (
               <SidebarCard>
                 <SidebarTitle>Customer Reviews</SidebarTitle>
-                {broker.reviews.map((review, i) => (
+                {broker.reviews.slice(0, 3).map((review, i) => (
                   <ReviewItem key={i}>
                     <ReviewHeader>
                       <ReviewerIcon><img src={customerLogo} alt="Reviewer" /></ReviewerIcon>
@@ -206,6 +209,8 @@ const BrokerDetailPage: React.FC<BrokerDetailPageProps> = ({
 
           </Section>
         )}
+
+        <BrokerReviewsSection brokerId={broker.id} brokerName={broker.name} />
       </Container>
     </PageWrapper>
   );
@@ -363,6 +368,24 @@ const SetupButton = styled.button`
 
   @media (max-width: 768px) {
     /* width: 100%; */
+  }
+`;
+
+const ReportLink = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #9a3412;
+  border: 1px solid #fdba74;
+  padding: 0.45rem 1rem;
+  border-radius: 24px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  &:hover {
+    background: #fff7ed;
   }
 `;
 

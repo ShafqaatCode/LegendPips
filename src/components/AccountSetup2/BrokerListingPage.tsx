@@ -23,6 +23,7 @@ import {
 import { Description } from "../Broker/BrokerCard2";
 import TradeLogo from "../../assets/TradeMarketBrands/Ellipse 1-1.svg";
 import ListPagination from "../SharedComponents/ListPagination";
+import CompareToggle from "../Broker/CompareToggle";
 import {
   BROKER_KIND_COLORS,
   BROKER_KIND_DESCRIPTIONS,
@@ -54,6 +55,7 @@ export type Broker = {
   reviews: Review[];
   fundingMethods: string[];
   cashbackRate?: string;
+  reviewStats?: { average: number; count: number };
 };
 
 export type AccountType = {
@@ -171,8 +173,10 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({
         <BrokerStack>
           {brokers.map((broker, idx) => {
             const globalIndex = (currentPage - 1) * ITEMS_PER_PAGE + idx + 1;
-            const stars = averageReviewStars(broker.reviews);
-            const reviewCount = broker.reviews?.length ?? 0;
+            const stars = broker.reviewStats?.count
+              ? Math.round(broker.reviewStats.average)
+              : averageReviewStars(broker.reviews);
+            const reviewCount = broker.reviewStats?.count ?? broker.reviews?.length ?? 0;
 
             return (
               <Container key={broker.id}>
@@ -239,6 +243,7 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({
                       <SecondaryButton as="button" type="button" onClick={() => onBrokerSelect(broker)}>
                         Broker Reviews →
                       </SecondaryButton>
+                      <CompareToggle brokerId={broker.id} />
                     </ActionSection>
                   </CardContainer>
                 </motion.div>

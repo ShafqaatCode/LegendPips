@@ -119,7 +119,7 @@ const faqsData = {
     {
       question: "How to compare brokers?",
       answer:
-        "Visit our broker comparison page where features like leverage, spread, and user reviews are listed.",
+        "Open the Compare page, pick 2–4 brokers, and share the URL. You can also tap Add to compare on any broker card.",
     },
   ],
   "Education and Tutorials": [

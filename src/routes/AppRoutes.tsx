@@ -15,8 +15,7 @@ import ForumThreadDetail from "../components/Forum/ForumThreadDetail";
 import Courses from "../pages/Courses/Courses";
 import TradingVideos from "../pages/TradingVideos/TradingVideos";
 import Webinars from "../pages/Webinars/Webinars";
-import LoginForm from "../pages/Login/LoginForm";
-import RegisterForm from "../pages/Register/RegisterForm";
+import { SignInPage, RegisterPage } from "../pages/Login/AuthPage";
 import ContestDetails from "../components/Contest/ContestDetails";
 import UserPanel from "../pages/UserPanel/UserPanel";
 import Dashboard from "../pages/UserPanel/Dashboard/Dashboard";
@@ -28,6 +27,8 @@ import MyCourses from "../pages/UserPanel/Courses/MyCourses";
 import MyTradingVideos from "../pages/UserPanel/TradingVideos/TradingVideos";
 import SavedAnalysis from "../pages/UserPanel/Analysis/SavedAnalysis";
 import ForumPosts from "../pages/UserPanel/Forum/ForumPosts";
+import MyBrokerReviews from "../pages/UserPanel/Reviews/MyBrokerReviews";
+import MyComplaints from "../pages/UserPanel/Complaints/MyComplaints";
 import Activity from "../pages/UserPanel/Activity/Activity";
 import MyRebates from "../pages/UserPanel/Rebates/MyRebates";
 import InviteFriends from "../pages/UserPanel/Referrals/InviteFriends";
@@ -43,6 +44,8 @@ import UserDetail from "../pages/AdminPanel/Users/UserDetail";
 import AdminBulkEmail from "../pages/AdminPanel/Users/AdminBulkEmail";
 import KycRecordsManagement from "../pages/AdminPanel/Kyc/KycRecordsManagement";
 import BrokersManagement from "../pages/AdminPanel/Brokers/BrokersManagement";
+import AdminBrokerReviews from "../pages/AdminPanel/Brokers/AdminBrokerReviews";
+import AdminComplaints from "../pages/AdminPanel/Complaints/AdminComplaints";
 import ContestsManagement from "../pages/AdminPanel/Contests/ContestsManagement";
 import SignalsManagement from "../pages/AdminPanel/Signals/SignalsManagement";
 import WebinarsManagement from "../pages/AdminPanel/Webinars/WebinarsManagement";
@@ -68,6 +71,8 @@ import PositionSizeCalculatorPage from "../pages/PositionSizeCalculator/Position
 import PipCalculatorPage from "../pages/PipCalculator/PipCalculatorPage";
 import CalculatorsPage from "../pages/Calculators/CalculatorsPage";
 import AboutPage from "../pages/About/AboutPage";
+import ComplaintsPage from "../pages/Complaints/ComplaintsPage";
+import ComparePage from "../pages/Compare/ComparePage";
 
 // 👇 Add these imports
 
@@ -76,8 +81,8 @@ const AppRoutes: React.FC = () => {
   return (
     <Routes>
       
-      <Route path="/signin" element={<LoginForm />}/>
-      <Route path="/register" element={<RegisterForm />} />
+      <Route path="/signin" element={<SignInPage />} />
+      <Route path="/register" element={<RegisterPage />} />
 
       {/* ⬇ Admin Panel Layout */}
       <Route
@@ -95,6 +100,8 @@ const AppRoutes: React.FC = () => {
         <Route path="users" element={<UsersManagement />} />
         <Route path="users/:id" element={<UserDetail />} />
         <Route path="brokers" element={<BrokersManagement />} />
+        <Route path="broker-reviews" element={<AdminBrokerReviews />} />
+        <Route path="complaints" element={<AdminComplaints />} />
         <Route path="contests" element={<ContestsManagement />} />
         <Route path="signals" element={<SignalsManagement />} />
         <Route path="webinars" element={<WebinarsManagement />} />
@@ -130,6 +137,8 @@ const AppRoutes: React.FC = () => {
         <Route path="trading-videos" element={<MyTradingVideos />} />
         <Route path="analysis" element={<SavedAnalysis />} />
         <Route path="forum" element={<ForumPosts />} />
+        <Route path="broker-reviews" element={<MyBrokerReviews />} />
+        <Route path="complaints" element={<MyComplaints />} />
         <Route path="activity" element={<Activity />} />
         <Route path="rebates" element={<MyRebates />} />
         <Route path="live-accounts" element={<MyLiveAccounts />} />
@@ -159,6 +168,8 @@ const AppRoutes: React.FC = () => {
         <Route path="analysis/:id/*" element={<AnalysisDetail />} />
         <Route path="how-it-works" element={<HitWorksPage />} />
         <Route path="about" element={<AboutPage />} />
+        <Route path="complaints" element={<ComplaintsPage />} />
+        <Route path="compare" element={<ComparePage />} />
 
         <Route path="forum" element={<Forum />} />
         <Route path="forum/thread/:threadId" element={<ForumThreadDetail />} />

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 
 import GrothImg from "../../assets/icons/GrothImg.svg";
@@ -150,6 +151,15 @@ const ButtonContainer = styled.div`
   }
 `;
 
+const CtaLink = styled(Link)`
+  color: inherit;
+  text-decoration: none;
+  &:hover {
+    color: #de992f;
+    text-decoration: underline;
+  }
+`;
+
 const UpperContentContainer = styled.div``;
 
 const POINTS = [
@@ -157,6 +167,7 @@ const POINTS = [
     title: "Broker causing problems? Submit a complaint now.",
     desc: "Facing issues like delayed withdrawals, trade manipulation, or poor support? We’re here to help resolve it.",
     icon: Icon1,
+    to: "/complaints",
   },
   {
     title: "AI-Powered Broker Finder",
@@ -238,7 +249,13 @@ const ChoosUs: React.FC = () => {
               <PointBox key={i}>
                 <img src={point.icon} alt="Icon" />
                 <div>
-                  <h2>{point.title}</h2>
+                  <h2>
+                    {"to" in point && point.to ? (
+                      <CtaLink to={point.to}>{point.title}</CtaLink>
+                    ) : (
+                      point.title
+                    )}
+                  </h2>
                   <p>{point.desc}</p>
                 </div>
               </PointBox>

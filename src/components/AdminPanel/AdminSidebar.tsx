@@ -5,7 +5,7 @@ import {
   FiHome, FiUsers, FiAward, FiFileText, FiVideo, FiSettings,
   FiLogOut, FiBarChart2, FiTrendingUp, FiShield, FiDatabase,
   FiX, FiInbox, FiActivity, FiDollarSign, FiGlobe, FiChevronDown, FiChevronUp,
-  FiUserPlus, FiShuffle, FiLink,
+  FiUserPlus, FiShuffle, FiLink, FiStar, FiAlertTriangle,
 } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { USER_LIST_PRESETS } from '../../utils/userListFilters';
@@ -380,6 +380,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
         <NavSection>
           <SectionTitle>Content</SectionTitle>
           {show('brokers') && link('/admin-panel/brokers', 'Brokers', FiDatabase)}
+          {show('brokers') && link('/admin-panel/broker-reviews', 'Broker reviews', FiStar)}
           {show('contests') && link('/admin-panel/contests', 'Contests', FiAward)}
           {show('signals') && link('/admin-panel/signals', 'Signals', FiTrendingUp)}
           {show('webinars') && link('/admin-panel/webinars', 'Webinars', FiVideo)}
@@ -388,10 +389,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
         </NavSection>
       )}
 
-      {(show('feedback') || show('activity') || show('rebates') || show('live_accounts') || show('reports') || show('settings') || full) && (
+      {(show('feedback') || show('activity') || show('rebates') || show('live_accounts') || show('reports') || show('settings') || show('brokers') || full) && (
         <NavSection>
           <SectionTitle>System</SectionTitle>
           {show('feedback') && link('/admin-panel/feedback-inbox', 'Feedback', FiInbox)}
+          {(show('feedback') || show('brokers')) && link('/admin-panel/complaints', 'Complaints', FiAlertTriangle)}
           {show('activity') && link('/admin-panel/user-activity', 'Activity', FiActivity)}
           {show('referrals') && link('/admin-panel/referrals', 'Referrals', FiUserPlus)}
           {show('ib_change') && link('/admin-panel/ib-change', 'IB change', FiShuffle)}

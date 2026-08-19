@@ -199,6 +199,8 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin-panel/users/bulk-email': 'Bulk Email',
   '/admin-panel/kyc-records': 'KYC Records',
   '/admin-panel/brokers': 'Brokers',
+  '/admin-panel/broker-reviews': 'Broker Reviews',
+  '/admin-panel/complaints': 'Broker Complaints',
   '/admin-panel/contests': 'Contests',
   '/admin-panel/signals': 'Signals',
   '/admin-panel/webinars': 'Webinars',

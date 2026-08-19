@@ -74,7 +74,7 @@ export const SignInButton = styled.button`
 `;
 
 /** Solid pill — desktop topbar when signed in */
-export const UserPanelButton = styled(NavLink)`
+export const UserPanelButton = styled.button`
   background-color: ${({ theme }) => theme.colors.WHITE};
   padding: 8px 16px;
   border-radius: 6px;
@@ -89,6 +89,7 @@ export const UserPanelButton = styled(NavLink)`
   align-items: center;
   gap: 0.45rem;
   font-size: 14px;
+  font-family: inherit;
 
   &:hover {
     background-color: ${activeColor};
@@ -101,7 +102,7 @@ export const UserPanelButton = styled(NavLink)`
 `;
 
 /** Outline style — mobile bar on dark header when signed in */
-export const PortalOutlineButton = styled(NavLink)`
+export const PortalOutlineButton = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -113,6 +114,9 @@ export const PortalOutlineButton = styled(NavLink)`
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
 
   &:hover {
     background: rgba(255, 255, 255, 0.12);
@@ -122,6 +126,53 @@ export const PortalOutlineButton = styled(NavLink)`
 
   svg {
     flex-shrink: 0;
+  }
+`;
+
+export const AccountMenuWrap = styled.div`
+  position: relative;
+  display: inline-flex;
+`;
+
+export const AccountDropdown = styled.div`
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 180px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
+  padding: 0.35rem;
+  z-index: 1200;
+`;
+
+export const AccountDropdownItem = styled.button`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: none;
+  background: transparent;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #132e58;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+
+  &:hover {
+    background: #f8fafc;
+  }
+
+  &.danger {
+    color: #b91c1c;
+  }
+
+  &.danger:hover {
+    background: #fef2f2;
   }
 `;
 

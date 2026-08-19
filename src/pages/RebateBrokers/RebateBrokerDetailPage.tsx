@@ -15,6 +15,7 @@ import { formatPropOfferLines } from "../../utils/propTradingDisplay";
 import { REBATES_BROKER_FALLBACK_LOGOS } from "../../utils/rebatesBrokersDisplay";
 import ICLogo from "../../assets/icons/Ellipse 2.png";
 import BrokerSetupPage from "../../components/AccountSetup2/BrokerSetupPage";
+import BrokerReviewsSection from "../../components/Broker/BrokerReviewsSection";
 
 const PageShell = styled.main`
   background: #eef1f6;
@@ -842,6 +843,8 @@ const RebateBrokerDetailPage: React.FC = () => {
             ))}
           </ContentPanel>
         )}
+
+        <BrokerReviewsSection brokerId={broker._id} brokerName={broker.name} />
       </PageInner>
     </PageShell>
   );

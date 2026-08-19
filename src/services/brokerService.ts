@@ -43,6 +43,9 @@ export interface ApiBroker {
   features: string[];
   accountTypes: AccountType[];
   reviews: Review[];
+  reviewStats?: { average: number; count: number };
+  blacklisted?: boolean;
+  blacklistReason?: string;
   fundingMethods: string[];
   cashbackRate?: string;
   published?: boolean;
@@ -94,6 +97,7 @@ export const mapApiBrokerToBroker = (b: ApiBroker, defaultLogo: string): Broker 
   features: b.features || [],
   accountTypes: b.accountTypes || [],
   reviews: b.reviews || [],
+  reviewStats: b.reviewStats,
   fundingMethods: b.fundingMethods || [],
   cashbackRate: b.cashbackRate,
 });
@@ -180,6 +184,15 @@ export const fetchRebatesPageBrokers = async (opts?: {
 export const fetchPublicBrokerById = async (id: string): Promise<ApiBroker> => {
   const data = await fetchJson(`${API_CONFIG.BASE_URL}/brokers/${id}`);
   return data.broker;
+};
+
+/** Side-by-side compare: 2–4 published brokers, order preserved. */
+export const fetchCompareBrokers = async (ids: string[]): Promise<ApiBroker[]> => {
+  const unique = [...new Set(ids.map((id) => String(id).trim()).filter(Boolean))].slice(0, 4);
+  if (unique.length < 2) return [];
+  const qs = new URLSearchParams({ ids: unique.join(",") });
+  const data = await fetchJson(`${API_CONFIG.BASE_URL}/brokers/compare?${qs.toString()}`);
+  return data.items || [];
 };
 
 export const adminFetchBrokers = async (): Promise<ApiBroker[]> => {

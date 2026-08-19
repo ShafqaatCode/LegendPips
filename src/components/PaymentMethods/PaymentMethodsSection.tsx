@@ -13,6 +13,11 @@ import netellerLogo from "../../assets/payment/neteller.svg";
 import fasapayLogo from "../../assets/payment/fasapay.svg";
 import perfectMoneyLogo from "../../assets/payment/perfectmoney.svg";
 import voletLogo from "../../assets/payment/volet.svg";
+import usdtTrc20Logo from "../../assets/payment/usdt-trc20.svg";
+import usdtBep20Logo from "../../assets/payment/usdt-bep20.svg";
+import usdcLogo from "../../assets/payment/usdc.svg";
+import wiseLogo from "../../assets/payment/wise.svg";
+import payoneerLogo from "../../assets/payment/payoneer.svg";
 
 type PaymentMethod = {
   id: string;
@@ -29,10 +34,12 @@ const PAYMENT_METHODS: PaymentMethod[] = [
   { id: "wire", alt: "Wire Transfer", variant: "wire" },
   { id: "perfectmoney", alt: "Perfect Money", src: perfectMoneyLogo },
   { id: "volet", alt: "Volet", src: voletLogo },
+  { id: "usdt-trc20", alt: "USDT TRC20", src: usdtTrc20Logo },
+  { id: "usdt-bep20", alt: "USDT BEP20", src: usdtBep20Logo },
+  { id: "usdc", alt: "USDC", src: usdcLogo },
+  { id: "wise", alt: "Wise", src: wiseLogo },
+  { id: "payoneer", alt: "Payoneer", src: payoneerLogo },
 ];
-
-const PAYMENT_ROW_ONE = PAYMENT_METHODS.slice(0, 4);
-const PAYMENT_ROW_TWO = PAYMENT_METHODS.slice(4);
 
 const Section = styled.section`
   background: ${({ theme }) => theme.colors.WHITE};
@@ -220,10 +227,7 @@ const PaymentMethodsSection: React.FC = () => {
 
         <LogoPanel>
           <LogoRows>
-            <LogoGrid $columns={4}>{PAYMENT_ROW_ONE.map(renderBrand)}</LogoGrid>
-            <LogoGrid $columns={3} $center>
-              {PAYMENT_ROW_TWO.map(renderBrand)}
-            </LogoGrid>
+            <LogoGrid $columns={4}>{PAYMENT_METHODS.map(renderBrand)}</LogoGrid>
           </LogoRows>
         </LogoPanel>
 

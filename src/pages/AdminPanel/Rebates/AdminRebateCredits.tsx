@@ -2,7 +2,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { FiDollarSign, FiRefreshCw, FiPlus, FiSearch, FiCheck } from 'react-icons/fi';
 import SimpleModal from '../../../components/AdminPanel/SimpleModal';
-import { fetchAdminRebateCredits, grantRebateAdmin, formatUsd, type RebateCreditRow } from '../../../services/rebateService';
+import {
+  fetchAdminRebateCredits, grantRebateAdmin, formatUsd, type RebateCreditRow,
+  fetchAdminWithdrawals, patchAdminWithdrawal, REBATE_PAYOUT_LABELS,
+  type RebateWithdrawalRow, type RebateWithdrawalStatus,
+} from '../../../services/rebateService';
 import { TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
 import {
   PageWrap, PageHeader, PageTitleGroup, PageTitle, PageSubtitle,
@@ -63,6 +67,10 @@ const AdminRebateCredits: React.FC = () => {
   const [formCategory, setFormCategory] = useState<'forex' | 'crypto' | 'prop' | ''>('');
   const [formPurchaseType, setFormPurchaseType] = useState<'first' | 'repeat' | ''>('');
   const [saving, setSaving] = useState(false);
+  const [tab, setTab] = useState<'credits' | 'withdrawals'>('credits');
+  const [wdItems, setWdItems] = useState<RebateWithdrawalRow[]>([]);
+  const [wdStatus, setWdStatus] = useState<RebateWithdrawalStatus | ''>('pending');
+  const [wdLoading, setWdLoading] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
@@ -80,6 +88,23 @@ const AdminRebateCredits: React.FC = () => {
   }, [appliedUserId, appliedEmail]);
 
   useEffect(() => { refresh(); }, [refresh]);
+
+  const refreshWithdrawals = useCallback(async () => {
+    try {
+      setWdLoading(true);
+      setError(null);
+      const data = await fetchAdminWithdrawals(1, 50, wdStatus);
+      setWdItems(data.items || []);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load withdrawals');
+    } finally {
+      setWdLoading(false);
+    }
+  }, [wdStatus]);
+
+  useEffect(() => {
+    if (tab === 'withdrawals') refreshWithdrawals();
+  }, [tab, refreshWithdrawals]);
 
   const totalUsd = useMemo(() => {
     return items.reduce((s, r) => s + (r.amountCents || 0), 0) / 100;
@@ -112,13 +137,28 @@ const AdminRebateCredits: React.FC = () => {
     }
   };
 
+  const onPatchWithdrawal = async (id: string, status: 'approved' | 'rejected' | 'paid') => {
+    let adminNote: string | undefined;
+    if (status === 'rejected') {
+      const note = window.prompt('Rejection note (optional)') || '';
+      adminNote = note.trim() || undefined;
+    }
+    try {
+      await patchAdminWithdrawal(id, status, adminNote);
+      await refreshWithdrawals();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Update failed');
+    }
+  };
+
   return (
     <PageWrap>
       <PageHeader>
         <PageTitleGroup>
           <PageTitle><FiDollarSign /> Rebates</PageTitle>
-          <PageSubtitle>Ledger of rebate credits and manual grants to accounts</PageSubtitle>
+          <PageSubtitle>Ledger of rebate credits, grants, and payout requests</PageSubtitle>
         </PageTitleGroup>
+        {tab === 'credits' && (
         <PrimaryButton type="button" onClick={() => {
           setFormUserId(appliedUserId || '');
           setFormEmail(appliedEmail || '');
@@ -126,8 +166,22 @@ const AdminRebateCredits: React.FC = () => {
         }}>
           <FiPlus /> Grant rebate
         </PrimaryButton>
+        )}
       </PageHeader>
 
+      <FilterBar style={{ marginBottom: '0.85rem' }}>
+        <GhostButton $sm type="button" onClick={() => setTab('credits')} style={tab === 'credits' ? { background: '#132E58', color: '#fff', borderColor: '#132E58' } : undefined}>
+          Credits
+        </GhostButton>
+        <GhostButton $sm type="button" onClick={() => setTab('withdrawals')} style={tab === 'withdrawals' ? { background: '#132E58', color: '#fff', borderColor: '#132E58' } : undefined}>
+          Withdrawals
+        </GhostButton>
+      </FilterBar>
+
+      {error && <ErrorBanner>{error}</ErrorBanner>}
+
+      {tab === 'credits' && (
+        <>
       <StatsRow>
         <MiniStat>
           <div className="icon" style={{ background: '#d1fae5', color: '#059669' }}><FiDollarSign /></div>
@@ -151,8 +205,6 @@ const AdminRebateCredits: React.FC = () => {
           </div>
         </MiniStat>
       </StatsRow>
-
-      {error && <ErrorBanner>{error}</ErrorBanner>}
 
       <FilterBar>
         <SearchInput style={{ maxWidth: 240, flex: 1 }}>
@@ -207,6 +259,80 @@ const AdminRebateCredits: React.FC = () => {
           </tbody>
         </DataTable>
       </TableCard>
+        </>
+      )}
+
+      {tab === 'withdrawals' && (
+        <>
+          <FilterBar>
+            <select
+              value={wdStatus}
+              onChange={(e) => setWdStatus(e.target.value as RebateWithdrawalStatus | '')}
+              style={{ padding: '0.45rem 0.7rem', borderRadius: 8, border: '1px solid #e2e8f0', font: 'inherit' }}
+            >
+              <option value="">All statuses</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="paid">Paid</option>
+              <option value="rejected">Rejected</option>
+            </select>
+            <GhostButton $sm type="button" onClick={refreshWithdrawals} disabled={wdLoading}><FiRefreshCw /> Refresh</GhostButton>
+            <FilterCount>{wdLoading ? 'Loading…' : `${wdItems.length} requests`}</FilterCount>
+          </FilterBar>
+          <TableCard>
+            <DataTable>
+              <thead>
+                <tr>
+                  <Th>When</Th>
+                  <Th>User</Th>
+                  <Th>Amount</Th>
+                  <Th>Method</Th>
+                  <Th>Details</Th>
+                  <Th>Status</Th>
+                  <Th>Actions</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {wdLoading && <TableBodySkeleton rows={6} cols={7} />}
+                {!wdLoading && wdItems.map((row) => (
+                  <Tr key={row.id}>
+                    <Td style={{ whiteSpace: 'nowrap', fontSize: '0.75rem', color: adminColors.muted }}>
+                      {row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}
+                    </Td>
+                    <Td>
+                      <div style={{ fontWeight: 700, color: adminColors.navy, fontSize: '0.8125rem' }}>{row.userLabel || '—'}</div>
+                      <div style={{ fontSize: '0.6875rem', color: adminColors.muted }}>{row.userEmail || row.userId}</div>
+                    </Td>
+                    <Td style={{ fontWeight: 800 }}>{formatUsd(row.amountCents)}</Td>
+                    <Td style={{ fontSize: '0.75rem' }}>{REBATE_PAYOUT_LABELS[row.method] || row.method}</Td>
+                    <Td style={{ fontSize: '0.75rem', maxWidth: 180 }}>{row.payoutDetails}</Td>
+                    <Td><Pill $variant={row.status === 'paid' ? 'approved' : row.status}>{row.status}</Pill></Td>
+                    <Td>
+                      {row.status === 'pending' && (
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                          <GhostButton $sm type="button" onClick={() => onPatchWithdrawal(row.id, 'approved')}>Approve</GhostButton>
+                          <GhostButton $sm type="button" onClick={() => onPatchWithdrawal(row.id, 'paid')}>Mark paid</GhostButton>
+                          <GhostButton $sm type="button" onClick={() => onPatchWithdrawal(row.id, 'rejected')}>Reject</GhostButton>
+                        </div>
+                      )}
+                      {row.status === 'approved' && (
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                          <GhostButton $sm type="button" onClick={() => onPatchWithdrawal(row.id, 'paid')}>Mark paid</GhostButton>
+                          <GhostButton $sm type="button" onClick={() => onPatchWithdrawal(row.id, 'rejected')}>Reject</GhostButton>
+                        </div>
+                      )}
+                      {row.status === 'rejected' || row.status === 'paid' ? (row.adminNote || '—') : null}
+                    </Td>
+                  </Tr>
+                ))}
+                {!wdLoading && wdItems.length === 0 && (
+                  <Tr><Td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: adminColors.muted }}>No withdrawal requests.</Td></Tr>
+                )}
+              </tbody>
+            </DataTable>
+          </TableCard>
+        </>
+      )}
 
       <SimpleModal
         isOpen={modalOpen}

@@ -70,7 +70,7 @@ const PromoBanner = () => {
   };
 
   const handleCompareBrokers = () => {
-    navigate("/rebates");
+    navigate("/compare");
   };
 
   return (

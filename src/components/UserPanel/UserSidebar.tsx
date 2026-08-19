@@ -6,7 +6,7 @@ import { getMyKyc, type KycStatus } from '../../services/kycService';
 import {
   FiHome, FiUser, FiAward, FiTrendingUp, FiVideo, FiBook, FiFileText,
   FiMessageSquare, FiSettings, FiLogOut, FiBarChart2, FiCalendar,
-  FiX, FiDollarSign, FiGlobe, FiShield, FiUserPlus, FiShuffle, FiLink,
+  FiX, FiDollarSign, FiGlobe, FiShield, FiUserPlus, FiShuffle, FiLink, FiStar, FiAlertTriangle,
 } from 'react-icons/fi';
 
 const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
@@ -280,6 +280,8 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
       <NavSection>
         <SectionTitle>Community</SectionTitle>
         {link('/user-panel/forum', 'Forum Posts', FiMessageSquare)}
+        {link('/user-panel/broker-reviews', 'Broker reviews', FiStar)}
+        {link('/user-panel/complaints', 'My complaints', FiAlertTriangle)}
         {link('/user-panel/activity', 'Activity', FiBarChart2)}
         {link('/user-panel/calendar', 'Calendar', FiCalendar)}
         {link('/user-panel/settings', 'Settings', FiSettings)}

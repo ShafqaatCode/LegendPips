@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 import GirlImage from "../../assets/brokerbannergirl.jpg";
 
 const Wrapper = styled.section`
@@ -87,6 +88,21 @@ const Description = styled.p`
   }
 `;
 
+const ReportLink = styled(Link)`
+  display: inline-flex;
+  margin-top: 0.35rem;
+  background: #132e58;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.875rem;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  &:hover {
+    background: #1a3d6e;
+  }
+`;
+
 const Figure = styled.div`
   display: flex;
   align-items: flex-end;
@@ -139,6 +155,7 @@ const BrokerHeroSection2 = () => {
               detailed report. Our dedicated support team will thoroughly review your submission, investigate the
               matter, and take the necessary steps to ensure your trading experience remains secure and fair.
             </Description>
+            <ReportLink to="/complaints">Submit a broker complaint →</ReportLink>
           </Copy>
 
           <Figure>

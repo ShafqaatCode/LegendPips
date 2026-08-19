@@ -1,167 +1,106 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
-import ArrowRight from '../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg';
+import bannerBg from '../../assets/banner/BannerBg.jpg';
 
 const HeroWrapper = styled.section`
   position: relative;
-  padding: clamp(2.5rem, 6vw, 4rem) ${({ theme }) => theme.typography.pageGutter};
-  background: white;
-  overflow: hidden;
-`;
-
-const ContentWrapper = styled.div`
-  max-width: ${({ theme }) => theme.typography.contentMax};
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(1.5rem, 4vw, 2.5rem);
+  min-height: clamp(380px, 52vh, 480px);
+  display: flex;
   align-items: center;
+  padding: clamp(4rem, 9vw, 5.5rem) ${({ theme }) => theme.typography.pageGutter}
+    clamp(2.25rem, 5vw, 3.5rem);
+  overflow: hidden;
+  background: linear-gradient(135deg, #0b1b38 0%, #132e58 100%);
 
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    grid-template-columns: 1fr;
-    gap: 1.75rem;
+    padding: clamp(3.5rem, 8vw, 5rem) ${({ theme }) => theme.typography.pageGutter}
+      clamp(2rem, 4vw, 3rem);
+    min-height: 420px;
+  }
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    padding: clamp(3.25rem, 8vw, 4.5rem) ${({ theme }) => theme.typography.pageGutter}
+      clamp(1.75rem, 4vw, 2.5rem);
+    min-height: 380px;
+    flex-direction: column;
   }
 `;
 
-const LeftContent = styled.div`
-  color: #132e58;
+const ChartOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  opacity: 0.15;
+  background-image: url(${bannerBg});
+  background-size: cover;
+  background-position: center;
+  filter: blur(2px);
+  z-index: 1;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(11, 27, 56, 0.8) 0%, rgba(19, 46, 88, 0.8) 100%);
+  }
 `;
 
-const Title = styled.h1`
+const ContentWrapper = styled.div`
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: ${({ theme }) => theme.typography.contentMax};
+  margin: 0 auto;
+`;
+
+const LeftContent = styled.div`
+  width: 100%;
+  max-width: 800px;
+  color: white;
+  text-align: center;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    max-width: 100%;
+  }
+`;
+
+const MainHeading = styled.h1`
   font-size: ${({ theme }) => theme.typography.heroTitle};
   font-weight: 700;
   line-height: ${({ theme }) => theme.typography.heroTitleLh};
-  margin: 0 0 0.65rem;
-  color: #132e58;
-`;
-
-const HighlightText = styled.span`
-  color: #fbbf24;
-`;
-
-const Subtitle = styled.p`
-  font-size: ${({ theme }) => theme.typography.heroSubtitle};
-  font-weight: 500;
-  color: #132e58;
   margin: 0 0 1rem;
+  color: white;
 `;
 
 const Description = styled.p`
   font-size: ${({ theme }) => theme.typography.body};
   line-height: 1.65;
-  color: #555;
-  margin: 0 0 1.25rem;
+  margin: 0 0 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
 `;
 
-const JoinButton = styled.button`
-  background: #fbbf24;
-  color: #132e58;
-  border: none;
-  padding: 0.55rem 1.25rem;
-  font-size: ${({ theme }) => theme.typography.body};
+const FeedHeading = styled.h3`
+  font-size: ${({ theme }) => theme.typography.panelSectionTitle};
   font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  
-  &:hover {
-    background: #f4b400;
-    transform: translateY(-2px);
-  }
-  
-  img {
-    width: 20px;
-    height: 20px;
-  }
-`;
-
-const RightContent = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    order: -1;
-  }
-`;
-
-const CommunityGraphic = styled.div`
-  width: 100%;
-  max-width: min(380px, 100%);
-  height: clamp(220px, 36vh, 300px);
-  background: linear-gradient(135deg, #f0f7ff 0%, #e8f4ff 100%);
-  border-radius: 16px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &::before {
-    content: "👥";
-    font-size: clamp(4rem, 18vw, 7rem);
-    opacity: 0.3;
-  }
-`;
-
-const ChatBubble = styled.div`
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
-  background: #132E58;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  
-  &::after {
-    content: '💬';
-    font-size: 24px;
-  }
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    width: 50px;
-    height: 50px;
-    bottom: 15px;
-    right: 15px;
-    
-    &::after {
-      font-size: 20px;
-    }
-  }
+  margin: 2rem 0 1rem;
+  color: white;
 `;
 
 const ForumHero: React.FC = () => {
-  const navigate = useNavigate();
-
   return (
     <HeroWrapper>
+      <ChartOverlay />
       <ContentWrapper>
         <LeftContent>
-          <Title>
-            Welcome To The LegendPips <HighlightText>Community</HighlightText>
-          </Title>
-          <Subtitle>Trade, Learn, Discuss.</Subtitle>
+          <MainHeading>TRADER COMMUNITY</MainHeading>
           <Description>
-            Share your market ideas, ask questions, and take part in discussions that give you a clear view of real trading conditions. Learn directly from experienced traders and explore analysis across Forex, Gold, Crypto, Stocks, and Indices. You get practical insights, short breakdowns, and strategy explanations that help you make stronger decisions and stay prepared for every major market move.
+            Share market ideas, ask questions, and join live discussions across Forex, Gold, Crypto,
+            Stocks, and Indices — post charts, leave comments, and learn with traders worldwide.
           </Description>
-          <JoinButton onClick={() => navigate('/register')}>
-            Join Now
-            <img src={ArrowRight} alt="Arrow" />
-          </JoinButton>
+          <FeedHeading>Community Feed</FeedHeading>
         </LeftContent>
-        <RightContent>
-          <CommunityGraphic>
-            <ChatBubble />
-          </CommunityGraphic>
-        </RightContent>
       </ContentWrapper>
     </HeroWrapper>
   );

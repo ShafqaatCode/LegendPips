@@ -19,6 +19,7 @@ import {
 } from "./BrokerCard.styles";
 import type { PropCashbackOffer } from "../../services/brokerService";
 import { formatPropCardSummary, formatPropRatingLabel } from "../../utils/propTradingDisplay";
+import CompareToggle from "./CompareToggle";
 
 interface PropFirmCardProps {
   title: string;
@@ -98,6 +99,7 @@ const PropFirmCard: React.FC<PropFirmCardProps> = ({
           >
             Open Account
           </PrimaryButton>
+          <CompareToggle brokerId={brokerId} />
         </ActionSection>
       </CardContainer>
     </Container>

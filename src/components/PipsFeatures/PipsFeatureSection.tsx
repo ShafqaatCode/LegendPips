@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 
 import clockIcon from "../../assets/FeaturesIcon/clock.png";
@@ -52,6 +53,31 @@ const Card = styled.article`
 
   &:hover {
     border-color: #d0d7e2;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.07);
+  }
+
+  @media (max-width: 520px) {
+    align-items: center;
+    text-align: center;
+  }
+`;
+
+const CardLink = styled(Link)`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.85rem 0.9rem;
+  background: #fff;
+  border: 1px solid #e8eaef;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    border-color: #fbbf24;
     box-shadow: 0 2px 8px rgba(15, 23, 42, 0.07);
   }
 
@@ -136,6 +162,7 @@ const LegendPipsFeatures: React.FC = () => {
       icon: complaintIcon,
       title: "Raise a Complaint",
       desc: "Help us improve by reporting any concerns you have.",
+      to: "/complaints",
     },
   ];
 
@@ -149,15 +176,22 @@ const LegendPipsFeatures: React.FC = () => {
         />
 
         <Grid>
-          {features.map(({ icon, title, desc }) => (
-            <Card key={title}>
+          {features.map(({ icon, title, desc, to }) => {
+            const inner = (
+              <>
               <IconBadge>
                 <img src={icon} alt="" aria-hidden />
               </IconBadge>
               <Heading>{title}</Heading>
               <Description>{desc}</Description>
-            </Card>
-          ))}
+              </>
+            );
+            return to ? (
+              <CardLink key={title} to={to}>{inner}</CardLink>
+            ) : (
+              <Card key={title}>{inner}</Card>
+            );
+          })}
         </Grid>
       </Inner>
     </FeaturesWrapper>

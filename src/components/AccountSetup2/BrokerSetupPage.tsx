@@ -172,9 +172,11 @@ const BrokerSetupPage: React.FC<BrokerSetupPageProps> = ({
                   <StepLabel>Step 1</StepLabel>
                   <StepCard>
                     <StepHeading>Open a live account with {broker.name}</StepHeading>
-                    <OpenLiveBtn type="button" onClick={handleOpenLive}>
-                      Open Live {broker.name}
-                    </OpenLiveBtn>
+                    <BtnCenter>
+                      <OpenLiveBtn type="button" onClick={handleOpenLive}>
+                        Open Live {broker.name}
+                      </OpenLiveBtn>
+                    </BtnCenter>
                     <Notes>
                       <li>
                         If you are based in the EU, Brazil, the UK, or Australia, open your account with the
@@ -258,16 +260,18 @@ const BrokerSetupPage: React.FC<BrokerSetupPageProps> = ({
                   <StepCard>
                     <StepHeading>Submit your account</StepHeading>
                     {error && <ErrorBanner role="alert">{error}</ErrorBanner>}
-                    <SubmitBtn type="submit" disabled={loading || !isAuthenticated}>
-                      {loading ? (
-                        <>
-                          <Loader2 size={18} className="spin" />
-                          Submitting…
-                        </>
-                      ) : (
-                        'Submit for review'
-                      )}
-                    </SubmitBtn>
+                    <BtnCenter>
+                      <SubmitBtn type="submit" disabled={loading || !isAuthenticated}>
+                        {loading ? (
+                          <>
+                            <Loader2 size={18} className="spin" />
+                            Submitting…
+                          </>
+                        ) : (
+                          'Submit for review'
+                        )}
+                      </SubmitBtn>
+                    </BtnCenter>
                     <Hint>
                       After submit, our team reviews the account and will <strong>approve or reject</strong> it.
                       Track status under{' '}
@@ -486,11 +490,19 @@ const StepHeading = styled.h2`
   line-height: 1.35;
 `;
 
+const BtnCenter = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0.15rem 0 0.25rem;
+`;
+
 const OpenLiveBtn = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 200px;
+  max-width: 100%;
   padding: 0.7rem 1.4rem;
   border: none;
   border-radius: 8px;

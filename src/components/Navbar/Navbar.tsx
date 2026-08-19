@@ -1,5 +1,5 @@
 // Header.tsx
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   HeaderWrapper,
   Topbar,
@@ -12,6 +12,9 @@ import {
   SignInButton,
   UserPanelButton,
   PortalOutlineButton,
+  AccountMenuWrap,
+  AccountDropdown,
+  AccountDropdownItem,
   MobileBar,
   MobileMenu,
   Backdrop,
@@ -20,9 +23,16 @@ import {
   Submenu,
   SubmenuItem,
 } from "./Navbar.styles";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
-import { FiChevronDown, FiChevronUp, FiShield, FiUser } from "react-icons/fi";
+import {
+  FiChevronDown,
+  FiChevronUp,
+  FiShield,
+  FiUser,
+  FiLogOut,
+  FiGrid,
+} from "react-icons/fi";
 import { useAuth } from "../../contexts/AuthContext";
 import { useSiteConfig } from "../../contexts/SiteConfigContext";
 import LogoImg from "../../assets/icons/image 2.svg";
@@ -30,8 +40,7 @@ import SupportIcon from "../../assets/icons/SupportIcon.svg";
 import CalculatorIcon from "../../assets/icons/calculator-svgrepo-com (1) 1.svg";
 import LocationIcon from "../../assets/icons/Location marker.svg";
 
-import LoginModal from "../../pages/Login/LoginModal";
-import RegisterModal from "../../pages/Register/RegisterModal";
+import { useAuthModal } from "../../contexts/AuthModalContext";
 
 const FALLBACK_NAV = [
   { to: "/", label: "Home", end: true },
@@ -39,6 +48,8 @@ const FALLBACK_NAV = [
   { to: "/rebates", label: "Rebates Brokers" },
   { to: "/contests", label: "Contests" },
   { to: "/brokers", label: "Brokers" },
+  { to: "/compare", label: "Compare" },
+  { to: "/complaints", label: "Complaints" },
   { to: "/signals", label: "Signals" },
   { to: "/rewards", label: "Rewards" },
   { to: "/analysis", label: "Analysis" },
@@ -59,12 +70,15 @@ const FALLBACK_TOOLS = [
 ];
 
 const Header: React.FC = () => {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [submenuOpen, setSubmenuOpen] = useState(false);
   const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState(false);
-  const [signupOpen, setSignupOpen] = useState(false);
-  const [signinOpen, setSigninOpen] = useState(false);
-  const { isAuthenticated, user } = useAuth();
+  const [accountOpen, setAccountOpen] = useState(false);
+  const desktopAccountRef = useRef<HTMLDivElement | null>(null);
+  const mobileAccountRef = useRef<HTMLDivElement | null>(null);
+  const { isAuthenticated, user, logout } = useAuth();
+  const { openSignIn } = useAuthModal();
   const { mainNav, toolsNav, config } = useSiteConfig();
 
   const navLinks = mainNav.length
@@ -77,6 +91,71 @@ const Header: React.FC = () => {
 
   const portalPath = user?.role === "admin" ? "/admin-panel" : "/user-panel";
   const isAdmin = user?.role === "admin";
+  const accountLabel = isAdmin ? "Admin panel" : `${user?.firstName || "My"} account`;
+
+  useEffect(() => {
+    if (!accountOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      const target = e.target as Node;
+      const inDesktop = desktopAccountRef.current?.contains(target);
+      const inMobile = mobileAccountRef.current?.contains(target);
+      if (!inDesktop && !inMobile) setAccountOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [accountOpen]);
+
+  const goPortal = () => {
+    setAccountOpen(false);
+    setMenuOpen(false);
+    navigate(portalPath);
+  };
+
+  const handleLogout = () => {
+    setAccountOpen(false);
+    setMenuOpen(false);
+    logout();
+    navigate("/");
+  };
+
+  const renderAccountMenu = (
+    outline: boolean,
+    wrapRef: React.RefObject<HTMLDivElement | null>
+  ) => {
+    const Trigger = outline ? PortalOutlineButton : UserPanelButton;
+    return (
+      <AccountMenuWrap ref={wrapRef}>
+        <Trigger
+          type="button"
+          aria-haspopup="menu"
+          aria-expanded={accountOpen}
+          title="Account menu"
+          onClick={() => setAccountOpen((v) => !v)}
+        >
+          {isAdmin ? <FiShield size={18} aria-hidden /> : <FiUser size={18} aria-hidden />}
+          <span>{outline ? (isAdmin ? "Admin" : user?.firstName || "Account") : accountLabel}</span>
+          {accountOpen ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
+        </Trigger>
+        {accountOpen && (
+          <AccountDropdown role="menu">
+            <AccountDropdownItem type="button" role="menuitem" onClick={goPortal}>
+              <FiGrid size={15} />
+              Portal
+            </AccountDropdownItem>
+            <AccountDropdownItem
+              type="button"
+              role="menuitem"
+              className="danger"
+              onClick={handleLogout}
+            >
+              <FiLogOut size={15} />
+              Logout
+            </AccountDropdownItem>
+          </AccountDropdown>
+        )}
+      </AccountMenuWrap>
+    );
+  };
 
   return (
     <>
@@ -90,7 +169,6 @@ const Header: React.FC = () => {
           />
         )}
 
-        {/* Topbar */}
         <Topbar>
           <NavLink to="/">
             <Logo src={logoSrc} alt={`${config?.siteName || "LegendPips"} Logo`} />
@@ -116,25 +194,17 @@ const Header: React.FC = () => {
               </HeaderItem>
             </NavLink>
             {isAuthenticated ? (
-              <UserPanelButton to={portalPath} title={isAdmin ? "Open admin panel" : "Open your account panel"}>
-                {isAdmin ? <FiShield size={18} aria-hidden /> : <FiUser size={18} aria-hidden />}
-                <span>{isAdmin ? "Admin panel" : `${user?.firstName || "My"} account`}</span>
-              </UserPanelButton>
+              renderAccountMenu(false, desktopAccountRef)
             ) : (
-              <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
+              <SignInButton onClick={() => openSignIn()}>Sign In</SignInButton>
             )}
           </LinkGroup>
         </Topbar>
 
-        {/* Desktop Navbar */}
         <Navbar>
           <NavList>
             {navLinks.map((link) => (
-              <NavItem
-                to={link.to}
-                key={link.to}
-                end={link.end || false}
-              >
+              <NavItem to={link.to} key={link.to} end={link.end || false}>
                 {link.label}
               </NavItem>
             ))}
@@ -153,7 +223,6 @@ const Header: React.FC = () => {
                     <SubmenuItem to={tool.to} key={tool.to}>
                       {tool.label}
                     </SubmenuItem>
-
                   ))}
                 </Submenu>
               )}
@@ -161,19 +230,15 @@ const Header: React.FC = () => {
           </NavList>
         </Navbar>
 
-        {/* Mobile Bar */}
         <MobileBar>
           <NavLink to="/">
             <Logo src={logoSrc} alt={`${config?.siteName || "LegendPips"} Logo`} />
           </NavLink>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             {isAuthenticated ? (
-              <PortalOutlineButton to={portalPath} title={isAdmin ? "Admin panel" : "My account panel"}>
-                {isAdmin ? <FiShield size={18} aria-hidden /> : <FiUser size={18} aria-hidden />}
-                <span>{isAdmin ? "Admin" : user?.firstName || "Account"}</span>
-              </PortalOutlineButton>
+              renderAccountMenu(false, mobileAccountRef)
             ) : (
-              <SignInButton onClick={() => setSigninOpen(true)}>Sign In</SignInButton>
+              <SignInButton onClick={() => openSignIn()}>Sign In</SignInButton>
             )}
             <FaBars
               size={22}
@@ -184,13 +249,36 @@ const Header: React.FC = () => {
           </div>
         </MobileBar>
 
-        {/* Mobile Menu */}
         {menuOpen && (
           <MobileMenu>
             {isAuthenticated && (
-              <NavItem to={portalPath} onClick={() => setMenuOpen(false)}>
-                {isAdmin ? "Admin panel" : "My account panel"}
-              </NavItem>
+              <>
+                <NavItem
+                  to={portalPath}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setAccountOpen(false);
+                  }}
+                >
+                  Portal
+                </NavItem>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: "#fecaca",
+                    fontWeight: 600,
+                    fontSize: 14,
+                    textAlign: "left",
+                    padding: "0.5rem 0",
+                    cursor: "pointer",
+                  }}
+                >
+                  Logout
+                </button>
+              </>
             )}
             {navLinks.map((link) => (
               <NavItem
@@ -203,7 +291,6 @@ const Header: React.FC = () => {
               </NavItem>
             ))}
 
-            {/* Mobile Tools Submenu */}
             <div>
               <SubmenuToggle onClick={() => setMobileSubmenuOpen(!mobileSubmenuOpen)}>
                 Tools {mobileSubmenuOpen ? <FiChevronUp /> : <FiChevronDown />}
@@ -237,20 +324,6 @@ const Header: React.FC = () => {
           </MobileMenu>
         )}
       </HeaderWrapper>
-
-      {/* Auth Modals */}
-      <RegisterModal
-        isOpen={signupOpen}
-        onClose={() => setSignupOpen(false)}
-      />
-      <LoginModal
-        isOpen={signinOpen}
-        onClose={() => setSigninOpen(false)}
-        onSwitchToRegister={() => {
-          setSigninOpen(false);
-          setSignupOpen(true);
-        }}
-      />
     </>
   );
 };

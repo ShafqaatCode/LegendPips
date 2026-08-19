@@ -110,6 +110,8 @@ export const PERM_ROUTE_MAP: { pathPrefix: string; permissions: string[] }[] = [
   { pathPrefix: "/admin-panel/users", permissions: ["users"] },
   { pathPrefix: "/admin-panel/kyc-records", permissions: ["kyc"] },
   { pathPrefix: "/admin-panel/brokers", permissions: ["brokers"] },
+  { pathPrefix: "/admin-panel/broker-reviews", permissions: ["brokers"] },
+  { pathPrefix: "/admin-panel/complaints", permissions: ["feedback", "brokers"] },
   { pathPrefix: "/admin-panel/contests", permissions: ["contests"] },
   { pathPrefix: "/admin-panel/signals", permissions: ["signals"] },
   { pathPrefix: "/admin-panel/webinars", permissions: ["webinars"] },

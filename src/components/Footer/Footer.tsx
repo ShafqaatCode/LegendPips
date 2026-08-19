@@ -230,6 +230,9 @@ const Footer2: React.FC = () => {
               <LinkHeading>Help</LinkHeading>
               <LinkList>
                 <LinkItem>
+                  <Link to="/complaints">Complaint Center</Link>
+                </LinkItem>
+                <LinkItem>
                   <Link to="/support">Customer Support</Link>
                 </LinkItem>
                 <LinkItem>
