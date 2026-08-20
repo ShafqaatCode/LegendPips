@@ -5,8 +5,10 @@ import {
   CardsGrid, ListCard, CardTitle, MetaLine, CardFooter,
   Pill, EmptyState, GhostButton,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const SavedAnalysis: React.FC = () => {
+  const { t } = useLocale();
   const [savedItems, setSavedItems] = useState([
     { id: 1, title: 'Gold Market Analysis: Q1 2024 Outlook', category: 'Forex', excerpt: 'Comprehensive analysis of gold market trends and predictions for Q1 2024…', date: '2024-01-15', author: 'John Smith' },
     { id: 2, title: 'EUR/USD Technical Breakdown', category: 'Forex', excerpt: 'Detailed technical analysis with key support and resistance levels…', date: '2024-01-14', author: 'Jane Doe' },
@@ -16,7 +18,7 @@ const SavedAnalysis: React.FC = () => {
   return (
     <PageWrap>
       <PageHeader>
-        <PageTitle><FiFileText /> Saved Analysis</PageTitle>
+        <PageTitle><FiFileText /> {t("panel.analysis")}</PageTitle>
         <PageSubtitle>Articles you bookmarked for later</PageSubtitle>
       </PageHeader>
 

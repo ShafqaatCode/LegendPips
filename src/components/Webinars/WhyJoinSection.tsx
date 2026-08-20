@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useLocale } from '../../contexts/LocaleContext';
 
 const SectionWrapper = styled.section`
   background: white;
@@ -35,13 +36,14 @@ const BenefitItem = styled.li`
   font-size: 16px;
   line-height: 1.8;
   color: #555;
-  padding-left: 2rem;
+  padding-inline-start: 2rem;
   position: relative;
   
   &::before {
     content: '✓';
     position: absolute;
-    left: 0;
+    inset-inline-start: 0;
+    left: auto;
     color: #Fbbf24;
     font-weight: bold;
     font-size: 24px;
@@ -55,21 +57,16 @@ const BenefitItem = styled.li`
 `;
 
 const WhyJoinSection: React.FC = () => {
-  const benefits = [
-    'Live market analysis with full breakdowns of market structure, key levels, trends, and session behavior to help you understand price movement in real time.',
-    'Interactive Q and A sessions where you can ask detailed questions and receive clear, practical answers directly from experienced traders.',
-    'Real trade examples explained from start to finish, including entry reasoning, risk placement, trade management, and exit decisions.',
-    'Replay access available for every session, allowing you to review lessons, pause explanations, and learn again at your own pace.',
-    'Learn directly from professionals who share real market experience, practical insights and disciplined trading approaches used in live conditions.'
-  ];
+  const { t } = useLocale();
+  const benefits = ["webinars.w1", "webinars.w2", "webinars.w3", "webinars.w4", "webinars.w5"];
 
   return (
     <SectionWrapper>
       <ContentWrapper>
-        <Heading>Why Join Our Live Trading Webinars</Heading>
+        <Heading>{t("webinars.why")}</Heading>
         <BenefitsList>
-          {benefits.map((benefit, index) => (
-            <BenefitItem key={index}>{benefit}</BenefitItem>
+          {benefits.map((key) => (
+            <BenefitItem key={key}>{t(key)}</BenefitItem>
           ))}
         </BenefitsList>
       </ContentWrapper>

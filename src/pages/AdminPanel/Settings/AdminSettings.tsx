@@ -159,15 +159,43 @@ const AdminSettings: React.FC = () => {
                   <Field>Default Language
                     <select value={settings.defaultLanguage} onChange={(e) => setSettings({ ...settings, defaultLanguage: e.target.value })}>
                       <option value="en">English</option>
+                      <option value="ar">Arabic</option>
                       <option value="es">Spanish</option>
+                      <option value="pt">Portuguese</option>
+                      <option value="id">Indonesian</option>
+                      <option value="vi">Vietnamese</option>
                       <option value="fr">French</option>
+                      <option value="tr">Turkish</option>
+                      <option value="ur">Urdu</option>
                     </select>
                   </Field>
+                </FieldGrid>
+                <p style={{ margin: '1rem 0 0.4rem', fontWeight: 700, color: '#132e58' }}>LegendScore weights (must add toward 100)</p>
+                <FieldGrid>
+                  {(['regulation','tradingConditions','withdrawals','userExperience','complaints','support'] as const).map((k) => (
+                    <Field key={k}>{k}
+                      <input
+                        type="number"
+                        value={settings.legendScoreWeights?.[k] ?? ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          legendScoreWeights: {
+                            ...(settings.legendScoreWeights || {}),
+                            [k]: Number(e.target.value),
+                          },
+                        })}
+                      />
+                    </Field>
+                  ))}
                 </FieldGrid>
                 <div style={{ marginTop: '0.75rem' }}>
                   <PrimaryButton disabled={saving} onClick={() => persistSettings({
                     siteName: settings.siteName, siteEmail: settings.siteEmail,
                     siteTagline: settings.siteTagline, defaultLanguage: settings.defaultLanguage,
+                    legendScoreWeights: settings.legendScoreWeights || {
+                      regulation: 20, tradingConditions: 20, withdrawals: 20,
+                      userExperience: 15, complaints: 15, support: 10,
+                    },
                   })}><FiSave /> Save</PrimaryButton>
                 </div>
               </PanelBody>

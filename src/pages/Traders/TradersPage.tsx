@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { FiCheckCircle, FiSearch, FiShield } from "react-icons/fi";
 import bannerBg from "../../assets/banner/BannerBg.jpg";
 import { fetchPublicTraders, type TraderProfile } from "../../services/traderService";
+import { useLocale } from "../../contexts/LocaleContext";
 
 type Props = { copyOnly?: boolean };
 
@@ -13,6 +14,7 @@ const TradersPage: React.FC<Props> = ({ copyOnly }) => {
   const [items, setItems] = useState<TraderProfile[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const { t } = useLocale();
 
   useEffect(() => {
     setLoading(true);
@@ -30,11 +32,9 @@ const TradersPage: React.FC<Props> = ({ copyOnly }) => {
       <Hero>
         <Overlay />
         <HeroInner>
-          <h1>{copyOnly ? "COPY TRADING" : "VERIFIED TRADERS"}</h1>
+          <h1>{copyOnly ? t("traders.copyTitle") : t("traders.title")}</h1>
           <p>
-            {copyOnly
-              ? "Request to follow verified traders. LegendPips matches you with the trader — it does not auto-copy trades on your broker account."
-              : "Performance profiles reviewed by LegendPips. Stats are submitted by the trader and verified by our team, not live-synced from MT4/MT5."}
+            {copyOnly ? t("traders.copyBody") : t("traders.body")}
           </p>
         </HeroInner>
       </Hero>

@@ -219,18 +219,16 @@ export const NavItem = styled(NavLink)`
 `;
 export const SubmenuWrapper = styled.div`
   position: relative;
-
-  @media (min-width: 1101px) {
-    &:hover > ul {
-      display: block;
-    }
-  }
+  /* Extra hit area under the label so the pointer never “falls through” the gap */
+  padding-bottom: 0.75rem;
+  margin-bottom: -0.75rem;
 
   @media (max-width: 1100px) {
     width: 100%;
+    padding-bottom: 0;
+    margin-bottom: 0;
   }
 `;
-
 
 export const SubmenuToggle = styled.div`
   display: flex;
@@ -240,13 +238,104 @@ export const SubmenuToggle = styled.div`
   color: white;
   font-size: 14px;
   font-weight: 500;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+
+  &:hover,
+  &[data-open="true"] {
+    color: ${activeColor};
+    border-bottom-color: ${activeColor};
+  }
+`;
+
+/** Desktop mega-menu panel — stays inside viewport, multi-column.
+ *  No vertical gap under the trigger: padding-top keeps the hover bridge continuous. */
+export const ToolsMegaMenu = styled.div`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  inset-inline-end: 0;
+  inset-inline-start: auto;
+  html[dir="rtl"] & {
+    right: auto;
+    left: 0;
+    inset-inline-end: 0;
+    inset-inline-start: auto;
+  }
+  z-index: 1300;
+  width: min(560px, calc(100vw - 2rem));
+  max-height: min(70vh, 480px);
+  overflow: auto;
+  /* Invisible hover bridge from trigger → panel (was causing leave/close) */
+  padding: 0.65rem 1.1rem 1.15rem;
+  margin-top: 0;
+  border-radius: 0 0 14px 14px;
+  background: linear-gradient(165deg, #0f2448 0%, #132e58 55%, #0c1f3d 100%);
+  border: 1px solid rgba(251, 191, 36, 0.22);
+  border-top: none;
+  box-shadow:
+    0 18px 48px rgba(8, 20, 40, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  display: grid;
+  grid-template-columns: 168px 1fr;
+  gap: 1rem 1.15rem;
+  text-align: start;
+
+  @media (max-width: 1100px) {
+    display: none;
+  }
+`;
+
+export const ToolsMegaColumn = styled.div`
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  & + & {
+    border-inline-start: 1px solid rgba(255, 255, 255, 0.1);
+    padding-inline-start: 1.1rem;
+  }
+`;
+
+export const ToolsMegaLabel = styled.div`
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(251, 191, 36, 0.9);
+  margin-bottom: 0.35rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+`;
+
+export const ToolsMegaGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.15rem 0.75rem;
+`;
+
+export const ToolsMegaLink = styled(NavLink)`
+  display: block;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 0.45rem 0.55rem;
+  border-radius: 8px;
+  line-height: 1.35;
+  white-space: normal;
+  transition: background 0.15s ease, color 0.15s ease;
 
   &:hover {
+    background: rgba(255, 255, 255, 0.08);
     color: ${activeColor};
   }
 
-  @media (min-width: 1101px) {
-    border-bottom: 2px solid transparent;
+  &.active {
+    color: ${activeColor};
+    background: rgba(251, 191, 36, 0.12);
+    font-weight: 650;
   }
 `;
 
@@ -257,6 +346,10 @@ export const Submenu = styled.ul`
   left: 0;
   background-color: #132e58;
   padding: 1rem;
+  html[dir="rtl"] & {
+    left: auto;
+    right: 0;
+  }
   border-radius: 6px;
   list-style: none;
   min-width: 220px;
@@ -288,6 +381,23 @@ export const SubmenuItem = styled(NavLink)`
     font-weight: 600;
     color: ${activeColor};
   }
+`;
+
+export const MobileToolsGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  padding-inline-start: 0.35rem;
+`;
+
+export const MobileToolsHeading = styled.div`
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(251, 191, 36, 0.85);
+  margin: 0.55rem 0 0.2rem;
 `;
 
 export const MobileBar = styled.div`

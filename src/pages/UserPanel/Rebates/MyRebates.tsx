@@ -19,8 +19,10 @@ import {
   TableCard, DataTable, Th, Td, EmptyCell, StatsGrid, StatCard, StatIconBox, StatBody, StatValue,
   StatLabel, SectionCard, SectionHead, SectionBody, FormGrid, Field, PrimaryButton, Pill,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const MyRebates: React.FC = () => {
+  const { t } = useLocale();
   const [items, setItems] = useState<RebateCreditRow[]>([]);
   const [withdrawals, setWithdrawals] = useState<RebateWithdrawalRow[]>([]);
   const [summary, setSummary] = useState<RebateSummary | null>(null);
@@ -82,7 +84,7 @@ const MyRebates: React.FC = () => {
   return (
     <PageWrap>
       <PageHeader>
-        <PageTitle><FiDollarSign /> My Rebates</PageTitle>
+        <PageTitle><FiDollarSign /> {t("panel.rebates")}</PageTitle>
         <PageSubtitle>Cashback credits, available balance, and payout requests</PageSubtitle>
       </PageHeader>
 

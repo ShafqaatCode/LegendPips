@@ -10,6 +10,7 @@ import ManIcon from "../../assets/icons/trading-svgrepo-com 1.png";
 import ArrowUp from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 import RegisterModal from "../../pages/Register/RegisterModal";
 import { useAuth } from "../../contexts/AuthContext";
+import { useLocale } from "../../contexts/LocaleContext";
 
 const WorkSectionWrapper = styled.section`
   padding: 3rem 1rem;
@@ -93,7 +94,7 @@ const SignUpText = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  text-align: left;
+  text-align: start;
 
   @media (max-width: 768px) {
     text-align: center;
@@ -155,13 +156,15 @@ const InstructionList = styled.div`
   justify-content: center;
   font-size: 16px;
   font-weight: 300;
-  // text-align: center;
+  text-align: start;
+  unicode-bidi: isolate;
   ul {
    display: flex;
    max-width: 800px;
    flex-direction: column;
    justify-content: center;
    gap:0.5rem;
+   padding-inline-start: 1.25rem;
   }
 `;
 
@@ -169,6 +172,7 @@ const HowItWorks: React.FC = () => {
   const [signupOpen, setSignupOpen] = useState(false);
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLocale();
 
   const handleSignupClick = () => {
     if (isAuthenticated) {
@@ -181,51 +185,25 @@ const HowItWorks: React.FC = () => {
   return (
     <WorkSectionWrapper>
       <SectionHeadingSet
-        upperText="All in one trading Platform"
-        mainHeading="How it works"
-        subText="Trade, earn, repeat. With rebates, expert tools, and a strong community, Legend Pips makes every trade more rewarding."
+        upperText={t("how.kicker")}
+        mainHeading={t("how.title")}
+        subText={t("how.body")}
       />
 
       <InstructionList>
         <ul>
-          <li>
-            Register for free and connect your existing tradinga ccount with one
-            of our partnered brokers.
-          </li>
-          <li>
-           Keep trading as you normally do  we’ll return a portion of the spread or commission on every trade.
-          </li>
-          <li>
-           Check your rewards in real-time  stay up to date with live statistics and see your cashback grow.
-          </li>
-          <li>
-           Take part in exciting competitions, leverage premium trading tools and signals, and benefit from daily market analysis.
-          </li>
-          <li>
-           Participate in our active forum  share tips, ask questions, and learn alongside other traders.
-          </li>
+          <li>{t("how.b1")}</li>
+          <li>{t("how.b2")}</li>
+          <li>{t("how.b3")}</li>
+          <li>{t("how.b4")}</li>
+          <li>{t("how.b5")}</li>
         </ul>
       </InstructionList>
 
       <WorksWrapper>
-        <WorkBox
-          index={1}
-          icon={HandShake}
-          title="Connect & Trade"
-          description="Link your account through Legend Pips. No changes to your broker or spreads."
-        />
-        <WorkBox
-          index={2}
-          icon={DBIcon}
-          title="Earn Rebates"
-          description="Get cashback on every trade made with supported brokers through our platform."
-        />
-        <WorkBox
-          index={3}
-          icon={WoletCard}
-          title="Grow Your Skills"
-          description="We pay you back—fast, simple, and with no hidden fees."
-        />
+        <WorkBox index={1} icon={HandShake} title={t("how.c1t")} description={t("how.c1d")} />
+        <WorkBox index={2} icon={DBIcon} title={t("how.c2t")} description={t("how.c2d")} />
+        <WorkBox index={3} icon={WoletCard} title={t("how.c3t")} description={t("how.c3d")} />
       </WorksWrapper>
       <SignUpPanel>
         <SignUpCard>
@@ -234,14 +212,12 @@ const HowItWorks: React.FC = () => {
               <img src={ManIcon} alt="" aria-hidden />
             </IconBadge>
             <SignUpText>
-              <SignUpTitle>Don&apos;t have an account?</SignUpTitle>
-              <SignUpSubtitle>
-                Create your free LegendPips account and start earning rebates today.
-              </SignUpSubtitle>
+              <SignUpTitle>{t("how.ctaTitle")}</SignUpTitle>
+              <SignUpSubtitle>{t("how.ctaSub")}</SignUpSubtitle>
             </SignUpText>
           </SignUpCopy>
           <SignUpButton type="button" onClick={handleSignupClick}>
-            Signup For Free
+            {t("how.ctaBtn")}
             <img src={ArrowUp} alt="" aria-hidden />
           </SignUpButton>
         </SignUpCard>

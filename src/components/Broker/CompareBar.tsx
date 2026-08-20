@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { FiColumns, FiX } from "react-icons/fi";
 import { clearCompareIds, comparePath, getCompareIds, subscribeCompare } from "../../utils/compareBrokers";
+import { useLocale } from "../../contexts/LocaleContext";
 
 const CompareBar: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLocale();
   const [ids, setIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -20,16 +22,16 @@ const CompareBar: React.FC = () => {
       <Spacer />
       <Bar>
       <span>
-        <FiColumns /> {ids.length} broker{ids.length === 1 ? "" : "s"} selected
+        <FiColumns /> {ids.length === 1 ? t("compare.selectedOne") : t("compare.selected", { n: ids.length })}
       </span>
       <Actions>
         {ids.length > 0 && (
-          <Chip type="button" onClick={() => clearCompareIds()} title="Clear selection">
-            Clear <FiX size={12} />
+          <Chip type="button" onClick={() => clearCompareIds()} title={t("compare.clear")}>
+            {t("compare.clear")} <FiX size={12} />
           </Chip>
         )}
         <Go type="button" disabled={ids.length < 2} onClick={() => navigate(comparePath(ids))}>
-          Compare now
+          {t("compare.now")}
         </Go>
       </Actions>
       </Bar>

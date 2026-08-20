@@ -13,6 +13,7 @@ import {
   EmptyState,
   userColors,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 import styled from 'styled-components';
 
 const ListStack = styled.div`
@@ -49,6 +50,7 @@ const RowCard = styled.div`
 `;
 
 const MyLiveAccounts: React.FC = () => {
+  const { t } = useLocale();
   const [items, setItems] = useState<LiveAccountRequestRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +82,7 @@ const MyLiveAccounts: React.FC = () => {
   return (
     <PageWrap>
       <PageHeader>
-        <PageTitle><FiLink /> My live accounts</PageTitle>
+        <PageTitle><FiLink /> {t("panel.liveAccounts")}</PageTitle>
         <PageSubtitle>
           Track account numbers you submitted for cashback linking — pending, approved, or rejected
         </PageSubtitle>

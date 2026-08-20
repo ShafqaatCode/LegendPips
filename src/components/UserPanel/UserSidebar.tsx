@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { getMyKyc, type KycStatus } from '../../services/kycService';
+import { useLocale } from '../../contexts/LocaleContext';
 import {
   FiHome, FiUser, FiAward, FiTrendingUp, FiVideo, FiBook, FiFileText,
   FiMessageSquare, FiSettings, FiLogOut, FiBarChart2, FiCalendar, FiX,
@@ -12,6 +13,12 @@ import {
 const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
   position: fixed;
   left: 0;
+  html[dir="rtl"] & {
+    left: auto;
+    right: 0;
+    border-right: none;
+    border-left: 1px solid rgba(251, 191, 36, 0.12);
+  }
   top: 0;
   width: 248px;
   height: 100vh;
@@ -29,6 +36,9 @@ const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     transform: translateX(${({ $isOpen }) => ($isOpen ? '0' : '-100%')});
+    html[dir="rtl"] & {
+      transform: translateX(${({ $isOpen }) => ($isOpen ? '0' : '100%')});
+    }
   }
 
   &::-webkit-scrollbar { width: 4px; }
@@ -214,6 +224,7 @@ interface UserSidebarProps {
 const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
   const navigate = useNavigate();
   const { user, logout: authLogout } = useAuth();
+  const { t } = useLocale();
   const [kycStatus, setKycStatus] = useState<KycStatus | undefined>(
     user?.kycStatus as KycStatus | undefined
   );
@@ -242,7 +253,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
   return (
     <SidebarWrapper $isOpen={isOpen}>
       <SidebarHeader>
-        <Logo><span className="mark">LP</span> Member</Logo>
+        <Logo><span className="mark">LP</span> {t("panel.member")}</Logo>
         <CloseButton onClick={onToggle}><FiX /></CloseButton>
       </SidebarHeader>
 
@@ -251,48 +262,48 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
           {!user?.profileImage && (user ? `${user.firstName[0]}${user.lastName[0]}` : 'U')}
         </Avatar>
         <ProfileText>
-          <h3>{user ? `${user.firstName} ${user.lastName}` : 'User'}</h3>
+          <h3>{user ? `${user.firstName} ${user.lastName}` : t("panel.userFallback")}</h3>
           <p>{user?.email || ''}</p>
         </ProfileText>
       </UserProfile>
 
       <NavSection>
-        <SectionTitle>Main</SectionTitle>
-        {link('/user-panel', 'Dashboard', FiHome, true)}
-        {link('/user-panel/profile', 'My Profile', FiUser)}
-        {link('/user-panel/verification', 'Identity Verification', FiShield, false, kycBadge)}
-        {link('/user-panel/contests', 'My Contests', FiAward)}
-        {link('/user-panel/signals', 'My Signals', FiTrendingUp)}
-        {link('/user-panel/rebates', 'My Rebates', FiDollarSign)}
-        {link('/user-panel/live-accounts', 'My live accounts', FiLink)}
-        {link('/user-panel/invite', 'Invite a friend', FiUserPlus)}
-        {link('/user-panel/ib-change', 'IB change', FiShuffle)}
-        {link('/user-panel/trader-profile', 'Trader profile', FiUsers)}
-        {link('/user-panel/copy-trading', 'Copy trading', FiShare2)}
+        <SectionTitle>{t("panel.main")}</SectionTitle>
+        {link('/user-panel', t("panel.dashboard"), FiHome, true)}
+        {link('/user-panel/profile', t("panel.profile"), FiUser)}
+        {link('/user-panel/verification', t("panel.verification"), FiShield, false, kycBadge)}
+        {link('/user-panel/contests', t("panel.contests"), FiAward)}
+        {link('/user-panel/signals', t("panel.signals"), FiTrendingUp)}
+        {link('/user-panel/rebates', t("panel.rebates"), FiDollarSign)}
+        {link('/user-panel/live-accounts', t("panel.liveAccounts"), FiLink)}
+        {link('/user-panel/invite', t("panel.invite"), FiUserPlus)}
+        {link('/user-panel/ib-change', t("panel.ibChange"), FiShuffle)}
+        {link('/user-panel/trader-profile', t("panel.traderProfile"), FiUsers)}
+        {link('/user-panel/copy-trading', t("panel.copyTrading"), FiShare2)}
       </NavSection>
 
       <NavSection>
-        <SectionTitle>Content</SectionTitle>
-        {link('/user-panel/webinars', 'My Webinars', FiVideo)}
-        {link('/user-panel/courses', 'My Courses', FiBook)}
-        {link('/user-panel/trading-videos', 'Trading Videos', FiVideo)}
-        {link('/user-panel/analysis', 'Saved Analysis', FiFileText)}
+        <SectionTitle>{t("panel.content")}</SectionTitle>
+        {link('/user-panel/webinars', t("panel.webinars"), FiVideo)}
+        {link('/user-panel/courses', t("panel.courses"), FiBook)}
+        {link('/user-panel/trading-videos', t("panel.videos"), FiVideo)}
+        {link('/user-panel/analysis', t("panel.analysis"), FiFileText)}
       </NavSection>
 
       <NavSection>
-        <SectionTitle>Community</SectionTitle>
-        {link('/user-panel/forum', 'Forum Posts', FiMessageSquare)}
-        {link('/user-panel/broker-reviews', 'Broker reviews', FiStar)}
-        {link('/user-panel/complaints', 'My complaints', FiAlertTriangle)}
-        {link('/user-panel/activity', 'Activity', FiBarChart2)}
-        {link('/user-panel/calendar', 'Calendar', FiCalendar)}
-        {link('/user-panel/settings', 'Settings', FiSettings)}
+        <SectionTitle>{t("panel.community")}</SectionTitle>
+        {link('/user-panel/forum', t("panel.forum"), FiMessageSquare)}
+        {link('/user-panel/broker-reviews', t("panel.reviews"), FiStar)}
+        {link('/user-panel/complaints', t("panel.complaints"), FiAlertTriangle)}
+        {link('/user-panel/activity', t("panel.activity"), FiBarChart2)}
+        {link('/user-panel/calendar', t("panel.calendar"), FiCalendar)}
+        {link('/user-panel/settings', t("panel.settings"), FiSettings)}
       </NavSection>
 
       <Footer>
-        {link('/', 'Homepage', FiGlobe, true)}
+        {link('/', t("panel.homepage"), FiGlobe, true)}
         <LogoutButton onClick={() => { authLogout(); navigate('/'); window.location.reload(); }}>
-          <FiLogOut /><span>Logout</span>
+          <FiLogOut /><span>{t("panel.logout")}</span>
         </LogoutButton>
       </Footer>
     </SidebarWrapper>

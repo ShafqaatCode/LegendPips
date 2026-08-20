@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useLocale } from '../../contexts/LocaleContext';
 
 const HeroWrapper = styled.section`
   background: white;
@@ -75,18 +76,19 @@ const IconWrapper = styled.div`
 `;
 
 const AnalysisHero: React.FC = () => {
+  const { t } = useLocale();
   return (
     <HeroWrapper>
       <ContentWrapper>
         <LeftContent>
           <MainHeading>
-            Market <HighlightText>Analysis</HighlightText>
+            {t("analysis.title")} <HighlightText>{t("analysis.highlight")}</HighlightText>
           </MainHeading>
           <SubHeading>
-            Smart <HighlightText>Insights</HighlightText> To Help You Make Stronger <HighlightText>Trading</HighlightText> Decisions.
+            {t("analysis.sub")}
           </SubHeading>
           <Description>
-            Forex analysis helps you understand where a currency pair is likely to move next. By examining historical price movements, economic indicators, and market sentiment, traders can make more informed decisions about when to enter or exit positions.
+            {t("analysis.body")}
           </Description>
         </LeftContent>
         <RightContent>

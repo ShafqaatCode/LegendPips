@@ -11,6 +11,7 @@ import chartIcon from "../../assets/FeaturesIcon/award.png";
 import contestIcon from "../../assets/FeaturesIcon/position.png";
 import headsetIcon from "../../assets/FeaturesIcon/headset.png";
 import complaintIcon from "../../assets/FeaturesIcon/complain.png";
+import { useLocale } from "../../contexts/LocaleContext";
 
 const FeaturesWrapper = styled.section`
   padding: 2rem 0 2.25rem;
@@ -122,57 +123,25 @@ const Description = styled.p`
 `;
 
 const LegendPipsFeatures: React.FC = () => {
+  const { t } = useLocale();
   const features = [
-    {
-      icon: clockIcon,
-      title: "Live Reporting",
-      desc: "See your cashback update instantly as you trade.",
-    },
-    {
-      icon: speedIcon,
-      title: "Premium Rebate Offers",
-      desc: "Enjoy the most competitive rates in the industry.",
-    },
-    {
-      icon: checkIcon,
-      title: "Handpicked Trusted Brokers",
-      desc: "Trade with only fully verified brokers.",
-    },
-    {
-      icon: networkIcon,
-      title: "Join Our Community",
-      desc: "Chat, learn, and succeed with like-minded people.",
-    },
-    {
-      icon: chartIcon,
-      title: "Signals & Expert Analysis",
-      desc: "Receive top-notch signals and timely insights.",
-    },
-    {
-      icon: contestIcon,
-      title: "Exciting Trading Contests",
-      desc: "Compete for prizes and showcase your skills.",
-    },
-    {
-      icon: headsetIcon,
-      title: "Quick & Helpful Support",
-      desc: "Get fast, friendly help whenever you need it.",
-    },
-    {
-      icon: complaintIcon,
-      title: "Raise a Complaint",
-      desc: "Help us improve by reporting any concerns you have.",
-      to: "/complaints",
-    },
+    { icon: clockIcon, title: t("pips.f1t"), desc: t("pips.f1d") },
+    { icon: speedIcon, title: t("pips.f2t"), desc: t("pips.f2d") },
+    { icon: checkIcon, title: t("pips.f3t"), desc: t("pips.f3d") },
+    { icon: networkIcon, title: t("pips.f4t"), desc: t("pips.f4d") },
+    { icon: chartIcon, title: t("pips.f5t"), desc: t("pips.f5d") },
+    { icon: contestIcon, title: t("pips.f6t"), desc: t("pips.f6d") },
+    { icon: headsetIcon, title: t("pips.f7t"), desc: t("pips.f7d") },
+    { icon: complaintIcon, title: t("pips.f8t"), desc: t("pips.f8d"), to: "/complaints" },
   ];
 
   return (
     <FeaturesWrapper>
       <Inner>
         <SectionHeadingSet
-          upperText="Why traders choose us"
-          mainHeading="Legend Pips Features"
-          subText="Everything you need to trade smarter, earn rebates, and grow with a trusted community."
+          upperText={t("pips.kicker")}
+          mainHeading={t("pips.title")}
+          subText={t("pips.body")}
         />
 
         <Grid>

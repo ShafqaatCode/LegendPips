@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import bannerBg from '../../assets/banner/BannerBg.jpg';
+import { useLocale } from '../../contexts/LocaleContext';
 
 const HeroWrapper = styled.section`
   position: relative;
@@ -206,6 +207,7 @@ const ChatWidget = styled.div`
 
 const CoursesHero: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLocale();
 
   return (
     <HeroWrapper>
@@ -213,14 +215,14 @@ const CoursesHero: React.FC = () => {
       <ContentWrapper>
         <LeftContent>
           <MainHeading>
-            Understand <HighlightText>Markets,</HighlightText> Trade <HighlightText>Smarter</HighlightText>
+            {t("courses.title")} <HighlightText>{t("courses.highlight1")}</HighlightText> Trade <HighlightText>{t("courses.highlight2")}</HighlightText>
           </MainHeading>
-          <Subtitle>An All-in-One Trading Platform.</Subtitle>
+          <Subtitle>{t("courses.subtitle")}</Subtitle>
           <Description>
-            Learn trading with expert guidance and hands-on practice. Build your knowledge, skills, and confidence to trade smarter and make informed decisions in the markets.
+            {t("courses.body")}
           </Description>
           <AccessButton onClick={() => navigate('/register')}>
-            Access Now
+            {t("courses.cta")}
           </AccessButton>
         </LeftContent>
         <RightContent>

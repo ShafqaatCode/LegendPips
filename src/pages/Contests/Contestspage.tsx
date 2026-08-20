@@ -7,6 +7,7 @@ import styled from 'styled-components';
 
 import Competitions from '../../components/ContestList/Competitions';
 import ContestHeaderWithModals from '../../components/ContestList/BrodcumHeader';
+import { useLocale } from '../../contexts/LocaleContext';
 const MainContainer = styled.main`
   margin: 0;
   padding: 0;
@@ -16,11 +17,11 @@ const MainContainer = styled.main`
 
 
 const Contests: React.FC = () => {
-
+  const { t } = useLocale();
 
   return (
     <MainContainer>
-      <ContestHeaderWithModals heading='Elite Skills Contest on the Web We Never Ask for Real Money!' />
+      <ContestHeaderWithModals heading={t('contests.pageHeading')} />
       <Competitions />
     </MainContainer>
   )

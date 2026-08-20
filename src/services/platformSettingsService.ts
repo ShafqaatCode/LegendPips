@@ -16,6 +16,14 @@ export interface PlatformSettings {
   defaultOgImageUrl?: string;
   navItems: NavItem[];
   pageMeta: PageMetaEntry[];
+  legendScoreWeights?: {
+    regulation?: number;
+    tradingConditions?: number;
+    withdrawals?: number;
+    userExperience?: number;
+    complaints?: number;
+    support?: number;
+  };
 }
 
 const json = async (url: string, init?: RequestInit) => {

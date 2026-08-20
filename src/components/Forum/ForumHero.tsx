@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import bannerBg from '../../assets/banner/BannerBg.jpg';
+import { useLocale } from '../../contexts/LocaleContext';
 
 const HeroWrapper = styled.section`
   position: relative;
@@ -89,17 +90,17 @@ const FeedHeading = styled.h3`
 `;
 
 const ForumHero: React.FC = () => {
+  const { t } = useLocale();
   return (
     <HeroWrapper>
       <ChartOverlay />
       <ContentWrapper>
         <LeftContent>
-          <MainHeading>TRADER COMMUNITY</MainHeading>
+          <MainHeading>{t("forum.title")}</MainHeading>
           <Description>
-            Share market ideas, ask questions, and join live discussions across Forex, Gold, Crypto,
-            Stocks, and Indices — post charts, leave comments, and learn with traders worldwide.
+            {t("forum.body")}
           </Description>
-          <FeedHeading>Community Feed</FeedHeading>
+          <FeedHeading>{t("forum.feed")}</FeedHeading>
         </LeftContent>
       </ContentWrapper>
     </HeroWrapper>

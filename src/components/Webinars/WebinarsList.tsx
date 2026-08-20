@@ -9,6 +9,7 @@ import WatchReplayModal from './WatchReplayModal';
 import type { ReserveSeatData } from './ReserveSeatModal';
 import type { JoinLiveData } from './JoinLiveModal';
 import type { WatchReplayData } from './WatchReplayModal';
+import { useLocale } from '../../contexts/LocaleContext';
 
 const SectionWrapper = styled.section`
   background: #fafbfc;
@@ -239,9 +240,8 @@ const ActionButton = styled.button<{ $type: 'live' | 'upcoming' | 'recorded'; $p
 
 interface Webinar {
   id: number;
-  title: string;
+  desc: "dLive" | "dSize";
   instructor: string;
-  description: string;
   date?: string;
   time?: string;
   status: 'live' | 'upcoming' | 'recorded';
@@ -251,159 +251,63 @@ interface Webinar {
 }
 
 const allWebinars: Webinar[] = [
-  {
-    id: 1,
-    title: 'Gold Market Breakdown',
-    instructor: 'Newson Official',
-    description: 'Live Analysis of XAU/USD with trade Planning.',
-    date: '26/12/2020',
-    time: '15:08',
-    status: 'live',
-    thumbnail: bannerGirl
-  },
-  {
-    id: 2,
-    title: 'Smart Risk Management',
-    instructor: 'Newson Official',
-    description: 'Live Analysis of XAU/USD with trade Planning.',
-    date: '27/12/2020',
-    time: '15:08',
-    status: 'upcoming',
-    thumbnail: brokerbannergirl
-  },
-  {
-    id: 3,
-    title: 'Live Market Breakdown',
-    instructor: 'Newson Official',
-    description: 'Live Analysis of XAU/USD with trade Planning.',
-    date: '28/12/2020',
-    time: '14:00',
-    status: 'upcoming',
-    thumbnail: bannerGirl
-  },
-  {
-    id: 4,
-    title: 'Forex Trading Basics',
-    instructor: 'Newson Official',
-    description: 'Live Analysis of XAU/USD with trade Planning.',
-    date: '20/10/2020',
-    time: '14:00',
-    status: 'recorded',
-    premium: false,
-    thumbnail: brokerbannergirl
-  },
-  {
-    id: 5,
-    title: 'Gold Market Insights',
-    instructor: 'Newson Official',
-    description: 'Learn position sizing and drawdown control.',
-    status: 'recorded',
-    premium: true,
-    price: '$19.99',
-    thumbnail: bannerGirl
-  },
-  {
-    id: 6,
-    title: 'Trade Planning Workshop',
-    instructor: 'Newson Official',
-    description: 'Live Analysis of XAU/USD with trade Planning.',
-    date: '20/10/2020',
-    time: '14:00',
-    status: 'recorded',
-    premium: false,
-    thumbnail: brokerbannergirl
-  },
-  {
-    id: 7,
-    title: 'Forex Risk Management Webinar',
-    instructor: 'Newson Official',
-    description: 'Learn position sizing and drawdown control.',
-    status: 'recorded',
-    premium: true,
-    price: '$19.99',
-    thumbnail: bannerGirl
-  },
-  {
-    id: 8,
-    title: 'Price Action Explained',
-    instructor: 'Newson Official',
-    description: 'Live Analysis of XAU/USD with trade Planning.',
-    date: '20/10/2020',
-    time: '14:00',
-    status: 'recorded',
-    premium: false,
-    thumbnail: brokerbannergirl
-  },
-  {
-    id: 9,
-    title: 'Advanced Trading Strategies',
-    instructor: 'Newson Official',
-    description: 'Learn position sizing and drawdown control.',
-    status: 'recorded',
-    premium: true,
-    price: '$24.99',
-    thumbnail: bannerGirl
-  },
-  {
-    id: 10,
-    title: 'Market Structure Analysis',
-    instructor: 'Newson Official',
-    description: 'Live Analysis of XAU/USD with trade Planning.',
-    date: '22/10/2020',
-    time: '16:00',
-    status: 'recorded',
-    premium: false,
-    thumbnail: brokerbannergirl
-  },
-  {
-    id: 11,
-    title: 'Position Sizing Masterclass',
-    instructor: 'Newson Official',
-    description: 'Learn position sizing and drawdown control.',
-    status: 'recorded',
-    premium: true,
-    price: '$19.99',
-    thumbnail: bannerGirl
-  },
-  {
-    id: 12,
-    title: 'Trading Psychology Workshop',
-    instructor: 'Newson Official',
-    description: 'Live Analysis of XAU/USD with trade Planning.',
-    date: '25/10/2020',
-    time: '15:00',
-    status: 'recorded',
-    premium: false,
-    thumbnail: brokerbannergirl
-  }
+  { id: 1, desc: "dLive", instructor: "Newson Official", date: "26/12/2020", time: "15:08", status: "live", thumbnail: bannerGirl },
+  { id: 2, desc: "dLive", instructor: "Newson Official", date: "27/12/2020", time: "15:08", status: "upcoming", thumbnail: brokerbannergirl },
+  { id: 3, desc: "dLive", instructor: "Newson Official", date: "28/12/2020", time: "14:00", status: "upcoming", thumbnail: bannerGirl },
+  { id: 4, desc: "dLive", instructor: "Newson Official", date: "20/10/2020", time: "14:00", status: "recorded", premium: false, thumbnail: brokerbannergirl },
+  { id: 5, desc: "dSize", instructor: "Newson Official", status: "recorded", premium: true, price: "$19.99", thumbnail: bannerGirl },
+  { id: 6, desc: "dLive", instructor: "Newson Official", date: "20/10/2020", time: "14:00", status: "recorded", premium: false, thumbnail: brokerbannergirl },
+  { id: 7, desc: "dSize", instructor: "Newson Official", status: "recorded", premium: true, price: "$19.99", thumbnail: bannerGirl },
+  { id: 8, desc: "dLive", instructor: "Newson Official", date: "20/10/2020", time: "14:00", status: "recorded", premium: false, thumbnail: brokerbannergirl },
+  { id: 9, desc: "dSize", instructor: "Newson Official", status: "recorded", premium: true, price: "$24.99", thumbnail: bannerGirl },
+  { id: 10, desc: "dLive", instructor: "Newson Official", date: "22/10/2020", time: "16:00", status: "recorded", premium: false, thumbnail: brokerbannergirl },
+  { id: 11, desc: "dSize", instructor: "Newson Official", status: "recorded", premium: true, price: "$19.99", thumbnail: bannerGirl },
+  { id: 12, desc: "dLive", instructor: "Newson Official", date: "25/10/2020", time: "15:00", status: "recorded", premium: false, thumbnail: brokerbannergirl },
 ];
 
 const WebinarsList: React.FC = () => {
-  const [activeFilter, setActiveFilter] = useState<string>('All Webinars');
+  const { t } = useLocale();
+  const [activeFilter, setActiveFilter] = useState<string>("all");
   const [selectedWebinar, setSelectedWebinar] = useState<Webinar | null>(null);
   const [reserveModalOpen, setReserveModalOpen] = useState(false);
   const [joinModalOpen, setJoinModalOpen] = useState(false);
   const [watchModalOpen, setWatchModalOpen] = useState(false);
 
+  const titleOf = (w: Webinar) => t(`webinars.t${w.id}`);
+  const descOf = (w: Webinar) => t(`webinars.${w.desc}`);
+  const modalWebinar = selectedWebinar
+    ? {
+        ...selectedWebinar,
+        title: titleOf(selectedWebinar),
+        description: descOf(selectedWebinar),
+      }
+    : null;
+
   const getFilteredWebinars = () => {
     switch (activeFilter) {
-      case 'Upcoming':
-        return allWebinars.filter(w => w.status === 'upcoming');
-      case 'Recorded':
-        return allWebinars.filter(w => w.status === 'recorded');
-      case 'Free':
-        return allWebinars.filter(w => w.status === 'recorded' && !w.premium);
-      case 'Premium':
-        return allWebinars.filter(w => w.premium);
+      case "upcoming":
+        return allWebinars.filter((w) => w.status === "upcoming");
+      case "recorded":
+        return allWebinars.filter((w) => w.status === "recorded");
+      case "free":
+        return allWebinars.filter((w) => w.status === "recorded" && !w.premium);
+      case "premium":
+        return allWebinars.filter((w) => w.premium);
       default:
         return allWebinars;
     }
   };
 
   const getButtonText = (webinar: Webinar) => {
-    if (webinar.status === 'live') return 'Join Live';
-    if (webinar.status === 'upcoming') return 'Reserve Seat';
-    return 'Watch Replay';
+    if (webinar.status === "live") return t("webinars.joinLive");
+    if (webinar.status === "upcoming") return t("webinars.reserve");
+    return t("webinars.replay");
+  };
+
+  const statusLabel = (webinar: Webinar) => {
+    if (webinar.status === "live") return t("webinars.joinLive");
+    if (webinar.status === "upcoming") return t("webinars.upcoming");
+    return t("webinars.recorded");
   };
 
   const handleCardClick = (webinar: Webinar) => {
@@ -457,7 +361,13 @@ const WebinarsList: React.FC = () => {
     return Promise.resolve();
   };
 
-  const filters = ['All Webinars', 'Upcoming', 'Recorded', 'Free', 'Premium'];
+  const filters = [
+    { id: "all", label: t("webinars.all") },
+    { id: "upcoming", label: t("webinars.upcoming") },
+    { id: "recorded", label: t("webinars.recorded") },
+    { id: "free", label: t("webinars.free") },
+    { id: "premium", label: t("webinars.premium") },
+  ];
 
   return (
     <SectionWrapper>
@@ -466,11 +376,11 @@ const WebinarsList: React.FC = () => {
           <FilterButtons>
             {filters.map((filter) => (
               <FilterButton
-                key={filter}
-                $active={activeFilter === filter}
-                onClick={() => setActiveFilter(filter)}
+                key={filter.id}
+                $active={activeFilter === filter.id}
+                onClick={() => setActiveFilter(filter.id)}
               >
-                {filter}
+                {filter.label}
               </FilterButton>
             ))}
           </FilterButtons>
@@ -481,20 +391,20 @@ const WebinarsList: React.FC = () => {
           {getFilteredWebinars().map((webinar) => (
             <WebinarCard key={webinar.id} onClick={() => handleCardClick(webinar)}>
               <ThumbnailWrapper>
-                <Thumbnail src={webinar.thumbnail} alt={webinar.title} />
+                <Thumbnail src={webinar.thumbnail} alt={titleOf(webinar)} />
                 <StatusTag $type={webinar.status}>
-                  {webinar.status === 'live' ? 'Join Live' : webinar.status === 'upcoming' ? 'Upcoming' : 'Recorded'}
+                  {statusLabel(webinar)}
                 </StatusTag>
                 {webinar.status === 'recorded' && (
                   <PriceTag $premium={webinar.premium}>
-                    {webinar.premium ? `Premium ${webinar.price}` : 'Free'}
+                    {webinar.premium ? `${t("webinars.premium")} ${webinar.price}` : t("webinars.free")}
                   </PriceTag>
                 )}
               </ThumbnailWrapper>
               <WebinarContent>
-                <WebinarTitle>{webinar.title}</WebinarTitle>
+                <WebinarTitle>{titleOf(webinar)}</WebinarTitle>
                 <Instructor>{webinar.instructor}</Instructor>
-                <WebinarDescription>{webinar.description}</WebinarDescription>
+                <WebinarDescription>{descOf(webinar)}</WebinarDescription>
                 {(webinar.date || webinar.time) && (
                   <WebinarMeta>
                     {webinar.date && <DateTime>📅 {webinar.date}</DateTime>}
@@ -522,7 +432,7 @@ const WebinarsList: React.FC = () => {
             setReserveModalOpen(false);
             setSelectedWebinar(null);
           }}
-          webinar={selectedWebinar}
+          webinar={modalWebinar}
           onSubmit={handleReserveSeat}
         />
 
@@ -532,7 +442,7 @@ const WebinarsList: React.FC = () => {
             setJoinModalOpen(false);
             setSelectedWebinar(null);
           }}
-          webinar={selectedWebinar}
+          webinar={modalWebinar}
           onJoin={handleJoinLive}
         />
 
@@ -542,7 +452,7 @@ const WebinarsList: React.FC = () => {
             setWatchModalOpen(false);
             setSelectedWebinar(null);
           }}
-          webinar={selectedWebinar}
+          webinar={modalWebinar}
           onWatch={handleWatchReplay}
         />
       </ContentWrapper>

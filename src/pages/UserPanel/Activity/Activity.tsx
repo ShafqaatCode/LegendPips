@@ -10,6 +10,7 @@ import {
   TimelineList, TimelineItem, TimelineIcon,
   ErrorBanner, GhostButton, EmptyState,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const iconForType = (type: string): { icon: React.ElementType; color: string } => {
   switch (type) {
@@ -25,6 +26,7 @@ const iconForType = (type: string): { icon: React.ElementType; color: string } =
 };
 
 const Activity: React.FC = () => {
+  const { t } = useLocale();
   const [items, setItems] = useState<ActivityRow[]>([]);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<{ hasNextPage: boolean } | null>(null);
@@ -54,7 +56,7 @@ const Activity: React.FC = () => {
   return (
     <PageWrap>
       <PageHeader>
-        <PageTitle><FiActivity /> Activity</PageTitle>
+        <PageTitle><FiActivity /> {t("panel.activity")}</PageTitle>
         <PageSubtitle>Your platform activity timeline</PageSubtitle>
       </PageHeader>
 

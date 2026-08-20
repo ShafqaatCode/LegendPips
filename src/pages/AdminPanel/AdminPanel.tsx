@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom';
 import AdminSidebar from '../../components/AdminPanel/AdminSidebar';
 import AdminHeader from '../../components/AdminPanel/AdminHeader';
 import { adminColors } from '../../components/AdminPanel/adminUi';
+import AutoTranslateRoot from '../../components/i18n/AutoTranslateRoot';
 
 const PanelWrapper = styled.div`
   display: flex;
@@ -58,11 +59,17 @@ const AdminPanel: React.FC = () => {
   return (
     <PanelWrapper>
       <Backdrop $isOpen={sidebarOpen} onClick={() => setSidebarOpen(false)} />
-      <AdminSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      <div className="notranslate">
+        <AdminSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      </div>
       <MainContent>
-        <AdminHeader onMenuClick={() => setSidebarOpen(true)} />
+        <div className="notranslate">
+          <AdminHeader onMenuClick={() => setSidebarOpen(true)} />
+        </div>
         <ContentArea>
-          <Outlet />
+          <AutoTranslateRoot>
+            <Outlet />
+          </AutoTranslateRoot>
         </ContentArea>
       </MainContent>
     </PanelWrapper>

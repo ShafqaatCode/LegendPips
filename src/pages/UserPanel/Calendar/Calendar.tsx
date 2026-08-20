@@ -6,6 +6,7 @@ import {
   SectionCard, SectionHead, SectionBody, MetaLine, ListStack, ListCard, CardTitle,
   GhostButton,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const Layout = styled.div`
   display: grid;
@@ -62,6 +63,7 @@ const DayCell = styled.div<{ $muted?: boolean; $today?: boolean; $event?: boolea
 `;
 
 const Calendar: React.FC = () => {
+  const { t } = useLocale();
   const [currentDate, setCurrentDate] = useState(new Date());
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const weekDays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
@@ -93,7 +95,7 @@ const Calendar: React.FC = () => {
   return (
     <PageWrap>
       <PageHeader>
-        <PageTitle><FiCalendar /> Calendar</PageTitle>
+        <PageTitle><FiCalendar /> {t("panel.calendar")}</PageTitle>
         <PageSubtitle>Webinars, contests, and scheduled events</PageSubtitle>
       </PageHeader>
 

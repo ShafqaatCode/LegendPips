@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import { FaStar } from "react-icons/fa";
 import { FiColumns, FiX } from "react-icons/fi";
 import bannerBg from "../../assets/banner/BannerBg.jpg";
 import CompareToggle from "../../components/Broker/CompareToggle";
-import { fetchBrokersPage, fetchCompareBrokers, type ApiBroker } from "../../services/brokerService";
+import { fetchBrokersPage, fetchCompareBrokers, fetchCompareBrokersBySlugs, type ApiBroker } from "../../services/brokerService";
 import { clearCompareIds, getCompareIds, setCompareIds } from "../../utils/compareBrokers";
+import { comparePairPath, parseComparePairSlug } from "../../utils/brokerSlug";
+import { useLocale } from "../../contexts/LocaleContext";
 
 function cashbackScore(rate?: string) {
   const n = parseFloat(String(rate || "").replace(/[^\d.]/g, ""));
@@ -19,6 +21,8 @@ function spreadScore(spread?: string) {
 }
 
 const ComparePage: React.FC = () => {
+  const navigate = useNavigate();
+  const { pairSlug } = useParams();
   const [params, setParams] = useSearchParams();
   const ids = useMemo(
     () => (params.get("ids") || "").split(",").map((s) => s.trim()).filter(Boolean).slice(0, 4),
@@ -28,22 +32,57 @@ const ComparePage: React.FC = () => {
   const [items, setItems] = useState<ApiBroker[]>([]);
   const [pool, setPool] = useState<ApiBroker[]>([]);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState<"forex" | "crypto" | "prop" | "">("");
+  const [category, setCategory] = useState<"forex" | "crypto" | "prop" | "">(
+    () => (params.get("category") as "forex" | "crypto" | "prop" | "") || ""
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const { t } = useLocale();
+
+  const propMode = useMemo(
+    () =>
+      category === "prop" ||
+      (items.length >= 2 && items.every((b) => b.rebateCategory === "prop")),
+    [category, items]
+  );
 
   useEffect(() => {
     if (ids.length) setCompareIds(ids);
   }, [ids]);
 
   useEffect(() => {
+    if (pairSlug) return;
     if (ids.length) return;
     const stored = getCompareIds();
     if (stored.length >= 2) setParams({ ids: stored.join(",") }, { replace: true });
-  }, [ids.length, setParams]);
+  }, [ids.length, pairSlug, setParams]);
 
   useEffect(() => {
+    if (!pairSlug) return;
+    const slugs = parseComparePairSlug(pairSlug);
+    if (slugs.length < 2) return;
+    let cancelled = false;
+    setLoading(true);
+    fetchCompareBrokersBySlugs(slugs)
+      .then((rows) => {
+        if (cancelled) return;
+        setItems(rows);
+        if (rows.length >= 2) setCompareIds(rows.map((b) => b._id));
+      })
+      .catch((e) => {
+        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to compare");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [pairSlug]);
+
+  useEffect(() => {
+    if (pairSlug) return;
     if (ids.length < 2) {
       setItems([]);
       setError(null);
@@ -65,7 +104,12 @@ const ComparePage: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [ids]);
+  }, [ids, pairSlug]);
+
+  useEffect(() => {
+    if (pairSlug || items.length < 2) return;
+    navigate(comparePairPath(items), { replace: true });
+  }, [items, pairSlug, navigate]);
 
   useEffect(() => {
     fetchBrokersPage({
@@ -115,10 +159,9 @@ const ComparePage: React.FC = () => {
       <Hero>
         <Overlay />
         <HeroInner>
-          <h1>BROKER COMPARISON</h1>
+          <h1>{t("compare.title")}</h1>
           <p>
-            Compare regulation, spreads, cashback, and reviews side by side. Pick 2–4 brokers and share the
-            link with other traders.
+            {t("compare.body")}
           </p>
         </HeroInner>
       </Hero>
@@ -126,7 +169,7 @@ const ComparePage: React.FC = () => {
       <Page>
         <Picker>
           <h2>
-            <FiColumns /> Add brokers
+            <FiColumns /> {t("compare.add")}
           </h2>
           <Filters>
             <input
@@ -201,6 +244,13 @@ const ComparePage: React.FC = () => {
               </thead>
               <tbody>
                 <Row
+                  label="LegendScore"
+                  values={items.map((b) => ({
+                    text: b.legendScore ? `${b.legendScore.toFixed(1)}/10` : "—",
+                    win: b.legendScore === Math.max(0, ...items.map((x) => x.legendScore || 0)) && !!b.legendScore,
+                  }))}
+                />
+                <Row
                   label="Rating"
                   values={items.map((b) => {
                     const avg = b.reviewStats?.average || b.rebatesStarRating || 0;
@@ -218,29 +268,126 @@ const ComparePage: React.FC = () => {
                     };
                   })}
                 />
-                <Row
-                  label="Min deposit"
-                  values={items.map((b) => ({
-                    text: b.minDeposit ? `$${b.minDeposit}` : "—",
-                    win: b.minDeposit === bestMin && bestMin !== Infinity,
-                  }))}
-                />
-                <Row
-                  label="Spread from"
-                  values={items.map((b) => ({
-                    text: b.spreadFrom || "—",
-                    win: spreadScore(b.spreadFrom) === bestSpread && bestSpread !== Infinity,
-                  }))}
-                />
-                <Row
-                  label="Cashback"
-                  values={items.map((b) => ({
-                    text: b.cashbackRate || "—",
-                    win: cashbackScore(b.cashbackRate) === bestCash && bestCash > 0,
-                  }))}
-                />
-                <Row label="Regulation" values={items.map((b) => ({ text: b.regulation || "—" }))} />
-                <Row label="Crypto" values={items.map((b) => ({ text: b.crypto || "—" }))} />
+                {propMode ? (
+                  <>
+                    <Row
+                      label="Best first cashback"
+                      values={items.map((b) => {
+                        const o = (b.propOffers || [])[0];
+                        const best = (b.propOffers || []).reduce(
+                          (m, x) => Math.max(m, cashbackScore(x.firstPurchaseCashback)),
+                          -1
+                        );
+                        const top = (b.propOffers || []).find(
+                          (x) => cashbackScore(x.firstPurchaseCashback) === best
+                        ) || o;
+                        return {
+                          text: top?.firstPurchaseCashback || "—",
+                          win: cashbackScore(top?.firstPurchaseCashback) === Math.max(...items.map((x) => {
+                            const bb = (x.propOffers || []).reduce(
+                              (m, p) => Math.max(m, cashbackScore(p.firstPurchaseCashback)),
+                              -1
+                            );
+                            return bb;
+                          })) && cashbackScore(top?.firstPurchaseCashback) > 0,
+                        };
+                      })}
+                    />
+                    <Row
+                      label="Discount %"
+                      values={items.map((b) => ({
+                        text: (b.propOffers || [])[0]?.discountPercent || "—",
+                      }))}
+                    />
+                    <Row
+                      label="Discount code"
+                      values={items.map((b) => ({
+                        text:
+                          (b.propOffers || []).find((o) => o.discountCode)?.discountCode ||
+                          (b.propPromoCodes || []).find((p) => p.active !== false)?.code ||
+                          "—",
+                      }))}
+                    />
+                    <Row
+                      label="Challenge fee"
+                      values={items.map((b) => ({
+                        text: (b.propOffers || [])[0]?.challengeFee || "—",
+                      }))}
+                    />
+                    <Row
+                      label="Profit target"
+                      values={items.map((b) => ({
+                        text: (b.propOffers || [])[0]?.profitTarget || "—",
+                      }))}
+                    />
+                    <Row
+                      label="Daily / max drawdown"
+                      values={items.map((b) => {
+                        const o = (b.propOffers || [])[0];
+                        return {
+                          text: [o?.dailyDrawdown, o?.maxDrawdown].filter(Boolean).join(" / ") || "—",
+                        };
+                      })}
+                    />
+                    <Row
+                      label="Min trading days"
+                      values={items.map((b) => ({
+                        text: (b.propOffers || [])[0]?.minTradingDays || "—",
+                      }))}
+                    />
+                    <Row
+                      label="Payout cycle"
+                      values={items.map((b) => ({
+                        text: (b.propOffers || [])[0]?.payoutCycle || "—",
+                      }))}
+                    />
+                    <Row
+                      label="Scaling"
+                      values={items.map((b) => ({
+                        text: (b.propOffers || [])[0]?.scalingPlan || "—",
+                      }))}
+                    />
+                    <Row
+                      label="Eval / split / size"
+                      values={items.map((b) => {
+                        const o = (b.propOffers || [])[0];
+                        return {
+                          text: [o?.evaluationType, o?.profitSplit, o?.accountSize].filter(Boolean).join(" · ") || "—",
+                        };
+                      })}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Row
+                      label="Min deposit"
+                      values={items.map((b) => ({
+                        text: b.minDeposit ? `$${b.minDeposit}` : "—",
+                        win: b.minDeposit === bestMin && bestMin !== Infinity,
+                      }))}
+                    />
+                    <Row
+                      label="Spread from"
+                      values={items.map((b) => ({
+                        text: b.spreadFrom || "—",
+                        win: spreadScore(b.spreadFrom) === bestSpread && bestSpread !== Infinity,
+                      }))}
+                    />
+                    <Row
+                      label="Cashback"
+                      values={items.map((b) => ({
+                        text: b.cashbackRate || "—",
+                        win: cashbackScore(b.cashbackRate) === bestCash && bestCash > 0,
+                      }))}
+                    />
+                    <Row label="Country" values={items.map((b) => ({ text: b.country || "—" }))} />
+                    <Row label="Leverage" values={items.map((b) => ({ text: b.leverage || "—" }))} />
+                    <Row label="Platforms" values={items.map((b) => ({ text: b.platforms || "—" }))} />
+                    <Row label="Commission" values={items.map((b) => ({ text: b.commission || "—" }))} />
+                    <Row label="Regulation" values={items.map((b) => ({ text: b.regulation || "—" }))} />
+                    <Row label="Crypto" values={items.map((b) => ({ text: b.crypto || "—" }))} />
+                  </>
+                )}
                 <Row label="Type" values={items.map((b) => ({ text: b.rebateCategory || "forex" }))} />
                 <Row label="Verified" values={items.map((b) => ({ text: b.verified === false ? "No" : "Yes" }))} />
                 <Row
@@ -250,18 +397,22 @@ const ComparePage: React.FC = () => {
                     warn: !!b.blacklisted,
                   }))}
                 />
-                <Row
-                  label="Funding"
-                  values={items.map((b) => ({
-                    text: (b.fundingMethods || []).slice(0, 4).join(", ") || "—",
-                  }))}
-                />
-                <Row
-                  label="Highlights"
-                  values={items.map((b) => ({
-                    text: (b.features || []).slice(0, 3).join(" · ") || "—",
-                  }))}
-                />
+                {!propMode && (
+                  <>
+                    <Row
+                      label="Funding"
+                      values={items.map((b) => ({
+                        text: (b.fundingMethods || []).slice(0, 4).join(", ") || "—",
+                      }))}
+                    />
+                    <Row
+                      label="Highlights"
+                      values={items.map((b) => ({
+                        text: (b.features || []).slice(0, 3).join(" · ") || "—",
+                      }))}
+                    />
+                  </>
+                )}
                 <tr>
                   <th>Actions</th>
                   {items.map((b) => (

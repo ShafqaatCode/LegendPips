@@ -4,6 +4,7 @@ import styled from "styled-components";
 import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import NetworkImg from "../../assets/FeaturesIcon/position.png";
 import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
+import { useLocale } from "../../contexts/LocaleContext";
 
 
 const MainWrapper = styled.main`
@@ -64,6 +65,7 @@ const ViewDetailsLink = styled(Link)`
 `;
 
 const ContestSection: React.FC = () => {
+    const { t } = useLocale();
     return (
         <MainWrapper>
 
@@ -72,10 +74,10 @@ const ContestSection: React.FC = () => {
                 <ImgWrapper>
                     <img src={NetworkImg} alt="" />
                 </ImgWrapper>
-                <SectionHeadingSet subText="Join our exciting trading contest designed for both new and experienced traders. Make the most profit during the contest period and take home huge cash prizes! Track your rank live and beat the best in the game." mainHeading="Exciting trading Contest " upperText="All in one trading platform" />
+                <SectionHeadingSet subText={t("contests.body")} mainHeading={t("contests.heading")} upperText={t("contests.kicker")} />
 
                 <ViewDetailsLink to="/contests">
-                  View Details
+                  {t("contests.view")}
                   <img width="24" height="24" src={ArrowIcon} alt="" aria-hidden />
                 </ViewDetailsLink>
 

@@ -6,6 +6,7 @@ import {
   SectionCard, SectionHead, SectionBody,
   PrimaryButton, ErrorBanner, userColors,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 import {
   fetchMyReferralInvites,
   fetchReferralTemplates,
@@ -249,6 +250,7 @@ function buildLivePreview(
 }
 
 const InviteFriends: React.FC = () => {
+  const { t } = useLocale();
   const { user } = useAuth();
   const [templates, setTemplates] = useState<ReferralTemplate[]>([]);
   const [history, setHistory] = useState<ReferralInviteRow[]>([]);
@@ -330,7 +332,7 @@ const InviteFriends: React.FC = () => {
   return (
     <PageWrap>
       <PageHeader>
-        <PageTitle><FiUserPlus /> Invite a friend by email</PageTitle>
+        <PageTitle><FiUserPlus /> {t("panel.pageInvite")}</PageTitle>
         <PageSubtitle>
           Choose a template, check the subject & message, then send — from LegendPips to your friend
         </PageSubtitle>

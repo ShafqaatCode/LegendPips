@@ -21,10 +21,20 @@ export const GlobalStyles = createGlobalStyle`
   body {
     margin: 0;
     padding: 0;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', 'Noto Naskh Arabic', 'Noto Nastaliq Urdu', sans-serif;
     
     background-color: ${({ theme }) => theme.colors.surface};
     color: ${({ theme }) => theme.colors.text};
+  }
+
+  html[dir="rtl"] body {
+    text-align: right;
+  }
+
+  html[dir="rtl"] input,
+  html[dir="rtl"] textarea,
+  html[dir="rtl"] select {
+    text-align: right;
   }
 
   a {

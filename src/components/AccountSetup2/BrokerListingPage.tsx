@@ -56,6 +56,11 @@ export type Broker = {
   fundingMethods: string[];
   cashbackRate?: string;
   reviewStats?: { average: number; count: number };
+  country?: string;
+  leverage?: string;
+  platforms?: string;
+  commission?: string;
+  legendScore?: number;
 };
 
 export type AccountType = {
@@ -82,6 +87,22 @@ type BrokerListingPageProps = {
   onPageChange: (page: number) => void;
   category?: "forex" | "crypto" | "prop";
   onCategoryChange?: (cat: "forex" | "crypto" | "prop") => void;
+  filters?: {
+    search: string;
+    country: string;
+    regulation: string;
+    platform: string;
+    maxMinDeposit: string;
+    minScore: string;
+  };
+  onFiltersChange?: (next: {
+    search: string;
+    country: string;
+    regulation: string;
+    platform: string;
+    maxMinDeposit: string;
+    minScore: string;
+  }) => void;
 };
 
 const ITEMS_PER_PAGE = 10;
@@ -139,6 +160,8 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({
   onPageChange,
   category = "forex",
   onCategoryChange,
+  filters,
+  onFiltersChange,
 }) => {
   const heading = BROKER_KIND_LABELS[category] || "Brokers";
   const sub = BROKER_KIND_DESCRIPTIONS[category];
@@ -168,6 +191,41 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({
               </TypeTab>
             ))}
           </TypeTabs>
+        )}
+
+        {filters && onFiltersChange && (
+          <FilterGrid>
+            <input
+              placeholder="Search name"
+              value={filters.search}
+              onChange={(e) => onFiltersChange({ ...filters, search: e.target.value })}
+            />
+            <input
+              placeholder="Country"
+              value={filters.country}
+              onChange={(e) => onFiltersChange({ ...filters, country: e.target.value })}
+            />
+            <input
+              placeholder="Regulation"
+              value={filters.regulation}
+              onChange={(e) => onFiltersChange({ ...filters, regulation: e.target.value })}
+            />
+            <input
+              placeholder="Platform (MT4, MT5…)"
+              value={filters.platform}
+              onChange={(e) => onFiltersChange({ ...filters, platform: e.target.value })}
+            />
+            <input
+              placeholder="Max min-deposit"
+              value={filters.maxMinDeposit}
+              onChange={(e) => onFiltersChange({ ...filters, maxMinDeposit: e.target.value })}
+            />
+            <input
+              placeholder="Min LegendScore"
+              value={filters.minScore}
+              onChange={(e) => onFiltersChange({ ...filters, minScore: e.target.value })}
+            />
+          </FilterGrid>
         )}
 
         <BrokerStack>
@@ -217,8 +275,12 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({
                           <p>{broker.spreadFrom}</p>
                         </div>
                         <div>
-                          <h4>Crypto Trading</h4>
-                          <p>{broker.crypto}</p>
+                          <h4>LegendScore</h4>
+                          <p>{broker.legendScore ? `${broker.legendScore.toFixed(1)}/10` : "—"}</p>
+                        </div>
+                        <div>
+                          <h4>Country</h4>
+                          <p>{broker.country || "—"}</p>
                         </div>
                       </Description>
                     </InfoSection>
@@ -344,5 +406,21 @@ const BrokerStack = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
+`;
+
+const FilterGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  input {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.5rem 0.7rem;
+    font: inherit;
+  }
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr 1fr;
+  }
 `;
 

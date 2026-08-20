@@ -4,6 +4,7 @@ import {
   PageWrap, PageHeader, PageTitle, PageSubtitle,
   CardsGrid, MediaCard, MediaThumb, CardBody, CardTitle, MetaLine, Pill,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const VIDEOS = [
   { id: 1, title: 'Introduction to Forex Trading', duration: '15:30', premium: false },
@@ -14,10 +15,12 @@ const VIDEOS = [
   { id: 6, title: 'Live Trading Session', duration: '45:15', premium: true },
 ];
 
-const TradingVideos: React.FC = () => (
+const TradingVideos: React.FC = () => {
+  const { t } = useLocale();
+  return (
   <PageWrap>
     <PageHeader>
-      <PageTitle><FiVideo /> Trading Videos</PageTitle>
+      <PageTitle><FiVideo /> {t("panel.videos")}</PageTitle>
       <PageSubtitle>Educational video library</PageSubtitle>
     </PageHeader>
 
@@ -42,5 +45,6 @@ const TradingVideos: React.FC = () => (
     </CardsGrid>
   </PageWrap>
 );
+};
 
 export default TradingVideos;

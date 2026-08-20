@@ -5,13 +5,15 @@ import {
   SectionCard, SectionHead, SectionBody,
   SettingRow, Toggle, SelectCompact, PrimaryButton,
 } from '../../../components/UserPanel/userUi';
+import { LOCALES } from '../../../i18n/locales';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const Settings: React.FC = () => {
+  const { locale, setLocale, t } = useLocale();
   const [notifications, setNotifications] = useState({
     email: true, push: false, signals: true, contests: true, webinars: true,
   });
   const [privacy, setPrivacy] = useState({ profileVisible: true, showEmail: false });
-  const [language, setLanguage] = useState('en');
 
   const notifRow = (key: keyof typeof notifications, label: string, desc: string) => (
     <SettingRow key={key}>
@@ -26,8 +28,8 @@ const Settings: React.FC = () => {
   return (
     <PageWrap>
       <PageHeader>
-        <PageTitle><FiSettings /> Settings</PageTitle>
-        <PageSubtitle>Notifications, privacy, and preferences</PageSubtitle>
+        <PageTitle><FiSettings /> {t('settings.title')}</PageTitle>
+        <PageSubtitle>{t('settings.subtitle')}</PageSubtitle>
       </PageHeader>
 
       <SectionCard>
@@ -69,12 +71,11 @@ const Settings: React.FC = () => {
         <SectionHead><h2><FiGlobe style={{ marginRight: 6 }} />Preferences</h2></SectionHead>
         <SectionBody>
           <SettingRow>
-            <div><h4>Language</h4><p>Preferred display language</p></div>
-            <SelectCompact value={language} onChange={(e) => setLanguage(e.target.value)}>
-              <option value="en">English</option>
-              <option value="es">Spanish</option>
-              <option value="fr">French</option>
-              <option value="de">German</option>
+            <div><h4>{t('settings.language')}</h4><p>{t('settings.languageHint')}</p></div>
+            <SelectCompact value={locale} onChange={(e) => setLocale(e.target.value as typeof locale)}>
+              {LOCALES.map((l) => (
+                <option key={l.code} value={l.code}>{l.native}</option>
+              ))}
             </SelectCompact>
           </SettingRow>
         </SectionBody>

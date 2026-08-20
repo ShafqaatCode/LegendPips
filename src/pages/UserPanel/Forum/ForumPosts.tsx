@@ -8,8 +8,10 @@ import {
   ListStack, ListCard, CardTitle, MetaLine, CardFooter,
   PrimaryButton, EmptyState, ErrorBanner,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const ForumPosts: React.FC = () => {
+  const { t } = useLocale();
   const navigate = useNavigate();
   const [posts, setPosts] = useState<MyForumPostItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +34,7 @@ const ForumPosts: React.FC = () => {
   if (loading) {
     return (
       <PageWrap>
-        <PageHeader><PageTitle><FiMessageSquare /> Forum Posts</PageTitle></PageHeader>
+        <PageHeader><PageTitle><FiMessageSquare /> {t("panel.forum")}</PageTitle></PageHeader>
         <EmptyState><PanelCardListSkeleton cards={3} /></EmptyState>
       </PageWrap>
     );
@@ -41,7 +43,7 @@ const ForumPosts: React.FC = () => {
   return (
     <PageWrap>
       <PageHeader>
-        <PageTitle><FiMessageSquare /> Forum Posts</PageTitle>
+        <PageTitle><FiMessageSquare /> {t("panel.forum")}</PageTitle>
         <PageSubtitle>Threads you started or commented on</PageSubtitle>
       </PageHeader>
 

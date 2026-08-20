@@ -3,6 +3,7 @@ import { BannerWrapper, Overlay } from "./Banner.styles";
 import BannerHeadingSet from "../SharedComponents/BannerHeadingSet";
 import ButtonBase from "../SharedComponents/Button";
 import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 2.svg";
+import { useLocale } from "../../contexts/LocaleContext";
 interface BannerProps {
   backgroundImage?: string;
   upperText: string;
@@ -20,6 +21,8 @@ const Banner: React.FC<BannerProps> = ({
   buttonText = "Signup For Free",
   onButtonClick,
 }) => {
+  const { t } = useLocale();
+  const resolvedButton = buttonText ?? t("how.ctaBtn");
   return (
     <BannerWrapper style={{ backgroundImage: `url(${backgroundImage})` }}>
       <Overlay />
@@ -37,7 +40,7 @@ const Banner: React.FC<BannerProps> = ({
           bgColor=""
           onClick={onButtonClick}
         >
-          {buttonText}
+          {resolvedButton}
           <img src={ArrowIcon} alt="" />
         </ButtonBase>
       </div>

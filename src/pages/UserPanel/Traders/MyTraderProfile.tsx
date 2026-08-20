@@ -10,10 +10,12 @@ import {
   PageWrap, PageHeader, PageTitle, PageSubtitle, HintBar, ErrorBanner,
   SectionCard, SectionHead, SectionBody, FormGrid, Field, PrimaryButton, GhostButton, Pill,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const MARKETS: TraderMarket[] = ['forex', 'crypto', 'indices', 'commodities'];
 
 const MyTraderProfile: React.FC = () => {
+  const { t } = useLocale();
   const [profile, setProfile] = useState<TraderProfile | null>(null);
   const [kyc, setKyc] = useState<string>('incomplete');
   const [error, setError] = useState<string | null>(null);
@@ -114,7 +116,7 @@ const MyTraderProfile: React.FC = () => {
   return (
     <PageWrap>
       <PageHeader>
-        <PageTitle><FiUser /> Trader profile</PageTitle>
+        <PageTitle><FiUser /> {t("panel.traderProfile")}</PageTitle>
         <PageSubtitle>Publish verified performance. Changing ROI / win rate / drawdown after verification sends you back to review.</PageSubtitle>
       </PageHeader>
       <HintBar>

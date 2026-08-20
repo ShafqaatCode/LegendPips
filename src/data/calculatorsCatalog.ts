@@ -58,4 +58,46 @@ export const CALCULATORS_CATALOG: CalculatorItem[] = [
     description:
       "Get instant insight into potential cashback earnings. Enter your deposit currency, rebate level, traded pair, and volume in lots to estimate how much you can earn through LegendPips.",
   },
+  {
+    id: "profit",
+    title: "Profit Calculator",
+    shortLabel: "P/L estimate",
+    path: "/profit-calculator",
+    description: "Estimate profit or loss from lots, pip value, and pip distance.",
+  },
+  {
+    id: "lot",
+    title: "Lot Calculator",
+    shortLabel: "Units to lots",
+    path: "/lot-calculator",
+    description: "Convert units of base currency into standard lots.",
+  },
+  {
+    id: "rr",
+    title: "Risk / Reward Calculator",
+    shortLabel: "R:R ratio",
+    path: "/risk-reward-calculator",
+    description: "Check whether a planned target justifies the stop distance.",
+  },
+  {
+    id: "drawdown",
+    title: "Drawdown Calculator",
+    shortLabel: "Peak to trough",
+    path: "/drawdown-calculator",
+    description: "Measure percentage drawdown between peak and trough equity.",
+  },
+  {
+    id: "compound",
+    title: "Compound Calculator",
+    shortLabel: "Growth projection",
+    path: "/compound-calculator",
+    description: "Project balance growth from a constant monthly return.",
+  },
+  {
+    id: "crypto-profit",
+    title: "Crypto Profit Calculator",
+    shortLabel: "Coin P/L",
+    path: "/crypto-profit-calculator",
+    description: "Simple buy versus sell profit for a crypto quantity.",
+  },
 ];

@@ -14,9 +14,15 @@ export type PublicBrokerReview = {
   rating: number;
   title: string;
   comment: string;
+  reviewKind?: "general" | "payout";
+  payoutSpeedDays?: number;
+  payoutReceived?: boolean;
   kycVerified: boolean;
   createdAt?: string;
   source: "member" | "editorial";
+  brokerId?: string;
+  brokerName?: string;
+  brokerLogoUrl?: string;
 };
 
 export type MyBrokerReview = {
@@ -27,6 +33,9 @@ export type MyBrokerReview = {
   rating: number;
   title: string;
   comment: string;
+  reviewKind?: "general" | "payout";
+  payoutSpeedDays?: number;
+  payoutReceived?: boolean;
   status: BrokerReviewStatus;
   adminNote?: string;
   kycVerified: boolean;
@@ -64,11 +73,12 @@ const fetchJson = async (url: string, options?: RequestInit) => {
 
 export const fetchBrokerReviews = async (
   brokerId: string,
-  opts?: { page?: number; limit?: number }
+  opts?: { page?: number; limit?: number; kind?: "general" | "payout" }
 ): Promise<BrokerReviewsPage> => {
   const qs = new URLSearchParams();
   qs.set("page", String(opts?.page || 1));
   qs.set("limit", String(opts?.limit || 8));
+  if (opts?.kind) qs.set("kind", opts.kind);
   const data = await fetchJson(`${API_CONFIG.BASE_URL}/brokers/${brokerId}/reviews?${qs.toString()}`, {
     headers: getAuthHeaders(),
   });
@@ -88,9 +98,21 @@ export const fetchBrokerReviews = async (
   };
 };
 
+export const fetchRecentPayoutReviews = async (limit = 8): Promise<PublicBrokerReview[]> => {
+  const data = await fetchJson(`${API_CONFIG.BASE_URL}/brokers/reviews/payout-recent?limit=${limit}`);
+  return data.items || [];
+};
+
 export const submitBrokerReview = async (
   brokerId: string,
-  payload: { rating: number; title?: string; comment: string }
+  payload: {
+    rating: number;
+    title?: string;
+    comment: string;
+    reviewKind?: "general" | "payout";
+    payoutSpeedDays?: number;
+    payoutReceived?: boolean;
+  }
 ): Promise<{ review: MyBrokerReview; message: string }> => {
   const data = await fetchJson(`${API_CONFIG.BASE_URL}/brokers/${brokerId}/reviews`, {
     method: "POST",
@@ -117,6 +139,8 @@ export const deleteMyBrokerReview = async (reviewId: string): Promise<void> => {
 export type AdminBrokerReviewRow = MyBrokerReview & {
   userId: string;
   authorName: string;
+  flagged?: boolean;
+  flagReason?: string;
 };
 
 export const adminFetchBrokerReviews = async (opts?: {

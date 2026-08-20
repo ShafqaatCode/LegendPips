@@ -7,6 +7,7 @@ import {
   TableCard, DataTable, Th, Td, Tr, EmptyCell,
   ErrorBanner, GhostButton, Pill,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const displayStatus = (s: ApiSignal['status']): 'open' | 'closed' | 'pending' => {
   if (s === 'active') return 'open';
@@ -14,6 +15,7 @@ const displayStatus = (s: ApiSignal['status']): 'open' | 'closed' | 'pending' =>
 };
 
 const MySignals: React.FC = () => {
+  const { t } = useLocale();
   const [signals, setSignals] = useState<ApiSignal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +52,7 @@ const MySignals: React.FC = () => {
   return (
     <PageWrap>
       <PageHeader>
-        <PageTitle><FiTrendingUp /> My Signals</PageTitle>
+        <PageTitle><FiTrendingUp /> {t("panel.signals")}</PageTitle>
         <PageSubtitle>Published signals — log views to track activity</PageSubtitle>
       </PageHeader>
 

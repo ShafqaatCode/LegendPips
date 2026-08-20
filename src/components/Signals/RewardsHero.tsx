@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 import GiftIllustration from "../../assets/money-bag 2.png";
+import { useLocale } from "../../contexts/LocaleContext";
 
 type RewardsHeroProps = {
   onJoinNow?: () => void;
@@ -113,25 +114,25 @@ const Illustration = styled.img`
 `;
 
 const RewardsHero: React.FC<RewardsHeroProps> = ({ onJoinNow }) => {
+  const { t } = useLocale();
   return (
     <Hero>
       <Inner>
         <Left>
           <Upper>
-            <UpperText>ALL IN ONE TRADING PLATFORM</UpperText>
+            <UpperText>{t("rewards.kicker")}</UpperText>
           </Upper>
 
           <Title>
-            Gift Rewards <TitleAccent>That Something More</TitleAccent>
+            {t("rewards.title")} <TitleAccent>{t("rewards.accent")}</TitleAccent>
           </Title>
 
           <Description>
-            From cash prizes to exciting bonus rewards, we turn every trade into progress. Join the
-            club and unlock deals designed to keep your momentum strong.
+            {t("rewards.body")}
           </Description>
 
           <JoinButton type="button" onClick={onJoinNow}>
-            Join Now
+            {t("rewards.cta")}
           </JoinButton>
         </Left>
 

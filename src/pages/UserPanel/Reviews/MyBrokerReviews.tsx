@@ -12,6 +12,7 @@ import {
   ListStack, ListCard, CardTitle, MetaLine, CardFooter,
   PrimaryButton, GhostButton, EmptyState, ErrorBanner,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const statusLabel: Record<string, string> = {
   pending: 'Awaiting moderation',
@@ -20,6 +21,7 @@ const statusLabel: Record<string, string> = {
 };
 
 const MyBrokerReviews: React.FC = () => {
+  const { t } = useLocale();
   const navigate = useNavigate();
   const [items, setItems] = useState<MyBrokerReview[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +54,7 @@ const MyBrokerReviews: React.FC = () => {
   if (loading) {
     return (
       <PageWrap>
-        <PageHeader><PageTitle><FiStar /> My broker reviews</PageTitle></PageHeader>
+        <PageHeader><PageTitle><FiStar /> {t("panel.reviews")}</PageTitle></PageHeader>
         <EmptyState><PanelCardListSkeleton cards={3} /></EmptyState>
       </PageWrap>
     );
@@ -61,7 +63,7 @@ const MyBrokerReviews: React.FC = () => {
   return (
     <PageWrap>
       <PageHeader>
-        <PageTitle><FiStar /> My broker reviews</PageTitle>
+        <PageTitle><FiStar /> {t("panel.reviews")}</PageTitle>
         <PageSubtitle>Ratings you submitted. Published reviews appear on the broker page after approval.</PageSubtitle>
       </PageHeader>
 

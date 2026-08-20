@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import bannerBg from '../../assets/banner/BannerBg.jpg';
 import ArrowRight from '../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg';
+import { useLocale } from '../../contexts/LocaleContext';
 
 const HeroWrapper = styled.section`
   position: relative;
@@ -245,21 +246,22 @@ const ChatWidget = styled.div`
 
 const VideosHero: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLocale();
 
   return (
     <HeroWrapper>
       <ChartOverlay />
       <ContentWrapper>
         <LeftContent>
-          <SubHeading>ALL IN ONE TRADING PLATFORM</SubHeading>
+          <SubHeading>{t("videos.kicker")}</SubHeading>
           <MainHeading>
-            Understand <HighlightText>Markets,</HighlightText> Trade <HighlightText>Smarter</HighlightText>
+            {t("videos.title")} <HighlightText>{t("videos.highlight1")}</HighlightText> Trade <HighlightText>{t("videos.highlight2")}</HighlightText>
           </MainHeading>
           <Description>
-            Learn trading with expert guidance and hands-on practice. Build your knowledge, skills, and confidence to trade smarter and make informed decisions in the markets.
+            {t("videos.body")}
           </Description>
           <JoinButton onClick={() => navigate('/register')}>
-            Join Now
+            {t("videos.cta")}
             <img src={ArrowRight} alt="Arrow" />
           </JoinButton>
         </LeftContent>

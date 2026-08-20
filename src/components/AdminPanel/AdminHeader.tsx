@@ -5,6 +5,8 @@ import { FiMenu, FiBell, FiSearch } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { adminColors } from './adminUi';
 import { isFullAdmin } from '../../utils/adminPermissions';
+import { useLocale } from '../../contexts/LocaleContext';
+import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher';
 
 const HeaderWrapper = styled.header`
   background: rgba(255, 255, 255, 0.82);
@@ -193,32 +195,32 @@ const UserMeta = styled.div`
   }
 `;
 
-const PAGE_TITLES: Record<string, string> = {
-  '/admin-panel': 'Dashboard',
-  '/admin-panel/users': 'Users',
-  '/admin-panel/users/bulk-email': 'Bulk Email',
-  '/admin-panel/kyc-records': 'KYC Records',
-  '/admin-panel/brokers': 'Brokers',
-  '/admin-panel/broker-reviews': 'Broker Reviews',
-  '/admin-panel/complaints': 'Broker Complaints',
-  '/admin-panel/contests': 'Contests',
-  '/admin-panel/signals': 'Signals',
-  '/admin-panel/webinars': 'Webinars',
-  '/admin-panel/analysis': 'Analysis',
-  '/admin-panel/courses': 'Courses',
-  '/admin-panel/feedback-inbox': 'Feedback Inbox',
-  '/admin-panel/user-activity': 'User Activity',
-  '/admin-panel/rebate-credits': 'Rebate Credits',
-  '/admin-panel/reports': 'Reports',
-  '/admin-panel/settings': 'Platform Settings',
-  '/admin-panel/team': 'Admin Team',
+const PAGE_TITLE_KEYS: Record<string, string> = {
+  '/admin-panel': 'panel.dashboard',
+  '/admin-panel/users': 'panel.users',
+  '/admin-panel/users/bulk-email': 'panel.bulkEmail',
+  '/admin-panel/kyc-records': 'panel.kycRecords',
+  '/admin-panel/brokers': 'panel.brokers',
+  '/admin-panel/broker-reviews': 'panel.brokerReviews',
+  '/admin-panel/complaints': 'nav.complaints',
+  '/admin-panel/contests': 'nav.contests',
+  '/admin-panel/signals': 'nav.signals',
+  '/admin-panel/webinars': 'nav.webinars',
+  '/admin-panel/analysis': 'nav.analysis',
+  '/admin-panel/courses': 'nav.courses',
+  '/admin-panel/feedback-inbox': 'panel.feedback',
+  '/admin-panel/user-activity': 'panel.activity',
+  '/admin-panel/rebate-credits': 'nav.rebates',
+  '/admin-panel/reports': 'panel.reports',
+  '/admin-panel/settings': 'panel.settings',
+  '/admin-panel/team': 'panel.adminTeam',
 };
 
-function resolveTitle(pathname: string): string {
-  if (PAGE_TITLES[pathname]) return PAGE_TITLES[pathname];
-  if (pathname.startsWith('/admin-panel/users/')) return 'User Detail';
-  if (pathname.startsWith('/admin-panel/kyc-records/')) return 'KYC Review';
-  return 'Admin';
+function resolveTitleKey(pathname: string): string {
+  if (PAGE_TITLE_KEYS[pathname]) return PAGE_TITLE_KEYS[pathname];
+  if (pathname.startsWith('/admin-panel/users/')) return 'panel.userDetail';
+  if (pathname.startsWith('/admin-panel/kyc-records/')) return 'panel.kycReview';
+  return 'panel.admin';
 }
 
 interface AdminHeaderProps {
@@ -227,6 +229,7 @@ interface AdminHeaderProps {
 
 const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuClick }) => {
   const { user } = useAuth();
+  const { t, locale } = useLocale();
   const { pathname } = useLocation();
   const [clock, setClock] = useState(() => new Date());
 
@@ -235,8 +238,8 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuClick }) => {
     return () => window.clearInterval(t);
   }, []);
 
-  const title = resolveTitle(pathname);
-  const timeLabel = clock.toLocaleString(undefined, {
+  const title = t(resolveTitleKey(pathname));
+  const timeLabel = clock.toLocaleString(locale, {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
@@ -247,28 +250,29 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuClick }) => {
   return (
     <HeaderWrapper>
       <Left>
-        <MenuButton type="button" onClick={onMenuClick} aria-label="Open menu"><FiMenu /></MenuButton>
+        <MenuButton type="button" onClick={onMenuClick} aria-label={t("panel.openMenu")}><FiMenu /></MenuButton>
         <TitleBlock>
-          <div className="crumb">LegendPips · Console</div>
+          <div className="crumb">{t("panel.consoleCrumb")}</div>
           <h1>{title}</h1>
         </TitleBlock>
       </Left>
 
       <RightSection>
+        <LanguageSwitcher compact light />
         <SearchPill>
           <FiSearch size={14} />
-          <span>Search…</span>
+          <span>{t("panel.search")}</span>
           <kbd>{timeLabel}</kbd>
         </SearchPill>
-        <IconButton type="button" aria-label="Notifications">
+        <IconButton type="button" aria-label={t("panel.notifications")}>
           <FiBell />
           <Badge>5</Badge>
         </IconButton>
         <UserChip>
           <Avatar>{user ? `${user.firstName[0]}${user.lastName[0]}` : 'A'}</Avatar>
           <UserMeta>
-            <div className="name">{user ? `${user.firstName} ${user.lastName}` : 'Admin'}</div>
-            <div className="role">{isFullAdmin(user) ? 'Super admin' : 'Staff'}</div>
+            <div className="name">{user ? `${user.firstName} ${user.lastName}` : t("panel.admin")}</div>
+            <div className="role">{isFullAdmin(user) ? t("panel.superAdmin") : t("panel.staff")}</div>
           </UserMeta>
         </UserChip>
       </RightSection>

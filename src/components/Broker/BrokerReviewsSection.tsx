@@ -22,6 +22,8 @@ const EMPTY_STATS: ReviewStats = {
 type Props = {
   brokerId: string;
   brokerName: string;
+  /** Enable payout-experience reviews (prop firms). */
+  allowPayoutReviews?: boolean;
 };
 
 const formatDate = (raw?: string) => {
@@ -41,9 +43,10 @@ const initials = (name: string) =>
     .slice(0, 2)
     .toUpperCase() || "TR";
 
-const BrokerReviewsSection: React.FC<Props> = ({ brokerId, brokerName }) => {
+const BrokerReviewsSection: React.FC<Props> = ({ brokerId, brokerName, allowPayoutReviews }) => {
   const { isAuthenticated } = useAuth();
   const { openSignIn } = useAuthModal();
+  const [kind, setKind] = useState<"general" | "payout">("general");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,16 +60,24 @@ const BrokerReviewsSection: React.FC<Props> = ({ brokerId, brokerName }) => {
   const [hoverRating, setHoverRating] = useState(0);
   const [title, setTitle] = useState("");
   const [comment, setComment] = useState("");
+  const [payoutSpeedDays, setPayoutSpeedDays] = useState("");
+  const [payoutReceived, setPayoutReceived] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
   const [formOk, setFormOk] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const activeKind = allowPayoutReviews ? kind : "general";
 
   const load = useCallback(
     async (p: number) => {
       setLoading(true);
       setError(null);
       try {
-        const data = await fetchBrokerReviews(brokerId, { page: p, limit: 8 });
+        const data = await fetchBrokerReviews(brokerId, {
+          page: p,
+          limit: 8,
+          kind: allowPayoutReviews ? activeKind : undefined,
+        });
         setItems(data.items);
         setEditorial(p === 1 ? data.editorial : []);
         setStats(data.stats);
@@ -76,6 +87,16 @@ const BrokerReviewsSection: React.FC<Props> = ({ brokerId, brokerName }) => {
           setRating(data.myReview.rating);
           setTitle(data.myReview.title || "");
           setComment(data.myReview.comment || "");
+          setPayoutSpeedDays(
+            data.myReview.payoutSpeedDays != null ? String(data.myReview.payoutSpeedDays) : ""
+          );
+          setPayoutReceived(data.myReview.payoutReceived !== false);
+        } else {
+          setTitle("");
+          setComment("");
+          setPayoutSpeedDays("");
+          setPayoutReceived(true);
+          setRating(5);
         }
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "Could not load reviews.");
@@ -83,13 +104,13 @@ const BrokerReviewsSection: React.FC<Props> = ({ brokerId, brokerName }) => {
         setLoading(false);
       }
     },
-    [brokerId]
+    [brokerId, allowPayoutReviews, activeKind]
   );
 
   useEffect(() => {
     setPage(1);
     load(1);
-  }, [brokerId, load]);
+  }, [brokerId, load, activeKind]);
 
   useEffect(() => {
     if (window.location.hash === "#reviews") {
@@ -123,7 +144,14 @@ const BrokerReviewsSection: React.FC<Props> = ({ brokerId, brokerName }) => {
     }
     setSaving(true);
     try {
-      const res = await submitBrokerReview(brokerId, { rating, title: title.trim(), comment: comment.trim() });
+      const res = await submitBrokerReview(brokerId, {
+        rating,
+        title: title.trim(),
+        comment: comment.trim(),
+        reviewKind: activeKind,
+        payoutSpeedDays: activeKind === "payout" && payoutSpeedDays !== "" ? Number(payoutSpeedDays) : undefined,
+        payoutReceived: activeKind === "payout" ? payoutReceived : undefined,
+      });
       setMyReview(res.review);
       setFormOk(res.message);
       await load(page);
@@ -146,6 +174,16 @@ const BrokerReviewsSection: React.FC<Props> = ({ brokerId, brokerName }) => {
             Honest trader feedback, moderated by LegendPips. KYC-verified members are marked so you can
             trust the source.
           </Sub>
+          {allowPayoutReviews && (
+            <Tabs>
+              <Tab type="button" $on={activeKind === "general"} onClick={() => setKind("general")}>
+                General
+              </Tab>
+              <Tab type="button" $on={activeKind === "payout"} onClick={() => setKind("payout")}>
+                Payout experience
+              </Tab>
+            </Tabs>
+          )}
         </div>
         <ScoreCard>
           <ScoreNum>{stats.count ? stats.average.toFixed(1) : "—"}</ScoreNum>
@@ -175,7 +213,13 @@ const BrokerReviewsSection: React.FC<Props> = ({ brokerId, brokerName }) => {
       )}
 
       <FormCard>
-        <FormTitle>{myReview ? "Update your review" : `Write a review of ${brokerName}`}</FormTitle>
+        <FormTitle>
+          {myReview
+            ? `Update your ${activeKind === "payout" ? "payout" : ""} review`
+            : activeKind === "payout"
+              ? `Share a payout review of ${brokerName}`
+              : `Write a review of ${brokerName}`}
+        </FormTitle>
         {myReview?.status === "pending" && (
           <Notice>Your review is awaiting moderation. It will appear publicly after approval.</Notice>
         )}
@@ -210,8 +254,32 @@ const BrokerReviewsSection: React.FC<Props> = ({ brokerId, brokerName }) => {
             maxLength={80}
             onChange={(e) => setTitle(e.target.value)}
           />
+          {activeKind === "payout" && (
+            <PayoutFields>
+              <Field
+                type="number"
+                min={0}
+                max={365}
+                placeholder="Days until payout arrived"
+                value={payoutSpeedDays}
+                onChange={(e) => setPayoutSpeedDays(e.target.value)}
+              />
+              <label>
+                <input
+                  type="checkbox"
+                  checked={payoutReceived}
+                  onChange={(e) => setPayoutReceived(e.target.checked)}
+                />
+                I received my payout
+              </label>
+            </PayoutFields>
+          )}
           <Area
-            placeholder="Share spreads, withdrawals, support, or execution — at least 20 characters."
+            placeholder={
+              activeKind === "payout"
+                ? "Describe payout speed, fees, proof required, and support — at least 20 characters."
+                : "Share spreads, withdrawals, support, or execution — at least 20 characters."
+            }
             value={comment}
             maxLength={2000}
             rows={5}
@@ -239,16 +307,19 @@ const BrokerReviewsSection: React.FC<Props> = ({ brokerId, brokerName }) => {
               <div>
                 <ItemTop>
                   <strong>{r.authorName}</strong>
-                  {r.kycVerified && (
+                  {r.kycVerified ? (
                     <Badge>
-                      <FiShield size={12} /> Verified trader
+                      <FiShield size={12} /> Verified
                     </Badge>
-                  )}
+                  ) : r.source === "member" ? (
+                    <Badge>Unverified</Badge>
+                  ) : null}
                   {r.source === "editorial" && (
                     <Badge $gold>
                       <FiCheckCircle size={12} /> LegendPips
                     </Badge>
                   )}
+                  {r.reviewKind === "payout" && <Badge $gold>Payout</Badge>}
                   <time>{formatDate(r.createdAt)}</time>
                 </ItemTop>
                 <Stars>
@@ -256,6 +327,9 @@ const BrokerReviewsSection: React.FC<Props> = ({ brokerId, brokerName }) => {
                     <FaStar key={n} size={12} color={n <= r.rating ? "#FBAF00" : "#d1d5db"} />
                   ))}
                 </Stars>
+                {r.payoutSpeedDays != null && (
+                  <ItemTitle>{r.payoutSpeedDays} days to payout</ItemTitle>
+                )}
                 {r.title ? <ItemTitle>{r.title}</ItemTitle> : null}
                 <ItemBody>{r.comment}</ItemBody>
               </div>
@@ -324,6 +398,37 @@ const Sub = styled.p`
   color: #64748b;
   font-size: 0.875rem;
   line-height: 1.55;
+`;
+
+const Tabs = styled.div`
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.85rem;
+`;
+
+const Tab = styled.button<{ $on?: boolean }>`
+  border: 1px solid ${({ $on }) => ($on ? "#132e58" : "#e2e8f0")};
+  background: ${({ $on }) => ($on ? "#132e58" : "#fff")};
+  color: ${({ $on }) => ($on ? "#fff" : "#475569")};
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+`;
+
+const PayoutFields = styled.div`
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 0.65rem;
+  label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: #475569;
+  }
 `;
 
 const ScoreCard = styled.div`

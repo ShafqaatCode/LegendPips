@@ -13,13 +13,13 @@ import {
   PasswordRow,
   Icon,
   Terms,
-  Highlight,
   RegisterButton,
   ForgetPassword,
 } from "./Login.styles";
 import ForgetPasswordModal from "./ForgetPasswordModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { firstAdminPath } from "../../utils/adminPermissions";
+import { useLocale } from "../../contexts/LocaleContext";
 
 interface LoginFormProps {
   onSwitchToRegister?: () => void;
@@ -35,6 +35,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onLoginSucces
   } = useForm();
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { t } = useLocale();
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,10 +65,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onLoginSucces
           window.location.reload();
         }, 200);
       } else {
-        setError(response.message || "Invalid email or password.");
+        setError(response.message || t("panel.authInvalid"));
       }
     } catch (err: any) {
-      setError(err.message || "Login failed. Please try again.");
+      setError(err.message || t("panel.authFail"));
       console.error("Login error:", err);
     } finally {
       setIsLoading(false);
@@ -76,49 +77,49 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onLoginSucces
 
   return (
     <Container>
-      <Heading>Login</Heading>
+      <Heading>{t("panel.authLogin")}</Heading>
 
       <GoogleButton type="button">
-        Continue with Google <GoogleIcon src={GLogo} alt="G" />
+        {t("panel.authGoogle")} <GoogleIcon src={GLogo} alt="G" />
       </GoogleButton>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Input
           type="email"
-          placeholder="Email Address"
+          placeholder={t("panel.authEmail")}
           {...register("email", { required: true })}
         />
-        {errors.email && <ErrorMsg>Email is required</ErrorMsg>}
+        {errors.email && <ErrorMsg>{t("panel.authEmailReq")}</ErrorMsg>}
 
         <PasswordRow>
           <Input
             type={showPassword ? "text" : "password"}
-            placeholder="Password"
+            placeholder={t("panel.authPassword")}
             {...register("password", { required: true })}
           />
           <Icon onClick={() => setShowPassword(!showPassword)}>
             {showPassword ? <FaEyeSlash /> : <FaEye />}
           </Icon>
         </PasswordRow>
-        {errors.password && <ErrorMsg>Password is required</ErrorMsg>}
+        {errors.password && <ErrorMsg>{t("panel.authPassReq")}</ErrorMsg>}
 
         {error && <ErrorMsg>{error}</ErrorMsg>}
 
         <Terms>
           <input type="checkbox" {...register("terms", { required: true })} />
           <label>
-            I Accept The <Highlight>Terms And Disclaimer</Highlight> Set Forth By Legend Pips.
+            {t("panel.authTerms")}
           </label>
         </Terms>
-        {errors.terms && <ErrorMsg>You must accept the terms</ErrorMsg>}
+        {errors.terms && <ErrorMsg>{t("panel.authTermsReq")}</ErrorMsg>}
 
-        <ForgetPassword onClick={() => setIsForgotOpen(true)}>Forget The Password?</ForgetPassword>
+        <ForgetPassword onClick={() => setIsForgotOpen(true)}>{t("panel.authForgot")}</ForgetPassword>
 
         <RegisterButton type="submit" disabled={isLoading}>
-          {isLoading ? "Logging in..." : "Login"}
+          {isLoading ? t("panel.authLogging") : t("panel.authLogin")}
         </RegisterButton>
         <RegisterButton onClick={onSwitchToRegister} type="button" style={{ marginTop: "0.65rem" }}>
-          Register
+          {t("panel.authRegister")}
         </RegisterButton>
       </form>
       <ForgetPasswordModal isOpen={isForgotOpen} onClose={() => setIsForgotOpen(false)} />

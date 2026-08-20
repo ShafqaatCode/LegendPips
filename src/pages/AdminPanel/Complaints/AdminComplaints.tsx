@@ -34,6 +34,20 @@ const NoteInput = styled.input`
   font-family: inherit;
 `;
 
+const EvidenceThumbs = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+  a img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid ${adminColors.border};
+  }
+`;
+
 const AdminComplaints: React.FC = () => {
   const [status, setStatus] = useState('pending');
   const [q, setQ] = useState('');
@@ -42,6 +56,7 @@ const AdminComplaints: React.FC = () => {
   const [items, setItems] = useState<BrokerComplaint[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [notes, setNotes] = useState<Record<string, string>>({});
+  const [brokerReplies, setBrokerReplies] = useState<Record<string, string>>({});
   const [pagination, setPagination] = useState<{
     totalPages: number;
     currentPage: number;
@@ -75,7 +90,21 @@ const AdminComplaints: React.FC = () => {
 
   const setStatusFor = async (id: string, next: ComplaintStatus) => {
     try {
-      await adminUpdateComplaint(id, { status: next, adminNote: notes[id], resolution: notes[id] });
+      await adminUpdateComplaint(id, {
+        status: next,
+        adminNote: notes[id],
+        resolution: notes[id],
+        brokerResponse: brokerReplies[id],
+      });
+      await refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Update failed');
+    }
+  };
+
+  const saveBrokerReply = async (id: string) => {
+    try {
+      await adminUpdateComplaint(id, { brokerResponse: brokerReplies[id] || '', status: 'broker_responded' });
       await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Update failed');
@@ -121,7 +150,10 @@ const AdminComplaints: React.FC = () => {
           <option value="">All statuses</option>
           <option value="pending">Pending</option>
           <option value="investigating">Investigating</option>
+          <option value="broker_contacted">Broker contacted</option>
+          <option value="broker_responded">Broker responded</option>
           <option value="resolved">Resolved</option>
+          <option value="unresolved">Unresolved</option>
           <option value="dismissed">Dismissed</option>
         </FilterSelect>
         <SearchInput>
@@ -181,6 +213,25 @@ const AdminComplaints: React.FC = () => {
                   <Td>
                     <div style={{ fontWeight: 700, marginBottom: 4 }}>{row.category} · {row.subject}</div>
                     <Details>{row.details}</Details>
+                    {(row.amount || row.incidentDate || row.accountRef) && (
+                      <div style={{ fontSize: 11, color: adminColors.muted, marginTop: 4 }}>
+                        {[row.amount && `Amt: ${row.amount}`, row.incidentDate && `Date: ${row.incidentDate}`, row.accountRef && `Ref: ${row.accountRef}`]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </div>
+                    )}
+                    {(row.evidenceUrls?.length || row.evidenceUrl) && (
+                      <EvidenceThumbs>
+                        {(row.evidenceUrls?.length ? row.evidenceUrls : [row.evidenceUrl!]).map((url) => (
+                          <a key={url} href={url} target="_blank" rel="noopener noreferrer">
+                            <img src={url} alt="Evidence" />
+                          </a>
+                        ))}
+                      </EvidenceThumbs>
+                    )}
+                    {row.brokerResponse ? (
+                      <div style={{ fontSize: 11, color: '#1e40af', marginTop: 4 }}>Broker: {row.brokerResponse}</div>
+                    ) : null}
                   </Td>
                   <Td><Pill $variant={row.status === 'resolved' ? 'approved' : row.status === 'dismissed' ? 'rejected' : 'pending'}>{row.status}</Pill></Td>
                   <Td>
@@ -190,8 +241,23 @@ const AdminComplaints: React.FC = () => {
                         value={notes[row.id] || ''}
                         onChange={(e) => setNotes((prev) => ({ ...prev, [row.id]: e.target.value }))}
                       />
+                      <NoteInput
+                        placeholder="Broker response"
+                        value={brokerReplies[row.id] ?? row.brokerResponse ?? ''}
+                        onChange={(e) => setBrokerReplies((prev) => ({ ...prev, [row.id]: e.target.value }))}
+                      />
+                      <GhostButton $sm type="button" onClick={() => saveBrokerReply(row.id)}>Save broker reply</GhostButton>
                       {row.status === 'pending' && (
                         <PrimaryButton $sm type="button" onClick={() => setStatusFor(row.id, 'investigating')}>Investigate</PrimaryButton>
+                      )}
+                      {row.status === 'investigating' && (
+                        <PrimaryButton $sm type="button" onClick={() => setStatusFor(row.id, 'broker_contacted')}>Broker contacted</PrimaryButton>
+                      )}
+                      {row.status === 'broker_contacted' && (
+                        <PrimaryButton $sm type="button" onClick={() => setStatusFor(row.id, 'broker_responded')}>Broker replied</PrimaryButton>
+                      )}
+                      {row.status !== 'unresolved' && row.status !== 'resolved' && (
+                        <GhostButton $sm type="button" onClick={() => setStatusFor(row.id, 'unresolved')}>Unresolved</GhostButton>
                       )}
                       {row.status !== 'resolved' && (
                         <PrimaryButton $sm type="button" onClick={() => setStatusFor(row.id, 'resolved')}>Resolve</PrimaryButton>

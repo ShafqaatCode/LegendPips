@@ -1,7 +1,9 @@
 import styled from "styled-components";
+import type { FC } from "react";
 import logo_white from "../../assets/icons/Logo_Svg.svg";
 import { NavLink } from "react-router-dom";
 import { FaChevronUp } from "react-icons/fa";
+import { useLocale } from "../../contexts/LocaleContext";
 
 const GotoStart = styled.a`
   display: block;
@@ -190,7 +192,8 @@ const Description2 = styled.p`
 `;
 
 
-const Footer2: React.FC = () => {
+const Footer2: FC = () => {
+  const { t } = useLocale();
   return (
     <>
       <GotoStart href="#top"><FaChevronUp size="1.3rem" /></GotoStart>
@@ -203,58 +206,63 @@ const Footer2: React.FC = () => {
                 <LogoImage src={logo_white} alt="LegendPips" />
               </a>
               <Description>
-                Join Legend Pips and unlock your Forex potential with expert
-                guidance, secure trading, and real support.
+                {t("footer.blurb")}
               </Description>
             </LogoContainer>
 
             <LinkContainer>
-              <LinkHeading>Company</LinkHeading>
+              <LinkHeading>{t("footer.company")}</LinkHeading>
               <LinkList>
                 <LinkItem>
-                  <Link to="/about">About</Link>
+                  <Link to="/about">{t("footer.about")}</Link>
                 </LinkItem>
                 <LinkItem>
-                  <Link to="/features">Features</Link>
+                  <Link to="/features">{t("footer.features")}</Link>
                 </LinkItem>
                 <LinkItem>
-                  <Link to="/brokers">Brokers</Link>
+                  <Link to="/brokers">{t("footer.brokers")}</Link>
                 </LinkItem>
                 <LinkItem>
-                  <Link to="/tools">Tools</Link>
+                  <Link to="/tools">{t("footer.tools")}</Link>
                 </LinkItem>
               </LinkList>
             </LinkContainer>
 
             <LinkContainer>
-              <LinkHeading>Help</LinkHeading>
+              <LinkHeading>{t("footer.help")}</LinkHeading>
               <LinkList>
                 <LinkItem>
-                  <Link to="/complaints">Complaint Center</Link>
+                  <Link to="/complaints">{t("footer.complaintCenter")}</Link>
                 </LinkItem>
                 <LinkItem>
-                  <Link to="/support">Customer Support</Link>
+                  <Link to="/support">{t("footer.support")}</Link>
                 </LinkItem>
                 <LinkItem>
-                  <Link to="/delivery">Delivery Details</Link>
+                  <Link to="/delivery">{t("footer.delivery")}</Link>
                 </LinkItem>
                 <LinkItem>
-                  <Link to="/terms">Terms & Conditions</Link>
+                  <Link to="/legal/terms">{t("footer.terms")}</Link>
                 </LinkItem>
                 <LinkItem>
-                  <Link to="/privacy">Privacy Policy</Link>
+                  <Link to="/legal/privacy">{t("footer.privacy")}</Link>
+                </LinkItem>
+                <LinkItem>
+                  <Link to="/legal/risk-disclosure">{t("footer.risk")}</Link>
+                </LinkItem>
+                <LinkItem>
+                  <Link to="/legal/cashback-terms">{t("footer.cashback")}</Link>
                 </LinkItem>
               </LinkList>
             </LinkContainer>
 
             <NewsletterContainer>
-              <NewsletterHeading>Newsletter</NewsletterHeading>
+              <NewsletterHeading>{t("footer.newsletter")}</NewsletterHeading>
               <NewsletterForm>
                 <NewsletterInput
                   type="email"
-                  placeholder="Enter your email address"
+                  placeholder={t("footer.emailPlaceholder")}
                 />
-                <NewsletterButton type="submit">Subscribe Now</NewsletterButton>
+                <NewsletterButton type="submit">{t("footer.subscribe")}</NewsletterButton>
               </NewsletterForm>
             </NewsletterContainer>
           </Grid>

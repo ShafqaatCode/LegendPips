@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useLocale } from "../../contexts/LocaleContext";
 
 const HeroWrapper = styled.section`
   background: white;
@@ -65,15 +66,16 @@ const IconWrapper = styled.div`
 `;
 
 const WebinarsHero: React.FC = () => {
+  const { t } = useLocale();
   return (
     <HeroWrapper>
       <ContentWrapper>
         <LeftContent>
           <Heading>
-            Live Trading <HighlightText>Webinars</HighlightText>
+            {t("webinars.title")} <HighlightText>{t("webinars.highlight")}</HighlightText>
           </Heading>
           <Description>
-            Learn directly from experienced traders through live sessions and detailed market breakdowns. Watch real time analysis, understand trade planning, and see how professionals read price action. Ask questions, follow live explanations, and gain practical insights you can apply in your own trading.
+            {t("webinars.body")}
           </Description>
         </LeftContent>
         <RightContent>

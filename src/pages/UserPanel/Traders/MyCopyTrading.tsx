@@ -9,8 +9,10 @@ import {
   PageWrap, PageHeader, PageTitle, PageSubtitle, HintBar, ErrorBanner,
   TableCard, DataTable, Th, Td, EmptyCell, GhostButton, Pill, Toolbar,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const MyCopyTrading: React.FC = () => {
+  const { t } = useLocale();
   const [tab, setTab] = useState<'copying' | 'followers'>('copying');
   const [copying, setCopying] = useState<CopyRequestRow[]>([]);
   const [followers, setFollowers] = useState<CopyRequestRow[]>([]);
@@ -43,7 +45,7 @@ const MyCopyTrading: React.FC = () => {
   return (
     <PageWrap>
       <PageHeader>
-        <PageTitle><FiShare2 /> Copy trading</PageTitle>
+        <PageTitle><FiShare2 /> {t("panel.copyTrading")}</PageTitle>
         <PageSubtitle>Marketplace requests only — LegendPips does not auto-copy trades on your broker.</PageSubtitle>
       </PageHeader>
       <HintBar>

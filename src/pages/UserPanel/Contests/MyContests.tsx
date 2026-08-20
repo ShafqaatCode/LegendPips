@@ -6,8 +6,10 @@ import {
   FilterTabs, FilterTab, CardsGrid, MediaCard, CardBody, CardTitle,
   MetaLine, InlineStats, CardFooter, PrimaryButton, EmptyState, BadgeOverlay,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const MyContests: React.FC = () => {
+  const { t } = useLocale();
   const [activeFilter, setActiveFilter] = useState('all');
   const [contests, setContests] = useState<any[]>([]);
 
@@ -40,7 +42,7 @@ const MyContests: React.FC = () => {
   return (
     <PageWrap>
       <PageHeader>
-        <PageTitle><FiAward /> My Contests</PageTitle>
+        <PageTitle><FiAward /> {t("panel.contests")}</PageTitle>
         <PageSubtitle>Contests you have joined</PageSubtitle>
       </PageHeader>
 

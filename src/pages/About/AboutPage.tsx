@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import SectionHeadingSet from '../../components/SharedComponents/SectionHeadingSet';
 import { fetchPublicTeamMembers, type TeamMember } from '../../services/siteConfigService';
+import { useLocale } from '../../contexts/LocaleContext';
 
 const Page = styled.div`
   max-width: 1100px;
@@ -57,6 +58,7 @@ const Card = styled.div`
 
 const AboutPage: React.FC = () => {
   const [team, setTeam] = useState<TeamMember[]>([]);
+  const { t } = useLocale();
 
   useEffect(() => {
     fetchPublicTeamMembers().then(setTeam).catch(() => setTeam([]));
@@ -65,12 +67,12 @@ const AboutPage: React.FC = () => {
   return (
     <Page>
       <SectionHeadingSet
-        upperText="ABOUT US"
-        mainHeading="Our Team"
-        subText="Meet the people behind LegendPips — experienced traders, analysts, and operators dedicated to your success."
+        upperText={t("about.kicker")}
+        mainHeading={t("about.title")}
+        subText={t("about.body")}
       />
       {team.length === 0 ? (
-        <p style={{ textAlign: 'center', color: '#64748b', marginTop: '2rem' }}>Team information coming soon.</p>
+        <p style={{ textAlign: 'center', color: '#64748b', marginTop: '2rem' }}>{t("about.empty")}</p>
       ) : (
         <Grid>
           {team.map((m) => (

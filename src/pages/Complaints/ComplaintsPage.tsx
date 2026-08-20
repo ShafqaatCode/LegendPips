@@ -14,12 +14,14 @@ import {
   type BlacklistBroker,
   type BlacklistWarning,
 } from "../../services/complaintService";
+import { useLocale } from "../../contexts/LocaleContext";
 
 const ComplaintsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const prefillBroker = searchParams.get("broker") || "";
   const { isAuthenticated } = useAuth();
   const { openSignIn } = useAuthModal();
+  const { t } = useLocale();
 
   const [brokers, setBrokers] = useState<ApiBroker[]>([]);
   const [listed, setListed] = useState<BlacklistBroker[]>([]);
@@ -31,12 +33,17 @@ const ComplaintsPage: React.FC = () => {
   const [subject, setSubject] = useState("");
   const [details, setDetails] = useState("");
   const [accountRef, setAccountRef] = useState("");
+  const [amount, setAmount] = useState("");
+  const [incidentDate, setIncidentDate] = useState("");
+  const [evidenceUrl, setEvidenceUrl] = useState("");
+  const [evidenceFiles, setEvidenceFiles] = useState<File[]>([]);
+  const [evidencePreviews, setEvidencePreviews] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchBrokersPage({ page: 1, limit: 50 })
+    fetchBrokersPage({ page: 1, limit: 100 })
       .then((r) => setBrokers(r.items || []))
       .catch(() => setBrokers([]));
     fetchComplaintBlacklist()
@@ -49,6 +56,12 @@ const ComplaintsPage: React.FC = () => {
         setWarnings([]);
       });
   }, []);
+
+  useEffect(() => {
+    const urls = evidenceFiles.map((f) => URL.createObjectURL(f));
+    setEvidencePreviews(urls);
+    return () => urls.forEach((u) => URL.revokeObjectURL(u));
+  }, [evidenceFiles]);
 
   useEffect(() => {
     if (!prefillBroker) return;
@@ -82,11 +95,19 @@ const ComplaintsPage: React.FC = () => {
         subject: subject.trim(),
         details: details.trim(),
         accountRef: accountRef.trim() || undefined,
+        amount: amount.trim() || undefined,
+        incidentDate: incidentDate.trim() || undefined,
+        evidenceUrl: evidenceUrl.trim() || undefined,
+        evidenceFiles,
       });
       setOk(res.message);
       setSubject("");
       setDetails("");
       setAccountRef("");
+      setAmount("");
+      setIncidentDate("");
+      setEvidenceUrl("");
+      setEvidenceFiles([]);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Could not submit complaint.");
     } finally {
@@ -99,12 +120,11 @@ const ComplaintsPage: React.FC = () => {
       <Hero>
         <Overlay />
         <HeroInner>
-          <h1>BROKER COMPLAINT CENTER</h1>
+          <h1>{t("complaints.title")}</h1>
           <p>
-            Report withdrawal delays, unfair trading conditions, or suspected scam brokers. Every case
-            gets a ticket ID and is reviewed by the LegendPips team.
+            {t("complaints.body")}
           </p>
-          <h3>File a report · Track status · Public warning list</h3>
+          <h3>{t("complaints.sub")}</h3>
         </HeroInner>
       </Hero>
 
@@ -167,6 +187,29 @@ const ComplaintsPage: React.FC = () => {
                 placeholder="Broker account number or their ticket ID"
                 maxLength={80}
               />
+              <Label>Amount involved (optional)</Label>
+              <Input value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="$500" maxLength={40} />
+              <Label>Incident date (optional)</Label>
+              <Input value={incidentDate} onChange={(e) => setIncidentDate(e.target.value)} placeholder="2026-08-01" />
+              <Label>Screenshot evidence (optional, up to 3)</Label>
+              <FileInput
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                onChange={(e) => {
+                  const picked = Array.from(e.target.files || []).slice(0, 3);
+                  setEvidenceFiles(picked);
+                }}
+              />
+              {evidencePreviews.length > 0 && (
+                <PreviewRow>
+                  {evidencePreviews.map((src, i) => (
+                    <img key={src} src={src} alt={`Evidence ${i + 1}`} />
+                  ))}
+                </PreviewRow>
+              )}
+              <Label>Evidence URL (optional fallback)</Label>
+              <Input value={evidenceUrl} onChange={(e) => setEvidenceUrl(e.target.value)} placeholder="https://…" />
               {error && <Err>{error}</Err>}
               {ok && <Ok><FiCheckCircle /> {ok}</Ok>}
               <Submit type="submit" disabled={saving}>
@@ -322,6 +365,26 @@ const Input = styled.input`
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   font: inherit;
+`;
+
+const FileInput = styled.input`
+  width: 100%;
+  margin: 0.15rem 0 0.5rem;
+  font: inherit;
+`;
+
+const PreviewRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+  img {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
 `;
 
 const Select = styled.select`

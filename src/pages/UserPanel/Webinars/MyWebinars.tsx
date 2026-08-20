@@ -5,6 +5,7 @@ import {
   FilterTabs, FilterTab, CardsGrid, MediaCard, MediaThumb, CardBody, CardTitle,
   MetaLine, PrimaryButton, BadgeOverlay, Pill,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const WEBINARS = [
   { id: 1, title: 'Advanced Forex Trading Strategies', instructor: 'John Smith', date: '2024-01-20', time: '14:00', status: 'upcoming', premium: false, duration: '60 min' },
@@ -14,13 +15,14 @@ const WEBINARS = [
 ];
 
 const MyWebinars: React.FC = () => {
+  const { t } = useLocale();
   const [activeFilter, setActiveFilter] = useState('all');
   const filtered = WEBINARS.filter((w) => activeFilter === 'all' || w.status === activeFilter);
 
   return (
     <PageWrap>
       <PageHeader>
-        <PageTitle><FiVideo /> My Webinars</PageTitle>
+        <PageTitle><FiVideo /> {t("panel.webinars")}</PageTitle>
         <PageSubtitle>Live sessions and recorded replays</PageSubtitle>
       </PageHeader>
 

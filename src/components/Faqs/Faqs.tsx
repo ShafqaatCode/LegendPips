@@ -14,6 +14,7 @@ import {
   Divider,
 } from "./Faqs.styles";
 import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
+import { useLocale } from "../../contexts/LocaleContext";
 import ButtonBase from "../SharedComponents/Button";
 import styled from "styled-components";
 import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
@@ -49,11 +50,14 @@ export const fadeInDown: Variants = {
 }
 
 
-type CategoryKey =
-  | "Forex & Stock Basics"
-  | "Trading Strategies"
-  | "Broker Comparisons"
-  | "Education and Tutorials";
+type FaqGroup = { cat: string; items: Array<[string, string]> };
+
+const FAQ_GROUPS: FaqGroup[] = [
+  { cat: "faq.cat1", items: [["faq.q1", "faq.a1"], ["faq.q2", "faq.a2"], ["faq.q3", "faq.a3"], ["faq.q4", "faq.a4"]] },
+  { cat: "faq.cat2", items: [["faq.q5", "faq.a5"], ["faq.q6", "faq.a6"]] },
+  { cat: "faq.cat3", items: [["faq.q7", "faq.a7"], ["faq.q8", "faq.a8"], ["faq.q9", "faq.a9"]] },
+  { cat: "faq.cat4", items: [["faq.q10", "faq.a10"], ["faq.q11", "faq.a11"]] },
+];
 
 const ContactWrapper = styled.div`
   width: 100%;
@@ -68,84 +72,12 @@ const ContactWrapper = styled.div`
   }
 `;
 
-const categories: CategoryKey[] = [
-  "Forex & Stock Basics",
-  "Trading Strategies",
-  "Broker Comparisons",
-  "Education and Tutorials",
-];
-
-const faqsData = {
-  "Forex & Stock Basics": [
-    {
-      question: "What is Forex trading?",
-      answer:
-        "Our platform provides realtime Forex signals based on expert analysis. You can access these signals directly through your LegendPips account. LegendPips partners with reliable brokers to ensure secure trading.",
-    },
-    {
-      question: "How do I start trading with LegendPips?",
-      answer:
-        "You can start trading by creating an account and following our guided onboarding process.",
-    },
-    {
-      question: "How do I get Forex signals?",
-      answer:
-        "Forex signals will be available directly on your dashboard after subscribing to a plan.",
-    },
-    {
-      question: "Do I need experience to start trading?",
-      answer:
-        "No, our platform provides tutorials and customer support to help beginners learn and grow.",
-    },
-  ],
-  "Trading Strategies": [
-    {
-      question: "What trading strategies do you support?",
-      answer:
-        "We support multiple strategies including scalping, swing trading, and day trading with detailed analysis.",
-    },
-    {
-      question: "Can I customize my trading strategy?",
-      answer:
-        "Yes, users can choose and adapt strategies based on their risk tolerance and goals.",
-    },
-  ],
-  "Broker Comparisons": [
-    {
-      question: "Which brokers are supported?",
-      answer:
-        "We work with top brokers such as ICMarkets, Exness, and FBS, selected based on reliability and spreads.",
-    },
-    {
-      question: "How to compare brokers?",
-      answer:
-        "Open the Compare page, pick 2–4 brokers, and share the URL. You can also tap Add to compare on any broker card.",
-    },
-    {
-      question: "Where is the Prop Firm Hub?",
-      answer:
-        "Open /prop-firms to compare challenge cashback, evaluation types, and partnered prop firms. The Prop tab on Rebates lists the same firms.",
-    },
-  ],
-  "Education and Tutorials": [
-    {
-      question: "Do you offer Forex tutorials?",
-      answer:
-        "Yes, we have a library of tutorials designed for all levels, from beginners to advanced traders.",
-    },
-    {
-      question: "Are the tutorials free?",
-      answer:
-        "Basic tutorials are free, while premium educational content is available with a subscription.",
-    },
-  ],
-};
-
 const Faqs: React.FC = () => {
+  const { t } = useLocale();
   const [selectedCategory, setSelectedCategory] = useState(0);
   const [openQuestion, setOpenQuestion] = useState<number | null>(null);
 
-  const selectedQuestions = faqsData[categories[selectedCategory]];
+  const selectedQuestions = FAQ_GROUPS[selectedCategory].items;
 
   const handleToggle = (index: number) => {
     setOpenQuestion(openQuestion === index ? null : index);
@@ -155,43 +87,42 @@ const Faqs: React.FC = () => {
     <Section>
       <Container>
         <SectionHeadingSet
-          mainHeading="Get Answers"
-          upperText="Frequently asked questions"
-          subText="We’ve answered common questions to help you understand how our platform works and what you can expect."
+          mainHeading={t("faq.title")}
+          upperText={t("faq.kicker")}
+          subText={t("faq.body")}
         />
 
         <ContentWrapper>
           <LeftPanel>
-            {categories.map((cat, i) => (
+            {FAQ_GROUPS.map((group, i) => (
               <TabButton custom={i} variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
-                key={i}
+                key={group.cat}
                 selected={selectedCategory === i}
                 onClick={() => {
                   setSelectedCategory(i);
                   setOpenQuestion(null);
                 }}
               >
-                {cat}
+                {t(group.cat)}
               </TabButton>
             ))}
 
             <ContactWrapper>
               <p>
-                We've compiled a list of frequently asked questions to provide
-                you with quick and helpful answers.
+                {t("faq.contact")}
               </p>
               <ButtonBase fontSize="11px" width="150px">
-                Contact Us{" "}
-                <img style={{ width: "16px" }} src={ArrowIcon} alt="arrowicon" />
+                {t("faq.contactBtn")}{" "}
+                <img style={{ width: "16px" }} src={ArrowIcon} alt="" />
               </ButtonBase>
             </ContactWrapper>
           </LeftPanel>
 
           <RightPanel>
-            {selectedQuestions.map((q, i) => (
-              <QuestionItem key={i} custom={i} variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+            {selectedQuestions.map(([qKey, aKey], i) => (
+              <QuestionItem key={qKey} custom={i} variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
                 <QuestionHeader onClick={() => handleToggle(i)}>
-                  <QuestionTitle>{q.question}</QuestionTitle>
+                  <QuestionTitle>{t(qKey)}</QuestionTitle>
                   <ToggleIcon isOpen={openQuestion === i}>
                     {openQuestion === i ? "−" : "+"}
                   </ToggleIcon>
@@ -200,7 +131,7 @@ const Faqs: React.FC = () => {
                 {openQuestion === i && (
                   <>
                     <Divider />
-                    <Answer>{q.answer}</Answer>
+                    <Answer>{t(aKey)}</Answer>
                   </>
                 )}
               </QuestionItem>

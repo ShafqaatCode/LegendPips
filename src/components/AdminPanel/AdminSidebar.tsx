@@ -12,10 +12,18 @@ import { USER_LIST_PRESETS } from '../../utils/userListFilters';
 import { KYC_RECORD_PRESETS } from '../../utils/kycRecordFilters';
 import { adminColors } from './adminUi';
 import { hasPermission, isFullAdmin } from '../../utils/adminPermissions';
+import { useLocale } from '../../contexts/LocaleContext';
 
 const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
   position: fixed;
   left: 0;
+  html[dir="rtl"] & {
+    left: auto;
+    right: 0;
+    border-right: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: -4px 0 32px rgba(8, 20, 40, 0.35);
+  }
   top: 0;
   width: 256px;
   height: 100vh;
@@ -33,6 +41,9 @@ const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     transform: translateX(${({ $isOpen }) => ($isOpen ? '0' : '-100%')});
+    html[dir="rtl"] & {
+      transform: translateX(${({ $isOpen }) => ($isOpen ? '0' : '100%')});
+    }
   }
 
   &::-webkit-scrollbar { width: 4px; }
@@ -249,6 +260,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout: authLogout, user } = useAuth();
+  const { t } = useLocale();
 
   const isUsersSection =
     location.pathname.startsWith('/admin-panel/users') ||
@@ -287,15 +299,15 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
           <BrandMark><FiShield /></BrandMark>
           <BrandText>
             <div className="name">LegendPips</div>
-            <div className="tag">{full ? 'Admin console' : 'Staff console'}</div>
+            <div className="tag">{full ? t("panel.adminConsole") : t("panel.staffConsole")}</div>
           </BrandText>
         </Brand>
-        <CloseButton type="button" onClick={onToggle} aria-label="Close menu"><FiX /></CloseButton>
+        <CloseButton type="button" onClick={onToggle} aria-label={t("panel.closeMenu")}><FiX /></CloseButton>
       </SidebarHeader>
 
       <NavSection>
-        <SectionTitle>Main</SectionTitle>
-        {show('dashboard') && link('/admin-panel', 'Dashboard', FiHome, true)}
+        <SectionTitle>{t("panel.main")}</SectionTitle>
+        {show('dashboard') && link('/admin-panel', t("panel.dashboard"), FiHome, true)}
 
         {show('users') && (
           <>
@@ -305,7 +317,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
               $active={isUsersSection}
               onClick={() => setUsersOpen((o) => !o)}
             >
-              <FiUsers /><span>Users</span>
+              <FiUsers /><span>{t("panel.users")}</span>
               <span className="chevron">{usersOpen ? <FiChevronUp /> : <FiChevronDown />}</span>
             </UsersGroupBtn>
 
@@ -322,7 +334,19 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
                     }}
                     onClick={closeMobile}
                   >
-                    {preset.label}
+                    {t(
+                      preset.id === "kyc-verified"
+                        ? "panel.usersKycOk"
+                        : preset.id === "kyc-pending"
+                          ? "panel.usersKycWait"
+                          : preset.id === "email-verified"
+                            ? "panel.usersEmail"
+                            : preset.id === "active"
+                              ? "panel.usersActive"
+                              : preset.id === "banned"
+                                ? "panel.usersBanned"
+                                : "panel.usersAll"
+                    )}
                   </SubLink>
                 ))}
                 {show('bulk_email') && (
@@ -331,7 +355,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
                     className={() => (location.pathname === '/admin-panel/users/bulk-email' ? 'active' : '')}
                     onClick={closeMobile}
                   >
-                    Bulk Email
+                    {t("panel.bulkEmail")}
                   </SubLink>
                 )}
               </SubNav>
@@ -339,7 +363,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
           </>
         )}
 
-        {!show('users') && show('bulk_email') && link('/admin-panel/users/bulk-email', 'Bulk Email', FiInbox)}
+        {!show('users') && show('bulk_email') && link('/admin-panel/users/bulk-email', t("panel.bulkEmail"), FiInbox)}
 
         {show('kyc') && (
           <>
@@ -349,7 +373,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
               $active={isKycSection}
               onClick={() => setKycOpen((o) => !o)}
             >
-              <FiShield /><span>KYC Records</span>
+              <FiShield /><span>{t("panel.kycRecords")}</span>
               <span className="chevron">{kycOpen ? <FiChevronUp /> : <FiChevronDown />}</span>
             </UsersGroupBtn>
 
@@ -367,7 +391,15 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
                     }}
                     onClick={closeMobile}
                   >
-                    {preset.label}
+                    {t(
+                      preset.id === "pending"
+                        ? "panel.kycPend"
+                        : preset.id === "approved"
+                          ? "panel.kycOk"
+                          : preset.id === "rejected"
+                            ? "panel.kycNo"
+                            : "panel.kycAll"
+                    )}
                   </SubLink>
                 ))}
               </SubNav>
@@ -378,31 +410,31 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
 
       {(show('brokers') || show('contests') || show('signals') || show('webinars') || show('analysis') || show('courses')) && (
         <NavSection>
-          <SectionTitle>Content</SectionTitle>
-          {show('brokers') && link('/admin-panel/brokers', 'Brokers', FiDatabase)}
-          {show('brokers') && link('/admin-panel/broker-reviews', 'Broker reviews', FiStar)}
-          {show('contests') && link('/admin-panel/contests', 'Contests', FiAward)}
-          {show('signals') && link('/admin-panel/signals', 'Signals', FiTrendingUp)}
-          {show('webinars') && link('/admin-panel/webinars', 'Webinars', FiVideo)}
-          {show('analysis') && link('/admin-panel/analysis', 'Analysis', FiFileText)}
-          {show('courses') && link('/admin-panel/courses', 'Courses', FiFileText)}
+          <SectionTitle>{t("panel.content")}</SectionTitle>
+          {show('brokers') && link('/admin-panel/brokers', t("panel.brokers"), FiDatabase)}
+          {show('brokers') && link('/admin-panel/broker-reviews', t("panel.brokerReviews"), FiStar)}
+          {show('contests') && link('/admin-panel/contests', t("nav.contests"), FiAward)}
+          {show('signals') && link('/admin-panel/signals', t("nav.signals"), FiTrendingUp)}
+          {show('webinars') && link('/admin-panel/webinars', t("nav.webinars"), FiVideo)}
+          {show('analysis') && link('/admin-panel/analysis', t("nav.analysis"), FiFileText)}
+          {show('courses') && link('/admin-panel/courses', t("nav.courses"), FiFileText)}
         </NavSection>
       )}
 
       {(show('feedback') || show('activity') || show('rebates') || show('traders') || show('live_accounts') || show('reports') || show('settings') || show('brokers') || full) && (
         <NavSection>
-          <SectionTitle>System</SectionTitle>
-          {show('feedback') && link('/admin-panel/feedback-inbox', 'Feedback', FiInbox)}
-          {(show('feedback') || show('brokers')) && link('/admin-panel/complaints', 'Complaints', FiAlertTriangle)}
-          {show('activity') && link('/admin-panel/user-activity', 'Activity', FiActivity)}
-          {show('referrals') && link('/admin-panel/referrals', 'Referrals', FiUserPlus)}
-          {show('ib_change') && link('/admin-panel/ib-change', 'IB change', FiShuffle)}
-          {show('live_accounts') && link('/admin-panel/live-accounts', 'Live accounts', FiLink)}
-          {show('rebates') && link('/admin-panel/rebate-credits', 'Rebates', FiDollarSign)}
-          {show('traders') && link('/admin-panel/traders', 'Traders', FiUsers)}
-          {show('reports') && link('/admin-panel/reports', 'Reports', FiBarChart2)}
-          {show('settings') && link('/admin-panel/settings', 'Settings', FiSettings)}
-          {full && link('/admin-panel/team', 'Admin team', FiUsers)}
+          <SectionTitle>{t("panel.system")}</SectionTitle>
+          {show('feedback') && link('/admin-panel/feedback-inbox', t("panel.feedback"), FiInbox)}
+          {(show('feedback') || show('brokers')) && link('/admin-panel/complaints', t("nav.complaints"), FiAlertTriangle)}
+          {show('activity') && link('/admin-panel/user-activity', t("panel.activity"), FiActivity)}
+          {show('referrals') && link('/admin-panel/referrals', t("panel.referrals"), FiUserPlus)}
+          {show('ib_change') && link('/admin-panel/ib-change', t("panel.ibChange"), FiShuffle)}
+          {show('live_accounts') && link('/admin-panel/live-accounts', t("panel.qlLive"), FiLink)}
+          {show('rebates') && link('/admin-panel/rebate-credits', t("nav.rebates"), FiDollarSign)}
+          {show('traders') && link('/admin-panel/traders', t("nav.traders"), FiUsers)}
+          {show('reports') && link('/admin-panel/reports', t("panel.reports"), FiBarChart2)}
+          {show('settings') && link('/admin-panel/settings', t("panel.settings"), FiSettings)}
+          {full && link('/admin-panel/team', t("panel.adminTeam"), FiUsers)}
         </NavSection>
       )}
 
@@ -419,13 +451,13 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
               {user.firstName} {user.lastName}
             </div>
             <div style={{ fontSize: '0.625rem', color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
-              {full ? 'Super administrator' : 'Team staff'}
+              {full ? t("panel.superAdmin") : t("panel.teamStaff")}
             </div>
           </div>
         )}
-        {link('/', 'View website', FiGlobe, true)}
+        {link('/', t("panel.viewWebsite"), FiGlobe, true)}
         <LogoutButton type="button" onClick={() => { authLogout(); navigate('/'); window.location.reload(); }}>
-          <FiLogOut /><span>Logout</span>
+          <FiLogOut /><span>{t("panel.logout")}</span>
         </LogoutButton>
       </Footer>
     </SidebarWrapper>

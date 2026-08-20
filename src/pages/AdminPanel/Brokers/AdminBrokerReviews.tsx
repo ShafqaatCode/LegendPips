@@ -159,7 +159,8 @@ const AdminBrokerReviews: React.FC = () => {
                   </Td>
                   <Td>
                     {row.authorName}
-                    {row.kycVerified ? <div style={{ fontSize: 11, color: '#047857' }}>KYC verified</div> : null}
+                    {row.kycVerified ? <div style={{ fontSize: 11, color: '#047857' }}>KYC verified</div> : <div style={{ fontSize: 11, color: adminColors.muted }}>Unverified</div>}
+                    {row.flagged ? <div style={{ fontSize: 11, color: '#c2410c' }}>Flagged{row.flagReason ? `: ${row.flagReason}` : ''}</div> : null}
                   </Td>
                   <Td><Stars>{row.rating} / 5</Stars></Td>
                   <Td>

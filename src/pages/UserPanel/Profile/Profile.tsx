@@ -5,13 +5,14 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { getMe } from '../../../services/authService';
 import { updateMyProfile, uploadProfileAvatar, persistUser } from '../../../services/profileService';
 import {
-  PageWrap, PageHeader, PageSubtitle,
+  PageWrap, PageHeader, PageSubtitle, PageTitle,
   ProfileBanner, ProfileAvatar, ProfileBannerInfo, AvatarUploadWrap, AvatarCameraBadge, AvatarChangeBtn, ReadOnlyInput,
   SectionCard, SectionHead, SectionBody,
   FormGrid, Field, TextArea, PrimaryButton, GhostButton, Pill,
   StatsGrid, StatCard, StatIconBox, StatBody, StatValue, StatLabel,
   ErrorBanner,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const FieldHint = styled.span`
   font-size: 0.6875rem;
@@ -20,6 +21,7 @@ const FieldHint = styled.span`
 `;
 
 const Profile: React.FC = () => {
+  const { t } = useLocale();
   const { user, setUser } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -106,6 +108,9 @@ const Profile: React.FC = () => {
 
   return (
     <PageWrap>
+      <PageHeader>
+        <PageTitle><FiUser /> {t("panel.pageProfile")}</PageTitle>
+      </PageHeader>
       <ProfileBanner>
         <AvatarUploadWrap>
           <ProfileAvatar

@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { FiMenu, FiBell } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLocale } from '../../contexts/LocaleContext';
+import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher';
 
 const HeaderWrapper = styled.header`
   background: rgba(255, 255, 255, 0.82);
@@ -150,26 +152,28 @@ interface UserHeaderProps {
 
 const UserHeader: React.FC<UserHeaderProps> = ({ onMenuClick }) => {
   const { user } = useAuth();
+  const { t } = useLocale();
 
   return (
     <HeaderWrapper>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <MenuButton onClick={onMenuClick} type="button" aria-label="Open menu"><FiMenu /></MenuButton>
+        <MenuButton onClick={onMenuClick} type="button" aria-label={t("panel.openMenu")}><FiMenu /></MenuButton>
         <PageHint>
-          <span className="title">Member Panel</span>
-          <span className="sub">LegendPips workspace</span>
+          <span className="title">{t("panel.member")}</span>
+          <span className="sub">{t("panel.workspace")}</span>
         </PageHint>
       </div>
 
       <RightSection>
-        <IconButton type="button" aria-label="Notifications">
+        <LanguageSwitcher compact light />
+        <IconButton type="button" aria-label={t("panel.notifications")}>
           <FiBell />
         </IconButton>
         <UserChip>
           <Avatar $image={user?.profileImage}>
             {!user?.profileImage && (user ? `${user.firstName[0]}${user.lastName[0]}` : 'U')}
           </Avatar>
-          <UserName>{user ? `${user.firstName} ${user.lastName}` : 'User'}</UserName>
+          <UserName>{user ? `${user.firstName} ${user.lastName}` : t("panel.userFallback")}</UserName>
         </UserChip>
       </RightSection>
     </HeaderWrapper>

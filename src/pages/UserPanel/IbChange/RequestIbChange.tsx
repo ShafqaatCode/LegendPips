@@ -9,6 +9,7 @@ import {
   SectionCard, SectionHead, SectionBody,
   PrimaryButton, ErrorBanner, userColors, Pill,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 import {
   fetchMyIbChangeRequests,
   submitIbChangeRequest,
@@ -335,6 +336,7 @@ async function loadAllPublishedBrokers(): Promise<ApiBroker[]> {
 }
 
 const RequestIbChange: React.FC = () => {
+  const { t } = useLocale();
   const { user } = useAuth();
   const [brokers, setBrokers] = useState<ApiBroker[]>([]);
   const [history, setHistory] = useState<IbChangeRequestRow[]>([]);
@@ -457,7 +459,7 @@ const RequestIbChange: React.FC = () => {
   return (
     <PageWrap>
       <PageHero>
-        <h1><FiShuffle /> Request IB change</h1>
+        <h1><FiShuffle /> {t("panel.ibChange")}</h1>
         <p>
           Pick your current broker and the partner you want under LegendPips IB.
           We’ll email our team and follow up on your account.
@@ -466,7 +468,7 @@ const RequestIbChange: React.FC = () => {
 
       {/* keep title in a11y tree via hidden header for layout parity if needed */}
       <PageHeader style={{ display: 'none' }}>
-        <PageTitle>Request IB change</PageTitle>
+        <PageTitle>{t("panel.ibChange")}</PageTitle>
         <PageSubtitle>IB change</PageSubtitle>
       </PageHeader>
 

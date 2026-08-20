@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import GirlImage from "../../assets/brokerbannergirl.jpg";
+import { useLocale } from "../../contexts/LocaleContext";
 
 const Wrapper = styled.section`
   background: #f8fafc;
@@ -130,6 +131,7 @@ const Figure = styled.div`
 `;
 
 const BrokerHeroSection2 = () => {
+  const { t } = useLocale();
   return (
     <Wrapper>
       <Inner>
@@ -140,22 +142,18 @@ const BrokerHeroSection2 = () => {
 
         <ContentRow>
           <Copy>
-            <Title>Trusted Brokers</Title>
+            <Title>{t("brokers.title")}</Title>
 
             <Description>
-              We partner only with regulated and reputable brokers who adhere to the highest industry standards.
-              Our listed brokers are carefully vetted to ensure transparency, security, and fair trading conditions —
-              giving you the confidence to trade in a safe and reliable environment.
+              {t("brokers.body1")}
             </Description>
 
-            <Subtitle>Facing any issue with our recommended broker? Submit a report.</Subtitle>
+            <Subtitle>{t("brokers.subtitle")}</Subtitle>
 
             <Description>
-              If you experience any problems or have concerns regarding a broker, we encourage you to submit a
-              detailed report. Our dedicated support team will thoroughly review your submission, investigate the
-              matter, and take the necessary steps to ensure your trading experience remains secure and fair.
+              {t("brokers.body2")}
             </Description>
-            <ReportLink to="/complaints">Submit a broker complaint →</ReportLink>
+            <ReportLink to="/complaints">{t("brokers.report")}</ReportLink>
           </Copy>
 
           <Figure>

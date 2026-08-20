@@ -5,7 +5,8 @@ import {
 } from 'react-icons/fi';
 import { useAuth } from '../../../contexts/AuthContext';
 import { fetchMyDashboard, type DashboardStat } from '../../../services/userInsightService';
-import { getMyKyc, KYC_STATUS_LABELS, type KycStatus } from '../../../services/kycService';
+import { getMyKyc, type KycStatus } from '../../../services/kycService';
+import { useLocale } from '../../../contexts/LocaleContext';
 import { ShimmerBar } from '../../../components/SharedComponents/Shimmer';
 import {
   PageWrap, DashboardHero, StatsGrid, StatCard, StatIconBox, StatBody,
@@ -22,22 +23,32 @@ const iconByKey: Record<string, React.ElementType> = {
   rebates: FiDollarSign,
 };
 
-const kycHint: Record<KycStatus, string> = {
-  incomplete: 'Complete verification to unlock full platform access.',
-  pending: 'Your documents are under review — we\'ll update you soon.',
-  approved: 'Your identity is verified. Full access is enabled.',
-  rejected: 'Verification was declined. Review feedback and resubmit.',
+const STAT_I18N: Record<string, string> = {
+  contests: "panel.statContests",
+  signals: "panel.statSignals",
+  webinars: "panel.statWebinars",
+  courses: "panel.statCourses",
+  forum: "panel.statForum",
+  rebates: "panel.statRebates",
 };
 
-const quickLinks = [
-  { to: '/user-panel/rebates', title: 'My Rebates', desc: 'Cashback & credits', icon: FiDollarSign },
-  { to: '/user-panel/live-accounts', title: 'Live accounts', desc: 'Track setup requests', icon: FiLink },
-  { to: '/user-panel/invite', title: 'Invite friends', desc: 'Earn referral rewards', icon: FiUserPlus },
-  { to: '/user-panel/verification', title: 'Verification', desc: 'KYC status', icon: FiShield },
-];
+const KYC_STATUS_KEY: Record<KycStatus, string> = {
+  incomplete: "panel.statusIncomplete",
+  pending: "panel.statusPending",
+  approved: "panel.statusApproved",
+  rejected: "panel.statusRejected",
+};
+
+const KYC_HINT_KEY: Record<KycStatus, string> = {
+  incomplete: "panel.kycIncomplete",
+  pending: "panel.kycPending",
+  approved: "panel.kycApproved",
+  rejected: "panel.kycRejected",
+};
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
+  const { t } = useLocale();
   const [stats, setStats] = useState<DashboardStat[]>([]);
   const [activitySummary, setActivitySummary] = useState<{
     thisMonth: number;
@@ -72,35 +83,35 @@ const Dashboard: React.FC = () => {
     <PageWrap>
       <DashboardHero>
         <div>
-          <h1>Welcome back, {user?.firstName || 'User'}</h1>
-          <p>Track contests, rebates, signals, and verification — all in one place.</p>
+          <h1>{t("panel.welcome", { name: user?.firstName || t("panel.userFallback") })}</h1>
+          <p>{t("panel.dashSub")}</p>
         </div>
-        <Pill $variant={kycStatus}>{KYC_STATUS_LABELS[kycStatus]}</Pill>
+        <Pill $variant={kycStatus}>{t(KYC_STATUS_KEY[kycStatus])}</Pill>
       </DashboardHero>
 
       {error && <ErrorBanner>{error}</ErrorBanner>}
 
       <KycStrip $variant={kycStatus}>
         <div>
-          <div className="label">Identity Verification</div>
-          <div className="desc">{kycHint[kycStatus]}</div>
+          <div className="label">{t("panel.kycTitle")}</div>
+          <div className="desc">{t(KYC_HINT_KEY[kycStatus])}</div>
         </div>
         <GhostNavLink to="/user-panel/verification">
-          {kycStatus === 'approved' ? 'View status' : 'Manage verification'}
+          {kycStatus === 'approved' ? t("panel.viewStatus") : t("panel.manageKyc")}
           <FiChevronRight />
         </GhostNavLink>
       </KycStrip>
 
       {activitySummary && !loading && (
         <HintBar>
-          <strong>Activity this month:</strong> {activitySummary.thisMonth} events
+          <strong>{t("panel.activityMonth")}</strong> {activitySummary.thisMonth} {t("panel.events")}
           <span style={{ color: activitySummary.positive ? '#059669' : '#dc2626', marginLeft: 6, fontWeight: 600 }}>
-            ({activitySummary.changeText} vs last month)
+            ({activitySummary.changeText} {t("panel.vsLast")})
           </span>
         </HintBar>
       )}
 
-      <SectionLabel>Overview</SectionLabel>
+      <SectionLabel>{t("panel.overview")}</SectionLabel>
       <StatsGrid>
         {loading
           ? Array.from({ length: 6 }).map((_, i) => (
@@ -119,17 +130,22 @@ const Dashboard: React.FC = () => {
                   <StatIconBox $color={stat.color}><Icon /></StatIconBox>
                   <StatBody>
                     <StatValue>{stat.value}</StatValue>
-                    <StatLabel>{stat.label}</StatLabel>
-                    <StatMeta $positive={stat.positive}>{stat.changeText} this month</StatMeta>
+                    <StatLabel>{STAT_I18N[stat.key] ? t(STAT_I18N[stat.key]) : stat.label}</StatLabel>
+                    <StatMeta $positive={stat.positive}>{stat.changeText} {t("panel.thisMonth")}</StatMeta>
                   </StatBody>
                 </StatCard>
               );
             })}
       </StatsGrid>
 
-      <SectionLabel>Quick actions</SectionLabel>
+      <SectionLabel>{t("panel.quick")}</SectionLabel>
       <QuickLinksGrid>
-        {quickLinks.map((item) => {
+        {[
+          { to: '/user-panel/rebates', title: t("panel.qlRebates"), desc: t("panel.qlRebatesD"), icon: FiDollarSign },
+          { to: '/user-panel/live-accounts', title: t("panel.qlLive"), desc: t("panel.qlLiveD"), icon: FiLink },
+          { to: '/user-panel/invite', title: t("panel.qlInvite"), desc: t("panel.qlInviteD"), icon: FiUserPlus },
+          { to: '/user-panel/verification', title: t("panel.qlKyc"), desc: t("panel.qlKycD"), icon: FiShield },
+        ].map((item) => {
           const Icon = item.icon;
           return (
             <QuickLinkCard key={item.to} to={item.to}>
@@ -143,7 +159,7 @@ const Dashboard: React.FC = () => {
 
       <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
         <GhostNavLink to="/user-panel/settings">
-          <FiSettings /> Preferences
+          <FiSettings /> {t("panel.preferences")}
         </GhostNavLink>
       </div>
     </PageWrap>

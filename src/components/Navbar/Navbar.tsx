@@ -20,8 +20,13 @@ import {
   Backdrop,
   SubmenuWrapper,
   SubmenuToggle,
-  Submenu,
-  SubmenuItem,
+  ToolsMegaMenu,
+  ToolsMegaColumn,
+  ToolsMegaLabel,
+  ToolsMegaGrid,
+  ToolsMegaLink,
+  MobileToolsGroup,
+  MobileToolsHeading,
 } from "./Navbar.styles";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
@@ -41,6 +46,8 @@ import CalculatorIcon from "../../assets/icons/calculator-svgrepo-com (1) 1.svg"
 import LocationIcon from "../../assets/icons/Location marker.svg";
 
 import { useAuthModal } from "../../contexts/AuthModalContext";
+import { useLocale } from "../../contexts/LocaleContext";
+import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
 
 const FALLBACK_NAV = [
   { to: "/", label: "Home", end: true },
@@ -56,13 +63,20 @@ const FALLBACK_NAV = [
   { to: "/analysis", label: "Analysis" },
   { to: "/forum", label: "Forum" },
   { to: "/traders", label: "Traders" },
+];
+
+const EDUCATION_PATHS = new Set([
+  "/copy-trading",
+  "/courses",
+  "/trading-videos",
+  "/webinars",
+]);
+
+const FALLBACK_TOOLS = [
   { to: "/copy-trading", label: "Copy Trading" },
   { to: "/courses", label: "Courses" },
   { to: "/trading-videos", label: "Trading Videos" },
   { to: "/webinars", label: "Webinars" },
-];
-
-const FALLBACK_TOOLS = [
   { to: "/calculators", label: "All Calculators" },
   { to: "/pip-calculator", label: "Pip Calculator" },
   { to: "/position-size-calculator", label: "Position Size Calculator" },
@@ -70,6 +84,11 @@ const FALLBACK_TOOLS = [
   { to: "/rebate-calculator", label: "Rebate Calculator" },
   { to: "/pivot-point-calculator", label: "Pivot Point Calculator" },
   { to: "/fibonacci-calculator", label: "Fibonacci Calculator" },
+  { to: "/profit-calculator", label: "Profit Calculator" },
+  { to: "/risk-reward-calculator", label: "Risk / Reward" },
+  { to: "/drawdown-calculator", label: "Drawdown Calculator" },
+  { to: "/compound-calculator", label: "Compound Calculator" },
+  { to: "/crypto-profit-calculator", label: "Crypto Profit" },
 ];
 
 const Header: React.FC = () => {
@@ -80,21 +99,44 @@ const Header: React.FC = () => {
   const [accountOpen, setAccountOpen] = useState(false);
   const desktopAccountRef = useRef<HTMLDivElement | null>(null);
   const mobileAccountRef = useRef<HTMLDivElement | null>(null);
+  const toolsCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { isAuthenticated, user, logout } = useAuth();
   const { openSignIn } = useAuthModal();
   const { mainNav, toolsNav, config } = useSiteConfig();
+  const { t, labelForPath } = useLocale();
 
   const navLinks = mainNav.length
-    ? mainNav.map((n) => ({ to: n.path, label: n.label, end: n.end }))
-    : FALLBACK_NAV;
+    ? mainNav.map((n) => ({ to: n.path, label: labelForPath(n.path, n.label), end: n.end }))
+    : FALLBACK_NAV.map((n) => ({ ...n, label: labelForPath(n.to, n.label) }));
   const toolsSubmenu = toolsNav.length
-    ? toolsNav.map((n) => ({ to: n.path, label: n.label }))
-    : FALLBACK_TOOLS;
+    ? toolsNav.map((n) => ({ to: n.path, label: labelForPath(n.path, n.label) }))
+    : FALLBACK_TOOLS.map((n) => ({ ...n, label: labelForPath(n.to, n.label) }));
+  const educationTools = toolsSubmenu.filter((n) => EDUCATION_PATHS.has(n.to));
+  const calculatorTools = toolsSubmenu.filter((n) => !EDUCATION_PATHS.has(n.to));
   const logoSrc = config?.siteLogoUrl || LogoImg;
 
   const portalPath = user?.role === "admin" ? "/admin-panel" : "/user-panel";
   const isAdmin = user?.role === "admin";
-  const accountLabel = isAdmin ? "Admin panel" : `${user?.firstName || "My"} account`;
+  const accountLabel = isAdmin ? t("header.adminPanel") : t("header.myAccount");
+
+  useEffect(() => {
+    return () => {
+      if (toolsCloseTimer.current) clearTimeout(toolsCloseTimer.current);
+    };
+  }, []);
+
+  const openToolsMenu = () => {
+    if (toolsCloseTimer.current) {
+      clearTimeout(toolsCloseTimer.current);
+      toolsCloseTimer.current = null;
+    }
+    setSubmenuOpen(true);
+  };
+
+  const closeToolsMenu = () => {
+    if (toolsCloseTimer.current) clearTimeout(toolsCloseTimer.current);
+    toolsCloseTimer.current = setTimeout(() => setSubmenuOpen(false), 180);
+  };
 
   useEffect(() => {
     if (!accountOpen) return;
@@ -136,14 +178,14 @@ const Header: React.FC = () => {
           onClick={() => setAccountOpen((v) => !v)}
         >
           {isAdmin ? <FiShield size={18} aria-hidden /> : <FiUser size={18} aria-hidden />}
-          <span>{outline ? (isAdmin ? "Admin" : user?.firstName || "Account") : accountLabel}</span>
+          <span>{outline ? (isAdmin ? t("header.admin") : user?.firstName || t("header.account")) : accountLabel}</span>
           {accountOpen ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
         </Trigger>
         {accountOpen && (
           <AccountDropdown role="menu">
             <AccountDropdownItem type="button" role="menuitem" onClick={goPortal}>
               <FiGrid size={15} />
-              Portal
+              {t("header.portal")}
             </AccountDropdownItem>
             <AccountDropdownItem
               type="button"
@@ -152,7 +194,7 @@ const Header: React.FC = () => {
               onClick={handleLogout}
             >
               <FiLogOut size={15} />
-              Logout
+              {t("header.logout")}
             </AccountDropdownItem>
           </AccountDropdown>
         )}
@@ -181,26 +223,27 @@ const Header: React.FC = () => {
             <NavLink to="/live-chat">
               <HeaderItem>
                 <img src={SupportIcon} alt="Live Chat" />
-                <span>Live Chat</span>
+                <span>{t("header.liveChat")}</span>
               </HeaderItem>
             </NavLink>
             <NavLink to="/rebate-calculator">
               <HeaderItem>
                 <img src={CalculatorIcon} alt="Calculator" />
-                <span>Rebate Calculator</span>
+                <span>{t("header.rebateCalculator")}</span>
               </HeaderItem>
             </NavLink>
             <NavLink to="/location">
               <HeaderItem>
                 <img src={LocationIcon} alt="Location" />
-                <span>United States</span>
+                <span>{t("header.location")}</span>
               </HeaderItem>
             </NavLink>
             {isAuthenticated ? (
               renderAccountMenu(false, desktopAccountRef)
             ) : (
-              <SignInButton onClick={() => openSignIn()}>Sign In</SignInButton>
+              <SignInButton onClick={() => openSignIn()}>{t("header.signIn")}</SignInButton>
             )}
+            <LanguageSwitcher />
           </LinkGroup>
         </Topbar>
 
@@ -212,22 +255,36 @@ const Header: React.FC = () => {
               </NavItem>
             ))}
 
-            <SubmenuWrapper
-              onMouseEnter={() => setSubmenuOpen(true)}
-              onMouseLeave={() => setSubmenuOpen(false)}
-            >
-              <SubmenuToggle>
-                Tools {submenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+            <SubmenuWrapper onMouseEnter={openToolsMenu} onMouseLeave={closeToolsMenu}>
+              <SubmenuToggle data-open={submenuOpen ? "true" : "false"}>
+                {t("header.tools")} {submenuOpen ? <FiChevronUp /> : <FiChevronDown />}
               </SubmenuToggle>
 
               {submenuOpen && (
-                <Submenu>
-                  {toolsSubmenu.map((tool) => (
-                    <SubmenuItem to={tool.to} key={tool.to}>
-                      {tool.label}
-                    </SubmenuItem>
-                  ))}
-                </Submenu>
+                <ToolsMegaMenu role="menu" aria-label={t("header.tools")}>
+                  {educationTools.length > 0 && (
+                    <ToolsMegaColumn>
+                      <ToolsMegaLabel>{t("header.education")}</ToolsMegaLabel>
+                      {educationTools.map((tool) => (
+                        <ToolsMegaLink to={tool.to} key={tool.to} role="menuitem">
+                          {tool.label}
+                        </ToolsMegaLink>
+                      ))}
+                    </ToolsMegaColumn>
+                  )}
+                  {calculatorTools.length > 0 && (
+                    <ToolsMegaColumn>
+                      <ToolsMegaLabel>{t("header.calculators")}</ToolsMegaLabel>
+                      <ToolsMegaGrid>
+                        {calculatorTools.map((tool) => (
+                          <ToolsMegaLink to={tool.to} key={tool.to} role="menuitem">
+                            {tool.label}
+                          </ToolsMegaLink>
+                        ))}
+                      </ToolsMegaGrid>
+                    </ToolsMegaColumn>
+                  )}
+                </ToolsMegaMenu>
               )}
             </SubmenuWrapper>
           </NavList>
@@ -237,11 +294,12 @@ const Header: React.FC = () => {
           <NavLink to="/">
             <Logo src={logoSrc} alt={`${config?.siteName || "LegendPips"} Logo`} />
           </NavLink>
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.65rem" }}>
+            <LanguageSwitcher compact />
             {isAuthenticated ? (
               renderAccountMenu(false, mobileAccountRef)
             ) : (
-              <SignInButton onClick={() => openSignIn()}>Sign In</SignInButton>
+              <SignInButton onClick={() => openSignIn()}>{t("header.signIn")}</SignInButton>
             )}
             <FaBars
               size={22}
@@ -263,7 +321,7 @@ const Header: React.FC = () => {
                     setAccountOpen(false);
                   }}
                 >
-                  Portal
+                  {t("header.portal")}
                 </NavItem>
                 <button
                   type="button"
@@ -279,7 +337,7 @@ const Header: React.FC = () => {
                     cursor: "pointer",
                   }}
                 >
-                  Logout
+                  {t("header.logout")}
                 </button>
               </>
             )}
@@ -296,32 +354,46 @@ const Header: React.FC = () => {
 
             <div>
               <SubmenuToggle onClick={() => setMobileSubmenuOpen(!mobileSubmenuOpen)}>
-                Tools {mobileSubmenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+                {t("header.tools")} {mobileSubmenuOpen ? <FiChevronUp /> : <FiChevronDown />}
               </SubmenuToggle>
 
               {mobileSubmenuOpen && (
-                <div
-                  style={{
-                    paddingLeft: "1rem",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "0.4rem",
-                    marginTop: "0.75rem",
-                  }}
-                >
-                  {toolsSubmenu.map((tool) => (
-                    <NavItem
-                      to={tool.to}
-                      key={tool.to}
-                      onClick={() => {
-                        setMenuOpen(false);
-                        setMobileSubmenuOpen(false);
-                      }}
-                    >
-                      {tool.label}
-                    </NavItem>
-                  ))}
-                </div>
+                <MobileToolsGroup>
+                  {educationTools.length > 0 && (
+                    <>
+                      <MobileToolsHeading>{t("header.education")}</MobileToolsHeading>
+                      {educationTools.map((tool) => (
+                        <NavItem
+                          to={tool.to}
+                          key={tool.to}
+                          onClick={() => {
+                            setMenuOpen(false);
+                            setMobileSubmenuOpen(false);
+                          }}
+                        >
+                          {tool.label}
+                        </NavItem>
+                      ))}
+                    </>
+                  )}
+                  {calculatorTools.length > 0 && (
+                    <>
+                      <MobileToolsHeading>{t("header.calculators")}</MobileToolsHeading>
+                      {calculatorTools.map((tool) => (
+                        <NavItem
+                          to={tool.to}
+                          key={tool.to}
+                          onClick={() => {
+                            setMenuOpen(false);
+                            setMobileSubmenuOpen(false);
+                          }}
+                        >
+                          {tool.label}
+                        </NavItem>
+                      ))}
+                    </>
+                  )}
+                </MobileToolsGroup>
               )}
             </div>
           </MobileMenu>

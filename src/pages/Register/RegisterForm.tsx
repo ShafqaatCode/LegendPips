@@ -20,7 +20,6 @@ import {
   Icon,
   Terms,
   CloseBtn,
-  Highlight,
   RegisterButton,
   EmailOtpWrap,
   SendOtpBtn,
@@ -29,6 +28,7 @@ import {
 import { FaX } from "react-icons/fa6";
 import { register as registerUser, sendRegistrationOtp } from "../../services/authService";
 import { fetchRegisterConfig, type RegisterConfig } from "../../services/siteConfigService";
+import { useLocale } from "../../contexts/LocaleContext";
 
 interface Props {
   isOpen?: boolean;
@@ -53,6 +53,7 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
   const [success, setSuccess] = useState<string>("");
   const [otpCooldown, setOtpCooldown] = useState(0);
   const [regConfig, setRegConfig] = useState<RegisterConfig | null>(null);
+  const { t } = useLocale();
 
   useEffect(() => {
     fetchRegisterConfig().then(setRegConfig).catch(() => setRegConfig(null));
@@ -73,20 +74,20 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
     setError("");
     setSuccess("");
     if (!email?.trim()) {
-      setError("Enter your email first, then request a code.");
+      setError(t("panel.authEnterEmail"));
       return;
     }
     if (!EMAIL_RE.test(email.trim())) {
-      setError("Enter a valid email address.");
+      setError(t("panel.authValidEmail"));
       return;
     }
     setOtpSending(true);
     try {
       const res = await sendRegistrationOtp(email.trim());
-      setSuccess(res.message || "Verification code sent. Check your inbox.");
+      setSuccess(res.message || t("panel.authOtpSent"));
       setOtpCooldown(60);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Could not send verification code.");
+      setError(err instanceof Error ? err.message : t("panel.authOtpFail"));
     } finally {
       setOtpSending(false);
     }
@@ -98,14 +99,14 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
     setSuccess("");
 
     if (data.password !== data.confirmPassword) {
-      setError("Passwords do not match");
+      setError(t("panel.authPassMatch"));
       setIsLoading(false);
       return;
     }
 
     const otpRaw = String(data.otp ?? "").trim();
     if (emailVerificationRequired && !/^\d{6}$/.test(otpRaw)) {
-      setError("Enter the 6-digit verification code sent to your email.");
+      setError(t("panel.authNeedOtp"));
       setIsLoading(false);
       return;
     }
@@ -121,14 +122,14 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
       });
 
       if (response.success) {
-        setSuccess("Registration successful! You can now login.");
+        setSuccess(t("panel.authRegOk"));
         setTimeout(() => {
           if (onClose) onClose();
           window.location.reload();
         }, 1500);
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Registration failed. Please try again.");
+      setError(err instanceof Error ? err.message : t("panel.authRegFail"));
       console.error("Registration error:", err);
     } finally {
       setIsLoading(false);
@@ -140,56 +141,56 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
       <CloseBtn type="button" onClick={onClose}>
         <FaX size={"16px"} />
       </CloseBtn>
-      <Heading>Register</Heading>
+      <Heading>{t("panel.authRegister")}</Heading>
 
       <GoogleButton type="button">
-        Continue with Google <GoogleIcon src={GLogo} alt="G" />
+        {t("panel.authGoogle")} <GoogleIcon src={GLogo} alt="G" />
       </GoogleButton>
 
-      <Or>or</Or>
+      <Or>{t("panel.authOr")}</Or>
 
       <Divider>
         <Line />
-        <span>Register with Email</span>
+        <span>{t("panel.authEmailReg")}</span>
         <Line />
       </Divider>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Input type="text" placeholder="First Name" {...register("firstName", { required: true })} />
-        {errors.firstName && <ErrorMsg>First Name is required</ErrorMsg>}
+        <Input type="text" placeholder={t("panel.authFirst")} {...register("firstName", { required: true })} />
+        {errors.firstName && <ErrorMsg>{t("panel.authFirstReq")}</ErrorMsg>}
 
-        <Input type="text" placeholder="Last Name" {...register("lastName", { required: true })} />
-        {errors.lastName && <ErrorMsg>Last Name is required</ErrorMsg>}
+        <Input type="text" placeholder={t("panel.authLast")} {...register("lastName", { required: true })} />
+        {errors.lastName && <ErrorMsg>{t("panel.authLastReq")}</ErrorMsg>}
 
         {emailVerificationRequired ? (
           <>
             <EmailOtpWrap>
-              <Input type="email" placeholder="Email address" {...register("email", { required: true })} />
+              <Input type="email" placeholder={t("panel.authEmail")} {...register("email", { required: true })} />
               <SendOtpBtn
                 type="button"
                 onClick={handleSendOtp}
                 disabled={otpSending || otpCooldown > 0}
                 $cooling={otpCooldown > 0}
               >
-                {otpSending ? "Sending…" : otpCooldown > 0 ? `${otpCooldown}s` : "Send code"}
+                {otpSending ? t("panel.authSending") : otpCooldown > 0 ? `${otpCooldown}s` : t("panel.authSendCode")}
               </SendOtpBtn>
             </EmailOtpWrap>
-            {errors.email && <ErrorMsg>Email is required</ErrorMsg>}
-            <OtpHint>We&apos;ll email a 6-digit code. Enter it below to verify this address before you register.</OtpHint>
+            {errors.email && <ErrorMsg>{t("panel.authEmailReq")}</ErrorMsg>}
+            <OtpHint>{t("panel.authOtpHint")}</OtpHint>
             <Input
               type="text"
               inputMode="numeric"
               autoComplete="one-time-code"
               maxLength={6}
-              placeholder="6-digit code"
+              placeholder={t("panel.authOtp")}
               {...register("otp", { required: emailVerificationRequired })}
             />
-            {errors.otp && <ErrorMsg>Verification code is required</ErrorMsg>}
+            {errors.otp && <ErrorMsg>{t("panel.authOtpReq")}</ErrorMsg>}
           </>
         ) : (
           <>
-            <Input type="email" placeholder="Email address" {...register("email", { required: true })} />
-            {errors.email && <ErrorMsg>Email is required</ErrorMsg>}
+            <Input type="email" placeholder={t("panel.authEmail")} {...register("email", { required: true })} />
+            {errors.email && <ErrorMsg>{t("panel.authEmailReq")}</ErrorMsg>}
           </>
         )}
 
@@ -215,24 +216,24 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
         </PhoneRow>
 
         <PasswordRow>
-          <Input type={showPassword ? "text" : "password"} placeholder="Password" {...register("password", { required: true })} />
+          <Input type={showPassword ? "text" : "password"} placeholder={t("panel.authPassword")} {...register("password", { required: true })} />
           <Icon onClick={() => setShowPassword(!showPassword)}>
             {showPassword ? <FaEyeSlash /> : <FaEye />}
           </Icon>
         </PasswordRow>
-        {errors.password && <ErrorMsg>Password is required</ErrorMsg>}
+        {errors.password && <ErrorMsg>{t("panel.authPassReq")}</ErrorMsg>}
 
         <PasswordRow>
           <Input
             type={showConfirmPassword ? "text" : "password"}
-            placeholder="Confirm Password"
+              placeholder={t("panel.authConfirm")}
             {...register("confirmPassword", { required: true })}
           />
           <Icon onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
             {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
           </Icon>
         </PasswordRow>
-        {errors.confirmPassword && <ErrorMsg>Confirm your password</ErrorMsg>}
+        {errors.confirmPassword && <ErrorMsg>{t("panel.authConfirmReq")}</ErrorMsg>}
 
         {error && <ErrorMsg style={{ color: "#e74c3c" }}>{error}</ErrorMsg>}
         {success && <ErrorMsg style={{ color: "#2ecc71" }}>{success}</ErrorMsg>}
@@ -240,13 +241,13 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
         <Terms>
           <input type="checkbox" {...register("terms", { required: true })} />
           <label>
-            I Understand And Accept The <Highlight>Terms And Disclaimer</Highlight> Set Forth By Legend Pips.
+            {t("panel.authUnderstand")}
           </label>
         </Terms>
-        {errors.terms && <ErrorMsg>You must accept the terms</ErrorMsg>}
+        {errors.terms && <ErrorMsg>{t("panel.authTermsReq")}</ErrorMsg>}
 
         <RegisterButton type="submit" disabled={isLoading}>
-          {isLoading ? "Registering..." : "Register"}
+          {isLoading ? t("panel.authRegistering") : t("panel.authRegister")}
         </RegisterButton>
       </form>
     </Container>

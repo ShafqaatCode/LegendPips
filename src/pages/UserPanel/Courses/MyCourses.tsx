@@ -11,8 +11,10 @@ import {
   CardsGrid, MediaCard, MediaThumb, CardBody, CardTitle, MetaLine,
   PrimaryButton, EmptyState, ErrorBanner, GhostNavLink, BadgeOverlay,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const MyCourses: React.FC = () => {
+  const { t } = useLocale();
   const [courses, setCourses] = useState<MyEnrollmentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +52,7 @@ const MyCourses: React.FC = () => {
     <PageWrap>
       <PageHeaderRow>
         <PageHeader style={{ marginBottom: 0 }}>
-          <PageTitle><FiBook /> My Courses</PageTitle>
+          <PageTitle><FiBook /> {t("panel.courses")}</PageTitle>
           <PageSubtitle>Your enrolled courses and progress</PageSubtitle>
         </PageHeader>
         <GhostNavLink to="/courses#course-catalog">Browse catalog</GhostNavLink>

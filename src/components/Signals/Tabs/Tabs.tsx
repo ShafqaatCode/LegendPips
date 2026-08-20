@@ -4,6 +4,7 @@ import RecentSignals from './SignalList';
 import SignalPerformance from './SignalPerformance';
 
 import SectionHeadingSet from '../../SharedComponents/SectionHeadingSet';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 const Container = styled.div`
   background-color: #F3F4F7;
@@ -64,9 +65,15 @@ const CardsWrapper = styled.div`
 `;
 
 const RewardsAndBenefits: React.FC = () => {
+  const { t } = useLocale();
   const [activeTab, setActiveTab] = useState('Signals');
 
-  const tabs = ['Signals', 'Rewards', 'Stats', 'Performance'];
+  const tabs = [
+    { id: 'Signals', label: t('signals.tab1') },
+    { id: 'Rewards', label: t('signals.tab2') },
+    { id: 'Stats', label: t('signals.tab3') },
+    { id: 'Performance', label: t('signals.tab4') },
+  ];
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -104,20 +111,20 @@ const RewardsAndBenefits: React.FC = () => {
   return (
     <Container>
       <SectionHeadingSet
-        upperText="ALL IN ONE TRADING PLATFORM"
-        mainHeading="LIVE SIGNALS"
-        subText="Trade, earn, repeat. With rebates, expert tools, and a strong community, Legend Pips makes every trade more rewarding."
+        upperText={t("common.allInOne")}
+        mainHeading={t("signals.title")}
+        subText={t("signals.body")}
       />
 
       <TabsWrapper>
         <Tabs>
           {tabs.map((tab) => (
             <Tab
-              key={tab}
-              active={activeTab === tab}
-              onClick={() => setActiveTab(tab)}
+              key={tab.id}
+              active={activeTab === tab.id}
+              onClick={() => setActiveTab(tab.id)}
             >
-              {tab}
+              {tab.label}
             </Tab>
           ))}
         </Tabs>

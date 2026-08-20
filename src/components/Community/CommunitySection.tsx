@@ -4,6 +4,7 @@ import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import NetworkImg from "../../assets/FeaturesIcon/network.png"
 import ButtonBase from "../SharedComponents/Button";
 import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg"
+import { useLocale } from "../../contexts/LocaleContext";
 
 
 const MainWrapper = styled.main`
@@ -36,6 +37,7 @@ const ImgWrapper = styled.div`
 `
 
 const CommunitySection: React.FC = () => {
+    const { t } = useLocale();
     return (
         <MainWrapper>
 
@@ -44,9 +46,9 @@ const CommunitySection: React.FC = () => {
             <ImgWrapper>
                 <img src={NetworkImg} alt="" />
             </ImgWrapper>
-            <SectionHeadingSet subText="Unlock your true trading potential by joining a community of experts, learners, and achievers. Share ideas, get support, and grow your skills every day" mainHeading="Unlock success with our community" upperText="All in one trading platform" />
+            <SectionHeadingSet subText={t("community.body")} mainHeading={t("community.title")} upperText={t("community.kicker")} />
 
-            <ButtonBase fontSize="16px">View Details<img width="24px" src={ArrowIcon} alt="Icon" /></ButtonBase>
+            <ButtonBase fontSize="16px">{t("contests.view")}<img width="24px" src={ArrowIcon} alt="" /></ButtonBase>
 
 
         </Container>

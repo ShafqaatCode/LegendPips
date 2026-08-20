@@ -8,6 +8,7 @@ import WhyChooseUs from '../../components/WhyChooseUs/Choose';
 import FeaturesSlider from '../../components/FeatureSection/FeaturesSlider';
 import RegisterModal from '../../pages/Register/RegisterModal';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLocale } from '../../contexts/LocaleContext';
 // import RebateCalculator from '../../components/Calculators/RebateCalculator/RebateCalculator';
 // import MarginCalculator from '../../components/Calculators/MarginCalculator/MarginCalculator';
 // import PipCalculator from '../../components/Calculators/PipsCalculator/PipCalculator';
@@ -17,6 +18,7 @@ import { useAuth } from '../../contexts/AuthContext';
 
 
 const HitWorksPage: React.FC = () => {
+  const { t } = useLocale();
   const [signupOpen, setSignupOpen] = useState(false);
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
@@ -45,9 +47,10 @@ const HitWorksPage: React.FC = () => {
     </div> */}
       <Banner
         backgroundImage={bannerImg}
-        bannerHeading="Earning from every trade has never been this simple."
-        upperText="all in one Trading plateform"
-        subText="Legend Pips gives you cashback for your trades without changing your broker. Plus, you get tools, signals, and protection—built to help you grow."
+        bannerHeading={t("how.bannerTitle")}
+        upperText={t("how.bannerKicker")}
+        subText={t("how.bannerBody")}
+        buttonText={t("how.ctaBtn")}
         onButtonClick={handleSignupClick}
       />
       <RegisterModal isOpen={signupOpen} onClose={() => setSignupOpen(false)} />

@@ -21,6 +21,7 @@ import Icon9 from "../../assets/ChooseusIcons/image3-4.png";
 import Icon10 from "../../assets/ChooseusIcons/img1.png";
 import Icon11 from "../../assets/ChooseusIcons/img3.png";
 import Icon12 from "../../assets/ChooseusIcons/Img2.png";
+import { useLocale } from "../../contexts/LocaleContext";
 
 
 const WorkSectionWrapper = styled.section`
@@ -162,84 +163,35 @@ const CtaLink = styled(Link)`
 
 const UpperContentContainer = styled.div``;
 
-const POINTS = [
-  {
-    title: "Broker causing problems? Submit a complaint now.",
-    desc: "Facing issues like delayed withdrawals, trade manipulation, or poor support? We’re here to help resolve it.",
-    icon: Icon1,
-    to: "/complaints",
-  },
-  {
-    title: "AI-Powered Broker Finder",
-    desc: "Whether you trade in forex, crypto, or stocks our AI helps you find the perfect trading partner fast.",
-    icon: Icon2,
-  },
-  {
-    title: "Excellent customer service",
-    desc: "We prioritize your satisfaction and profit. Our professional customer service team is always here to help you.",
-    icon: Icon3,
-  },
-  {
-    title: "Top technical analysis",
-    desc: "We have a very robust trading system, AI intelligence, technical analysis, big data and strategic cooperation with the world’s top trading analysts.",
-    icon: Icon4,
-  },
-  {
-    title: "Exciting Lucky Draws with Real Prizes",
-    desc: "Spend just $1 and get a chance to spin the wheel for exciting prizes! The more you spend, the more chances you get to win big.",
-    icon: Icon5,
-  },
-  {
-    title: "Delivering tools that elevate your trading game",
-    desc: "Gain access to a suite of powerful trading tools designed to enhance every aspect of your trading journey.",
-    icon: Icon6,
-  },
-];
-
-const UnderPoints = [
-  {
-    title: "Stay Informed with Daily Economic Insights",
-    desc: "Keep track of upcoming economic events, news releases, and data that can impact your trades.",
-    icon: Icon7,
-  },
-  {
-    title: "Become an Affiliate Partner & Start Earning",
-    desc: "Whether you’re a content creator or a trading pro, our affiliate program offers unlimited earning potential.",
-    icon: Icon8,
-  },
-  {
-    title: "Education That Elevates Your Trading",
-    desc: "Unlock powerful insights with structured learning from beginner to expert featuring monthly webinars, psychology classes, and advanced trading lessons.",
-    icon: Icon9,
-  },
-  {
-    title: "Advanced Scam Detection and Prevention",
-    desc: "Our intelligent system verifies brokers using advanced AI checks and ensures fast, transparent complaint resolution.",
-    icon: Icon10,
-  },
-  {
-    title: "Copy Top Traders, Earn Like a Pro",
-    desc: "Choose from a list of verified expert traders and mirror their trades in real time for consistent results.",
-    icon: Icon11,
-  },
-  {
-    title: "Trading signal tracking is simple and reliable",
-    desc: "Our trading signals are pushed live to VIP customers through the system, social network and email. Real-time trading broadcasts provide better clarity.",
-    icon: Icon12,
-  },
-];
-
 const ChoosUs: React.FC = () => {
   const [showMore, setShowMore] = useState(false);
+  const { t } = useLocale();
+
+  const POINTS = [
+    { title: t("why.p1t"), desc: t("why.p1d"), icon: Icon1, to: "/complaints" },
+    { title: t("why.p2t"), desc: t("why.p2d"), icon: Icon2 },
+    { title: t("why.p3t"), desc: t("why.p3d"), icon: Icon3 },
+    { title: t("why.p4t"), desc: t("why.p4d"), icon: Icon4 },
+    { title: t("why.p5t"), desc: t("why.p5d"), icon: Icon5 },
+    { title: t("why.p6t"), desc: t("why.p6d"), icon: Icon6 },
+  ];
+  const UnderPoints = [
+    { title: t("why.u1t"), desc: t("why.u1d"), icon: Icon7 },
+    { title: t("why.u2t"), desc: t("why.u2d"), icon: Icon8 },
+    { title: t("why.u3t"), desc: t("why.u3d"), icon: Icon9 },
+    { title: t("why.u4t"), desc: t("why.u4d"), icon: Icon10 },
+    { title: t("why.u5t"), desc: t("why.u5d"), icon: Icon11 },
+    { title: t("why.u6t"), desc: t("why.u6d"), icon: Icon12 },
+  ];
 
   const POINTS_SHOW = showMore ? POINTS : POINTS.slice(0, 3);
 
   return (
     <WorkSectionWrapper>
       <SectionHeadingSet
-        upperText="All in one trading Platform"
-        mainHeading="Why Choose Us"
-        subText="Discover why traders worldwide trust us as their top choice. With a focus on delivering consistent profits, exceptional service, cutting-edge technology."
+        upperText={t("why.kicker")}
+        mainHeading={t("why.title")}
+        subText={t("why.body")}
       />
 
       <Wrapper>
@@ -270,11 +222,11 @@ const ChoosUs: React.FC = () => {
               >
                 {showMore ? (
                   <>
-                    Show Less <FaCircleArrowUp />
+                    {t("why.less")} <FaCircleArrowUp />
                   </>
                 ) : (
                   <>
-                    Read More <FaCircleArrowDown />
+                    {t("why.more")} <FaCircleArrowDown />
                   </>
                 )}
               </ButtonBase>
@@ -306,11 +258,11 @@ const ChoosUs: React.FC = () => {
             >
               {showMore ? (
                 <>
-                  Show Less <FaCircleArrowUp />
+                  {t("why.less")} <FaCircleArrowUp />
                 </>
               ) : (
                 <>
-                  Read More <FaCircleArrowDown />
+                  {t("why.more")} <FaCircleArrowDown />
                 </>
               )}
             </ButtonBase>

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import RegisterModal from "../../pages/Register/RegisterModal";
 import { useAuth } from "../../contexts/AuthContext";
+import { useLocale } from "../../contexts/LocaleContext";
 import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 import bankIcon from "../../assets/icons/bank-transfer 1.svg";
 
@@ -191,6 +192,7 @@ const SignupButton = styled.button`
 `;
 
 const PaymentMethodsSection: React.FC = () => {
+  const { t } = useLocale();
   const [signupOpen, setSignupOpen] = useState(false);
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
@@ -220,9 +222,9 @@ const PaymentMethodsSection: React.FC = () => {
     <Section aria-labelledby="payment-methods-heading">
       <Inner>
         <SectionHeadingSet
-          upperText="Secure payouts & deposits"
-          mainHeading="Payment Methods"
-          subText="Fund your account and withdraw rebates through trusted global payment providers."
+          upperText={t("pay.kicker")}
+          mainHeading={t("pay.title")}
+          subText={t("pay.body")}
         />
 
         <LogoPanel>
@@ -232,7 +234,7 @@ const PaymentMethodsSection: React.FC = () => {
         </LogoPanel>
 
         <SignupButton type="button" onClick={handleSignup}>
-          Signup For Free
+          {t("how.ctaBtn")}
           <img src={ArrowIcon} alt="" aria-hidden />
         </SignupButton>
       </Inner>

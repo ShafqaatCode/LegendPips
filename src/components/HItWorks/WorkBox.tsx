@@ -35,7 +35,8 @@ const CardContainer = styled(motion.div)`
 
 const TopIndex = styled.div`
   position: absolute;
-  right: -20px;
+  right: auto;
+  inset-inline-end: -20px;
   top: -20px;
   background: white;
   width: 50px;

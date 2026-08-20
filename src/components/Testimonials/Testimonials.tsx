@@ -4,6 +4,7 @@ import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import ReviewBox from "./ReviewBox";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { fetchPublicClientReviews, type ClientReview } from "../../services/siteConfigService";
+import { useLocale } from "../../contexts/LocaleContext";
 
 const FALLBACK_REVIEWS = [
   {
@@ -89,6 +90,7 @@ const mapReview = (r: ClientReview): ReviewItem => ({
 });
 
 const Testimonials: React.FC = () => {
+  const { t } = useLocale();
   const [reviews, setReviews] = useState<ReviewItem[]>(FALLBACK_REVIEWS);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(1);
@@ -112,8 +114,8 @@ const Testimonials: React.FC = () => {
     <TestimonialContainer>
       <SectionHeadingSet
         upperText=""
-        mainHeading="TESTIMONIALS"
-        subText="Discover why traders worldwide trust us as their top choice, with a focus on delivering consistent profits, exceptional service, cutting-edge technology."
+        mainHeading={t("testimonials.title")}
+        subText={t("testimonials.body")}
       />
       <SliderWrapper>
         <SlideTrack currentIndex={currentIndex}>

@@ -20,14 +20,7 @@ import VerifiedIcon from "../../assets/icons/verified.svg";
 import TradingIcon from "../../assets/icons/trading.svg";
 import ContestIcon from "../../assets/icons/contest.svg";
 import ScamIcon from "../../assets/icons/scam.svg";
-
-const features = [
-  { icon: ScamIcon, label: "Scam Protection" },
-  { icon: CashbackIcon, label: "Cashback Rebates" },
-  { icon: VerifiedIcon, label: "Verified Broker" },
-  { icon: TradingIcon, label: "Trading Signals" },
-  { icon: ContestIcon, label: "Contests & Rewards" },
-];
+import { useLocale } from "../../contexts/LocaleContext";
 
 function getCardsToShow() {
   if (typeof window === "undefined") return 4;
@@ -37,6 +30,15 @@ function getCardsToShow() {
 }
 
 const FeaturesSlider = () => {
+  const { t } = useLocale();
+  const features = [
+    { icon: ScamIcon, label: t("slider.f1") },
+    { icon: CashbackIcon, label: t("slider.f2") },
+    { icon: VerifiedIcon, label: t("slider.f3") },
+    { icon: TradingIcon, label: t("slider.f4") },
+    { icon: ContestIcon, label: t("slider.f5") },
+  ];
+
   const [startIndex, setStartIndex] = useState(0);
   const [cardsToShow, setCardsToShow] = useState(getCardsToShow());
   const totalCards = features.length;

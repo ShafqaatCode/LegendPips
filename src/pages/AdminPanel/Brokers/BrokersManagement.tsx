@@ -18,6 +18,7 @@ import {
   adminUpdateBroker,
   type ApiBroker,
   type PropCashbackOffer,
+  type PropPromoCode,
 } from "../../../services/brokerService";
 import {
   BROKER_KIND_COLORS,
@@ -35,10 +36,21 @@ const emptyPropOffer = (): PropCashbackOffer => ({
   firstPurchaseCashback: "",
   repeatPurchaseCashback: "",
   discountPercent: "",
+  discountCode: "",
   evaluationType: undefined,
   profitSplit: "",
   accountSize: "",
+  challengeFee: "",
+  profitTarget: "",
+  dailyDrawdown: "",
+  maxDrawdown: "",
+  minTradingDays: "",
+  payoutCycle: "",
+  scalingPlan: "",
+  rulesUrl: "",
 });
+
+const emptyPromo = () => ({ code: "", label: "", percent: "", expiresAt: "", active: true });
 
 const StatsRow = styled.div`
   display: grid;
@@ -485,6 +497,17 @@ const BrokersManagement: React.FC = () => {
   const [formRebatesReviewsLabel, setFormRebatesReviewsLabel] = useState("");
   const [formRebatesFeatured, setFormRebatesFeatured] = useState(false);
   const [formPropOffers, setFormPropOffers] = useState<PropCashbackOffer[]>([emptyPropOffer()]);
+  const [formPropPromoCodes, setFormPropPromoCodes] = useState<PropPromoCode[]>([emptyPromo()]);
+  const [formCountry, setFormCountry] = useState("");
+  const [formLeverage, setFormLeverage] = useState("");
+  const [formPlatforms, setFormPlatforms] = useState("");
+  const [formCommission, setFormCommission] = useState("");
+  const [formScoreReg, setFormScoreReg] = useState("");
+  const [formScoreCond, setFormScoreCond] = useState("");
+  const [formScoreWd, setFormScoreWd] = useState("");
+  const [formScoreUx, setFormScoreUx] = useState("");
+  const [formScoreComp, setFormScoreComp] = useState("");
+  const [formScoreSup, setFormScoreSup] = useState("");
 
   const setPrimaryType = (kind: BrokerKind) => {
     setFormBothTabs(false);
@@ -530,6 +553,17 @@ const BrokersManagement: React.FC = () => {
     setFormRebatesReviewsLabel("");
     setFormRebatesFeatured(false);
     setFormPropOffers([emptyPropOffer()]);
+    setFormPropPromoCodes([emptyPromo()]);
+    setFormCountry("");
+    setFormLeverage("");
+    setFormPlatforms("");
+    setFormCommission("");
+    setFormScoreReg("");
+    setFormScoreCond("");
+    setFormScoreWd("");
+    setFormScoreUx("");
+    setFormScoreComp("");
+    setFormScoreSup("");
     setModalError(null);
     setIsModalOpen(true);
   };
@@ -556,8 +590,21 @@ const BrokersManagement: React.FC = () => {
     setFormRebatesReviewsLabel(b.rebatesReviewsLabel || "");
     setFormRebatesFeatured(!!b.rebatesFeatured);
     setFormPropOffers(
-      b.propOffers?.length ? b.propOffers.map((o) => ({ ...o })) : [emptyPropOffer()]
+      b.propOffers?.length ? b.propOffers.map((o) => ({ ...emptyPropOffer(), ...o })) : [emptyPropOffer()]
     );
+    setFormPropPromoCodes(
+      b.propPromoCodes?.length ? b.propPromoCodes.map((p) => ({ ...emptyPromo(), ...p })) : [emptyPromo()]
+    );
+    setFormCountry(b.country || "");
+    setFormLeverage(b.leverage || "");
+    setFormPlatforms(b.platforms || "");
+    setFormCommission(b.commission || "");
+    setFormScoreReg(b.legendScoreParts?.regulation != null ? String(b.legendScoreParts.regulation) : "");
+    setFormScoreCond(b.legendScoreParts?.tradingConditions != null ? String(b.legendScoreParts.tradingConditions) : "");
+    setFormScoreWd(b.legendScoreParts?.withdrawals != null ? String(b.legendScoreParts.withdrawals) : "");
+    setFormScoreUx(b.legendScoreParts?.userExperience != null ? String(b.legendScoreParts.userExperience) : "");
+    setFormScoreComp(b.legendScoreParts?.complaints != null ? String(b.legendScoreParts.complaints) : "");
+    setFormScoreSup(b.legendScoreParts?.support != null ? String(b.legendScoreParts.support) : "");
     setModalError(null);
     setIsModalOpen(true);
   };
@@ -606,6 +653,18 @@ const BrokersManagement: React.FC = () => {
         rebateCategory,
         rebatesListOrder: rebatesListOrder > 0 ? rebatesListOrder : 0,
         setupUrl: formSetupUrl.trim() || undefined,
+        country: formCountry.trim(),
+        leverage: formLeverage.trim(),
+        platforms: formPlatforms.trim(),
+        commission: formCommission.trim(),
+        legendScoreParts: {
+          regulation: formScoreReg ? Number(formScoreReg) : undefined,
+          tradingConditions: formScoreCond ? Number(formScoreCond) : undefined,
+          withdrawals: formScoreWd ? Number(formScoreWd) : undefined,
+          userExperience: formScoreUx ? Number(formScoreUx) : undefined,
+          complaints: formScoreComp ? Number(formScoreComp) : undefined,
+          support: formScoreSup ? Number(formScoreSup) : undefined,
+        },
         rebatesStarRating: Number(formRebatesStarRating) || undefined,
         rebatesReviewsLabel: formRebatesReviewsLabel.trim() || undefined,
         rebatesFeatured: formRebatesFeatured,
@@ -618,9 +677,30 @@ const BrokersManagement: React.FC = () => {
                   firstPurchaseCashback: o.firstPurchaseCashback?.trim() || undefined,
                   repeatPurchaseCashback: o.repeatPurchaseCashback?.trim() || undefined,
                   discountPercent: o.discountPercent?.trim() || undefined,
+                  discountCode: o.discountCode?.trim() || undefined,
                   evaluationType: o.evaluationType || undefined,
                   profitSplit: o.profitSplit?.trim() || undefined,
                   accountSize: o.accountSize?.trim() || undefined,
+                  challengeFee: o.challengeFee?.trim() || undefined,
+                  profitTarget: o.profitTarget?.trim() || undefined,
+                  dailyDrawdown: o.dailyDrawdown?.trim() || undefined,
+                  maxDrawdown: o.maxDrawdown?.trim() || undefined,
+                  minTradingDays: o.minTradingDays?.trim() || undefined,
+                  payoutCycle: o.payoutCycle?.trim() || undefined,
+                  scalingPlan: o.scalingPlan?.trim() || undefined,
+                  rulesUrl: o.rulesUrl?.trim() || undefined,
+                }))
+            : [],
+        propPromoCodes:
+          rebateCategory === "prop"
+            ? formPropPromoCodes
+                .filter((p) => p.code.trim())
+                .map((p) => ({
+                  code: p.code.trim(),
+                  label: p.label?.trim() || undefined,
+                  percent: p.percent?.trim() || undefined,
+                  expiresAt: p.expiresAt?.trim() || undefined,
+                  active: p.active !== false,
                 }))
             : [],
       };
@@ -913,6 +993,46 @@ const BrokersManagement: React.FC = () => {
               <input value={formRegulation} onChange={(e) => setFormRegulation(e.target.value)} />
             </FormField>
             <FormField>
+              Country
+              <input value={formCountry} onChange={(e) => setFormCountry(e.target.value)} placeholder="Cyprus, St. Vincent…" />
+            </FormField>
+            <FormField>
+              Leverage
+              <input value={formLeverage} onChange={(e) => setFormLeverage(e.target.value)} placeholder="1:500" />
+            </FormField>
+            <FormField>
+              Platforms
+              <input value={formPlatforms} onChange={(e) => setFormPlatforms(e.target.value)} placeholder="MT4, MT5, cTrader" />
+            </FormField>
+            <FormField>
+              Commission
+              <input value={formCommission} onChange={(e) => setFormCommission(e.target.value)} placeholder="$3.5 / lot" />
+            </FormField>
+            <FormField>
+              LegendScore regulation 0–10 (blank = auto)
+              <input value={formScoreReg} onChange={(e) => setFormScoreReg(e.target.value)} />
+            </FormField>
+            <FormField>
+              LegendScore conditions 0–10
+              <input value={formScoreCond} onChange={(e) => setFormScoreCond(e.target.value)} />
+            </FormField>
+            <FormField>
+              LegendScore withdrawals 0–10
+              <input value={formScoreWd} onChange={(e) => setFormScoreWd(e.target.value)} />
+            </FormField>
+            <FormField>
+              LegendScore UX 0–10
+              <input value={formScoreUx} onChange={(e) => setFormScoreUx(e.target.value)} />
+            </FormField>
+            <FormField>
+              LegendScore complaints 0–10
+              <input value={formScoreComp} onChange={(e) => setFormScoreComp(e.target.value)} />
+            </FormField>
+            <FormField>
+              LegendScore support 0–10
+              <input value={formScoreSup} onChange={(e) => setFormScoreSup(e.target.value)} />
+            </FormField>
+            <FormField>
               Spread From
               <input value={formSpreadFrom} onChange={(e) => setFormSpreadFrom(e.target.value)} />
             </FormField>
@@ -1029,6 +1149,16 @@ const BrokersManagement: React.FC = () => {
                       }}
                       style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
                     />
+                    <input
+                      placeholder="Discount code (e.g. LEGEND25)"
+                      value={offer.discountCode || ""}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = { ...next[idx], discountCode: e.target.value };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    />
                     <select
                       value={offer.evaluationType || ""}
                       onChange={(e) => {
@@ -1067,6 +1197,86 @@ const BrokersManagement: React.FC = () => {
                       }}
                       style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
                     />
+                    <input
+                      placeholder="Challenge fee (e.g. $99)"
+                      value={offer.challengeFee || ""}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = { ...next[idx], challengeFee: e.target.value };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    />
+                    <input
+                      placeholder="Profit target (e.g. 8%)"
+                      value={offer.profitTarget || ""}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = { ...next[idx], profitTarget: e.target.value };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    />
+                    <input
+                      placeholder="Daily drawdown (e.g. 5%)"
+                      value={offer.dailyDrawdown || ""}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = { ...next[idx], dailyDrawdown: e.target.value };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    />
+                    <input
+                      placeholder="Max drawdown (e.g. 10%)"
+                      value={offer.maxDrawdown || ""}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = { ...next[idx], maxDrawdown: e.target.value };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    />
+                    <input
+                      placeholder="Min trading days"
+                      value={offer.minTradingDays || ""}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = { ...next[idx], minTradingDays: e.target.value };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    />
+                    <input
+                      placeholder="Payout cycle (e.g. Bi-weekly)"
+                      value={offer.payoutCycle || ""}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = { ...next[idx], payoutCycle: e.target.value };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    />
+                    <input
+                      placeholder="Scaling plan"
+                      value={offer.scalingPlan || ""}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = { ...next[idx], scalingPlan: e.target.value };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    />
+                    <input
+                      placeholder="Rules URL"
+                      value={offer.rulesUrl || ""}
+                      onChange={(e) => {
+                        const next = [...formPropOffers];
+                        next[idx] = { ...next[idx], rulesUrl: e.target.value };
+                        setFormPropOffers(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    />
                     {formPropOffers.length > 1 && (
                       <GhostButton
                         $sm
@@ -1081,6 +1291,87 @@ const BrokersManagement: React.FC = () => {
                 ))}
                 <GhostButton type="button" $sm onClick={() => setFormPropOffers([...formPropOffers, emptyPropOffer()])}>
                   <FiPlus /> Add tier
+                </GhostButton>
+                <div style={{ fontWeight: 800, color: adminColors.navy, fontSize: "0.8125rem", margin: "14px 0 10px" }}>
+                  Promo / discount codes
+                </div>
+                {formPropPromoCodes.map((promo, idx) => (
+                  <div
+                    key={`promo-${idx}`}
+                    style={{
+                      display: "grid",
+                      gap: 8,
+                      marginBottom: 12,
+                      paddingBottom: 12,
+                      borderBottom: idx < formPropPromoCodes.length - 1 ? `1px solid ${adminColors.border}` : "none",
+                    }}
+                  >
+                    <input
+                      placeholder="Code (e.g. LEGEND25)"
+                      value={promo.code}
+                      onChange={(e) => {
+                        const next = [...formPropPromoCodes];
+                        next[idx] = { ...next[idx], code: e.target.value };
+                        setFormPropPromoCodes(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    />
+                    <input
+                      placeholder="Label"
+                      value={promo.label || ""}
+                      onChange={(e) => {
+                        const next = [...formPropPromoCodes];
+                        next[idx] = { ...next[idx], label: e.target.value };
+                        setFormPropPromoCodes(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    />
+                    <input
+                      placeholder="Percent (e.g. 25%)"
+                      value={promo.percent || ""}
+                      onChange={(e) => {
+                        const next = [...formPropPromoCodes];
+                        next[idx] = { ...next[idx], percent: e.target.value };
+                        setFormPropPromoCodes(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    />
+                    <input
+                      placeholder="Expires (optional)"
+                      value={promo.expiresAt || ""}
+                      onChange={(e) => {
+                        const next = [...formPropPromoCodes];
+                        next[idx] = { ...next[idx], expiresAt: e.target.value };
+                        setFormPropPromoCodes(next);
+                      }}
+                      style={{ padding: "0.5rem 0.75rem", borderRadius: 8, border: `1px solid ${adminColors.border}` }}
+                    />
+                    <label style={{ display: "flex", gap: 8, alignItems: "center", fontSize: "0.8rem" }}>
+                      <input
+                        type="checkbox"
+                        checked={promo.active !== false}
+                        onChange={(e) => {
+                          const next = [...formPropPromoCodes];
+                          next[idx] = { ...next[idx], active: e.target.checked };
+                          setFormPropPromoCodes(next);
+                        }}
+                      />
+                      Active
+                    </label>
+                    {formPropPromoCodes.length > 1 && (
+                      <GhostButton
+                        $sm
+                        $danger
+                        type="button"
+                        onClick={() => setFormPropPromoCodes(formPropPromoCodes.filter((_, i) => i !== idx))}
+                      >
+                        Remove code
+                      </GhostButton>
+                    )}
+                  </div>
+                ))}
+                <GhostButton type="button" $sm onClick={() => setFormPropPromoCodes([...formPropPromoCodes, emptyPromo()])}>
+                  <FiPlus /> Add promo code
                 </GhostButton>
               </PropTiersBox>
             )}

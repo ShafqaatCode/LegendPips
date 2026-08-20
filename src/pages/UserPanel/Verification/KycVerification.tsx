@@ -18,6 +18,7 @@ import {
   InfoGrid, InfoRow, FormGrid, Field, DocGrid, DocCameraRow, DocPreviewGrid, DocPreviewItem,
   PrimaryButton, ErrorBanner, Pill,
 } from '../../../components/UserPanel/userUi';
+import { useLocale } from '../../../contexts/LocaleContext';
 
 type CaptureState = { file: File | null; preview: string | null };
 const emptyCapture = (): CaptureState => ({ file: null, preview: null });
@@ -49,6 +50,7 @@ const STEPS = [
 ];
 
 const KycVerification: React.FC = () => {
+  const { t } = useLocale();
   const [kyc, setKyc] = useState<KycData | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -165,7 +167,7 @@ const KycVerification: React.FC = () => {
   return (
     <PageWrap>
       <PageHeader>
-        <PageTitle><FiShield /> Identity Verification</PageTitle>
+        <PageTitle><FiShield /> {t("panel.verification")}</PageTitle>
         <PageSubtitle>
           Upload your ID and proof of address, then capture a live selfie holding your ID.
         </PageSubtitle>

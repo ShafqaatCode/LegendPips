@@ -41,15 +41,37 @@ const BrokerList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState<BrokerKind>("forex");
+  const [filters, setFilters] = useState({
+    search: "",
+    country: "",
+    regulation: "",
+    platform: "",
+    maxMinDeposit: "",
+    minScore: "",
+  });
+  const [debounced, setDebounced] = useState(filters);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setDebounced(filters), 280);
+    return () => window.clearTimeout(t);
+  }, [filters]);
 
   const loadBrokers = useCallback(async (page: number, cat: BrokerKind) => {
     setLoading(true);
     setError(null);
     try {
+      const maxMin = parseFloat(debounced.maxMinDeposit);
+      const minScore = parseFloat(debounced.minScore);
       const result = await fetchBrokersPage({
         page,
         limit: BROKERS_PER_PAGE,
         category: cat,
+        search: debounced.search || undefined,
+        country: debounced.country || undefined,
+        regulation: debounced.regulation || undefined,
+        platform: debounced.platform || undefined,
+        maxMinDeposit: Number.isFinite(maxMin) ? maxMin : undefined,
+        minScore: Number.isFinite(minScore) ? minScore : undefined,
       });
       setBrokers(result.items.map((b) => mapApiBrokerToBroker(b, TradeLogo)));
       setListPage(result.pagination.currentPage);
@@ -63,7 +85,11 @@ const BrokerList: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [debounced]);
+
+  useEffect(() => {
+    setListPage(1);
+  }, [debounced, category]);
 
   useEffect(() => {
     if (currentPage === "listing") {
@@ -129,6 +155,8 @@ const BrokerList: React.FC = () => {
           onBrokerSelect={handleBrokerSelect}
           category={category}
           onCategoryChange={handleCategoryChange}
+          filters={filters}
+          onFiltersChange={setFilters}
         />
       )}
 

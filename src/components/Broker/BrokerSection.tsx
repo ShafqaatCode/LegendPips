@@ -10,6 +10,7 @@ import { fetchBrokersPage } from "../../services/brokerService";
 import { BrokerListSkeleton } from "../SharedComponents/Shimmer";
 import { mapApiBrokerToRebateCardRow } from "../../utils/rebatesBrokersDisplay";
 import type { ApiBroker } from "../../services/brokerService";
+import { useLocale } from "../../contexts/LocaleContext";
 
 const BrokerSectionWrapper = styled.section`
   display: flex;
@@ -42,6 +43,7 @@ interface props {
 }
 
 const BrokerSection: React.FC<props> = ({ showAll = false }) => {
+  const { t } = useLocale();
   const [items, setItems] = useState<ApiBroker[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -89,14 +91,14 @@ const BrokerSection: React.FC<props> = ({ showAll = false }) => {
   return (
     <BrokerSectionWrapper>
       <SectionHeadingSet
-        upperText="All in one Trading Platform"
-        mainHeading="Top Forex Brokers"
-        subText="Find the best brokers carefully compared & reviewed for your trading needs. Trade confidently with secure platforms."
+        upperText={t("brokersHome.kicker")}
+        mainHeading={t("brokersHome.title")}
+        subText={t("brokersHome.body")}
       />
       {error && <StatusLine>{error}</StatusLine>}
       {items === null && !error && <BrokerListSkeleton rows={showAll ? 5 : 3} />}
       {items !== null && cards.length === 0 && !error && (
-        <StatusLine>No rebate brokers are published yet.</StatusLine>
+        <StatusLine>{t("brokersHome.empty")}</StatusLine>
       )}
       <BrokerWrapper>
         {cards.map((broker) => (
@@ -124,7 +126,7 @@ const BrokerSection: React.FC<props> = ({ showAll = false }) => {
               fontSize="0.875rem"
               fontWeight="600"
             >
-              View All Brokers <img src={ArrowIcon} alt="icon" />
+              {t("brokersHome.viewAll")} <img src={ArrowIcon} alt="" />
             </ButtonBase>
           </Link>
         </ButtonContainer>

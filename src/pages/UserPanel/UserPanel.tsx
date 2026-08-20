@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Outlet } from 'react-router-dom';
 import UserSidebar from '../../components/UserPanel/UserSidebar';
 import UserHeader from '../../components/UserPanel/UserHeader';
+import AutoTranslateRoot from '../../components/i18n/AutoTranslateRoot';
 
 const PanelWrapper = styled.div`
   display: flex;
@@ -56,11 +57,17 @@ const UserPanel: React.FC = () => {
   return (
     <PanelWrapper>
       <Backdrop $isOpen={sidebarOpen} onClick={() => setSidebarOpen(false)} />
-      <UserSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      <div className="notranslate">
+        <UserSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      </div>
       <MainContent>
-        <UserHeader onMenuClick={() => setSidebarOpen(true)} />
+        <div className="notranslate">
+          <UserHeader onMenuClick={() => setSidebarOpen(true)} />
+        </div>
         <ContentArea>
-          <Outlet />
+          <AutoTranslateRoot>
+            <Outlet />
+          </AutoTranslateRoot>
         </ContentArea>
       </MainContent>
     </PanelWrapper>

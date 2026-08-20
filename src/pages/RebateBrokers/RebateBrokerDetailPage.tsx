@@ -850,7 +850,11 @@ const RebateBrokerDetailPage: React.FC = () => {
           </ContentPanel>
         )}
 
-        <BrokerReviewsSection brokerId={broker._id} brokerName={broker.name} />
+        <BrokerReviewsSection
+          brokerId={broker._id}
+          brokerName={broker.name}
+          allowPayoutReviews={broker.rebateCategory === "prop"}
+        />
       </PageInner>
     </PageShell>
   );

@@ -24,6 +24,7 @@ import type { Variants } from "framer-motion";
 import LoginModal from "../../pages/Login/LoginModal";
 import RegisterModal from "../../pages/Register/RegisterModal";
 import { useAuth } from "../../contexts/AuthContext";
+import { useLocale } from "../../contexts/LocaleContext";
 
 
 
@@ -59,6 +60,7 @@ const PromoBanner = () => {
   const [signinOpen, setSigninOpen] = useState(false);
   const [signupOpen, setSignupOpen] = useState(false);
   const { isAuthenticated, user } = useAuth();
+  const { t } = useLocale();
   const navigate = useNavigate();
 
   const handleJoinFree = () => {
@@ -81,34 +83,32 @@ const PromoBanner = () => {
         <HeroContent>
           <SubheadingWrapper custom={0} variants={fadeInDown} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <img src={mathIcon} alt="Trading Icon" />
-            <HeroSubTitle>ALL IN ONE TRADING PLATFORM</HeroSubTitle>
+            <HeroSubTitle>{t("home.kicker")}</HeroSubTitle>
           </SubheadingWrapper>
 
           <HeroTitle custom={1} variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            Compare Brokers, Earn <span>Cashback</span>, Get Signals
+            {t("home.title")}
           </HeroTitle>
 
           <BrokersContainer custom={2} variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <BrokerLeftSection>
-              <h4>Our Top Brokers</h4>
+              <h4>{t("home.topBrokers")}</h4>
               <img src={brokersImg} alt="Top Broker Logos" />
             </BrokerLeftSection>
             <BrokerRightSection>
               <p>
-                Whether you're buying or selling, we reward every move. No hidden
-                fees, just real money back in your pocket, every single time you
-                trade.
+                {t("home.blurb")}
               </p>
             </BrokerRightSection>
           </BrokersContainer>
 
           <ActionButtons custom={3} variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <JoinButton type="button" onClick={handleJoinFree}>
-              Join Free
+              {t("home.joinFree")}
               <img src={ArrowIcon} alt="Arrow" />
             </JoinButton>
             <CompareButton type="button" onClick={handleCompareBrokers}>
-              Compare Brokers
+              {t("home.compareBrokers")}
               <img src={ArrowIcon2} alt="Arrow" />
             </CompareButton>
           </ActionButtons>

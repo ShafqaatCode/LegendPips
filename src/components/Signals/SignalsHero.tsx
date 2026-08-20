@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import bannerBg from '../../assets/banner/BannerBg.jpg';
+import { useLocale } from '../../contexts/LocaleContext';
 
 const HeroWrapper = styled.section`
   position: relative;
@@ -100,18 +101,19 @@ const RecentPerformanceHeading = styled.h3`
 `;
 
 const SignalsHero: React.FC = () => {
+  const { t } = useLocale();
   return (
     <HeroWrapper>
       <ChartOverlay />
       <ContentWrapper>
         <LeftContent>
           <MainHeading>
-            LIVE SIGNALS
+            {t("signals.title")}
           </MainHeading>
           <Description>
-            Stay ahead of every move with accurate, live market signals across Forex, Gold, and Crypto — updated in real time to help you capture every trading opportunity with confidence and precision.
+            {t("signals.body")}
           </Description>
-          <RecentPerformanceHeading>Recent Signal Performance</RecentPerformanceHeading>
+          <RecentPerformanceHeading>{t("signals.recent")}</RecentPerformanceHeading>
         </LeftContent>
       </ContentWrapper>
     </HeroWrapper>

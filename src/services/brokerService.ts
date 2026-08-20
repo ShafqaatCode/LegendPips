@@ -27,9 +27,26 @@ export interface PropCashbackOffer {
   firstPurchaseCashback?: string;
   repeatPurchaseCashback?: string;
   discountPercent?: string;
+  discountCode?: string;
   evaluationType?: "1-step" | "2-step" | "instant" | "funded";
   profitSplit?: string;
   accountSize?: string;
+  challengeFee?: string;
+  profitTarget?: string;
+  dailyDrawdown?: string;
+  maxDrawdown?: string;
+  minTradingDays?: string;
+  payoutCycle?: string;
+  scalingPlan?: string;
+  rulesUrl?: string;
+}
+
+export interface PropPromoCode {
+  code: string;
+  label?: string;
+  percent?: string;
+  expiresAt?: string;
+  active?: boolean;
 }
 
 export interface ApiBroker {
@@ -66,6 +83,21 @@ export interface ApiBroker {
   setupUrl?: string;
   rebateCategory?: "forex" | "crypto" | "prop" | "both";
   propOffers?: PropCashbackOffer[];
+  propPromoCodes?: PropPromoCode[];
+  country?: string;
+  leverage?: string;
+  platforms?: string;
+  commission?: string;
+  slug?: string;
+  legendScore?: number;
+  legendScoreParts?: {
+    regulation?: number;
+    tradingConditions?: number;
+    withdrawals?: number;
+    userExperience?: number;
+    complaints?: number;
+    support?: number;
+  };
 }
 
 export type RebateTabCategory = "forex" | "crypto" | "prop";
@@ -103,6 +135,11 @@ export const mapApiBrokerToBroker = (b: ApiBroker, defaultLogo: string): Broker 
   reviewStats: b.reviewStats,
   fundingMethods: b.fundingMethods || [],
   cashbackRate: b.cashbackRate,
+  country: b.country,
+  leverage: b.leverage,
+  platforms: b.platforms,
+  commission: b.commission,
+  legendScore: b.legendScore,
 });
 
 const fetchJson = async (url: string, options?: RequestInit) => {
@@ -130,11 +167,21 @@ export const fetchBrokersPage = async (opts: {
   search?: string;
   page?: number;
   limit?: number;
+  country?: string;
+  regulation?: string;
+  platform?: string;
+  maxMinDeposit?: number;
+  minScore?: number;
 }): Promise<BrokersPageResult> => {
   const qs = new URLSearchParams();
   if (opts.rebatesPage) qs.set("rebatesPage", "1");
   if (opts.category) qs.set("category", opts.category);
   if (opts.search?.trim()) qs.set("search", opts.search.trim());
+  if (opts.country?.trim()) qs.set("country", opts.country.trim());
+  if (opts.regulation?.trim()) qs.set("regulation", opts.regulation.trim());
+  if (opts.platform?.trim()) qs.set("platform", opts.platform.trim());
+  if (typeof opts.maxMinDeposit === "number") qs.set("maxMinDeposit", String(opts.maxMinDeposit));
+  if (typeof opts.minScore === "number") qs.set("minScore", String(opts.minScore));
   qs.set("page", String(opts.page ?? 1));
   qs.set("limit", String(opts.limit ?? BROKERS_PAGE_SIZE));
   const data = await fetchJson(`${API_CONFIG.BASE_URL}/brokers?${qs.toString()}`);
@@ -194,6 +241,14 @@ export const fetchCompareBrokers = async (ids: string[]): Promise<ApiBroker[]> =
   const unique = [...new Set(ids.map((id) => String(id).trim()).filter(Boolean))].slice(0, 4);
   if (unique.length < 2) return [];
   const qs = new URLSearchParams({ ids: unique.join(",") });
+  const data = await fetchJson(`${API_CONFIG.BASE_URL}/brokers/compare?${qs.toString()}`);
+  return data.items || [];
+};
+
+export const fetchCompareBrokersBySlugs = async (slugs: string[]): Promise<ApiBroker[]> => {
+  const unique = [...new Set(slugs.map((s) => String(s).trim().toLowerCase()).filter(Boolean))].slice(0, 4);
+  if (unique.length < 2) return [];
+  const qs = new URLSearchParams({ slugs: unique.join(",") });
   const data = await fetchJson(`${API_CONFIG.BASE_URL}/brokers/compare?${qs.toString()}`);
   return data.items || [];
 };

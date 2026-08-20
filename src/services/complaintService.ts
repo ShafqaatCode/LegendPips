@@ -1,4 +1,4 @@
-import { API_CONFIG, getAuthHeaders } from "../utils/apiConfig";
+import { API_CONFIG, getAuthHeaders, getAuthHeadersMultipart } from "../utils/apiConfig";
 
 export const COMPLAINT_CATEGORIES = [
   { id: "withdrawal", label: "Withdrawal delay or refusal" },
@@ -7,10 +7,19 @@ export const COMPLAINT_CATEGORIES = [
   { id: "support", label: "Poor or no support" },
   { id: "account", label: "Account blocked or terms change" },
   { id: "scam", label: "Suspected scam or fraud" },
+  { id: "payout", label: "Prop firm payout issue" },
+  { id: "challenge_rules", label: "Challenge / evaluation rules dispute" },
   { id: "other", label: "Other" },
 ] as const;
 
-export type ComplaintStatus = "pending" | "investigating" | "resolved" | "dismissed";
+export type ComplaintStatus =
+  | "pending"
+  | "investigating"
+  | "broker_contacted"
+  | "broker_responded"
+  | "resolved"
+  | "unresolved"
+  | "dismissed";
 
 export type BrokerComplaint = {
   id: string;
@@ -21,6 +30,12 @@ export type BrokerComplaint = {
   subject: string;
   details: string;
   accountRef?: string;
+  amount?: string;
+  incidentDate?: string;
+  evidenceUrl?: string;
+  evidenceUrls?: string[];
+  evidencePublicId?: string;
+  brokerResponse?: string;
   status: ComplaintStatus;
   adminNote?: string;
   resolution?: string;
@@ -37,6 +52,7 @@ export type BlacklistBroker = {
   logoUrl?: string;
   reason: string;
   since?: string | null;
+  rebateCategory?: string;
   source: "catalog";
 };
 
@@ -75,11 +91,49 @@ export const submitBrokerComplaint = async (payload: {
   subject: string;
   details: string;
   accountRef?: string;
+  amount?: string;
+  incidentDate?: string;
+  evidenceUrl?: string;
+  evidenceFiles?: File[];
 }): Promise<{ complaint: BrokerComplaint; message: string }> => {
+  const files = (payload.evidenceFiles || []).slice(0, 3);
+  if (files.length) {
+    const form = new FormData();
+    if (payload.brokerId) form.append("brokerId", payload.brokerId);
+    if (payload.brokerName) form.append("brokerName", payload.brokerName);
+    form.append("category", payload.category);
+    form.append("subject", payload.subject);
+    form.append("details", payload.details);
+    if (payload.accountRef) form.append("accountRef", payload.accountRef);
+    if (payload.amount) form.append("amount", payload.amount);
+    if (payload.incidentDate) form.append("incidentDate", payload.incidentDate);
+    if (payload.evidenceUrl) form.append("evidenceUrl", payload.evidenceUrl);
+    files.forEach((f) => form.append("evidence", f));
+
+    const res = await fetch(`${API_CONFIG.BASE_URL}/complaints`, {
+      method: "POST",
+      headers: getAuthHeadersMultipart(),
+      body: form,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error((data as { message?: string }).message || "Request failed");
+    return { complaint: data.complaint, message: data.message || "Complaint submitted." };
+  }
+
   const data = await fetchJson(`${API_CONFIG.BASE_URL}/complaints`, {
     method: "POST",
     headers: getAuthHeaders(),
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      brokerId: payload.brokerId,
+      brokerName: payload.brokerName,
+      category: payload.category,
+      subject: payload.subject,
+      details: payload.details,
+      accountRef: payload.accountRef,
+      amount: payload.amount,
+      incidentDate: payload.incidentDate,
+      evidenceUrl: payload.evidenceUrl,
+    }),
   });
   return { complaint: data.complaint, message: data.message || "Complaint submitted." };
 };
@@ -114,7 +168,13 @@ export const adminFetchComplaints = async (opts?: {
 
 export const adminUpdateComplaint = async (
   id: string,
-  patch: { status?: ComplaintStatus; adminNote?: string; resolution?: string; publicWarning?: boolean }
+  patch: {
+    status?: ComplaintStatus;
+    adminNote?: string;
+    resolution?: string;
+    publicWarning?: boolean;
+    brokerResponse?: string;
+  }
 ) => {
   const data = await fetchJson(`${API_CONFIG.BASE_URL}/complaints/admin/${id}`, {
     method: "PATCH",

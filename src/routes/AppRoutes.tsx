@@ -79,6 +79,15 @@ import TraderDetailPage from "../pages/Traders/TraderDetailPage";
 import MyTraderProfile from "../pages/UserPanel/Traders/MyTraderProfile";
 import MyCopyTrading from "../pages/UserPanel/Traders/MyCopyTrading";
 import AdminTraderProfiles from "../pages/AdminPanel/Traders/AdminTraderProfiles";
+import LegalPage from "../pages/Legal/LegalPage";
+import {
+  ProfitCalculatorPage,
+  RiskRewardCalculatorPage,
+  DrawdownCalculatorPage,
+  CompoundCalculatorPage,
+  CryptoProfitCalculatorPage,
+  LotCalculatorPage,
+} from "../pages/ExtraCalculators/ExtraCalculatorPages";
 
 // 👇 Add these imports
 
@@ -178,6 +187,7 @@ const AppRoutes: React.FC = () => {
         <Route path="how-it-works" element={<HitWorksPage />} />
         <Route path="about" element={<AboutPage />} />
         <Route path="complaints" element={<ComplaintsPage />} />
+        <Route path="compare/:pairSlug" element={<ComparePage />} />
         <Route path="compare" element={<ComparePage />} />
         <Route path="prop-firms" element={<PropFirmHubPage />} />
         <Route path="traders/:id" element={<TraderDetailPage />} />
@@ -197,6 +207,16 @@ const AppRoutes: React.FC = () => {
         <Route path="calculator" element={<RebateCalculatorPage />} />
         <Route path="pivot-point-calculator" element={<PivotPointCalculatorPage />}/>
         <Route path="fibonacci-calculator" element={<FibonacciCalculatorPage />}/>
+        <Route path="profit-calculator" element={<ProfitCalculatorPage />} />
+        <Route path="lot-calculator" element={<LotCalculatorPage />} />
+        <Route path="risk-reward-calculator" element={<RiskRewardCalculatorPage />} />
+        <Route path="drawdown-calculator" element={<DrawdownCalculatorPage />} />
+        <Route path="compound-calculator" element={<CompoundCalculatorPage />} />
+        <Route path="crypto-profit-calculator" element={<CryptoProfitCalculatorPage />} />
+        <Route path="cashback-calculator" element={<RebateCalculatorPage />} />
+        <Route path="legal/:slug" element={<LegalPage />} />
+        <Route path="terms" element={<LegalPage slug="terms" />} />
+        <Route path="privacy" element={<LegalPage slug="privacy" />} />
 
       </Route>
     </Routes>
