@@ -31,6 +31,27 @@ import {
   type BrokerKind,
 } from "../../../utils/brokerTypes";
 
+function brokerRegulationsToInput(b: ApiBroker): string {
+  if (Array.isArray(b.regulations) && b.regulations.length) return b.regulations.join(", ");
+  const r = (b.regulation || "").trim();
+  return r === "—" ? "" : r;
+}
+
+function parseRegulationsInput(raw: string): string[] {
+  return raw
+    .split(/[,;|]/)
+    .map((r) => r.trim())
+    .filter(Boolean);
+}
+
+function displayBrokerRegulations(b: ApiBroker): string {
+  const regs =
+    Array.isArray(b.regulations) && b.regulations.length
+      ? b.regulations
+      : parseRegulationsInput(b.regulation || "");
+  return regs.length ? regs.join(", ") : "—";
+}
+
 const emptyPropOffer = (): PropCashbackOffer => ({
   label: "Standard",
   firstPurchaseCashback: "",
@@ -481,7 +502,7 @@ const BrokersManagement: React.FC = () => {
 
   const [formName, setFormName] = useState("");
   const [formMinDeposit, setFormMinDeposit] = useState("100");
-  const [formRegulation, setFormRegulation] = useState("");
+  const [formRegulations, setFormRegulations] = useState("");
   const [formSpreadFrom, setFormSpreadFrom] = useState("0.0 pips");
   const [formCashbackRate, setFormCashbackRate] = useState("0.35 pip");
   const [formTopCashback, setFormTopCashback] = useState(false);
@@ -544,7 +565,7 @@ const BrokersManagement: React.FC = () => {
     setSelectedBrokerId(null);
     setFormName("");
     setFormMinDeposit("100");
-    setFormRegulation("");
+    setFormRegulations("");
     setFormSpreadFrom("0.0 pips");
     setFormCashbackRate("0.35 pip");
     setFormTopCashback(false);
@@ -586,7 +607,7 @@ const BrokersManagement: React.FC = () => {
     setSelectedBrokerId(b._id);
     setFormName(b.name);
     setFormMinDeposit(String(b.minDeposit));
-    setFormRegulation(b.regulation);
+    setFormRegulations(brokerRegulationsToInput(b));
     setFormSpreadFrom(b.spreadFrom);
     setFormCashbackRate(b.cashbackRate || "0.35 pip");
     setFormTopCashback(!!b.topCashback);
@@ -661,7 +682,7 @@ const BrokersManagement: React.FC = () => {
       const base = {
         name,
         minDeposit,
-        regulation: formRegulation.trim() || "—",
+        regulations: parseRegulationsInput(formRegulations),
         spreadFrom: formSpreadFrom.trim(),
         cashbackRate: formCashbackRate.trim(),
         topCashback: formTopCashback,
@@ -935,7 +956,7 @@ const BrokersManagement: React.FC = () => {
                   </Metric>
                   <Metric>
                     <div className="k"><FiShield style={{ display: "inline", marginRight: 2 }} />Regulation</div>
-                    <div className="v">{broker.regulation || "—"}</div>
+                    <div className="v">{displayBrokerRegulations(broker)}</div>
                   </Metric>
                   <Metric>
                     <div className="k"><FiTrendingUp style={{ display: "inline", marginRight: 2 }} />Spread</div>
@@ -1045,9 +1066,13 @@ const BrokersManagement: React.FC = () => {
               Min Deposit (number)
               <input value={formMinDeposit} onChange={(e) => setFormMinDeposit(e.target.value)} />
             </FormField>
-            <FormField>
-              Regulation
-              <input value={formRegulation} onChange={(e) => setFormRegulation(e.target.value)} />
+            <FormField $full>
+              Regulation (comma-separated)
+              <input
+                value={formRegulations}
+                onChange={(e) => setFormRegulations(e.target.value)}
+                placeholder="FCA, CySEC, ASIC, FSC…"
+              />
             </FormField>
             <FormField>
               Country (HQ / primary)

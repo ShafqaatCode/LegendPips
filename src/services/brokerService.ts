@@ -55,6 +55,7 @@ export interface ApiBroker {
   logoUrl?: string;
   minDeposit: number;
   regulation: string;
+  regulations?: string[];
   spreadFrom: string;
   crypto: string;
   topCashback: boolean;
