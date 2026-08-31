@@ -217,7 +217,16 @@ const Footer2: FC = () => {
                   <Link to="/about">{t("footer.about")}</Link>
                 </LinkItem>
                 <LinkItem>
-                  <Link to="/features">{t("footer.features")}</Link>
+                  <Link to="/about/team">The team</Link>
+                </LinkItem>
+                <LinkItem>
+                  <Link to="/about/methodology">Our methodology</Link>
+                </LinkItem>
+                <LinkItem>
+                  <Link to="/about/careers">Careers</Link>
+                </LinkItem>
+                <LinkItem>
+                  <Link to="/about/partners">For partners</Link>
                 </LinkItem>
                 <LinkItem>
                   <Link to="/brokers">{t("footer.brokers")}</Link>

@@ -8,9 +8,11 @@ export const BannerWrapper = styled.section`
   align-items: center;
   justify-content: flex-start;
   // height: 100vh;
-  min-height: 520px;
+  min-height: 420px;
 //   border: 2px solid red;
-  padding: 0 ${({ theme }) => theme.typography.pageGutter};
+  /* Bottom pocket ≈ card pull-up so overlap sits on empty blue, not on CTAs */
+  padding: clamp(1.75rem, 3.5vw, 2.75rem) ${({ theme }) => theme.typography.pageGutter}
+    clamp(5.75rem, 8vw, 6.75rem);
   background-image: url("${bgImage}");
   background-size: cover;
   background-position: center;
@@ -18,7 +20,7 @@ export const BannerWrapper = styled.section`
   color: ${({ theme }) => theme.colors.WHITE};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: 0 ${({ theme }) => theme.typography.pageGutter};
+    padding: 2rem ${({ theme }) => theme.typography.pageGutter} 5rem;
     justify-content: center;
     /* margin-top: 70px; */
   }
@@ -28,16 +30,13 @@ export const BannerWrapper = styled.section`
     position: absolute;
     inset: 0;
     /* background-color: rgba(19, 45, 88, 0.7); */
-    z-index: 1;
-  }
-
-  & > * {
-    position: relative;
-    z-index: 2;
+    z-index: 0;
   }
 `;
 
 export const HeroContent = styled.div`
+  position: relative;
+  z-index: 5;
   width: 50%;
   max-width: 700px;
   display: flex;
@@ -160,6 +159,8 @@ export const BrokerRightSection = styled.div`
 `;
 
 export const ActionButtons = styled(motion.div)`
+  position: relative;
+  z-index: 5;
   display: flex;
   gap: 0.4rem;
   margin-top: 2.5rem;

@@ -1,17 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
-
-import CashIcon from "../../assets/icons/cashback.svg";
-import GiftIcon from "../../assets/icons/badge2.svg";
-import Flag3 from "../../assets/FlagIcons/Rectangle 34625471-2.png";
-import Flag4 from "../../assets/FlagIcons/Rectangle 34625472-2.png";
-
-type Reward = {
-  id: string;
-  title: string;
-  iconSrc: string;
-  detailText: string;
-};
+import { REWARD_LIST } from "../../data/rewardsDetails";
 
 const Section = styled.section`
   padding: 14px 12px 30px;
@@ -49,7 +39,7 @@ const SmallGrid = styled.div`
   }
 `;
 
-const SmallCard = styled.div`
+const SmallCard = styled(Link)`
   background: white;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
@@ -60,6 +50,16 @@ const SmallCard = styled.div`
   align-items: center;
   justify-content: center;
   gap: 8px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: rgba(251, 191, 36, 0.65);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(19, 46, 88, 0.08);
+  }
 `;
 
 const SmallIcon = styled.img`
@@ -86,11 +86,30 @@ const DetailsGrid = styled.div`
   }
 `;
 
-const DetailCard = styled.div`
+const DetailCard = styled(Link)`
   background: white;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
   padding: 16px 14px 18px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  transition: border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: rgba(251, 191, 36, 0.65);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(19, 46, 88, 0.08);
+  }
+`;
+
+const DetailCta = styled.span`
+  display: inline-flex;
+  margin-top: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #132e58;
 `;
 
 const DetailHeader = styled.div`
@@ -126,36 +145,7 @@ interface RewardsCardsProps {
 const RewardsCards: React.FC<RewardsCardsProps> = ({ onJoinNow }) => {
   // Not used for now, but kept so the parent can hook it later (e.g., CTA inside rewards).
   void onJoinNow;
-  const rewards: Reward[] = [
-    {
-      id: "cash",
-      title: "Cash Rewards",
-      iconSrc: CashIcon,
-      detailText:
-        "Earn cash rewards on your everyday trades with supported brokers. Enjoy transparent earnings with no hidden fees—just real rewards that grow with every move you make.",
-    },
-    {
-      id: "gift",
-      title: "Gift Rewards",
-      iconSrc: GiftIcon,
-      detailText:
-        "Unlock bonus gift rewards and exclusive offers designed to upgrade your trading experience. Expect special drops and tailored bonuses that keep momentum high.",
-    },
-    {
-      id: "international",
-      title: "International Tours",
-      iconSrc: Flag3,
-      detailText:
-        "Explore international promotions and event-driven reward drops. Discover new opportunities and participate in global experiences designed to celebrate great trading.",
-    },
-    {
-      id: "national",
-      title: "National Tours",
-      iconSrc: Flag4,
-      detailText:
-        "Rewards designed for local engagement—join community events, unlock exciting bonuses, and be part of trading experiences crafted for your region.",
-    },
-  ];
+  const rewards = REWARD_LIST;
 
   return (
     <Section>
@@ -164,7 +154,7 @@ const RewardsCards: React.FC<RewardsCardsProps> = ({ onJoinNow }) => {
 
         <SmallGrid>
           {rewards.map((r) => (
-            <SmallCard key={r.id}>
+            <SmallCard key={r.id} to={`/rewards/${r.id}`}>
               <SmallIcon src={r.iconSrc} alt={`${r.title} icon`} />
               <SmallTitle>{r.title}</SmallTitle>
             </SmallCard>
@@ -173,12 +163,13 @@ const RewardsCards: React.FC<RewardsCardsProps> = ({ onJoinNow }) => {
 
         <DetailsGrid>
           {rewards.map((r) => (
-            <DetailCard key={`${r.id}-detail`}>
+            <DetailCard key={`${r.id}-detail`} to={`/rewards/${r.id}`}>
               <DetailHeader>
                 <DetailIcon src={r.iconSrc} alt={`${r.title} icon`} />
                 {r.title}
               </DetailHeader>
-              <DetailText>{r.detailText}</DetailText>
+              <DetailText>{r.teaser}</DetailText>
+              <DetailCta>View full details →</DetailCta>
             </DetailCard>
           ))}
         </DetailsGrid>

@@ -47,7 +47,7 @@ const SectionWrapper = styled.section`
   isolation: isolate;
   background: #fafbfc;
   padding: 40px ${({ theme }) => theme.typography.pageGutter} 56px;
-
+  
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     padding: 28px 1.25rem 36px;
   }
@@ -96,13 +96,13 @@ const SearchInput = styled.input`
   border-radius: 12px;
   background: white;
   transition: border-color 0.2s, box-shadow 0.2s;
-
+  
   &:focus {
     outline: none;
     border-color: #132e58;
     box-shadow: 0 0 0 3px rgba(19, 46, 88, 0.1);
   }
-
+  
   &::placeholder {
     color: #999;
   }
@@ -268,7 +268,7 @@ const PublishBtn = styled.button`
   align-items: center;
   gap: 8px;
   transition: background 0.2s, transform 0.2s;
-
+  
   &:hover:not(:disabled) {
     background: #f4b400;
     transform: translateY(-1px);
@@ -318,7 +318,7 @@ const GuestBtn = styled.button`
   border-radius: 10px;
   cursor: pointer;
   transition: background 0.2s;
-
+  
   &:hover {
     background: #f4b400;
   }
@@ -326,7 +326,7 @@ const GuestBtn = styled.button`
 
 const Feed = styled.div`
   display: flex;
-  flex-direction: column;
+    flex-direction: column;
   gap: 1rem;
 `;
 
@@ -770,8 +770,8 @@ const ForumCategories: React.FC = () => {
     async (pageNum: number, append: boolean) => {
       if (append) setLoadingMore(true);
       else {
-        setLoading(true);
-        setLoadError(null);
+    setLoading(true);
+    setLoadError(null);
       }
       try {
         const res = await fetchCommunityPosts({
@@ -783,17 +783,17 @@ const ForumCategories: React.FC = () => {
         setPage(res.page);
         setHasMore(res.hasMore);
         setTotal(res.total);
-      } catch (e: any) {
+    } catch (e: any) {
         if (!append) {
           setLoadError(e.message || 'Failed to load community posts');
           setPosts([]);
         } else {
           showToast(e.message || 'Could not load more');
         }
-      } finally {
-        setLoading(false);
+    } finally {
+      setLoading(false);
         setLoadingMore(false);
-      }
+    }
     },
     [debouncedSearch]
   );
@@ -1007,12 +1007,12 @@ const ForumCategories: React.FC = () => {
     <SectionWrapper id="community-feed">
       <ContentWrapper>
         <SectionHead>
-          <SectionTitle>Trader Community Forums</SectionTitle>
+        <SectionTitle>Trader Community Forums</SectionTitle>
           <SectionSub>
             Post chart takes, ask questions, and discuss markets with other traders.
           </SectionSub>
         </SectionHead>
-
+        
         <SearchBar>
           <SearchIconWrap>
             <FiSearch size={18} />

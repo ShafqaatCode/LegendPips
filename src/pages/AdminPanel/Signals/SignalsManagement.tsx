@@ -7,6 +7,10 @@ import {
   createAdminSignal,
   updateAdminSignal,
   deleteAdminSignal,
+  fetchAdminTradingPairs,
+  createAdminTradingPair,
+  deleteAdminTradingPair,
+  type TradingPairOption,
 } from '../../../services/signalService';
 import { TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
 import {
@@ -79,6 +83,40 @@ const CheckRow = styled.label`
   input { accent-color: ${adminColors.navy}; }
 `;
 
+const PairCatalogBox = styled.div`
+  margin: -0.15rem 0 0.85rem;
+  padding: 0.65rem 0.7rem;
+  border-radius: 10px;
+  border: 1px dashed ${adminColors.border};
+  background: #f8fafc;
+`;
+
+const PairCatalogRow = styled.div`
+  display: grid;
+  grid-template-columns: 1.1fr 1.2fr auto;
+  gap: 0.45rem;
+  align-items: end;
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+  input {
+    width: 100%; padding: 0.5rem 0.65rem; border-radius: 9px; border: 1px solid ${adminColors.border};
+    font-size: 0.8125rem; outline: none; background: white; box-sizing: border-box;
+    &:focus { border-color: ${adminColors.navy}; box-shadow: 0 0 0 3px rgba(19, 46, 88, 0.08); }
+  }
+  label {
+    display: flex; flex-direction: column; gap: 0.3rem;
+    font-size: 0.625rem; font-weight: 700; color: ${adminColors.muted}; text-transform: uppercase; letter-spacing: 0.03em;
+  }
+`;
+
+const PairActionRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.55rem;
+`;
+
 const statusPill = (s: string) => {
   if (s === 'active' || s === 'open') return 'approved';
   if (s === 'pending') return 'pending';
@@ -90,7 +128,7 @@ const SignalsManagement: React.FC = () => {
   const [modalMode, setModalMode] = useState<'add' | 'edit' | 'delete'>('add');
   const [selectedSignalId, setSelectedSignalId] = useState<string | null>(null);
 
-  const [formPair, setFormPair] = useState('EUR/USD');
+  const [formPair, setFormPair] = useState('');
   const [formType, setFormType] = useState<'buy' | 'sell'>('buy');
   const [formEntry, setFormEntry] = useState('1.0850');
   const [formTp, setFormTp] = useState('1.0900');
@@ -98,6 +136,12 @@ const SignalsManagement: React.FC = () => {
   const [formStatus, setFormStatus] = useState<'active' | 'closed' | 'pending'>('active');
   const [formPremium, setFormPremium] = useState(false);
   const [formAssetClass, setFormAssetClass] = useState<'forex' | 'crypto' | 'commodities' | 'other'>('forex');
+  const [pairOptions, setPairOptions] = useState<TradingPairOption[]>([]);
+  const [pairsLoading, setPairsLoading] = useState(false);
+  const [pairsError, setPairsError] = useState<string | null>(null);
+  const [newPairSymbol, setNewPairSymbol] = useState('');
+  const [newPairLabel, setNewPairLabel] = useState('');
+  const [pairBusy, setPairBusy] = useState(false);
 
   type SignalRow = {
     id: string;
@@ -146,6 +190,98 @@ const SignalsManagement: React.FC = () => {
 
   useEffect(() => { refresh(); }, [refresh]);
 
+  const loadPairs = useCallback(async (assetClass: string) => {
+    try {
+      setPairsLoading(true);
+      setPairsError(null);
+      const items = await fetchAdminTradingPairs(assetClass);
+      setPairOptions(items);
+      return items;
+    } catch (e) {
+      setPairOptions([]);
+      setPairsError(e instanceof Error ? e.message : 'Failed to load pairs');
+      return [] as TradingPairOption[];
+    } finally {
+      setPairsLoading(false);
+    }
+  }, []);
+
+  const openCreate = async () => {
+    setModalMode('add');
+    setSelectedSignalId(null);
+    setFormType('buy');
+    setFormEntry('1.0850');
+    setFormTp('1.0900');
+    setFormSl('1.0820');
+    setFormStatus('active');
+    setFormPremium(false);
+    setFormAssetClass('forex');
+    setNewPairSymbol('');
+    setNewPairLabel('');
+    setIsModalOpen(true);
+    const items = await loadPairs('forex');
+    setFormPair(items[0]?.symbol || '');
+  };
+
+  const filteredPairs = useMemo(
+    () => pairOptions.filter((p) => p.assetClass === formAssetClass),
+    [pairOptions, formAssetClass]
+  );
+
+  const selectedPair = useMemo(
+    () => filteredPairs.find((p) => p.symbol === formPair) || null,
+    [filteredPairs, formPair]
+  );
+
+  const handleAddPairToCatalog = async () => {
+    const symbol = newPairSymbol.trim();
+    if (!symbol) {
+      alert('Enter a pair symbol, e.g. EUR/USD');
+      return;
+    }
+    try {
+      setPairBusy(true);
+      setPairsError(null);
+      const created = await createAdminTradingPair({
+        symbol,
+        label: newPairLabel.trim() || undefined,
+        assetClass: formAssetClass,
+      });
+      const items = await loadPairs(formAssetClass);
+      setFormPair(created.symbol);
+      if (!items.some((p) => p.symbol === created.symbol)) {
+        setPairOptions((prev) =>
+          prev.some((p) => p.symbol === created.symbol) ? prev : [...prev, created]
+        );
+      }
+      setNewPairSymbol('');
+      setNewPairLabel('');
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Failed to add pair');
+    } finally {
+      setPairBusy(false);
+    }
+  };
+
+  const handleDeleteSelectedPair = async () => {
+    if (!selectedPair) {
+      alert('Select a pair to delete.');
+      return;
+    }
+    if (!window.confirm(`Remove ${selectedPair.symbol} from the catalog?`)) return;
+    try {
+      setPairBusy(true);
+      setPairsError(null);
+      await deleteAdminTradingPair(selectedPair.id);
+      const items = await loadPairs(formAssetClass);
+      setFormPair(items[0]?.symbol || '');
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Failed to delete pair');
+    } finally {
+      setPairBusy(false);
+    }
+  };
+
   const stats = useMemo(() => ({
     total: signals.length,
     active: signals.filter((s) => s.status === 'active').length,
@@ -160,12 +296,7 @@ const SignalsManagement: React.FC = () => {
           <PageTitle><FiTrendingUp /> Signals</PageTitle>
           <PageSubtitle>Publish trading setups, TP/SL levels, and premium access control</PageSubtitle>
         </PageTitleGroup>
-        <PrimaryButton type="button" onClick={() => {
-          setModalMode('add'); setSelectedSignalId(null);
-          setFormPair('EUR/USD'); setFormType('buy'); setFormEntry('1.0850');
-          setFormTp('1.0900'); setFormSl('1.0820'); setFormStatus('active');
-          setFormPremium(false); setFormAssetClass('forex'); setIsModalOpen(true);
-        }}>
+        <PrimaryButton type="button" onClick={() => { void openCreate(); }}>
           <FiPlus /> Create signal
         </PrimaryButton>
       </PageHeader>
@@ -246,6 +377,26 @@ const SignalsManagement: React.FC = () => {
                       setFormEntry(signal.entry); setFormTp(signal.tp); setFormSl(signal.sl);
                       setFormStatus(signal.status); setFormPremium(!!signal.premium);
                       setFormAssetClass(signal.assetClass); setIsModalOpen(true);
+                      void loadPairs(signal.assetClass).then((items) => {
+                        if (!items.some((p) => p.symbol === signal.pair)) {
+                          // Keep current pair visible even if catalog filter is empty
+                          setPairOptions((prev) =>
+                            prev.some((p) => p.symbol === signal.pair)
+                              ? prev
+                              : [
+                                  ...prev,
+                                  {
+                                    id: `legacy-${signal.pair}`,
+                                    symbol: signal.pair,
+                                    label: signal.pair,
+                                    assetClass: signal.assetClass,
+                                    active: true,
+                                    sortOrder: 0,
+                                  },
+                                ]
+                          );
+                        }
+                      });
                     }}><FiEdit2 /></IconBtn>
                     <IconBtn $danger title="Delete" type="button" onClick={() => {
                       setModalMode('delete'); setSelectedSignalId(signal.id); setIsModalOpen(true);
@@ -282,6 +433,10 @@ const SignalsManagement: React.FC = () => {
               <GhostButton type="button" onClick={() => setIsModalOpen(false)}>Cancel</GhostButton>
               <PrimaryButton type="button" onClick={async () => {
                 try {
+                  if (!formPair) {
+                    alert('Please select a pair from the list.');
+                    return;
+                  }
                   if (modalMode === 'add') {
                     await createAdminSignal({
                       pair: formPair, type: formType, entry: formEntry, tp: formTp, sl: formSl,
@@ -307,15 +462,98 @@ const SignalsManagement: React.FC = () => {
           <div style={{ color: adminColors.muted, fontSize: 14 }}>Delete this signal permanently?</div>
         ) : (
           <div>
-            <FormField>Pair<input value={formPair} onChange={(e) => setFormPair(e.target.value)} /></FormField>
             <FormField>Market
-              <select value={formAssetClass} onChange={(e) => setFormAssetClass(e.target.value as typeof formAssetClass)}>
+              <select
+                value={formAssetClass}
+                onChange={(e) => {
+                  const next = e.target.value as typeof formAssetClass;
+                  setFormAssetClass(next);
+                  void loadPairs(next).then((items) => {
+                    setFormPair((current) =>
+                      items.some((p) => p.symbol === current) ? current : items[0]?.symbol || ''
+                    );
+                  });
+                }}
+              >
                 <option value="forex">Forex</option>
                 <option value="crypto">Crypto</option>
                 <option value="commodities">Commodities</option>
                 <option value="other">Other</option>
               </select>
             </FormField>
+            <FormField>
+              Pair
+              <select
+                value={formPair}
+                disabled={pairsLoading || filteredPairs.length === 0}
+                onChange={(e) => setFormPair(e.target.value)}
+              >
+                {pairsLoading && <option value="">Loading pairs…</option>}
+                {!pairsLoading && filteredPairs.length === 0 && (
+                  <option value="">No pairs in catalog for this market</option>
+                )}
+                {filteredPairs.map((p) => (
+                  <option key={p.id} value={p.symbol}>
+                    {p.symbol}{p.label && p.label !== p.symbol ? ` — ${p.label}` : ''}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+            <PairCatalogBox>
+              <PairCatalogRow>
+                <label>
+                  New symbol
+                  <input
+                    value={newPairSymbol}
+                    placeholder="e.g. EUR/USD"
+                    disabled={pairBusy}
+                    onChange={(e) => setNewPairSymbol(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        void handleAddPairToCatalog();
+                      }
+                    }}
+                  />
+                </label>
+                <label>
+                  Label (optional)
+                  <input
+                    value={newPairLabel}
+                    placeholder="Euro / US Dollar"
+                    disabled={pairBusy}
+                    onChange={(e) => setNewPairLabel(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        void handleAddPairToCatalog();
+                      }
+                    }}
+                  />
+                </label>
+                <PrimaryButton
+                  type="button"
+                  disabled={pairBusy || !newPairSymbol.trim()}
+                  onClick={() => void handleAddPairToCatalog()}
+                  style={{ height: 36, whiteSpace: 'nowrap' }}
+                >
+                  <FiPlus /> Add pair
+                </PrimaryButton>
+              </PairCatalogRow>
+              <PairActionRow>
+                <GhostButton
+                  $danger
+                  type="button"
+                  disabled={pairBusy || !selectedPair}
+                  onClick={() => void handleDeleteSelectedPair()}
+                >
+                  <FiTrash2 /> Delete selected pair
+                </GhostButton>
+              </PairActionRow>
+            </PairCatalogBox>
+            {pairsError && (
+              <div style={{ color: '#b91c1c', fontSize: 12, marginBottom: 10 }}>{pairsError}</div>
+            )}
             <FormField>Type
               <select value={formType} onChange={(e) => setFormType(e.target.value as 'buy' | 'sell')}>
                 <option value="buy">Buy</option>

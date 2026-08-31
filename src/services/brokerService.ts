@@ -66,6 +66,10 @@ export interface ApiBroker {
   reviewStats?: { average: number; count: number };
   blacklisted?: boolean;
   blacklistReason?: string;
+  blacklistedAt?: string;
+  forBeginners?: boolean;
+  beginnerBlurb?: string;
+  beginnerSortOrder?: number;
   fundingMethods: string[];
   cashbackRate?: string;
   published?: boolean;
@@ -85,6 +89,7 @@ export interface ApiBroker {
   propOffers?: PropCashbackOffer[];
   propPromoCodes?: PropPromoCode[];
   country?: string;
+  servedCountries?: string[];
   leverage?: string;
   platforms?: string;
   commission?: string;
@@ -172,6 +177,8 @@ export const fetchBrokersPage = async (opts: {
   platform?: string;
   maxMinDeposit?: number;
   minScore?: number;
+  forBeginners?: boolean;
+  scamShield?: boolean;
 }): Promise<BrokersPageResult> => {
   const qs = new URLSearchParams();
   if (opts.rebatesPage) qs.set("rebatesPage", "1");
@@ -182,6 +189,8 @@ export const fetchBrokersPage = async (opts: {
   if (opts.platform?.trim()) qs.set("platform", opts.platform.trim());
   if (typeof opts.maxMinDeposit === "number") qs.set("maxMinDeposit", String(opts.maxMinDeposit));
   if (typeof opts.minScore === "number") qs.set("minScore", String(opts.minScore));
+  if (opts.forBeginners) qs.set("forBeginners", "1");
+  if (opts.scamShield) qs.set("scamShield", "1");
   qs.set("page", String(opts.page ?? 1));
   qs.set("limit", String(opts.limit ?? BROKERS_PAGE_SIZE));
   const data = await fetchJson(`${API_CONFIG.BASE_URL}/brokers?${qs.toString()}`);
@@ -205,6 +214,32 @@ export const fetchBrokersPage = async (opts: {
 
   return { items, pagination };
 };
+
+/** Curated beginner-friendly brokers (excludes scam-shield list). */
+export const fetchBeginnerBrokers = async (opts?: {
+  search?: string;
+  page?: number;
+  limit?: number;
+}): Promise<BrokersPageResult> =>
+  fetchBrokersPage({
+    forBeginners: true,
+    search: opts?.search,
+    page: opts?.page ?? 1,
+    limit: opts?.limit ?? 24,
+  });
+
+/** Brokers flagged on Scam Broker Shield. */
+export const fetchScamShieldBrokers = async (opts?: {
+  search?: string;
+  page?: number;
+  limit?: number;
+}): Promise<BrokersPageResult> =>
+  fetchBrokersPage({
+    scamShield: true,
+    search: opts?.search,
+    page: opts?.page ?? 1,
+    limit: opts?.limit ?? 50,
+  });
 
 /** Brokers for /rebates list (paginated) or home strip preview (`limit` only, no page). */
 export const fetchRebatesPageBrokers = async (opts?: {

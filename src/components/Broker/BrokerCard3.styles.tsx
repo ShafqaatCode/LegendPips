@@ -112,12 +112,13 @@ export const TitleRow = styled.div`
   margin-bottom: 0.5rem;
 
   h2 {
-    font-size: 36px;
+    font-size: clamp(1.25rem, 1.2vw + 0.9rem, 1.65rem);
     margin: 0;
     color: #0f1c46;
+    line-height: 1.25;
 
     @media (max-width: 768px) {
-      font-size: 28px;
+      font-size: 1.25rem;
     }
   }
 

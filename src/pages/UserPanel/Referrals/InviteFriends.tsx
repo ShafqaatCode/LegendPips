@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { FiUserPlus, FiMail, FiSend, FiCheck, FiClock, FiChevronDown } from 'react-icons/fi';
+import { FiUserPlus, FiMail, FiSend, FiCheck, FiClock, FiChevronDown, FiCopy, FiDollarSign, FiUsers } from 'react-icons/fi';
 import {
   PageWrap, PageHeader, PageTitle, PageSubtitle,
   SectionCard, SectionHead, SectionBody,
@@ -14,7 +14,33 @@ import {
   type ReferralInviteRow,
   type ReferralTemplate,
 } from '../../../services/referralService';
+import { fetchMyAffiliateDashboard, type AffiliateDashboard } from '../../../services/affiliateService';
 import { useAuth } from '../../../contexts/AuthContext';
+
+const AffCard = styled.div`
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
+`;
+
+const AffBox = styled.div`
+  background: white;
+  border: 1px solid ${userColors.border};
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  h3 { margin: 0 0 0.35rem; font-size: 0.75rem; font-weight: 800; color: ${userColors.muted}; text-transform: uppercase; letter-spacing: 0.04em; }
+  .val { font-size: 1.15rem; font-weight: 800; color: ${userColors.navy}; word-break: break-all; }
+  .meta { margin-top: 0.35rem; font-size: 0.75rem; color: ${userColors.muted}; }
+  button.copy {
+    margin-top: 0.55rem;
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    border: 1px solid ${userColors.border}; background: #f8fafc; border-radius: 8px;
+    padding: 0.35rem 0.6rem; font-size: 0.75rem; font-weight: 700; color: ${userColors.navy}; cursor: pointer;
+  }
+`;
 
 const Layout = styled.div`
   display: grid;
@@ -261,17 +287,21 @@ const InviteFriends: React.FC = () => {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [affiliate, setAffiliate] = useState<AffiliateDashboard | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const [t, h] = await Promise.all([
+      const [t, h, aff] = await Promise.all([
         fetchReferralTemplates(),
         fetchMyReferralInvites(),
+        fetchMyAffiliateDashboard().catch(() => null),
       ]);
       setTemplates(t);
       setHistory(h);
+      setAffiliate(aff);
       setTemplateId((prev) => prev || (t[0]?.id ?? ''));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load invite options');
@@ -334,7 +364,7 @@ const InviteFriends: React.FC = () => {
       <PageHeader>
         <PageTitle><FiUserPlus /> {t("panel.pageInvite")}</PageTitle>
         <PageSubtitle>
-          Choose a template, check the subject & message, then send — from LegendPips to your friend
+          Share your affiliate link, earn signup bonuses, and invite friends by email
         </PageSubtitle>
       </PageHeader>
 
@@ -343,6 +373,41 @@ const InviteFriends: React.FC = () => {
         <SuccessBanner>
           <FiCheck /> {success}
         </SuccessBanner>
+      )}
+
+      {affiliate && (
+        <AffCard>
+          <AffBox>
+            <h3>Your invite link</h3>
+            <div className="val" style={{ fontSize: '0.85rem' }}>{affiliate.inviteLink}</div>
+            <div className="meta">Code: <strong>{affiliate.referralCode}</strong> · Tier: {affiliate.tier}</div>
+            <button
+              type="button"
+              className="copy"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(affiliate.inviteLink);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                } catch {
+                  /* ignore */
+                }
+              }}
+            >
+              <FiCopy /> {copied ? 'Copied' : 'Copy link'}
+            </button>
+          </AffBox>
+          <AffBox>
+            <h3><FiUsers style={{ display: 'inline', marginRight: 4 }} />Network</h3>
+            <div className="val">{affiliate.network.l1} direct</div>
+            <div className="meta">{affiliate.network.l2} level-2 · L1 bonus ${(affiliate.tierConfig.l1SignupCents / 100).toFixed(2)} / signup</div>
+          </AffBox>
+          <AffBox>
+            <h3><FiDollarSign style={{ display: 'inline', marginRight: 4 }} />Earnings</h3>
+            <div className="val">${affiliate.earnings.totalUsd.toFixed(2)}</div>
+            <div className="meta">Paid into your rebates wallet · {affiliate.earnings.count} commissions</div>
+          </AffBox>
+        </AffCard>
       )}
 
       <Layout>

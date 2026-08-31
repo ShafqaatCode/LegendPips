@@ -10,7 +10,7 @@ import { ArticleDetailSkeleton } from '../SharedComponents/Shimmer';
 const DetailWrapper = styled.section`
   background: #fafbfc;
   padding: 60px 3rem 40px 3rem;
-  min-height: 600px;
+  min-height: 420px;
   
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     padding: 40px 2rem 30px 2rem;
@@ -77,7 +77,7 @@ const PlaceholderHeader = styled.div`
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: clamp(2.5rem, 8vw, 3.5rem);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
   font-weight: bold;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {

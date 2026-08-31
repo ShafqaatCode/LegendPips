@@ -4,18 +4,15 @@ export const BannerWrapper = styled.section`
   position: relative;
   background-size: cover;
   background-position: center;
-  // height: 550px;
-  height: 600px;
+  height: clamp(320px, 42vh, 440px);
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  /* margin-top: 60px; */
-  padding: 0 1.5rem;
+  padding: 0 ${({ theme }) => theme.typography.pageGutter};
 
   @media (max-width: 768px) {
-    height: 440px;
-    /* margin-top: 75px; */
+    height: 300px;
     padding: 0 1rem;
   }
 
@@ -39,25 +36,18 @@ export const Overlay = styled.div`
 `;
 
 export const Title = styled.h1`
-  font-size: 3rem;
+  font-size: ${({ theme }) => theme.typography.heroTitle};
   font-weight: 700;
   text-transform: uppercase;
   margin-bottom: 0.5rem;
-
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
+  line-height: ${({ theme }) => theme.typography.heroTitleLh};
 `;
 
 export const Breadcrumb = styled.div`
-  font-size: 1rem;
+  font-size: ${({ theme }) => theme.typography.body};
 
   span {
     margin: 0 0.5rem;
     color: #fbc113;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 0.875rem;
   }
 `;

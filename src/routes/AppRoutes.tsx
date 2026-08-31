@@ -2,6 +2,9 @@ import { Routes, Route } from "react-router-dom";
 import Layout from "../Layout";
 import HomePage from "../pages/Home/Homepage";
 import Brokers from "../pages/Brokers/BrokersPage";
+import BeginnerBrokersPage from "../pages/Brokers/BeginnerBrokersPage";
+import ScamBrokerShieldPage from "../pages/Brokers/ScamBrokerShieldPage";
+import CountryBrokerMatcherPage from "../pages/Brokers/CountryBrokerMatcherPage";
 import Contests from "../pages/Contests/Contestspage";
 import RebateBrokers from "../pages/RebateBrokers/RebateBrokersPage";
 import RebateBrokerDetailPage from "../pages/RebateBrokers/RebateBrokerDetailPage";
@@ -10,6 +13,7 @@ import AnalysisDetail from "../components/Analysis/AnalysisDetail";
 import HitWorksPage from "../pages/HitWorksPage/HitWorksPage";
 import SignalsPage from "../pages/SignalsPage/SignalsPage";
 import RewardsPage from "../pages/RewardsPage/RewardsPage";
+import RewardDetailPage from "../pages/RewardsPage/RewardDetailPage";
 import Forum from "../pages/Forum/Forum";
 import ForumThreadDetail from "../components/Forum/ForumThreadDetail";
 import Courses from "../pages/Courses/Courses";
@@ -45,13 +49,18 @@ import AdminBulkEmail from "../pages/AdminPanel/Users/AdminBulkEmail";
 import KycRecordsManagement from "../pages/AdminPanel/Kyc/KycRecordsManagement";
 import BrokersManagement from "../pages/AdminPanel/Brokers/BrokersManagement";
 import AdminBrokerReviews from "../pages/AdminPanel/Brokers/AdminBrokerReviews";
+import AdminSignupBonuses from "../pages/AdminPanel/Market/AdminSignupBonuses";
+import AdminPerformingStocks from "../pages/AdminPanel/Market/AdminPerformingStocks";
 import AdminComplaints from "../pages/AdminPanel/Complaints/AdminComplaints";
+import BrokerSignupBonusesPage from "../pages/Brokers/BrokerSignupBonusesPage";
+import BestPerformingStocksPage from "../pages/Stocks/BestPerformingStocksPage";
 import ContestsManagement from "../pages/AdminPanel/Contests/ContestsManagement";
 import SignalsManagement from "../pages/AdminPanel/Signals/SignalsManagement";
 import WebinarsManagement from "../pages/AdminPanel/Webinars/WebinarsManagement";
 import AnalysisManagement from "../pages/AdminPanel/Analysis/AnalysisManagement";
 import CoursesManagement from "../pages/AdminPanel/Courses/CoursesManagement";
 import Reports from "../pages/AdminPanel/Reports/Reports";
+import AdminSecurity from "../pages/AdminPanel/Security/AdminSecurity";
 import AdminSettings from "../pages/AdminPanel/Settings/AdminSettings";
 import AdminFeedbackInbox from "../pages/AdminPanel/Engagement/AdminFeedbackInbox";
 import AdminUserActivityFeed from "../pages/AdminPanel/Engagement/AdminUserActivityFeed";
@@ -71,6 +80,13 @@ import PositionSizeCalculatorPage from "../pages/PositionSizeCalculator/Position
 import PipCalculatorPage from "../pages/PipCalculator/PipCalculatorPage";
 import CalculatorsPage from "../pages/Calculators/CalculatorsPage";
 import AboutPage from "../pages/About/AboutPage";
+import TeamPage from "../pages/About/TeamPage";
+import {
+  MethodologyPage,
+  CareersPage,
+  PartnersPage,
+  JournalistsPage,
+} from "../pages/About/AboutExtraPages";
 import ComplaintsPage from "../pages/Complaints/ComplaintsPage";
 import ComparePage from "../pages/Compare/ComparePage";
 import PropFirmHubPage from "../pages/PropFirms/PropFirmHubPage";
@@ -116,6 +132,8 @@ const AppRoutes: React.FC = () => {
         <Route path="users/:id" element={<UserDetail />} />
         <Route path="brokers" element={<BrokersManagement />} />
         <Route path="broker-reviews" element={<AdminBrokerReviews />} />
+        <Route path="signup-bonuses" element={<AdminSignupBonuses />} />
+        <Route path="performing-stocks" element={<AdminPerformingStocks />} />
         <Route path="complaints" element={<AdminComplaints />} />
         <Route path="contests" element={<ContestsManagement />} />
         <Route path="signals" element={<SignalsManagement />} />
@@ -123,6 +141,7 @@ const AppRoutes: React.FC = () => {
         <Route path="analysis" element={<AnalysisManagement />} />
         <Route path="courses" element={<CoursesManagement />} />
         <Route path="reports" element={<Reports />} />
+        <Route path="security" element={<AdminSecurity />} />
         <Route path="feedback-inbox" element={<AdminFeedbackInbox />} />
         <Route path="user-activity" element={<AdminUserActivityFeed />} />
         <Route path="referrals" element={<AdminReferralsProgress />} />
@@ -171,12 +190,16 @@ const AppRoutes: React.FC = () => {
         <Route index element={<HomePage />} />
         <Route path="tools" element={<CalculatorsPage />} />
         <Route path="calculators" element={<CalculatorsPage />} />
+        <Route path="brokers/beginners" element={<BeginnerBrokersPage />} />
+        <Route path="brokers/match" element={<CountryBrokerMatcherPage />} />
+        <Route path="find-broker" element={<CountryBrokerMatcherPage />} />
         <Route path="brokers" element={<Brokers />} />
         
         <Route path="contests" element={<Contests />} />
         <Route path="contests/:contestId" element={<ContestDetails />} />
         
         <Route path="signals" element={<SignalsPage />} />
+        <Route path="rewards/:rewardId" element={<RewardDetailPage />} />
         <Route path="rewards" element={<RewardsPage />} />
         <Route path="rebates/broker/:brokerId" element={<RebateBrokerDetailPage />} />
         <Route path="rebates" element={<RebateBrokers />} />
@@ -186,6 +209,14 @@ const AppRoutes: React.FC = () => {
         <Route path="analysis/:id/*" element={<AnalysisDetail />} />
         <Route path="how-it-works" element={<HitWorksPage />} />
         <Route path="about" element={<AboutPage />} />
+        <Route path="about/team" element={<TeamPage />} />
+        <Route path="about/methodology" element={<MethodologyPage />} />
+        <Route path="about/careers" element={<CareersPage />} />
+        <Route path="about/partners" element={<PartnersPage />} />
+        <Route path="about/journalists" element={<JournalistsPage />} />
+        <Route path="scam-broker-shield" element={<ScamBrokerShieldPage />} />
+        <Route path="broker-signup-bonuses" element={<BrokerSignupBonusesPage />} />
+        <Route path="best-performing-stocks" element={<BestPerformingStocksPage />} />
         <Route path="complaints" element={<ComplaintsPage />} />
         <Route path="compare/:pairSlug" element={<ComparePage />} />
         <Route path="compare" element={<ComparePage />} />

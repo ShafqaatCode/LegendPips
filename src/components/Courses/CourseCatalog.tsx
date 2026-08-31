@@ -33,14 +33,14 @@ const ContentWrapper = styled.div`
 `;
 
 const Heading = styled.h2`
-  font-size: 36px;
+  font-size: clamp(1.35rem, 1.5vw + 0.7rem, 1.75rem);
   font-weight: 700;
   color: #132e58;
   text-align: center;
   margin: 0 0 0.75rem 0;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 28px;
+    font-size: 1.25rem;
   }
 `;
 

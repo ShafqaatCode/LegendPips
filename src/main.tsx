@@ -8,6 +8,9 @@ import { GlobalStyles } from './styles/GlobalStyles.ts'
 import { AuthProvider } from './contexts/AuthContext.tsx'
 import { SiteConfigProvider } from './contexts/SiteConfigContext.tsx'
 import { LocaleProvider } from './contexts/LocaleContext.tsx'
+import { installApiAuthInterceptor } from './utils/apiConfig.ts'
+
+installApiAuthInterceptor()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

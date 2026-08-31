@@ -521,7 +521,10 @@ const AdminDashboard: React.FC = () => {
       setPlatform(data.platform);
       setPreviews(data.previews);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load dashboard');
+      const msg = e instanceof Error ? e.message : 'Failed to load dashboard';
+      // Session expiry redirects home via API interceptor — don't surface token errors
+      if (/invalid or expired token|session expired|no token provided/i.test(msg)) return;
+      setError(msg);
     } finally {
       setLoading(false);
     }

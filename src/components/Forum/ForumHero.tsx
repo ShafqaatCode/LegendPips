@@ -5,24 +5,24 @@ import { useLocale } from '../../contexts/LocaleContext';
 
 const HeroWrapper = styled.section`
   position: relative;
-  min-height: clamp(380px, 52vh, 480px);
+  min-height: clamp(280px, 36vh, 380px);
   display: flex;
   align-items: center;
-  padding: clamp(4rem, 9vw, 5.5rem) ${({ theme }) => theme.typography.pageGutter}
-    clamp(2.25rem, 5vw, 3.5rem);
+  padding: clamp(2.75rem, 6vw, 4rem) ${({ theme }) => theme.typography.pageGutter}
+    clamp(1.75rem, 4vw, 2.75rem);
   overflow: hidden;
   background: linear-gradient(135deg, #0b1b38 0%, #132e58 100%);
 
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    padding: clamp(3.5rem, 8vw, 5rem) ${({ theme }) => theme.typography.pageGutter}
-      clamp(2rem, 4vw, 3rem);
-    min-height: 420px;
+    padding: clamp(2.5rem, 6vw, 3.5rem) ${({ theme }) => theme.typography.pageGutter}
+      clamp(1.5rem, 3.5vw, 2.25rem);
+    min-height: 320px;
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: clamp(3.25rem, 8vw, 4.5rem) ${({ theme }) => theme.typography.pageGutter}
-      clamp(1.75rem, 4vw, 2.5rem);
-    min-height: 380px;
+    padding: clamp(2.25rem, 6vw, 3rem) ${({ theme }) => theme.typography.pageGutter}
+      clamp(1.35rem, 3.5vw, 2rem);
+    min-height: 280px;
     flex-direction: column;
   }
 `;

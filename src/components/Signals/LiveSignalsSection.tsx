@@ -7,7 +7,7 @@ import SignalPerformance from './Tabs/SignalPerformance';
 const SectionWrapper = styled.section`
   background: white;
   padding: 80px 3rem;
-  min-height: 600px;
+  min-height: 420px;
   
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     padding: 60px 2rem;

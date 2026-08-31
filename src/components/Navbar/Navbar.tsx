@@ -9,6 +9,7 @@ import {
   NavItem,
   LinkGroup,
   HeaderItem,
+  TopbarDivider,
   SignInButton,
   UserPanelButton,
   PortalOutlineButton,
@@ -25,6 +26,9 @@ import {
   ToolsMegaLabel,
   ToolsMegaGrid,
   ToolsMegaLink,
+  BrokersDropMenu,
+  BrokersDropLink,
+  DropSectionLabel,
   MobileToolsGroup,
   MobileToolsHeading,
 } from "./Navbar.styles";
@@ -48,6 +52,7 @@ import LocationIcon from "../../assets/icons/Location marker.svg";
 import { useAuthModal } from "../../contexts/AuthModalContext";
 import { useLocale } from "../../contexts/LocaleContext";
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
+import { ABOUT_NESTED_PATHS, ABOUT_SUBMENU } from "../../data/aboutPages";
 
 const FALLBACK_NAV = [
   { to: "/", label: "Home", end: true },
@@ -55,7 +60,6 @@ const FALLBACK_NAV = [
   { to: "/rebates", label: "Rebates Brokers" },
   { to: "/prop-firms", label: "Prop Firms" },
   { to: "/contests", label: "Contests" },
-  { to: "/brokers", label: "Brokers" },
   { to: "/compare", label: "Compare" },
   { to: "/complaints", label: "Complaints" },
   { to: "/signals", label: "Signals" },
@@ -65,14 +69,34 @@ const FALLBACK_NAV = [
   { to: "/traders", label: "Traders" },
 ];
 
+/** Broker-related paths belong under the Brokers submenu, not the top bar. */
+const BROKER_NESTED_PATHS = new Set([
+  "/brokers",
+  "/brokers/beginners",
+  "/find-broker",
+  "/brokers/match",
+  "/scam-broker-shield",
+]);
+
+const BROKER_SUBMENU = [
+  { to: "/brokers", label: "All Brokers", end: true },
+  { to: "/brokers/beginners", label: "Best for New Traders" },
+  { to: "/find-broker", label: "Find My Broker" },
+  { to: "/scam-broker-shield", label: "Scam Broker Shield" },
+];
+
 const EDUCATION_PATHS = new Set([
   "/copy-trading",
   "/courses",
   "/trading-videos",
   "/webinars",
+  "/broker-signup-bonuses",
+  "/best-performing-stocks",
 ]);
 
 const FALLBACK_TOOLS = [
+  { to: "/broker-signup-bonuses", label: "Broker Signup Bonuses", badge: "NEW" },
+  { to: "/best-performing-stocks", label: "Best Performing Stocks", badge: "NEW" },
   { to: "/copy-trading", label: "Copy Trading" },
   { to: "/courses", label: "Courses" },
   { to: "/trading-videos", label: "Trading Videos" },
@@ -95,19 +119,36 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [submenuOpen, setSubmenuOpen] = useState(false);
+  const [brokersMenuOpen, setBrokersMenuOpen] = useState(false);
+  const [aboutMenuOpen, setAboutMenuOpen] = useState(false);
   const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState(false);
+  const [mobileBrokersOpen, setMobileBrokersOpen] = useState(false);
+  const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const desktopAccountRef = useRef<HTMLDivElement | null>(null);
   const mobileAccountRef = useRef<HTMLDivElement | null>(null);
   const toolsCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const brokersCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const aboutCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { isAuthenticated, user, logout } = useAuth();
   const { openSignIn } = useAuthModal();
   const { mainNav, toolsNav, config } = useSiteConfig();
   const { t, labelForPath } = useLocale();
 
-  const navLinks = mainNav.length
-    ? mainNav.map((n) => ({ to: n.path, label: labelForPath(n.path, n.label), end: n.end }))
-    : FALLBACK_NAV.map((n) => ({ ...n, label: labelForPath(n.to, n.label) }));
+  const navLinks = (
+    mainNav.length
+      ? mainNav.map((n) => ({ to: n.path, label: labelForPath(n.path, n.label), end: n.end }))
+      : FALLBACK_NAV.map((n) => ({ ...n, label: labelForPath(n.to, n.label) }))
+  ).filter((n) => !BROKER_NESTED_PATHS.has(n.to) && !ABOUT_NESTED_PATHS.has(n.to));
+
+  const brokersInsertAt = (() => {
+    const compareIdx = navLinks.findIndex((l) => l.to === "/compare");
+    if (compareIdx >= 0) return compareIdx;
+    const contestsIdx = navLinks.findIndex((l) => l.to === "/contests");
+    if (contestsIdx >= 0) return contestsIdx + 1;
+    return Math.min(5, navLinks.length);
+  })();
+
   const toolsSubmenu = toolsNav.length
     ? toolsNav.map((n) => ({ to: n.path, label: labelForPath(n.path, n.label) }))
     : FALLBACK_TOOLS.map((n) => ({ ...n, label: labelForPath(n.to, n.label) }));
@@ -122,6 +163,8 @@ const Header: React.FC = () => {
   useEffect(() => {
     return () => {
       if (toolsCloseTimer.current) clearTimeout(toolsCloseTimer.current);
+      if (brokersCloseTimer.current) clearTimeout(brokersCloseTimer.current);
+      if (aboutCloseTimer.current) clearTimeout(aboutCloseTimer.current);
     };
   }, []);
 
@@ -130,12 +173,44 @@ const Header: React.FC = () => {
       clearTimeout(toolsCloseTimer.current);
       toolsCloseTimer.current = null;
     }
+    setBrokersMenuOpen(false);
+    setAboutMenuOpen(false);
     setSubmenuOpen(true);
   };
 
   const closeToolsMenu = () => {
     if (toolsCloseTimer.current) clearTimeout(toolsCloseTimer.current);
     toolsCloseTimer.current = setTimeout(() => setSubmenuOpen(false), 180);
+  };
+
+  const openBrokersMenu = () => {
+    if (brokersCloseTimer.current) {
+      clearTimeout(brokersCloseTimer.current);
+      brokersCloseTimer.current = null;
+    }
+    setSubmenuOpen(false);
+    setAboutMenuOpen(false);
+    setBrokersMenuOpen(true);
+  };
+
+  const closeBrokersMenu = () => {
+    if (brokersCloseTimer.current) clearTimeout(brokersCloseTimer.current);
+    brokersCloseTimer.current = setTimeout(() => setBrokersMenuOpen(false), 180);
+  };
+
+  const openAboutMenu = () => {
+    if (aboutCloseTimer.current) {
+      clearTimeout(aboutCloseTimer.current);
+      aboutCloseTimer.current = null;
+    }
+    setSubmenuOpen(false);
+    setBrokersMenuOpen(false);
+    setAboutMenuOpen(true);
+  };
+
+  const closeAboutMenu = () => {
+    if (aboutCloseTimer.current) clearTimeout(aboutCloseTimer.current);
+    aboutCloseTimer.current = setTimeout(() => setAboutMenuOpen(false), 180);
   };
 
   useEffect(() => {
@@ -177,9 +252,9 @@ const Header: React.FC = () => {
           title="Account menu"
           onClick={() => setAccountOpen((v) => !v)}
         >
-          {isAdmin ? <FiShield size={18} aria-hidden /> : <FiUser size={18} aria-hidden />}
+          {isAdmin ? <FiShield size={14} aria-hidden /> : <FiUser size={14} aria-hidden />}
           <span>{outline ? (isAdmin ? t("header.admin") : user?.firstName || t("header.account")) : accountLabel}</span>
-          {accountOpen ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
+          {accountOpen ? <FiChevronUp size={12} /> : <FiChevronDown size={12} />}
         </Trigger>
         {accountOpen && (
           <AccountDropdown role="menu">
@@ -210,6 +285,8 @@ const Header: React.FC = () => {
             onClick={() => {
               setMenuOpen(false);
               setMobileSubmenuOpen(false);
+              setMobileBrokersOpen(false);
+              setMobileAboutOpen(false);
             }}
           />
         )}
@@ -234,10 +311,11 @@ const Header: React.FC = () => {
             </NavLink>
             <NavLink to="/location">
               <HeaderItem>
-                <img src={LocationIcon} alt="Location" />
+                <img src={LocationIcon} alt="" />
                 <span>{t("header.location")}</span>
               </HeaderItem>
             </NavLink>
+            <TopbarDivider aria-hidden />
             {isAuthenticated ? (
               renderAccountMenu(false, desktopAccountRef)
             ) : (
@@ -249,11 +327,58 @@ const Header: React.FC = () => {
 
         <Navbar>
           <NavList>
-            {navLinks.map((link) => (
+            {navLinks.slice(0, brokersInsertAt).map((link) => (
               <NavItem to={link.to} key={link.to} end={link.end || false}>
                 {link.label}
               </NavItem>
             ))}
+
+            <SubmenuWrapper onMouseEnter={openBrokersMenu} onMouseLeave={closeBrokersMenu}>
+              <SubmenuToggle data-open={brokersMenuOpen ? "true" : "false"}>
+                {t("nav.brokers")} {brokersMenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+              </SubmenuToggle>
+              {brokersMenuOpen && (
+                <BrokersDropMenu role="menu" aria-label={t("nav.brokers")}>
+                  {BROKER_SUBMENU.map((item) => (
+                    <BrokersDropLink
+                      to={item.to}
+                      key={item.to}
+                      end={"end" in item ? item.end : false}
+                      role="menuitem"
+                    >
+                      {item.label}
+                    </BrokersDropLink>
+                  ))}
+                </BrokersDropMenu>
+              )}
+            </SubmenuWrapper>
+
+            {navLinks.slice(brokersInsertAt).map((link) => (
+              <NavItem to={link.to} key={link.to} end={link.end || false}>
+                {link.label}
+              </NavItem>
+            ))}
+
+            <SubmenuWrapper onMouseEnter={openAboutMenu} onMouseLeave={closeAboutMenu}>
+              <SubmenuToggle data-open={aboutMenuOpen ? "true" : "false"}>
+                About us {aboutMenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+              </SubmenuToggle>
+              {aboutMenuOpen && (
+                <BrokersDropMenu role="menu" aria-label="About us">
+                  <DropSectionLabel>Behind the scenes</DropSectionLabel>
+                  {ABOUT_SUBMENU.map((item) => (
+                    <BrokersDropLink
+                      to={item.to}
+                      key={item.to}
+                      end={"end" in item ? Boolean(item.end) : false}
+                      role="menuitem"
+                    >
+                      {item.label}
+                    </BrokersDropLink>
+                  ))}
+                </BrokersDropMenu>
+              )}
+            </SubmenuWrapper>
 
             <SubmenuWrapper onMouseEnter={openToolsMenu} onMouseLeave={closeToolsMenu}>
               <SubmenuToggle data-open={submenuOpen ? "true" : "false"}>
@@ -267,7 +392,23 @@ const Header: React.FC = () => {
                       <ToolsMegaLabel>{t("header.education")}</ToolsMegaLabel>
                       {educationTools.map((tool) => (
                         <ToolsMegaLink to={tool.to} key={tool.to} role="menuitem">
-                          {tool.label}
+                          <span>{tool.label}</span>
+                          {"badge" in tool && typeof (tool as { badge?: unknown }).badge === "string" ? (
+                            <span
+                              style={{
+                                marginLeft: 8,
+                                padding: "1px 7px",
+                                borderRadius: 999,
+                                background: "#fbbf24",
+                                color: "#111",
+                                fontSize: 10,
+                                fontWeight: 800,
+                                letterSpacing: "0.04em",
+                              }}
+                            >
+                              {(tool as { badge: string }).badge}
+                            </span>
+                          ) : null}
                         </ToolsMegaLink>
                       ))}
                     </ToolsMegaColumn>
@@ -341,7 +482,7 @@ const Header: React.FC = () => {
                 </button>
               </>
             )}
-            {navLinks.map((link) => (
+            {navLinks.slice(0, brokersInsertAt).map((link) => (
               <NavItem
                 to={link.to}
                 key={link.to}
@@ -351,6 +492,64 @@ const Header: React.FC = () => {
                 {link.label}
               </NavItem>
             ))}
+
+            <div>
+              <SubmenuToggle onClick={() => setMobileBrokersOpen(!mobileBrokersOpen)}>
+                {t("nav.brokers")} {mobileBrokersOpen ? <FiChevronUp /> : <FiChevronDown />}
+              </SubmenuToggle>
+              {mobileBrokersOpen && (
+                <MobileToolsGroup>
+                  {BROKER_SUBMENU.map((item) => (
+                    <NavItem
+                      to={item.to}
+                      key={item.to}
+                      end={"end" in item ? item.end : false}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setMobileBrokersOpen(false);
+                      }}
+                    >
+                      {item.label}
+                    </NavItem>
+                  ))}
+                </MobileToolsGroup>
+              )}
+            </div>
+
+            {navLinks.slice(brokersInsertAt).map((link) => (
+              <NavItem
+                to={link.to}
+                key={link.to}
+                end={link.end || false}
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </NavItem>
+            ))}
+
+            <div>
+              <SubmenuToggle onClick={() => setMobileAboutOpen(!mobileAboutOpen)}>
+                About us {mobileAboutOpen ? <FiChevronUp /> : <FiChevronDown />}
+              </SubmenuToggle>
+              {mobileAboutOpen && (
+                <MobileToolsGroup>
+                  <MobileToolsHeading>Behind the scenes</MobileToolsHeading>
+                  {ABOUT_SUBMENU.map((item) => (
+                    <NavItem
+                      to={item.to}
+                      key={item.to}
+                      end={"end" in item ? Boolean(item.end) : false}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setMobileAboutOpen(false);
+                      }}
+                    >
+                      {item.label}
+                    </NavItem>
+                  ))}
+                </MobileToolsGroup>
+              )}
+            </div>
 
             <div>
               <SubmenuToggle onClick={() => setMobileSubmenuOpen(!mobileSubmenuOpen)}>
@@ -372,6 +571,9 @@ const Header: React.FC = () => {
                           }}
                         >
                           {tool.label}
+                          {"badge" in tool && typeof (tool as { badge?: unknown }).badge === "string"
+                            ? ` · ${(tool as { badge: string }).badge}`
+                            : ""}
                         </NavItem>
                       ))}
                     </>

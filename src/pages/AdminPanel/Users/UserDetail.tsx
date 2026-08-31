@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { FiArrowLeft, FiCheck, FiX, FiSlash, FiCheckCircle, FiTrash2, FiLogIn } from 'react-icons/fi';
+import { FiArrowLeft, FiCheck, FiX, FiSlash, FiCheckCircle, FiTrash2, FiLogIn, FiActivity } from 'react-icons/fi';
 import {
   getAdminUserDetail, reviewKyc, KYC_STATUS_LABELS, DOCUMENT_LABELS,
   type KycStatus, type KycDocumentType,
 } from '../../../services/kycService';
 import { blockOrUnblockUser, deleteUser, impersonateUser } from '../../../services/userService';
 import { applyAuthSession } from '../../../services/authService';
+import { fetchAdminActivityFeed, type AdminActivityFeedRow } from '../../../services/adminEngagementService';
 import { useAuth } from '../../../contexts/AuthContext';
 import SimpleModal from '../../../components/AdminPanel/SimpleModal';
+import { TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
 import {
   PageWrap, Pill, SectionCard, SectionHead, SectionBody,
   GhostButton, PrimaryButton, ErrorBanner, UserAvatar, ActionGroup,
+  DataTable, Th, Td, Tr, adminColors,
 } from '../../../components/AdminPanel/adminUi';
 
 const BackLink = styled.button`
@@ -128,6 +131,8 @@ const UserDetail: React.FC = () => {
   const [reviewing, setReviewing] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [impersonating, setImpersonating] = useState(false);
+  const [activity, setActivity] = useState<AdminActivityFeedRow[]>([]);
+  const [activityLoading, setActivityLoading] = useState(false);
 
   const loadUser = async () => {
     if (!id) return;
@@ -143,6 +148,23 @@ const UserDetail: React.FC = () => {
   };
 
   useEffect(() => { loadUser(); }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        setActivityLoading(true);
+        const data = await fetchAdminActivityFeed(1, 40, { userId: id });
+        if (!cancelled) setActivity(data.items || []);
+      } catch {
+        if (!cancelled) setActivity([]);
+      } finally {
+        if (!cancelled) setActivityLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [id]);
 
   const handleReview = async (action: 'approve' | 'reject') => {
     if (!id) return;
@@ -312,6 +334,44 @@ const UserDetail: React.FC = () => {
           </SectionBody>
         </SectionCard>
       )}
+
+      <SectionCard>
+        <SectionHead>
+          <h2><FiActivity style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle' }} />Activity history</h2>
+        </SectionHead>
+        <SectionBody style={{ padding: 0 }}>
+          <DataTable>
+            <thead>
+              <tr>
+                <Th>When</Th>
+                <Th>Type</Th>
+                <Th>Title</Th>
+                <Th>Details</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {activityLoading && <TableBodySkeleton rows={5} cols={4} />}
+              {!activityLoading && activity.map((row) => (
+                <Tr key={row.id}>
+                  <Td style={{ whiteSpace: 'nowrap', fontSize: 12, color: adminColors.muted }}>
+                    {row.createdAt ? new Date(row.createdAt).toLocaleString() : row.time}
+                  </Td>
+                  <Td><Pill $variant="user">{row.type}</Pill></Td>
+                  <Td style={{ fontWeight: 600, color: adminColors.navy }}>{row.title}</Td>
+                  <Td style={{ fontSize: 12, color: adminColors.muted }}>{row.description || '—'}</Td>
+                </Tr>
+              ))}
+              {!activityLoading && activity.length === 0 && (
+                <Tr>
+                  <Td colSpan={4} style={{ color: adminColors.muted, textAlign: 'center', padding: '1.25rem' }}>
+                    No activity logged for this user yet.
+                  </Td>
+                </Tr>
+              )}
+            </tbody>
+          </DataTable>
+        </SectionBody>
+      </SectionCard>
 
       <SimpleModal
         isOpen={showDelete}

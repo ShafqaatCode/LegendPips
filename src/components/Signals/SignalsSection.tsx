@@ -17,7 +17,7 @@ const SectionWrapper = styled.section`
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 32px;
+  font-size: clamp(1.25rem, 1.2vw + 0.8rem, 1.6rem);
   font-weight: 700;
   color: #132E58;
   margin-bottom: 2rem;

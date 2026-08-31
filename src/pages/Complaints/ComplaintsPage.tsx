@@ -268,7 +268,7 @@ export default ComplaintsPage;
 
 const Hero = styled.section`
   position: relative;
-  min-height: clamp(320px, 42vh, 420px);
+  min-height: clamp(220px, 28vh, 300px);
   display: flex;
   align-items: center;
   overflow: hidden;

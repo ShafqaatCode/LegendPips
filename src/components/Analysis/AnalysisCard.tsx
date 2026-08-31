@@ -48,7 +48,7 @@ const PlaceholderImage = styled.div`
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 32px;
+  font-size: clamp(1.25rem, 1.2vw + 0.8rem, 1.6rem);
   font-weight: bold;
   opacity: 0.9;
   

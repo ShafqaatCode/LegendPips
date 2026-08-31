@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import { FiActivity, FiRefreshCw, FiSearch } from 'react-icons/fi';
 import { fetchAdminActivityFeed, type AdminActivityFeedRow } from '../../../services/adminEngagementService';
 import { TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
@@ -9,6 +10,39 @@ import {
   TableCard, DataTable, Th, Td, Tr, Pill, ErrorBanner, adminColors,
   Pagination, PageButtons, PageBtn,
 } from '../../../components/AdminPanel/adminUi';
+
+const ACTIVITY_TYPES = [
+  '',
+  'auth',
+  'kyc',
+  'profile',
+  'contest',
+  'webinar',
+  'course',
+  'forum',
+  'signal',
+  'analysis',
+  'feedback',
+  'rebate',
+  'broker',
+  'complaint',
+  'referral',
+  'live_account',
+  'ib_change',
+  'trader',
+  'system',
+];
+
+const TypeSelect = styled.select`
+  min-width: 160px;
+  padding: 0.5rem 0.7rem;
+  border-radius: 9px;
+  border: 1px solid ${adminColors.border};
+  background: white;
+  font-size: 0.8125rem;
+  color: ${adminColors.navy};
+  font-weight: 600;
+`;
 
 const StatsRow = styled.div`
   display: grid;
@@ -30,8 +64,9 @@ const HeroNote = styled.div`
 `;
 
 const AdminUserActivityFeed: React.FC = () => {
-  const [userIdFilter, setUserIdFilter] = useState('');
-  const [appliedUserId, setAppliedUserId] = useState('');
+  const [q, setQ] = useState('');
+  const [appliedQ, setAppliedQ] = useState('');
+  const [type, setType] = useState('');
   const [page, setPage] = useState(1);
   const [items, setItems] = useState<AdminActivityFeedRow[]>([]);
   const [pagination, setPagination] = useState<{
@@ -39,6 +74,7 @@ const AdminUserActivityFeed: React.FC = () => {
     currentPage: number;
     hasNextPage: boolean;
     hasPreviousPage: boolean;
+    totalItems?: number;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +83,10 @@ const AdminUserActivityFeed: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await fetchAdminActivityFeed(page, 25, appliedUserId.trim() || undefined);
+      const data = await fetchAdminActivityFeed(page, 30, {
+        q: appliedQ.trim() || undefined,
+        type: type || undefined,
+      });
       setItems(data.items);
       setPagination(data.pagination);
     } catch (e) {
@@ -55,7 +94,7 @@ const AdminUserActivityFeed: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, appliedUserId]);
+  }, [page, appliedQ, type]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
@@ -63,8 +102,8 @@ const AdminUserActivityFeed: React.FC = () => {
     <PageWrap>
       <PageHeader>
         <PageTitleGroup>
-          <PageTitle><FiActivity /> Activity</PageTitle>
-          <PageSubtitle>Live timeline of platform events and user actions</PageSubtitle>
+          <PageTitle><FiActivity /> User activity</PageTitle>
+          <PageSubtitle>Complete timeline of member actions across the platform</PageSubtitle>
         </PageTitleGroup>
         <GhostButton type="button" onClick={refresh} disabled={loading}>
           <FiRefreshCw /> Refresh
@@ -73,8 +112,11 @@ const AdminUserActivityFeed: React.FC = () => {
 
       <StatsRow>
         <HeroNote>
-          <h3>Unified activity log</h3>
-          <p>Filter by MongoDB user id to audit a single account — contests, enrollment, sign-ins, and more.</p>
+          <h3>Full member history</h3>
+          <p>
+            Tracks login, KYC, profile, contests, signals, forum, rebates, complaints, referrals,
+            live accounts, IB changes, traders, and more. Filter by email/name or activity type.
+          </p>
         </HeroNote>
       </StatsRow>
 
@@ -82,24 +124,54 @@ const AdminUserActivityFeed: React.FC = () => {
         <SearchInput style={{ maxWidth: 360, flex: 1 }}>
           <FiSearch />
           <input
-            placeholder="Filter by user MongoDB id"
-            value={userIdFilter}
-            onChange={(e) => setUserIdFilter(e.target.value)}
+            placeholder="Search email, name, or user id"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                setPage(1);
+                setAppliedQ(q.trim());
+              }
+            }}
           />
         </SearchInput>
+        <TypeSelect
+          value={type}
+          onChange={(e) => {
+            setPage(1);
+            setType(e.target.value);
+          }}
+        >
+          {ACTIVITY_TYPES.map((t) => (
+            <option key={t || 'all'} value={t}>
+              {t ? t.replace(/_/g, ' ') : 'All types'}
+            </option>
+          ))}
+        </TypeSelect>
         <GhostButton
           $sm
           type="button"
-          onClick={() => { setPage(1); setAppliedUserId(userIdFilter.trim()); }}
+          onClick={() => { setPage(1); setAppliedQ(q.trim()); }}
         >
-          Apply filter
+          Apply
         </GhostButton>
-        {appliedUserId && (
-          <GhostButton $sm type="button" onClick={() => { setUserIdFilter(''); setAppliedUserId(''); setPage(1); }}>
+        {(appliedQ || type) && (
+          <GhostButton
+            $sm
+            type="button"
+            onClick={() => {
+              setQ('');
+              setAppliedQ('');
+              setType('');
+              setPage(1);
+            }}
+          >
             Clear
           </GhostButton>
         )}
-        <FilterCount>{loading ? 'Loading…' : `${items.length} events`}</FilterCount>
+        <FilterCount>
+          {loading ? 'Loading…' : `${pagination?.totalItems ?? items.length} events`}
+        </FilterCount>
       </FilterBar>
 
       {error && <ErrorBanner>{error}</ErrorBanner>}
@@ -119,10 +191,23 @@ const AdminUserActivityFeed: React.FC = () => {
             {loading && <TableBodySkeleton rows={6} cols={5} />}
             {!loading && items.map((row) => (
               <Tr key={row.id}>
-                <Td style={{ whiteSpace: 'nowrap', fontSize: '0.75rem', color: adminColors.muted }}>{row.time}</Td>
+                <Td style={{ whiteSpace: 'nowrap', fontSize: '0.75rem', color: adminColors.muted }}>
+                  {row.time}
+                  {row.createdAt && (
+                    <div style={{ fontSize: 11 }}>{new Date(row.createdAt).toLocaleString()}</div>
+                  )}
+                </Td>
                 <Td>
-                  <div style={{ fontWeight: 700, color: adminColors.navy, fontSize: '0.8125rem' }}>{row.userLabel}</div>
-                  <div style={{ fontSize: '0.6875rem', color: adminColors.muted }}>{row.userId || '—'}</div>
+                  <div style={{ fontWeight: 700, color: adminColors.navy, fontSize: '0.8125rem' }}>
+                    {row.userId ? (
+                      <Link to={`/admin-panel/users/${row.userId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                        {row.userLabel}
+                      </Link>
+                    ) : row.userLabel}
+                  </div>
+                  <div style={{ fontSize: '0.6875rem', color: adminColors.muted }}>
+                    {row.userEmail || row.userId || '—'}
+                  </div>
                 </Td>
                 <Td><Pill $variant="user">{row.type}</Pill></Td>
                 <Td style={{ fontWeight: 600, color: adminColors.navy }}>{row.title}</Td>
@@ -130,7 +215,11 @@ const AdminUserActivityFeed: React.FC = () => {
               </Tr>
             ))}
             {!loading && items.length === 0 && (
-              <Tr><Td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: adminColors.muted }}>No activity events found.</Td></Tr>
+              <Tr>
+                <Td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: adminColors.muted }}>
+                  No activity events found.
+                </Td>
+              </Tr>
             )}
           </tbody>
         </DataTable>

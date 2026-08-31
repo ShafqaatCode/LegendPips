@@ -486,7 +486,13 @@ const BrokersManagement: React.FC = () => {
   const [formCashbackRate, setFormCashbackRate] = useState("0.35 pip");
   const [formTopCashback, setFormTopCashback] = useState(false);
   const [formVerified, setFormVerified] = useState(true);
+  const [formForBeginners, setFormForBeginners] = useState(false);
+  const [formBeginnerBlurb, setFormBeginnerBlurb] = useState("");
+  const [formBeginnerSortOrder, setFormBeginnerSortOrder] = useState("0");
+  const [formBlacklisted, setFormBlacklisted] = useState(false);
+  const [formBlacklistReason, setFormBlacklistReason] = useState("");
   const [formCrypto, setFormCrypto] = useState("No");
+  const [programFilter, setProgramFilter] = useState<"all" | "beginners" | "shield">("all");
   const [formDescription, setFormDescription] = useState("");
   const [formLogoUrl, setFormLogoUrl] = useState("");
   const [formRebateCategory, setFormRebateCategory] = useState<BrokerCategoryValue>("forex");
@@ -499,6 +505,7 @@ const BrokersManagement: React.FC = () => {
   const [formPropOffers, setFormPropOffers] = useState<PropCashbackOffer[]>([emptyPropOffer()]);
   const [formPropPromoCodes, setFormPropPromoCodes] = useState<PropPromoCode[]>([emptyPromo()]);
   const [formCountry, setFormCountry] = useState("");
+  const [formServedCountries, setFormServedCountries] = useState("");
   const [formLeverage, setFormLeverage] = useState("");
   const [formPlatforms, setFormPlatforms] = useState("");
   const [formCommission, setFormCommission] = useState("");
@@ -542,6 +549,11 @@ const BrokersManagement: React.FC = () => {
     setFormCashbackRate("0.35 pip");
     setFormTopCashback(false);
     setFormVerified(true);
+    setFormForBeginners(false);
+    setFormBeginnerBlurb("");
+    setFormBeginnerSortOrder("0");
+    setFormBlacklisted(false);
+    setFormBlacklistReason("");
     setFormCrypto("No");
     setFormDescription("");
     setFormLogoUrl("");
@@ -555,6 +567,7 @@ const BrokersManagement: React.FC = () => {
     setFormPropOffers([emptyPropOffer()]);
     setFormPropPromoCodes([emptyPromo()]);
     setFormCountry("");
+    setFormServedCountries("");
     setFormLeverage("");
     setFormPlatforms("");
     setFormCommission("");
@@ -578,6 +591,11 @@ const BrokersManagement: React.FC = () => {
     setFormCashbackRate(b.cashbackRate || "0.35 pip");
     setFormTopCashback(!!b.topCashback);
     setFormVerified(!!b.verified);
+    setFormForBeginners(!!b.forBeginners);
+    setFormBeginnerBlurb(b.beginnerBlurb || "");
+    setFormBeginnerSortOrder(String(b.beginnerSortOrder ?? 0));
+    setFormBlacklisted(!!b.blacklisted);
+    setFormBlacklistReason(b.blacklistReason || "");
     setFormCrypto(b.crypto || "No");
     setFormDescription(b.description || "");
     setFormLogoUrl(b.logoUrl || "");
@@ -596,6 +614,7 @@ const BrokersManagement: React.FC = () => {
       b.propPromoCodes?.length ? b.propPromoCodes.map((p) => ({ ...emptyPromo(), ...p })) : [emptyPromo()]
     );
     setFormCountry(b.country || "");
+    setFormServedCountries(Array.isArray(b.servedCountries) ? b.servedCountries.join(", ") : "");
     setFormLeverage(b.leverage || "");
     setFormPlatforms(b.platforms || "");
     setFormCommission(b.commission || "");
@@ -647,6 +666,11 @@ const BrokersManagement: React.FC = () => {
         cashbackRate: formCashbackRate.trim(),
         topCashback: formTopCashback,
         verified: formVerified,
+        forBeginners: formForBeginners && !formBlacklisted,
+        beginnerBlurb: formBeginnerBlurb.trim(),
+        beginnerSortOrder: Number(formBeginnerSortOrder) || 0,
+        blacklisted: formBlacklisted,
+        blacklistReason: formBlacklistReason.trim(),
         crypto: formCrypto,
         description: formDescription.trim(),
         logoUrl: formLogoUrl.trim() || undefined,
@@ -654,6 +678,10 @@ const BrokersManagement: React.FC = () => {
         rebatesListOrder: rebatesListOrder > 0 ? rebatesListOrder : 0,
         setupUrl: formSetupUrl.trim() || undefined,
         country: formCountry.trim(),
+        servedCountries: formServedCountries
+          .split(",")
+          .map((c) => c.trim())
+          .filter(Boolean),
         leverage: formLeverage.trim(),
         platforms: formPlatforms.trim(),
         commission: formCommission.trim(),
@@ -742,8 +770,15 @@ const BrokersManagement: React.FC = () => {
     const matchesSearch = broker.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType =
       listTypeFilter === "all" || matchesBrokerKind(broker.rebateCategory, listTypeFilter);
-    return matchesSearch && matchesType;
+    const matchesProgram =
+      programFilter === "all" ||
+      (programFilter === "beginners" && !!broker.forBeginners) ||
+      (programFilter === "shield" && !!broker.blacklisted);
+    return matchesSearch && matchesType && matchesProgram;
   });
+
+  const beginnersCount = brokers.filter((b) => b.forBeginners).length;
+  const shieldCount = brokers.filter((b) => b.blacklisted).length;
 
   const countByKind = (kind: BrokerKind) =>
     brokers.filter((b) => matchesBrokerKind(b.rebateCategory, kind)).length;
@@ -754,7 +789,7 @@ const BrokersManagement: React.FC = () => {
         <PageTitleGroup>
           <PageTitle><FiDatabase /> Brokers</PageTitle>
           <PageSubtitle>
-            Manage Forex brokers, Crypto exchanges, and Prop firms — shown on matching website tabs
+            Manage Forex, Crypto, and Prop firms — mark Best for new traders or Scam Broker Shield from the edit form
           </PageSubtitle>
         </PageTitleGroup>
         <PrimaryButton type="button" onClick={openAdd}>
@@ -816,6 +851,26 @@ const BrokersManagement: React.FC = () => {
         ))}
       </TypeFilterBar>
 
+      <TypeFilterBar>
+        <TypeFilterBtn type="button" $active={programFilter === "all"} onClick={() => setProgramFilter("all")}>
+          All programs
+        </TypeFilterBtn>
+        <TypeFilterBtn
+          type="button"
+          $active={programFilter === "beginners"}
+          onClick={() => setProgramFilter("beginners")}
+        >
+          <FiAward /> New traders ({listLoading ? "…" : beginnersCount})
+        </TypeFilterBtn>
+        <TypeFilterBtn
+          type="button"
+          $active={programFilter === "shield"}
+          onClick={() => setProgramFilter("shield")}
+        >
+          <FiShield /> Scam Shield ({listLoading ? "…" : shieldCount})
+        </TypeFilterBtn>
+      </TypeFilterBar>
+
       <FilterBar>
         <SearchInput style={{ maxWidth: 320, flex: 1 }}>
           <FiSearch />
@@ -866,6 +921,8 @@ const BrokersManagement: React.FC = () => {
                       </TypeBadge>
                       {broker.verified && <Pill $variant="approved">Verified</Pill>}
                       {broker.topCashback && <Pill $variant="pending">Top cashback</Pill>}
+                      {broker.forBeginners && <Pill $variant="admin">New traders</Pill>}
+                      {broker.blacklisted && <Pill $variant="rejected">Scam Shield</Pill>}
                       {broker.rebatesFeatured && <Pill $variant="admin">Featured</Pill>}
                     </BadgeRow>
                   </CardTitle>
@@ -993,8 +1050,16 @@ const BrokersManagement: React.FC = () => {
               <input value={formRegulation} onChange={(e) => setFormRegulation(e.target.value)} />
             </FormField>
             <FormField>
-              Country
+              Country (HQ / primary)
               <input value={formCountry} onChange={(e) => setFormCountry(e.target.value)} placeholder="Cyprus, St. Vincent…" />
+            </FormField>
+            <FormField $full>
+              Served countries (for country matcher — comma-separated)
+              <input
+                value={formServedCountries}
+                onChange={(e) => setFormServedCountries(e.target.value)}
+                placeholder="Pakistan, United Kingdom, India…"
+              />
             </FormField>
             <FormField>
               Leverage
@@ -1391,6 +1456,60 @@ const BrokersManagement: React.FC = () => {
               <input type="checkbox" checked={formVerified} onChange={(e) => setFormVerified(e.target.checked)} />
               <span>Verified</span>
             </CheckboxRow>
+            <CheckboxRow>
+              <input
+                type="checkbox"
+                checked={formForBeginners}
+                disabled={formBlacklisted}
+                onChange={(e) => setFormForBeginners(e.target.checked)}
+              />
+              <span>Best for new traders (shows on /brokers/beginners)</span>
+            </CheckboxRow>
+            {formForBeginners && !formBlacklisted && (
+              <>
+                <FormField $full>
+                  Beginner blurb (optional)
+                  <textarea
+                    value={formBeginnerBlurb}
+                    onChange={(e) => setFormBeginnerBlurb(e.target.value)}
+                    rows={2}
+                    placeholder="Why this broker suits new traders…"
+                  />
+                </FormField>
+                <FormField>
+                  Beginner list order
+                  <input
+                    type="number"
+                    min={0}
+                    value={formBeginnerSortOrder}
+                    onChange={(e) => setFormBeginnerSortOrder(e.target.value)}
+                  />
+                </FormField>
+              </>
+            )}
+            <CheckboxRow>
+              <input
+                type="checkbox"
+                checked={formBlacklisted}
+                onChange={(e) => {
+                  const on = e.target.checked;
+                  setFormBlacklisted(on);
+                  if (on) setFormForBeginners(false);
+                }}
+              />
+              <span>Scam Broker Shield (public warning list)</span>
+            </CheckboxRow>
+            {formBlacklisted && (
+              <FormField $full>
+                Shield reason
+                <textarea
+                  value={formBlacklistReason}
+                  onChange={(e) => setFormBlacklistReason(e.target.value)}
+                  rows={2}
+                  placeholder="Why this broker is listed on Scam Broker Shield…"
+                />
+              </FormField>
+            )}
           </FormGrid>
         )}
       </SimpleModal>

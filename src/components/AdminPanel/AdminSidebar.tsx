@@ -413,6 +413,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
           <SectionTitle>{t("panel.content")}</SectionTitle>
           {show('brokers') && link('/admin-panel/brokers', t("panel.brokers"), FiDatabase)}
           {show('brokers') && link('/admin-panel/broker-reviews', t("panel.brokerReviews"), FiStar)}
+          {show('brokers') && link('/admin-panel/signup-bonuses', "Signup Bonuses", FiDollarSign)}
+          {show('analysis') && link('/admin-panel/performing-stocks', "Performing Stocks", FiTrendingUp)}
           {show('contests') && link('/admin-panel/contests', t("nav.contests"), FiAward)}
           {show('signals') && link('/admin-panel/signals', t("nav.signals"), FiTrendingUp)}
           {show('webinars') && link('/admin-panel/webinars', t("nav.webinars"), FiVideo)}
@@ -433,8 +435,17 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
           {show('rebates') && link('/admin-panel/rebate-credits', t("nav.rebates"), FiDollarSign)}
           {show('traders') && link('/admin-panel/traders', t("nav.traders"), FiUsers)}
           {show('reports') && link('/admin-panel/reports', t("panel.reports"), FiBarChart2)}
+          {link('/admin-panel/security', t("panel.security"), FiShield)}
           {show('settings') && link('/admin-panel/settings', t("panel.settings"), FiSettings)}
           {full && link('/admin-panel/team', t("panel.adminTeam"), FiUsers)}
+        </NavSection>
+      )}
+
+      {/* Always expose Security for any admin (2FA self-service) */}
+      {!(show('feedback') || show('activity') || show('rebates') || show('traders') || show('live_accounts') || show('reports') || show('settings') || show('brokers') || full) && (
+        <NavSection>
+          <SectionTitle>{t("panel.system")}</SectionTitle>
+          {link('/admin-panel/security', t("panel.security"), FiShield)}
         </NavSection>
       )}
 

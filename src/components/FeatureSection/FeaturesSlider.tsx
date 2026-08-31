@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { AnimatePresence } from "framer-motion";
 import {
@@ -32,11 +33,11 @@ function getCardsToShow() {
 const FeaturesSlider = () => {
   const { t } = useLocale();
   const features = [
-    { icon: ScamIcon, label: t("slider.f1") },
-    { icon: CashbackIcon, label: t("slider.f2") },
-    { icon: VerifiedIcon, label: t("slider.f3") },
-    { icon: TradingIcon, label: t("slider.f4") },
-    { icon: ContestIcon, label: t("slider.f5") },
+    { icon: ScamIcon, label: t("slider.f1"), to: "/scam-broker-shield" },
+    { icon: CashbackIcon, label: t("slider.f2"), to: "/rebates" },
+    { icon: VerifiedIcon, label: t("slider.f3"), to: "/brokers/beginners" },
+    { icon: TradingIcon, label: t("slider.f4"), to: "/signals" },
+    { icon: ContestIcon, label: t("slider.f5"), to: "/contests" },
   ];
 
   const [startIndex, setStartIndex] = useState(0);
@@ -87,12 +88,18 @@ const FeaturesSlider = () => {
                 transition={{ duration: 0.3, ease: [0.42, 0, 0.58, 1] }}
               >
                 {visibleCards.map((card) => (
-                  <Card key={`${card.index}-${card.label}`} layout>
-                    <IconBadge>
-                      <img src={card.icon} alt="" aria-hidden />
-                    </IconBadge>
-                    <CardLabel>{card.label}</CardLabel>
-                  </Card>
+                  <Link
+                    key={`${card.index}-${card.label}`}
+                    to={card.to}
+                    style={{ textDecoration: "none", color: "inherit", minWidth: 0 }}
+                  >
+                    <Card layout>
+                      <IconBadge>
+                        <img src={card.icon} alt="" aria-hidden />
+                      </IconBadge>
+                      <CardLabel>{card.label}</CardLabel>
+                    </Card>
+                  </Link>
                 ))}
               </CardsSlider>
             </AnimatePresence>

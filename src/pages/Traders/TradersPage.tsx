@@ -101,7 +101,7 @@ export default TradersPage;
 
 const Hero = styled.section`
   position: relative;
-  min-height: clamp(240px, 34vh, 340px);
+  min-height: clamp(200px, 26vh, 280px);
   display: flex;
   align-items: center;
   overflow: hidden;

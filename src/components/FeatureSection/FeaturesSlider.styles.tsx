@@ -3,8 +3,10 @@ import { motion } from "framer-motion";
 
 export const SectionShell = styled.section`
   position: relative;
+  z-index: 1;
   width: 100%;
   padding: 0 0 clamp(1.75rem, 3vw, 2.25rem);
+  /* Transparent band matches the card pull-up so gray starts under the cards */
   background: linear-gradient(
     180deg,
     transparent 0,
@@ -16,9 +18,11 @@ export const SectionShell = styled.section`
 
 export const SliderWrapper = styled.div`
   position: relative;
-  z-index: 10;
+  /* Below hero CTAs (z-index 5), above banner background */
+  z-index: 3;
   width: 100%;
   max-width: ${({ theme }) => theme.typography.contentMax};
+  /* Classic overlap onto banner — only into reserved empty blue below CTAs */
   margin: -72px auto 0;
   padding: 0 ${({ theme }) => theme.typography.pageGutter};
   box-sizing: border-box;
@@ -61,6 +65,9 @@ export const Card = styled(motion.article)`
     0 1px 2px rgba(19, 46, 88, 0.04),
     0 8px 24px rgba(19, 46, 88, 0.08);
   text-align: center;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
   transition:
     transform 0.22s ease,
     box-shadow 0.22s ease,

@@ -36,6 +36,8 @@ export type PlatformMetrics = {
   rebateUsd30d: number;
   rebateCentsAllTime?: number;
   rebateUsdAllTime?: number;
+  withdrawalPending?: number;
+  withdrawalPaidUsd30d?: number;
   activityByTypeLast7d: Record<string, number>;
   activityLast7dTotal: number;
   userSignupsLast7d: { date: string; label: string; count: number }[];
@@ -47,6 +49,14 @@ export type PlatformMetrics = {
   ibChangeTotal?: number;
   ibChange24h?: number;
   ibChangeOpen?: number;
+  liveAccountTotal?: number;
+  liveAccount24h?: number;
+  liveAccountOpen?: number;
+  complaintsTotal?: number;
+  complaintsPending?: number;
+  complaintsOpen?: number;
+  complaintsResolved?: number;
+  complaintsLast7d?: number;
 };
 
 export type DashboardPreviews = {
@@ -208,6 +218,7 @@ export type AdminActivityFeedRow = {
   id: string;
   userId?: string;
   userLabel: string;
+  userEmail?: string;
   type: string;
   title: string;
   description: string;
@@ -215,15 +226,22 @@ export type AdminActivityFeedRow = {
   createdAt: string;
 };
 
-export async function fetchAdminActivityFeed(page = 1, limit = 50, userId?: string) {
+export async function fetchAdminActivityFeed(
+  page = 1,
+  limit = 50,
+  opts?: { userId?: string; type?: string; q?: string }
+) {
   const qs = new URLSearchParams({ page: String(page), limit: String(limit) });
-  if (userId) qs.set("userId", userId);
+  if (opts?.userId) qs.set("userId", opts.userId);
+  if (opts?.type) qs.set("type", opts.type);
+  if (opts?.q) qs.set("q", opts.q);
   const res = await fetch(`${base}/activity?${qs}`, { headers: getAuthHeaders() });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Failed");
   return data as {
     success: boolean;
     items: AdminActivityFeedRow[];
+    types?: string[];
     pagination: {
       totalItems: number;
       itemsPerPage: number;

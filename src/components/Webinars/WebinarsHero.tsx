@@ -60,7 +60,7 @@ const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(2.25rem, 6vw, 3rem);
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
   color: #132e58;
   opacity: 0.85;
 `;

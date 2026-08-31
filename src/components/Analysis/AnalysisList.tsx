@@ -10,7 +10,7 @@ import ListPagination from '../SharedComponents/ListPagination';
 const SectionWrapper = styled.section`
   background: #fafbfc;
   padding: 60px 3rem;
-  min-height: 600px;
+  min-height: 420px;
   
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     padding: 40px 2rem;

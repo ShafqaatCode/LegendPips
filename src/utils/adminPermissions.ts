@@ -114,6 +114,8 @@ export const PERM_ROUTE_MAP: { pathPrefix: string; permissions: string[] }[] = [
   { pathPrefix: "/admin-panel/kyc-records", permissions: ["kyc"] },
   { pathPrefix: "/admin-panel/brokers", permissions: ["brokers"] },
   { pathPrefix: "/admin-panel/broker-reviews", permissions: ["brokers"] },
+  { pathPrefix: "/admin-panel/signup-bonuses", permissions: ["brokers"] },
+  { pathPrefix: "/admin-panel/performing-stocks", permissions: ["analysis"] },
   { pathPrefix: "/admin-panel/complaints", permissions: ["feedback", "brokers"] },
   { pathPrefix: "/admin-panel/contests", permissions: ["contests"] },
   { pathPrefix: "/admin-panel/signals", permissions: ["signals"] },
@@ -140,6 +142,9 @@ export function canAccessPath(user: AuthUserLike | null | undefined, pathname: s
   }
   if (pathname === "/admin-panel/team" || pathname.startsWith("/admin-panel/team/")) {
     return isFullAdmin(user);
+  }
+  if (pathname === "/admin-panel/security" || pathname.startsWith("/admin-panel/security/")) {
+    return user.role === "admin";
   }
   for (const row of PERM_ROUTE_MAP) {
     if (row.pathPrefix === "/admin-panel/team") continue;

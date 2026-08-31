@@ -34,36 +34,47 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onLoginSucces
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, complete2fa } = useAuth();
   const { t } = useLocale();
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const [isForgotOpen, setIsForgotOpen] = useState(false);
+  const [tempToken, setTempToken] = useState<string | null>(null);
+  const [otpCode, setOtpCode] = useState("");
+
+  const finishLogin = () => {
+    if (onLoginSuccess) {
+      onLoginSuccess();
+      return;
+    }
+    setTimeout(() => {
+      const userData = JSON.parse(localStorage.getItem("user") || "{}");
+      if (userData.role === "admin") {
+        navigate(firstAdminPath(userData));
+      } else {
+        navigate("/user-panel");
+      }
+      window.location.reload();
+    }, 200);
+  };
 
   const onSubmit = async (data: any) => {
     setIsLoading(true);
     setError("");
-    
+
     try {
       const response = await login(data.email, data.password);
 
+      if (response.success && "requires2fa" in response && response.requires2fa) {
+        setTempToken(response.tempToken);
+        setError("");
+        return;
+      }
+
       if (response.success) {
-        if (onLoginSuccess) {
-          onLoginSuccess();
-          return;
-        }
-        // Wait a moment for state to update, then check role and redirect
-        setTimeout(() => {
-          const userData = JSON.parse(localStorage.getItem('user') || '{}');
-          if (userData.role === 'admin') {
-            navigate(firstAdminPath(userData));
-          } else {
-            navigate('/user-panel');
-          }
-          window.location.reload();
-        }, 200);
+        finishLogin();
       } else {
         setError(response.message || t("panel.authInvalid"));
       }
@@ -74,6 +85,62 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onLoginSucces
       setIsLoading(false);
     }
   };
+
+  const onVerify2fa = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tempToken) return;
+    setIsLoading(true);
+    setError("");
+    try {
+      const response = await complete2fa(tempToken, otpCode.trim());
+      if (response.success) {
+        finishLogin();
+      } else {
+        setError(response.message || "Invalid authenticator code");
+      }
+    } catch (err: any) {
+      setError(err.message || "2FA verification failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (tempToken) {
+    return (
+      <Container>
+        <Heading>Two-factor authentication</Heading>
+        <p style={{ color: "#64748b", fontSize: 14, marginTop: 0, lineHeight: 1.5 }}>
+          Enter the 6-digit code from your authenticator app to finish signing in.
+        </p>
+        <form onSubmit={onVerify2fa}>
+          <Input
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            placeholder="123456"
+            value={otpCode}
+            onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
+            maxLength={8}
+          />
+          {error && <ErrorMsg>{error}</ErrorMsg>}
+          <RegisterButton type="submit" disabled={isLoading || otpCode.length < 6}>
+            {isLoading ? "Verifying…" : "Verify & continue"}
+          </RegisterButton>
+          <RegisterButton
+            type="button"
+            style={{ marginTop: "0.65rem" }}
+            onClick={() => {
+              setTempToken(null);
+              setOtpCode("");
+              setError("");
+            }}
+          >
+            Back to login
+          </RegisterButton>
+        </form>
+      </Container>
+    );
+  }
 
   return (
     <Container>
@@ -123,7 +190,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onLoginSucces
         </RegisterButton>
       </form>
       <ForgetPasswordModal isOpen={isForgotOpen} onClose={() => setIsForgotOpen(false)} />
-    </Container> 
+    </Container>
   );
 };
 

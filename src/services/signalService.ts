@@ -68,6 +68,51 @@ export async function fetchAdminSignals(page = 1, limit = 50): Promise<Paginated
   return data;
 }
 
+export type TradingPairOption = {
+  id: string;
+  symbol: string;
+  label: string;
+  assetClass: "forex" | "crypto" | "commodities" | "other";
+  active: boolean;
+  sortOrder: number;
+};
+
+export async function fetchAdminTradingPairs(assetClass?: string): Promise<TradingPairOption[]> {
+  const qs = new URLSearchParams();
+  if (assetClass) qs.set("assetClass", assetClass);
+  const res = await fetch(`${API_CONFIG.BASE_URL}/signals/admin/pairs?${qs}`, {
+    headers: getAuthHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to load pairs");
+  return data.items || [];
+}
+
+export async function createAdminTradingPair(body: {
+  symbol: string;
+  label?: string;
+  assetClass?: string;
+}): Promise<TradingPairOption> {
+  const res = await fetch(`${API_CONFIG.BASE_URL}/signals/admin/pairs`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to add pair");
+  return data.pair;
+}
+
+export async function deleteAdminTradingPair(id: string): Promise<TradingPairOption> {
+  const res = await fetch(`${API_CONFIG.BASE_URL}/signals/admin/pairs/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to delete pair");
+  return data.pair;
+}
+
 export async function createAdminSignal(body: {
   pair: string;
   type: "buy" | "sell";

@@ -10,7 +10,7 @@ const ButtonBase = styled.button<{
   fontWeight?: string;
 }>`
   padding: ${({ padding }) => padding || "0.75rem 2rem"};
-  font-size: ${({ fontSize }) => fontSize || "1.2rem"};
+  font-size: ${({ fontSize }) => fontSize || "0.9375rem"};
   font-weight: ${({fontWeight}) => fontWeight || "500"};
   border-radius: 30px;
   cursor: pointer;

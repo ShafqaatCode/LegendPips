@@ -31,13 +31,13 @@ const ContentWrapper = styled.div`
 const LeftContent = styled.div``;
 
 const Heading = styled.h2`
-  font-size: 36px;
+  font-size: clamp(1.35rem, 1.5vw + 0.7rem, 1.75rem);
   font-weight: 700;
   color: #132E58;
   margin-bottom: 1.5rem;
   
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    font-size: 28px;
+    font-size: 1.25rem;
   }
 `;
 

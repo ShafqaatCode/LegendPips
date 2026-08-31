@@ -8,7 +8,7 @@ const activeColor = "#fbc113";
 export const HeaderWrapper = styled.header`
   width: 100%;
   position: relative;
-  z-index: 100;
+  z-index: 2000;
   background-color: ${({ theme }) => theme.colors.primary};
   transition: all 0.3s ease;
 `;
@@ -19,11 +19,10 @@ export const Topbar = styled.div`
   justify-content: space-between;
   align-items: center;
   background: ${({ theme }) => theme.colors.primary};
-  padding: 0 3rem;
-  height: 4.2rem;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.secondary};
+  padding: 0 ${({ theme }) => theme.typography.pageGutter};
+  height: 3.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   position: relative;
- 
 
   @media (max-width: 1100px) {
     display: none;
@@ -31,73 +30,99 @@ export const Topbar = styled.div`
 `;
 
 export const Logo = styled.img`
-  min-width: 150px;
-  height: 56px;
+  min-width: 112px;
+  height: 40px;
+  object-fit: contain;
 `;
 
 export const LinkGroup = styled.div`
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 0.35rem 0.85rem;
+`;
+
+export const TopbarDivider = styled.span`
+  width: 1px;
+  height: 1.1rem;
+  background: rgba(255, 255, 255, 0.18);
+  margin: 0 0.15rem;
+  flex-shrink: 0;
 `;
 
 export const HeaderItem = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  color: white;
+  gap: 0.35rem;
+  color: rgba(255, 255, 255, 0.82);
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #fff;
+  }
 
   img {
-    height: 20px;
-    width: 20px;
+    height: 14px;
+    width: 14px;
+    opacity: 0.9;
   }
 
   span {
-    font-size: 14px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
   }
 `;
 
 export const SignInButton = styled.button`
-  background-color: ${({ theme }) => theme.colors.WHITE};
-  padding: 8px 20px;
-  border-radius: 6px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s;
-  white-space: nowrap;
-
-  &:hover {
-    background-color: ${activeColor};
-    color: black;
-  }
-`;
-
-/** Solid pill — desktop topbar when signed in */
-export const UserPanelButton = styled.button`
-  background-color: ${({ theme }) => theme.colors.WHITE};
-  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.35rem 0.85rem;
+  height: 2rem;
   border-radius: 6px;
   font-weight: 600;
-  border: none;
+  font-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s ease;
   white-space: nowrap;
-  text-decoration: none;
-  color: ${({ theme }) => theme.colors.primary};
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 14px;
   font-family: inherit;
 
   &:hover {
-    background-color: ${activeColor};
+    background: ${activeColor};
+    border-color: ${activeColor};
     color: #0f172a;
+  }
+`;
+
+/** Compact ghost chip — desktop topbar when signed in */
+export const UserPanelButton = styled.button`
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.3rem 0.7rem;
+  height: 2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.95);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 12px;
+  font-family: inherit;
+  line-height: 1;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: #fff;
   }
 
   svg {
     flex-shrink: 0;
+    opacity: 0.9;
   }
 `;
 
@@ -105,18 +130,20 @@ export const UserPanelButton = styled.button`
 export const PortalOutlineButton = styled.button`
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 6px 12px;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  height: 2rem;
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.92);
-  color: #ffffff;
-  font-size: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 12px;
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.06);
   cursor: pointer;
   font-family: inherit;
+  line-height: 1;
 
   &:hover {
     background: rgba(255, 255, 255, 0.12);
@@ -177,13 +204,16 @@ export const AccountDropdownItem = styled.button`
 `;
 
 export const Navbar = styled.nav`
-  padding: 0.85rem 0 1rem;
+  position: relative;
+  z-index: 2;
+  padding: 0.55rem 0 0.65rem;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: ${({ theme }) => theme.colors.primary};
   width: 100%;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: visible;
 
   @media (max-width: 1100px) {
     display: none;
@@ -193,13 +223,16 @@ export const Navbar = styled.nav`
 export const NavList = styled.ul`
   display: flex;
   list-style: none;
-  gap: 2rem;
+  gap: 1.35rem;
   position: relative;
+  overflow: visible;
+  margin: 0;
+  padding: 0;
 `;
 
 export const NavItem = styled(NavLink)`
   color: white;
-  font-size: 14px;
+  font-size: 13px;
   text-decoration: none;
   padding-bottom: 4px;
   border-bottom: 2px solid transparent;
@@ -219,14 +252,11 @@ export const NavItem = styled(NavLink)`
 `;
 export const SubmenuWrapper = styled.div`
   position: relative;
-  /* Extra hit area under the label so the pointer never “falls through” the gap */
-  padding-bottom: 0.75rem;
-  margin-bottom: -0.75rem;
+  z-index: 5;
+  overflow: visible;
 
   @media (max-width: 1100px) {
     width: 100%;
-    padding-bottom: 0;
-    margin-bottom: 0;
   }
 `;
 
@@ -248,11 +278,10 @@ export const SubmenuToggle = styled.div`
   }
 `;
 
-/** Desktop mega-menu panel — stays inside viewport, multi-column.
- *  No vertical gap under the trigger: padding-top keeps the hover bridge continuous. */
+/** Desktop mega-menu — sits fully below the nav row (not under the Tools label). */
 export const ToolsMegaMenu = styled.div`
   position: absolute;
-  top: 100%;
+  top: calc(100% + 10px);
   right: 0;
   inset-inline-end: 0;
   inset-inline-start: auto;
@@ -262,17 +291,15 @@ export const ToolsMegaMenu = styled.div`
     inset-inline-end: 0;
     inset-inline-start: auto;
   }
-  z-index: 1300;
+  z-index: 3000;
   width: min(560px, calc(100vw - 2rem));
   max-height: min(70vh, 480px);
   overflow: auto;
-  /* Invisible hover bridge from trigger → panel (was causing leave/close) */
-  padding: 0.65rem 1.1rem 1.15rem;
+  padding: 0.85rem 1.1rem 1.15rem;
   margin-top: 0;
-  border-radius: 0 0 14px 14px;
+  border-radius: 12px;
   background: linear-gradient(165deg, #0f2448 0%, #132e58 55%, #0c1f3d 100%);
   border: 1px solid rgba(251, 191, 36, 0.22);
-  border-top: none;
   box-shadow:
     0 18px 48px rgba(8, 20, 40, 0.45),
     0 0 0 1px rgba(255, 255, 255, 0.04) inset;
@@ -280,6 +307,17 @@ export const ToolsMegaMenu = styled.div`
   grid-template-columns: 168px 1fr;
   gap: 1rem 1.15rem;
   text-align: start;
+
+  /* Invisible hover bridge so the menu does not close when moving the pointer down */
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -12px;
+    height: 12px;
+    background: transparent;
+  }
 
   @media (max-width: 1100px) {
     display: none;
@@ -316,7 +354,10 @@ export const ToolsMegaGrid = styled.div`
 `;
 
 export const ToolsMegaLink = styled(NavLink)`
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   color: rgba(255, 255, 255, 0.88);
   font-size: 0.8125rem;
   font-weight: 500;
@@ -381,6 +422,78 @@ export const SubmenuItem = styled(NavLink)`
     font-weight: 600;
     color: ${activeColor};
   }
+`;
+
+/** Compact Brokers dropdown under the Brokers nav label. */
+export const BrokersDropMenu = styled.div`
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 3000;
+  min-width: 240px;
+  padding: 0.55rem 0.45rem;
+  border-radius: 12px;
+  background: linear-gradient(165deg, #0f2448 0%, #132e58 55%, #0c1f3d 100%);
+  border: 1px solid rgba(251, 191, 36, 0.22);
+  box-shadow:
+    0 18px 48px rgba(8, 20, 40, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: start;
+
+  html[dir="rtl"] & {
+    left: auto;
+    right: 0;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -12px;
+    height: 12px;
+    background: transparent;
+  }
+
+  @media (max-width: 1100px) {
+    display: none;
+  }
+`;
+
+export const BrokersDropLink = styled(NavLink)`
+  display: block;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: ${activeColor};
+  }
+
+  &.active {
+    color: ${activeColor};
+    background: rgba(251, 191, 36, 0.12);
+    font-weight: 650;
+  }
+`;
+
+export const DropSectionLabel = styled.div`
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(251, 191, 36, 0.92);
+  padding: 0.35rem 0.7rem 0.45rem;
+  margin-bottom: 0.1rem;
 `;
 
 export const MobileToolsGroup = styled.div`

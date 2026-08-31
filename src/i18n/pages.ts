@@ -221,10 +221,10 @@ const en: PageCopy = {
     sub: "File a report · Track status · Public warning list",
   },
   about: {
-    kicker: "ABOUT US",
-    title: "Our Team",
-    body: "Meet the people behind LegendPips — experienced traders, analysts, and operators dedicated to your success.",
-    empty: "Team information coming soon.",
+    kicker: "BEHIND THE SCENES",
+    title: "About LegendPips",
+    body: "We help traders compare brokers, earn rebates, follow signals, and stay protected — with clear reviews, education, and human support.",
+    empty: "More about LegendPips coming soon.",
   },
   faq: {
     kicker: "Frequently asked questions",
@@ -345,7 +345,7 @@ const en: PageCopy = {
     f8d: "Help us improve by reporting any concerns you have.",
   },
   slider: {
-    f1: "Scam Protection",
+    f1: "Scam Broker Shield",
     f2: "Cashback Rebates",
     f3: "Verified Broker",
     f4: "Trading Signals",

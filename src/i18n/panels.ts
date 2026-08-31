@@ -41,6 +41,7 @@ export type PanelCopy = {
   feedback: string;
   referrals: string;
   reports: string;
+  security: string;
   adminTeam: string;
   viewWebsite: string;
   superAdmin: string;
@@ -178,7 +179,8 @@ const en: PanelCopy = {
   brokerReviews: "Broker reviews",
   feedback: "Feedback",
   referrals: "Referrals",
-  reports: "Reports",
+  reports: "Analytics",
+  security: "Security",
   adminTeam: "Admin team",
   viewWebsite: "View website",
   superAdmin: "Super administrator",
@@ -323,6 +325,7 @@ const ur = fill({
   feedback: "فیڈبیک",
   referrals: "ریفرلز",
   reports: "رپورٹس",
+  security: "سیکیورٹی",
   adminTeam: "ایڈمن ٹیم",
   viewWebsite: "ویب سائٹ دیکھیں",
   superAdmin: "سپر ایڈمنسٹریٹر",
@@ -461,6 +464,7 @@ const ar = fill({
   feedback: "الملاحظات",
   referrals: "الإحالات",
   reports: "التقارير",
+  security: "الأمان",
   adminTeam: "فريق الإدارة",
   viewWebsite: "عرض الموقع",
   superAdmin: "مشرف أعلى",

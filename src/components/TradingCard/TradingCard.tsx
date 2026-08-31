@@ -45,7 +45,7 @@ const Logo = styled.img`
 const Title = styled.h3`
   color: #d69e2e;
   font-weight: 700;
-  font-size: 32px;
+  font-size: clamp(1.25rem, 1.2vw + 0.8rem, 1.6rem);
   margin-bottom: 12px;
   text-transform: uppercase;
 `;

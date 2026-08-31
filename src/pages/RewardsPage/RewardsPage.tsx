@@ -14,18 +14,13 @@ import FairPlayIcon from "../../assets/icons/support-svgrepo-com 1.svg";
 
 const Frame = styled.div`
   max-width: 1120px;
-  margin: 24px auto;
+  margin: 0 auto 24px;
   background: white;
   overflow: hidden;
-
-  /* Navbar is absolutely positioned on desktop, so we need extra top space to avoid overlap. */
-  @media (min-width: 1101px) {
-    margin-top: 140px;
-  }
 `;
 
 const Inner = styled.div`
-  padding: 0 12px 22px;
+  padding: 1.15rem 12px 22px;
 `;
 
 const BottomCta = styled.div`
@@ -213,11 +208,12 @@ const RewardsPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
 
   return (
-    <Frame>
-      <Inner>
-        <RewardsJoinClub />
-        <XMBanner />
-        <RewardsCards onJoinNow={() => setShowModal(true)} />
+    <>
+      <RewardsJoinClub onJoinNow={() => setShowModal(true)} />
+      <Frame>
+        <Inner>
+          <XMBanner />
+          <RewardsCards onJoinNow={() => setShowModal(true)} />
 
         <BottomCta>
           <BottomText>Start Trading. Start winning.</BottomText>
@@ -412,6 +408,7 @@ const RewardsPage: React.FC = () => {
       </Inner>
       <SubscriptionModal isOpen={showModal} onClose={() => setShowModal(false)} />
     </Frame>
+    </>
   );
 };
 

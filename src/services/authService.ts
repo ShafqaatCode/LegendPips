@@ -13,6 +13,8 @@ export interface RegisterRequest {
   phone?: string;
   /** Required when server enforces email OTP (omit only if SKIP_EMAIL_OTP on backend). */
   otp?: string;
+  /** Affiliate invite code from ?ref= */
+  referralCode?: string;
 }
 
 export interface User {
@@ -34,8 +36,15 @@ export interface User {
 export interface AuthResponse {
   success: boolean;
   message: string;
-  user: User;
-  token: string;
+  user?: User;
+  token?: string;
+  requires2fa?: boolean;
+  tempToken?: string;
+}
+
+export interface Login2faRequest {
+  tempToken: string;
+  code: string;
 }
 
 export interface BasicResponse {
@@ -68,12 +77,20 @@ export const login = async (credentials: LoginRequest): Promise<AuthResponse> =>
       API_CONFIG.TIMEOUT
     );
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const data = await response.json();
       throw new Error(data.message || "Login failed");
     }
 
-    const data = await response.json();
+    if (data.requires2fa && data.tempToken) {
+      return {
+        success: true,
+        requires2fa: true,
+        tempToken: data.tempToken,
+        message: data.message || "2FA required",
+      };
+    }
 
     if (data.success && data.token) {
       setAuthToken(data.token);
@@ -90,6 +107,34 @@ export const login = async (credentials: LoginRequest): Promise<AuthResponse> =>
     console.error("Login error:", error);
     throw error;
   }
+};
+
+export const verifyLogin2fa = async (body: Login2faRequest): Promise<AuthResponse> => {
+  const response = await fetchWithTimeout(
+    `${API_CONFIG.BASE_URL}/login/2fa`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+    API_CONFIG.TIMEOUT
+  );
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "2FA verification failed");
+
+  if (data.success && data.token) {
+    setAuthToken(data.token);
+    if (data.user) {
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          ...data.user,
+          kycStatus: data.user.kycStatus || "incomplete",
+        })
+      );
+    }
+  }
+  return data;
 };
 
 /** Request a 6-digit registration code to the given email (must not already be registered). */

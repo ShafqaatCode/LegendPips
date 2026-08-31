@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useSearchParams } from "react-router-dom";
 
 import GLogo from "../../assets/icons/Google.png";
 import "react-phone-input-2/lib/style.css";
@@ -44,6 +45,8 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
     getValues,
     formState: { errors },
   } = useForm();
+  const [searchParams] = useSearchParams();
+  const referralFromUrl = (searchParams.get("ref") || searchParams.get("referralCode") || "").trim().toUpperCase();
   const [phone, setPhone] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -119,6 +122,7 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
         password: data.password,
         phone: phone || undefined,
         otp: emailVerificationRequired ? otpRaw : undefined,
+        referralCode: referralFromUrl || undefined,
       });
 
       if (response.success) {
@@ -142,6 +146,11 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
         <FaX size={"16px"} />
       </CloseBtn>
       <Heading>{t("panel.authRegister")}</Heading>
+      {referralFromUrl ? (
+        <p style={{ margin: "0 0 0.75rem", fontSize: 13, color: "#64748b" }}>
+          Invite code applied: <strong style={{ color: "#132E58" }}>{referralFromUrl}</strong>
+        </p>
+      ) : null}
 
       <GoogleButton type="button">
         {t("panel.authGoogle")} <GoogleIcon src={GLogo} alt="G" />

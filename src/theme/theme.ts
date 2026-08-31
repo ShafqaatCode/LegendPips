@@ -15,7 +15,7 @@ export const theme: DefaultTheme = {
   },
   font: {
     family:` 'Poppins', sans-serif`,
-    size: '16px',
+    size: '15px',
     weight: {
       regular: 400,
       medium: 500,
@@ -30,23 +30,23 @@ export const theme: DefaultTheme = {
     mobile: "768px",
     laptop: "1200px"
   },
-  /** Shared scale — use in styled-components for consistent headings & rhythm */
+  /** Shared scale — denser desktop rhythm (less “zoomed in”) */
   typography: {
-    heroTitle: "clamp(1.75rem, 2.8vw + 0.85rem, 2.5rem)",
-    heroTitleLh: "1.2",
-    heroSubtitle: "clamp(0.9375rem, 1.2vw + 0.75rem, 1.0625rem)",
-    sectionTitle: "clamp(1.625rem, 2.5vw + 0.75rem, 2.25rem)",
-    sectionTitleLh: "1.2",
-    bannerTitle: "clamp(1.75rem, 2.6vw + 0.85rem, 2.25rem)",
+    heroTitle: "clamp(1.5rem, 1.8vw + 0.75rem, 2.125rem)",
+    heroTitleLh: "1.22",
+    heroSubtitle: "clamp(0.875rem, 0.6vw + 0.7rem, 0.975rem)",
+    sectionTitle: "clamp(1.35rem, 1.5vw + 0.7rem, 1.85rem)",
+    sectionTitleLh: "1.25",
+    bannerTitle: "clamp(1.45rem, 1.6vw + 0.75rem, 1.95rem)",
     bannerTitleLh: "1.25",
-    bannerUpper: "0.8125rem",
-    panelPageTitle: "1.375rem",
-    panelSectionTitle: "1.125rem",
-    cardTitle: "1rem",
-    body: "0.875rem",
-    lead: "1rem",
-    caption: "0.75rem",
-    pageGutter: "clamp(1rem, 4vw, 2rem)",
-    contentMax: "min(1120px, 100%)",
+    bannerUpper: "0.75rem",
+    panelPageTitle: "1.25rem",
+    panelSectionTitle: "1.05rem",
+    cardTitle: "0.9375rem",
+    body: "0.8125rem",
+    lead: "0.9375rem",
+    caption: "0.7rem",
+    pageGutter: "clamp(1rem, 3.5vw, 2.5rem)",
+    contentMax: "min(1200px, 100%)",
   },
 };
