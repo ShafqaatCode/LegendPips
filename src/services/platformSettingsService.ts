@@ -1,4 +1,4 @@
-import { API_CONFIG, getAuthHeaders } from "../utils/apiConfig";
+import { API_CONFIG, getAuthHeaders, getAuthHeadersMultipart } from "../utils/apiConfig";
 import type { NavItem, PageMetaEntry } from "./siteConfigService";
 
 export interface PlatformSettings {
@@ -11,6 +11,9 @@ export interface PlatformSettings {
   allowRegistrations: boolean;
   emailVerificationEnabled: boolean;
   siteLogoUrl?: string;
+  previousSiteLogoUrl?: string;
+  siteLogoHeight?: number;
+  siteLogoMaxWidth?: number;
   defaultMetaTitle?: string;
   defaultMetaDescription?: string;
   defaultOgImageUrl?: string;
@@ -27,10 +30,13 @@ export interface PlatformSettings {
 }
 
 const json = async (url: string, init?: RequestInit) => {
+  const body = init?.body;
+  const isForm = typeof FormData !== "undefined" && body instanceof FormData;
   const res = await fetch(url, {
     ...init,
+    cache: "no-store",
     headers: {
-      ...(init?.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
+      ...(isForm ? {} : { "Content-Type": "application/json" }),
       ...(init?.headers || {}),
     },
   });
@@ -62,7 +68,7 @@ export const uploadSiteLogo = async (file: File): Promise<PlatformSettings> => {
   fd.append("logo", file);
   const data = await json(`${API_CONFIG.BASE_URL}/admin/platform-settings/logo`, {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers: getAuthHeadersMultipart(),
     body: fd,
   });
   return data.settings;
@@ -76,12 +82,21 @@ export const removeSiteLogo = async (): Promise<PlatformSettings> => {
   return data.settings;
 };
 
+export const restoreSiteLogo = async (target: "previous" | "default"): Promise<PlatformSettings> => {
+  const data = await json(`${API_CONFIG.BASE_URL}/admin/platform-settings/logo/restore`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ target }),
+  });
+  return data.settings;
+};
+
 export const uploadOgImage = async (file: File): Promise<PlatformSettings> => {
   const fd = new FormData();
   fd.append("ogImage", file);
   const data = await json(`${API_CONFIG.BASE_URL}/admin/platform-settings/og-image`, {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers: getAuthHeadersMultipart(),
     body: fd,
   });
   return data.settings;

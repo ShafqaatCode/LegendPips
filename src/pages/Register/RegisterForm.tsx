@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import GLogo from "../../assets/icons/Google.png";
 import "react-phone-input-2/lib/style.css";
@@ -30,6 +30,8 @@ import { FaX } from "react-icons/fa6";
 import { register as registerUser, sendRegistrationOtp } from "../../services/authService";
 import { fetchRegisterConfig, type RegisterConfig } from "../../services/siteConfigService";
 import { useLocale } from "../../contexts/LocaleContext";
+import { useAuth } from "../../contexts/AuthContext";
+import TermsAcceptLabel from "../../components/Auth/TermsAcceptLabel";
 
 interface Props {
   isOpen?: boolean;
@@ -57,6 +59,8 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
   const [otpCooldown, setOtpCooldown] = useState(0);
   const [regConfig, setRegConfig] = useState<RegisterConfig | null>(null);
   const { t } = useLocale();
+  const { loginWithGoogle } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchRegisterConfig().then(setRegConfig).catch(() => setRegConfig(null));
@@ -71,6 +75,35 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
     }, 1000);
     return () => window.clearInterval(t);
   }, [otpCooldown]);
+
+  const onGoogleClick = async () => {
+    setIsLoading(true);
+    setError("");
+    setSuccess("");
+    try {
+      const response = await loginWithGoogle({
+        referralCode: referralFromUrl || undefined,
+      });
+      if (response.success && "requires2fa" in response && response.requires2fa) {
+        setError(response.message || "Enter your authenticator code on the login screen.");
+        return;
+      }
+      if (response.success) {
+        setSuccess(t("panel.authRegOk"));
+        setTimeout(() => {
+          if (onClose) onClose();
+          navigate("/user-panel");
+          window.location.reload();
+        }, 600);
+      } else {
+        setError(response.message || t("panel.authRegFail"));
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t("panel.authRegFail"));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSendOtp = async () => {
     const email = getValues("email") as string | undefined;
@@ -152,7 +185,7 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
         </p>
       ) : null}
 
-      <GoogleButton type="button">
+      <GoogleButton type="button" onClick={onGoogleClick} disabled={isLoading}>
         {t("panel.authGoogle")} <GoogleIcon src={GLogo} alt="G" />
       </GoogleButton>
 
@@ -205,22 +238,15 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
 
         <PhoneRow>
           <PhoneInputStyled
-            country={"us"}
+            country="us"
             value={phone}
-            onChange={setPhone}
-            inputStyle={{
-              width: "100%",
-              height: "40px",
-              padding: "0 0.75rem",
-              borderRadius: "8px",
-              border: "1px solid #bfbfd4",
-              fontSize: "0.875rem",
-            }}
-            buttonStyle={{
-              border: "1px solid #bfbfd4",
-              borderRadius: "8px 0 0 8px",
-            }}
-            dropdownStyle={{ zIndex: 10 }}
+            onChange={(value) => setPhone(value)}
+            enableSearch
+            disableDropdown={false}
+            countryCodeEditable={false}
+            placeholder="Phone number"
+            inputProps={{ autoComplete: "tel", name: "phone" }}
+            preferredCountries={["us", "gb", "pk", "ae", "sa", "in"]}
           />
         </PhoneRow>
 
@@ -250,7 +276,7 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
         <Terms>
           <input type="checkbox" {...register("terms", { required: true })} />
           <label>
-            {t("panel.authUnderstand")}
+            <TermsAcceptLabel variant="register" />
           </label>
         </Terms>
         {errors.terms && <ErrorMsg>{t("panel.authTermsReq")}</ErrorMsg>}

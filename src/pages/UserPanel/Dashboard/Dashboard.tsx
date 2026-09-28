@@ -6,13 +6,17 @@ import {
 import { useAuth } from '../../../contexts/AuthContext';
 import { fetchMyDashboard, type DashboardStat } from '../../../services/userInsightService';
 import { getMyKyc, type KycStatus } from '../../../services/kycService';
+import { fetchMyAccountCare, type AccountCare } from '../../../services/accountManagerService';
 import { useLocale } from '../../../contexts/LocaleContext';
 import { ShimmerBar } from '../../../components/SharedComponents/Shimmer';
+import AccountManagerCard from '../../../components/UserPanel/AccountManagerCard';
+import RecommendedBrokerCard from '../../../components/UserPanel/RecommendedBrokerCard';
 import {
   PageWrap, DashboardHero, StatsGrid, StatCard, StatIconBox, StatBody,
   StatValue, StatLabel, StatMeta, HintBar, ErrorBanner, KycStrip, Pill, GhostNavLink,
   QuickLinksGrid, QuickLinkCard, SectionLabel,
 } from '../../../components/UserPanel/userUi';
+import styled from 'styled-components';
 
 const iconByKey: Record<string, React.ElementType> = {
   contests: FiAward,
@@ -58,6 +62,7 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [kycStatus, setKycStatus] = useState<KycStatus>('incomplete');
+  const [care, setCare] = useState<AccountCare | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -65,11 +70,16 @@ const Dashboard: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const [data, kyc] = await Promise.all([fetchMyDashboard(), getMyKyc().catch(() => null)]);
+        const [data, kyc, accountCare] = await Promise.all([
+          fetchMyDashboard(),
+          getMyKyc().catch(() => null),
+          fetchMyAccountCare().catch(() => null),
+        ]);
         if (cancelled) return;
         setStats(data.stats || []);
         setActivitySummary(data.activitySummary || null);
         if (kyc) setKycStatus(kyc.kycStatus);
+        if (accountCare) setCare(accountCare);
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load dashboard');
       } finally {
@@ -90,6 +100,13 @@ const Dashboard: React.FC = () => {
       </DashboardHero>
 
       {error && <ErrorBanner>{error}</ErrorBanner>}
+
+      {(care?.manager || care?.recommendedBroker) && (
+        <CareGrid>
+          {care.manager ? <AccountManagerCard manager={care.manager} /> : null}
+          {care.recommendedBroker ? <RecommendedBrokerCard broker={care.recommendedBroker} /> : null}
+        </CareGrid>
+      )}
 
       <KycStrip $variant={kycStatus}>
         <div>
@@ -167,3 +184,15 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
+
+const CareGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+`;
+

@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
-import { FiMenu, FiBell } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { FiLogOut, FiMenu, FiShield } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLocale } from '../../contexts/LocaleContext';
+import { isImpersonating, restoreAdminSession } from '../../services/authService';
 import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher';
+import NotificationBell from './NotificationBell';
 
 const HeaderWrapper = styled.header`
   background: rgba(255, 255, 255, 0.82);
@@ -81,35 +84,6 @@ const RightSection = styled.div`
   gap: 0.55rem;
 `;
 
-const IconButton = styled.button`
-  position: relative;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #132E58;
-  font-size: 1.05rem;
-  cursor: pointer;
-  padding: 0.45rem;
-  border-radius: 10px;
-  transition: all 0.15s;
-
-  &:hover {
-    background: #fffbeb;
-    border-color: rgba(251, 191, 36, 0.45);
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 7px;
-    right: 7px;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #Fbbf24;
-    box-shadow: 0 0 0 2px white;
-  }
-`;
-
 const UserChip = styled.div`
   display: flex;
   align-items: center;
@@ -146,13 +120,91 @@ const UserName = styled.span`
   }
 `;
 
+const LogoutBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid #fecaca;
+  background: #fff;
+  color: #b91c1c;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover {
+    background: #fef2f2;
+    border-color: #f87171;
+  }
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    padding: 0.45rem;
+    span { display: none; }
+  }
+`;
+
+const ImpersonationBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  padding: 0.45rem 0.75rem;
+  margin-right: 0.35rem;
+  border-radius: 10px;
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  color: #9a3412;
+  font-size: 0.75rem;
+  font-weight: 600;
+`;
+
+const ReturnAdminBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid #132E58;
+  background: #132E58;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: #1a3d6e;
+  }
+`;
+
 interface UserHeaderProps {
   onMenuClick: () => void;
 }
 
 const UserHeader: React.FC<UserHeaderProps> = ({ onMenuClick }) => {
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { user, logout: authLogout } = useAuth();
   const { t } = useLocale();
+  const viewingAsUser = useMemo(() => isImpersonating(), []);
+
+  const handleReturnToAdmin = () => {
+    if (!restoreAdminSession()) return;
+    window.location.href = '/admin-panel';
+  };
+
+  const handleLogout = () => {
+    if (viewingAsUser) {
+      handleReturnToAdmin();
+      return;
+    }
+    authLogout();
+    navigate('/');
+    window.location.reload();
+  };
 
   return (
     <HeaderWrapper>
@@ -165,16 +217,27 @@ const UserHeader: React.FC<UserHeaderProps> = ({ onMenuClick }) => {
       </div>
 
       <RightSection>
+        {viewingAsUser && (
+          <ImpersonationBar>
+            Viewing as {user ? `${user.firstName} ${user.lastName}` : 'user'}
+            <ReturnAdminBtn type="button" onClick={handleReturnToAdmin}>
+              <FiShield size={13} />
+              Return to admin
+            </ReturnAdminBtn>
+          </ImpersonationBar>
+        )}
         <LanguageSwitcher compact light />
-        <IconButton type="button" aria-label={t("panel.notifications")}>
-          <FiBell />
-        </IconButton>
+        <NotificationBell />
         <UserChip>
           <Avatar $image={user?.profileImage}>
             {!user?.profileImage && (user ? `${user.firstName[0]}${user.lastName[0]}` : 'U')}
           </Avatar>
           <UserName>{user ? `${user.firstName} ${user.lastName}` : t("panel.userFallback")}</UserName>
         </UserChip>
+        <LogoutBtn type="button" onClick={handleLogout} aria-label={viewingAsUser ? 'Return to admin' : t("panel.logout")}>
+          {viewingAsUser ? <FiShield size={15} /> : <FiLogOut size={15} />}
+          <span>{viewingAsUser ? 'Return to admin' : t("panel.logout")}</span>
+        </LogoutBtn>
       </RightSection>
     </HeaderWrapper>
   );

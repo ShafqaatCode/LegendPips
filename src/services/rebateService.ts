@@ -6,7 +6,7 @@ export type RebateCreditRow = {
   amountCents: number;
   brokerName?: string;
   notes?: string;
-  rebateCategory?: "forex" | "crypto" | "prop";
+  rebateCategory?: "forex" | "crypto" | "prop" | "binary" | "ewallet";
   purchaseType?: "first" | "repeat";
   createdAt?: string;
   userLabel?: string;
@@ -51,7 +51,7 @@ export async function grantRebateAdmin(body: {
   amountCents?: number;
   brokerName?: string;
   notes?: string;
-  rebateCategory?: "forex" | "crypto" | "prop";
+  rebateCategory?: "forex" | "crypto" | "prop" | "binary" | "ewallet";
   purchaseType?: "first" | "repeat";
 }) {
   const res = await fetch(`${API_CONFIG.BASE_URL}/rebates/admin/grant`, {
@@ -67,12 +67,13 @@ export async function grantRebateAdmin(body: {
 export const formatUsd = (amountCents: number) =>
   `$${(amountCents / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-export type RebatePayoutMethod = "paypal" | "skrill" | "wise" | "usdt_trc20" | "usdt_bep20" | "bank";
+export type RebatePayoutMethod = "paypal" | "skrill" | "neteller" | "wise" | "usdt_trc20" | "usdt_bep20" | "bank";
 export type RebateWithdrawalStatus = "pending" | "approved" | "rejected" | "paid";
 
 export const REBATE_PAYOUT_LABELS: Record<RebatePayoutMethod, string> = {
   paypal: "PayPal",
   skrill: "Skrill",
+  neteller: "Neteller",
   wise: "Wise",
   usdt_trc20: "USDT TRC20",
   usdt_bep20: "USDT BEP20",

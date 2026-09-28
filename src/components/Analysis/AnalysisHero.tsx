@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import { useLocale } from '../../contexts/LocaleContext';
 
 const HeroWrapper = styled.section`
@@ -53,6 +54,19 @@ const Description = styled.p`
   margin: 0;
 `;
 
+const ChartLink = styled(Link)`
+  display: inline-flex;
+  margin-top: 0.85rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.secondary};
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 const RightContent = styled.div`
   flex-shrink: 0;
   
@@ -90,6 +104,7 @@ const AnalysisHero: React.FC = () => {
           <Description>
             {t("analysis.body")}
           </Description>
+          <ChartLink to="/live-charts">Open live charts →</ChartLink>
         </LeftContent>
         <RightContent>
           <IconWrapper>

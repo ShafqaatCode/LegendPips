@@ -11,9 +11,10 @@ import PropFirmCard from "./PropFirmCard";
 import { BrokerListSkeleton } from "../SharedComponents/Shimmer";
 import ListPagination from "../SharedComponents/ListPagination";
 import { fetchBrokersPage, type RebateTabCategory } from "../../services/brokerService";
-import { mapApiBrokerToRebateCardRow, type RebateBrokerCardRow } from "../../utils/rebatesBrokersDisplay";
+import { mapApiBrokerToRebateCardRow, sortBrokersFeaturedFirst, type RebateBrokerCardRow } from "../../utils/rebatesBrokersDisplay";
 
 const BROKERS_PER_PAGE = 10;
+const SEARCH_PAGE_SIZE = 24;
 
 const BrokerSectionWrapper = styled.section`
   display: flex;
@@ -68,14 +69,16 @@ const AllBrokersList: React.FC<props> = ({ showAll = false, search = "", categor
       try {
         setError(null);
         if (showAll) setRows(null);
+        const isSearching = Boolean(showAll && search.trim());
         const result = await fetchBrokersPage({
           rebatesPage: true,
-          category: showAll ? category : "forex",
-          search: showAll ? search || undefined : undefined,
+          // Browse: keep tab filter. Search: all published categories so every broker is findable.
+          category: isSearching ? undefined : showAll ? category : "forex",
+          search: isSearching ? search.trim() : undefined,
           page: showAll ? page : 1,
-          limit: showAll ? BROKERS_PER_PAGE : 5,
+          limit: showAll ? (isSearching ? SEARCH_PAGE_SIZE : BROKERS_PER_PAGE) : 5,
         });
-        const mapped = result.items.map(mapApiBrokerToRebateCardRow);
+        const mapped = sortBrokersFeaturedFirst(result.items.map(mapApiBrokerToRebateCardRow));
         if (!cancelled) {
           setRows(mapped);
           setTotalPages(Math.max(1, result.pagination.totalPages));
@@ -97,14 +100,21 @@ const AllBrokersList: React.FC<props> = ({ showAll = false, search = "", categor
 
   const visibleRows = rows ?? [];
   const loading = rows === null && !error;
+  const isSearching = Boolean(search.trim());
+  const pageSize = showAll && isSearching ? SEARCH_PAGE_SIZE : BROKERS_PER_PAGE;
 
   return (
     <BrokerSectionWrapper>
       {error && <StatusLine>{error}</StatusLine>}
-      {loading && <BrokerListSkeleton rows={showAll ? BROKERS_PER_PAGE : 3} />}
+      {loading && <BrokerListSkeleton rows={showAll ? pageSize : 3} />}
+      {!loading && showAll && isSearching && totalItems > 0 && (
+        <StatusLine>
+          {totalItems} broker{totalItems === 1 ? "" : "s"} found
+        </StatusLine>
+      )}
       {!loading && visibleRows.length === 0 && !error && (
         <StatusLine>
-          {search.trim()
+          {isSearching
             ? "No brokers match your search. Try another name or keyword."
             : category === "crypto"
               ? "No crypto exchanges published for this tab yet. Add brokers with Crypto Exchange type in the admin panel (rebates list order ≥ 1)."
@@ -114,8 +124,10 @@ const AllBrokersList: React.FC<props> = ({ showAll = false, search = "", categor
         </StatusLine>
       )}
       <BrokerWrapper>
-        {visibleRows.map((broker) =>
-          category === "prop" ? (
+        {visibleRows.map((broker, idx) => {
+          const rank = showAll ? (page - 1) * pageSize + idx + 1 : idx + 1;
+          return (!isSearching && category === "prop") ||
+          (isSearching && (broker.propOffers?.length ?? 0) > 0) ? (
             <PropFirmCard
               key={broker.key}
               title={broker.title}
@@ -124,12 +136,14 @@ const AllBrokersList: React.FC<props> = ({ showAll = false, search = "", categor
               rating={broker.rating}
               reviewsCount={broker.reviewsCount}
               propOffers={broker.propOffers || []}
+              propPromoCodes={broker.propPromoCodes}
               setupUrl={broker.setupUrl}
+              temporarilyDisabled={broker.temporarilyDisabled}
             />
           ) : (
             <BrokerCard2
               key={broker.key}
-              index={broker.index}
+              index={rank}
               featured={broker.featured}
               title={broker.title}
               brokerId={broker.key}
@@ -138,9 +152,10 @@ const AllBrokersList: React.FC<props> = ({ showAll = false, search = "", categor
               rating={broker.rating}
               reviewsCount={broker.reviewsCount}
               accountTypes={broker.accountTypes}
+              temporarilyDisabled={broker.temporarilyDisabled}
             />
-          )
-        )}
+          );
+        })}
       </BrokerWrapper>
 
       {showAll && !loading && visibleRows.length > 0 && (

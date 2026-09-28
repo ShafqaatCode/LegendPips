@@ -54,7 +54,16 @@ const SuccessBanner = styled.div`
   margin-bottom: 0.875rem;
 `;
 
+const Hint = styled.p`
+  margin: -0.35rem 0 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #64748b;
+  line-height: 1.45;
+`;
+
 const AUDIENCE_OPTIONS: { value: BulkEmailAudience; label: string }[] = [
+  { value: 'single', label: 'Single user (by email)' },
   { value: 'all', label: 'All users (excluding admins)' },
   { value: 'active', label: 'Active users only' },
   { value: 'kyc-verified', label: 'KYC verified users' },
@@ -63,7 +72,8 @@ const AUDIENCE_OPTIONS: { value: BulkEmailAudience; label: string }[] = [
 ];
 
 const AdminBulkEmail: React.FC = () => {
-  const [audience, setAudience] = useState<BulkEmailAudience>('active');
+  const [audience, setAudience] = useState<BulkEmailAudience>('single');
+  const [recipientEmail, setRecipientEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -74,14 +84,31 @@ const AdminBulkEmail: React.FC = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    if (!window.confirm(`Send this email to "${AUDIENCE_OPTIONS.find((o) => o.value === audience)?.label}"?`)) return;
+
+    if (audience === 'single' && !recipientEmail.trim()) {
+      setError('Enter the member email address.');
+      return;
+    }
+
+    const targetLabel =
+      audience === 'single'
+        ? recipientEmail.trim()
+        : AUDIENCE_OPTIONS.find((o) => o.value === audience)?.label;
+
+    if (!window.confirm(`Send this email to "${targetLabel}"?`)) return;
 
     setSending(true);
     try {
-      const res = await sendBulkEmail({ audience, subject, message });
+      const res = await sendBulkEmail({
+        audience,
+        subject,
+        message,
+        email: audience === 'single' ? recipientEmail.trim() : undefined,
+      });
       setSuccess(res.message || 'Emails sent.');
       setSubject('');
       setMessage('');
+      if (audience === 'single') setRecipientEmail('');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -95,8 +122,8 @@ const AdminBulkEmail: React.FC = () => {
 
       <PageHeader>
         <PageTitleGroup>
-          <PageTitle><FiMail /> Bulk Email</PageTitle>
-          <PageSubtitle>Send announcements to a selected user group</PageSubtitle>
+          <PageTitle><FiMail /> Email members</PageTitle>
+          <PageSubtitle>Message one member or a selected user group</PageSubtitle>
         </PageTitleGroup>
       </PageHeader>
 
@@ -114,6 +141,22 @@ const AdminBulkEmail: React.FC = () => {
                 ))}
               </select>
             </Field>
+            {audience === 'single' && (
+              <>
+                <Field>
+                  Member email
+                  <input
+                    type="email"
+                    value={recipientEmail}
+                    onChange={(e) => setRecipientEmail(e.target.value)}
+                    required
+                    placeholder="member@example.com"
+                    autoComplete="off"
+                  />
+                </Field>
+                <Hint>Must match a registered LegendPips account. You can also email from a user’s detail page.</Hint>
+              </>
+            )}
             <Field>
               Subject
               <input value={subject} onChange={(e) => setSubject(e.target.value)} required placeholder="Email subject line" />
@@ -124,9 +167,16 @@ const AdminBulkEmail: React.FC = () => {
             </Field>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <PrimaryButton type="submit" disabled={sending}>
-                <FiSend /> {sending ? 'Sending…' : 'Send Email'}
+                <FiSend /> {sending ? 'Sending…' : audience === 'single' ? 'Send to user' : 'Send Email'}
               </PrimaryButton>
-              <GhostButton type="button" onClick={() => { setSubject(''); setMessage(''); }}>
+              <GhostButton
+                type="button"
+                onClick={() => {
+                  setSubject('');
+                  setMessage('');
+                  setRecipientEmail('');
+                }}
+              >
                 Clear
               </GhostButton>
             </div>

@@ -9,6 +9,8 @@ export interface AdminUser {
   role?: string;
   status?: string;
   phone?: string;
+  blockReason?: string;
+  blockedAt?: string;
   kycStatus?: KycStatus;
   kycSubmittedAt?: string;
   kycDocumentCount?: number;
@@ -66,13 +68,17 @@ export const getAllUsers = async (params: {
   return data;
 };
 
-export const blockOrUnblockUser = async (userId: string, action: "block" | "unblock") => {
+export const blockOrUnblockUser = async (
+  userId: string,
+  action: "block" | "unblock",
+  reason?: string
+) => {
   const response = await fetchWithTimeout(
     `${API_CONFIG.BASE_URL}/blockOrUnblockUser/${userId}`,
     {
       method: "PUT",
       headers: getAuthHeaders(),
-      body: JSON.stringify({ action }),
+      body: JSON.stringify({ action, ...(reason ? { reason } : {}) }),
     }
   );
   const data = await response.json();
@@ -111,12 +117,14 @@ export type BulkEmailAudience =
   | "kyc-verified"
   | "email-verified"
   | "active"
-  | "banned";
+  | "banned"
+  | "single";
 
 export const sendBulkEmail = async (payload: {
   audience: BulkEmailAudience;
   subject: string;
   message: string;
+  email?: string;
 }) => {
   const response = await fetchWithTimeout(
     `${API_CONFIG.BASE_URL}/admin/users/bulk-email`,
@@ -130,4 +138,22 @@ export const sendBulkEmail = async (payload: {
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to send bulk email");
   return data;
+};
+
+export const sendEmailToUser = async (
+  userId: string,
+  payload: { subject: string; message: string }
+) => {
+  const response = await fetchWithTimeout(
+    `${API_CONFIG.BASE_URL}/admin/users/${userId}/email`,
+    {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    },
+    60000
+  );
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to send email");
+  return data as { success: boolean; message: string; sent: number; email: string };
 };

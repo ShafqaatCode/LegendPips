@@ -8,6 +8,10 @@ export type PageCopy = {
     blurb: string;
     joinFree: string;
     compareBrokers: string;
+    trustedBy: string;
+    trustRegulated: string;
+    trustNoMarkups: string;
+    trustPayouts: string;
   };
   webinars: {
     title: string;
@@ -90,10 +94,44 @@ export type PageCopy = {
     f1t: string; f1d: string; f2t: string; f2d: string; f3t: string; f3d: string; f4t: string; f4d: string;
     f5t: string; f5d: string; f6t: string; f6d: string; f7t: string; f7d: string; f8t: string; f8d: string;
   };
-  slider: { f1: string; f2: string; f3: string; f4: string; f5: string };
+  slider: {
+    f1: string;
+    f2: string;
+    f3: string;
+    f4: string;
+    f5: string;
+    f6: string;
+    f7: string;
+    f8: string;
+    f9: string;
+    f10: string;
+    f11: string;
+    f12: string;
+    f13: string;
+  };
   pay: { kicker: string; title: string; body: string };
   brokersHome: { kicker: string; title: string; body: string; empty: string; viewAll: string };
   testimonials: { title: string; body: string };
+  whatWeDo: {
+    title: string;
+    kicker: string;
+    p1: string;
+    p2: string;
+    p3: string;
+    p4: string;
+    p5: string;
+    statRebate: string;
+    statRebateLabel: string;
+    statCost: string;
+    statCostLabel: string;
+    statCash: string;
+    statCashLabel: string;
+    compareTitle: string;
+    beforeLabel: string;
+    afterLabel: string;
+    beforeValue: string;
+    afterValue: string;
+  };
   common: { allInOne: string; joinNow: string };
 };
 
@@ -106,6 +144,10 @@ const en: PageCopy = {
       "Whether you're buying or selling, we reward every move. No hidden fees, just real money back in your pocket, every single time you trade.",
     joinFree: "Join Free",
     compareBrokers: "Compare Brokers",
+    trustedBy: "Trusted by 10,000+ traders",
+    trustRegulated: "Regulated Brokers Only",
+    trustNoMarkups: "No Spread Markups",
+    trustPayouts: "Monthly & Daily Payouts",
   },
   webinars: {
     title: "Live Trading",
@@ -350,6 +392,14 @@ const en: PageCopy = {
     f3: "Verified Broker",
     f4: "Trading Signals",
     f5: "Contests & Rewards",
+    f6: "Submit a Complaint",
+    f7: "AI-Powered Broker Finder",
+    f8: "Excellent Customer Service",
+    f9: "Top Technical Analysis",
+    f10: "Trading Tools",
+    f11: "Daily Economic Insights",
+    f12: "Affiliate Partner",
+    f13: "Live Forex Charts",
   },
   pay: {
     kicker: "Secure payouts & deposits",
@@ -366,6 +416,26 @@ const en: PageCopy = {
   testimonials: {
     title: "TESTIMONIALS",
     body: "Discover why traders worldwide trust us as their top choice, with a focus on delivering consistent profits, exceptional service, cutting-edge technology.",
+  },
+  whatWeDo: {
+    title: "What we do",
+    kicker: "HOW REBATES WORK",
+    p1: "LegendPips partners with brokers so you get the same spreads and commissions as going direct — no markups, no hidden costs.",
+    p2: "Because our team comes from a brokerage background, we negotiate rebate structures most traders never see. Then we give 80% of those rebates back to you, automatically.",
+    p3: "Most brokers charge about 1.2–1.4 pips ($12–$14) on a standard 1-lot EUR/USD trade. As introducers, we earn roughly 1 pip ($10) in rebates — and we return 0.8 pips ($8) of that to you.",
+    p4: "That means your real cost drops from 1.2 pips to about 0.4 pips. Same trading conditions. Lower effective cost.",
+    p5: "You trade under the same conditions, but you reach profitability faster — because every qualifying trade puts cashback back in your account.",
+    statRebate: "80%",
+    statRebateLabel: "Rebates returned to you",
+    statCost: "0.4 pips",
+    statCostLabel: "Effective cost after cashback",
+    statCash: "$8",
+    statCashLabel: "Back on a typical 1-lot trade",
+    compareTitle: "EUR/USD · 1 standard lot",
+    beforeLabel: "Typical broker cost",
+    afterLabel: "Your cost with LegendPips",
+    beforeValue: "~1.2 pips",
+    afterValue: "~0.4 pips",
   },
   common: { allInOne: "ALL IN ONE TRADING PLATFORM", joinNow: "Join Now" },
 };
@@ -396,6 +466,7 @@ function fill(p: DeepPartial<PageCopy>): PageCopy {
     pay: { ...en.pay, ...p.pay },
     brokersHome: { ...en.brokersHome, ...p.brokersHome },
     testimonials: { ...en.testimonials, ...p.testimonials },
+    whatWeDo: { ...en.whatWeDo, ...p.whatWeDo },
     common: { ...en.common, ...p.common },
   };
 }
@@ -410,6 +481,10 @@ const ur = fill({
     blurb: "خریدیں یا بیچیں، ہر ٹریڈ پر انعام۔ پوشیدہ فیس نہیں، ہر بار حقیقی رقم واپس۔",
     joinFree: "مفت شامل ہوں",
     compareBrokers: "بروکرز کا موازنہ",
+    trustedBy: "۱۰٬۰۰۰+ ٹریڈرز کا اعتماد",
+    trustRegulated: "صرف ریگولیٹڈ بروکرز",
+    trustNoMarkups: "کوئی اسپریڈ مارک اپ نہیں",
+    trustPayouts: "ماہانہ اور روزانہ ادائیگیاں",
   },
   webinars: {
     title: "لائیو ٹریڈنگ",
@@ -646,6 +721,14 @@ const ur = fill({
     f3: "تصدیق شدہ بروکر",
     f4: "ٹریڈنگ سگنلز",
     f5: "مقابلے اور انعامات",
+    f6: "شکایت درج کریں",
+    f7: "AI سے بروکر تلاش",
+    f8: "بہترین کسٹمر سروس",
+    f9: "ٹاپ تکنیکی تجزیہ",
+    f10: "ٹریڈنگ ٹولز",
+    f11: "روزانہ اقتصادی بصیرت",
+    f12: "افیلیئٹ پارٹنر",
+    f13: "لائیو فاریکس چارٹس",
   },
   pay: {
     kicker: "محفوظ ادائیگیاں اور ڈپازٹس",
@@ -660,6 +743,26 @@ const ur = fill({
     viewAll: "تمام بروکرز دیکھیں",
   },
   testimonials: { title: "رائے", body: "دنیا بھر کے ٹریڈرز ہم پر کیوں بھروسہ کرتے ہیں — مسلسل نتائج، سروس اور جدید ٹیکنالوجی۔" },
+  whatWeDo: {
+    title: "ہم کیا کرتے ہیں",
+    kicker: "ریبیٹس کیسے کام کرتے ہیں",
+    p1: "LegendPips بروکرز کے ساتھ شراکت کرتا ہے تاکہ آپ کو براہِ راست اکاؤنٹ جیسی ہی اسپریڈز اور کمیشن ملیں — کوئی مارک اپ نہیں، کوئی پوشیدہ لاگت نہیں۔",
+    p2: "ہماری ٹیم بروکریج پس منظر سے آتی ہے، اس لیے ہم ایسے ریبیٹ ڈھانچے حاصل کرتے ہیں جو زیادہ تر ٹریڈرز نہیں دیکھتے۔ پھر ان ریبیٹس کا 80% خود بخود آپ کو واپس دیتے ہیں۔",
+    p3: "زیادہ تر بروکرز معیاری 1-لاٹ EUR/USD ٹریڈ پر تقریباً 1.2–1.4 پپس ($12–$14) وصول کرتے ہیں۔ بطور انٹروڈیوسر ہم تقریباً 1 پپ ($10) ریبیٹ کماتے ہیں — اور اس میں سے 0.8 پپس ($8) آپ کو واپس کرتے ہیں۔",
+    p4: "یعنی آپ کی اصل لاگت تقریباً 1.2 پپس سے گھٹ کر 0.4 پپس رہ جاتی ہے۔ وہی ٹریڈنگ شرائط۔ کم مؤثر لاگت۔",
+    p5: "آپ وہی شرائط پر ٹریڈ کرتے ہیں، مگر منافع تک جلدی پہنچتے ہیں — کیونکہ ہر اہل ٹریڈ پر کیش بیک آپ کے اکاؤنٹ میں واپس آتا ہے۔",
+    statRebate: "80%",
+    statRebateLabel: "ریبیٹ آپ کو واپس",
+    statCost: "0.4 پپس",
+    statCostLabel: "کیش بیک کے بعد مؤثر لاگت",
+    statCash: "$8",
+    statCashLabel: "عام 1-لاٹ ٹریڈ پر واپسی",
+    compareTitle: "EUR/USD · 1 معیاری لاٹ",
+    beforeLabel: "عام بروکر لاگت",
+    afterLabel: "LegendPips کے ساتھ آپ کی لاگت",
+    beforeValue: "~1.2 پپس",
+    afterValue: "~0.4 پپس",
+  },
   common: { allInOne: "سب کچھ ایک ٹریڈنگ پلیٹ فارم", joinNow: "اب شامل ہوں" },
 });
 

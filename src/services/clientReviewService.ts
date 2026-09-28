@@ -1,23 +1,32 @@
-import { API_CONFIG, getAuthHeaders } from "../utils/apiConfig";
+import { API_CONFIG, getAuthHeaders, getAuthHeadersMultipart } from "../utils/apiConfig";
 import type { ClientReview } from "./siteConfigService";
 
-const authJson = async (url: string, init?: RequestInit) => {
-  const isForm = init?.body instanceof FormData;
-  const res = await fetch(url, {
-    ...init,
-    headers: {
-      ...(isForm ? {} : { "Content-Type": "application/json" }),
-      ...getAuthHeaders(),
-      ...(init?.headers || {}),
-    },
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Request failed");
-  return data;
+const authFetch = async (url: string, init?: RequestInit) => {
+  const isForm = typeof FormData !== "undefined" && init?.body instanceof FormData;
+  try {
+    const res = await fetch(url, {
+      ...init,
+      cache: "no-store",
+      headers: {
+        ...(isForm ? getAuthHeadersMultipart() : getAuthHeaders()),
+        ...(init?.headers || {}),
+      },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error((data as { message?: string }).message || "Request failed");
+    return data;
+  } catch (err) {
+    if (err instanceof TypeError) {
+      throw new Error(
+        "Could not reach the server. Check your connection and that the API is running."
+      );
+    }
+    throw err;
+  }
 };
 
 export const fetchAdminClientReviews = async (): Promise<ClientReview[]> => {
-  const data = await authJson(`${API_CONFIG.BASE_URL}/admin/client-reviews`);
+  const data = await authFetch(`${API_CONFIG.BASE_URL}/admin/client-reviews`);
   return data.reviews;
 };
 
@@ -33,7 +42,10 @@ export const createClientReview = async (
   if (payload.featured !== undefined) fd.append("featured", String(payload.featured));
   if (payload.published !== undefined) fd.append("published", String(payload.published));
   if (avatar) fd.append("avatar", avatar);
-  const data = await authJson(`${API_CONFIG.BASE_URL}/admin/client-reviews`, { method: "POST", body: fd });
+  const data = await authFetch(`${API_CONFIG.BASE_URL}/admin/client-reviews`, {
+    method: "POST",
+    body: fd,
+  });
   return data.review;
 };
 
@@ -50,16 +62,19 @@ export const updateClientReview = async (
   if (payload.featured !== undefined) fd.append("featured", String(payload.featured));
   if (payload.published !== undefined) fd.append("published", String(payload.published));
   if (avatar) fd.append("avatar", avatar);
-  const data = await authJson(`${API_CONFIG.BASE_URL}/admin/client-reviews/${id}`, { method: "PUT", body: fd });
+  const data = await authFetch(`${API_CONFIG.BASE_URL}/admin/client-reviews/${id}`, {
+    method: "PUT",
+    body: fd,
+  });
   return data.review;
 };
 
 export const deleteClientReview = async (id: string): Promise<void> => {
-  await authJson(`${API_CONFIG.BASE_URL}/admin/client-reviews/${id}`, { method: "DELETE" });
+  await authFetch(`${API_CONFIG.BASE_URL}/admin/client-reviews/${id}`, { method: "DELETE" });
 };
 
 export const reorderClientReviews = async (orderedIds: string[]): Promise<ClientReview[]> => {
-  const data = await authJson(`${API_CONFIG.BASE_URL}/admin/client-reviews/reorder`, {
+  const data = await authFetch(`${API_CONFIG.BASE_URL}/admin/client-reviews/reorder`, {
     method: "POST",
     body: JSON.stringify({ orderedIds }),
   });

@@ -6,7 +6,12 @@ import { FiColumns, FiX } from "react-icons/fi";
 import bannerBg from "../../assets/banner/BannerBg.jpg";
 import CompareToggle from "../../components/Broker/CompareToggle";
 import { fetchBrokersPage, fetchCompareBrokers, fetchCompareBrokersBySlugs, type ApiBroker } from "../../services/brokerService";
-import { clearCompareIds, getCompareIds, setCompareIds } from "../../utils/compareBrokers";
+import {
+  clearCompareIds,
+  getCompareIds,
+  setCompareIds,
+  subscribeCompare,
+} from "../../utils/compareBrokers";
 import { comparePairPath, parseComparePairSlug } from "../../utils/brokerSlug";
 import { useLocale } from "../../contexts/LocaleContext";
 
@@ -24,7 +29,7 @@ const ComparePage: React.FC = () => {
   const navigate = useNavigate();
   const { pairSlug } = useParams();
   const [params, setParams] = useSearchParams();
-  const ids = useMemo(
+  const idsFromUrl = useMemo(
     () => (params.get("ids") || "").split(",").map((s) => s.trim()).filter(Boolean).slice(0, 4),
     [params]
   );
@@ -32,13 +37,19 @@ const ComparePage: React.FC = () => {
   const [items, setItems] = useState<ApiBroker[]>([]);
   const [pool, setPool] = useState<ApiBroker[]>([]);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState<"forex" | "crypto" | "prop" | "">(
-    () => (params.get("category") as "forex" | "crypto" | "prop" | "") || ""
+  const [category, setCategory] = useState<"forex" | "crypto" | "prop" | "binary" | "ewallet" | "">(
+    () => (params.get("category") as "forex" | "crypto" | "prop" | "binary" | "ewallet" | "") || ""
   );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const { t } = useLocale();
+
+  /** Prefer URL ids; fall back to loaded rows so chips/remove stay correct after SEO slug URLs. */
+  const selectedIds = useMemo(() => {
+    if (idsFromUrl.length) return idsFromUrl;
+    return items.map((b) => b._id).filter(Boolean).slice(0, 4);
+  }, [idsFromUrl, items]);
 
   const propMode = useMemo(
     () =>
@@ -47,28 +58,68 @@ const ComparePage: React.FC = () => {
     [category, items]
   );
 
-  useEffect(() => {
-    if (ids.length) setCompareIds(ids);
-  }, [ids]);
+  const writeUrlIds = (next: string[]) => {
+    const qs: Record<string, string> = {};
+    if (next.length) qs.ids = next.join(",");
+    if (category) qs.category = category;
+    setParams(qs, { replace: true });
+  };
 
+  // Keep localStorage aligned with URL selection
+  useEffect(() => {
+    if (idsFromUrl.length) setCompareIds(idsFromUrl);
+  }, [idsFromUrl]);
+
+  // Restore from localStorage when landing on bare /compare
   useEffect(() => {
     if (pairSlug) return;
-    if (ids.length) return;
+    if (idsFromUrl.length) return;
     const stored = getCompareIds();
-    if (stored.length >= 2) setParams({ ids: stored.join(",") }, { replace: true });
-  }, [ids.length, pairSlug, setParams]);
+    if (stored.length >= 2) {
+      const qs: Record<string, string> = { ids: stored.join(",") };
+      if (category) qs.category = category;
+      setParams(qs, { replace: true });
+    }
+  }, [idsFromUrl.length, pairSlug, setParams, category]);
 
+  // Keep URL in sync when CompareToggle changes localStorage on this page
+  useEffect(() => {
+    return subscribeCompare((stored) => {
+      const current = (params.get("ids") || "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      if (stored.join(",") === current.join(",")) return;
+      const qs: Record<string, string> = {};
+      if (stored.length) qs.ids = stored.join(",");
+      if (category) qs.category = category;
+      setParams(qs, { replace: true });
+      if (!stored.length) setItems([]);
+    });
+  }, [params, category, setParams]);
+
+  // Load by SEO slug when there are no ids in the URL yet
   useEffect(() => {
     if (!pairSlug) return;
+    if (idsFromUrl.length >= 2) return;
     const slugs = parseComparePairSlug(pairSlug);
     if (slugs.length < 2) return;
     let cancelled = false;
     setLoading(true);
+    setError(null);
     fetchCompareBrokersBySlugs(slugs)
       .then((rows) => {
         if (cancelled) return;
         setItems(rows);
-        if (rows.length >= 2) setCompareIds(rows.map((b) => b._id));
+        if (rows.length >= 2) {
+          const nextIds = rows.map((b) => b._id);
+          setCompareIds(nextIds);
+          const qs: Record<string, string> = { ids: nextIds.join(",") };
+          if (category) qs.category = category;
+          setParams(qs, { replace: true });
+        } else if (rows.length < 2) {
+          setError("Could not load enough brokers for this comparison link.");
+        }
       })
       .catch((e) => {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to compare");
@@ -79,21 +130,39 @@ const ComparePage: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [pairSlug]);
+  }, [pairSlug, idsFromUrl.length, category, setParams]);
 
+  // Primary load path: compare by broker ids
   useEffect(() => {
-    if (pairSlug) return;
-    if (ids.length < 2) {
-      setItems([]);
-      setError(null);
+    if (idsFromUrl.length < 2) {
+      if (!pairSlug) {
+        setItems([]);
+        setError(null);
+      }
       return;
     }
     let cancelled = false;
     setLoading(true);
     setError(null);
-    fetchCompareBrokers(ids)
+    fetchCompareBrokers(idsFromUrl)
       .then((rows) => {
-        if (!cancelled) setItems(rows);
+        if (cancelled) return;
+        setItems(rows);
+        if (rows.length < idsFromUrl.length) {
+          setError(
+            "Some selected brokers are unavailable or unpublished. Showing the ones we could load."
+          );
+        }
+        if (rows.length >= 2) {
+          // Pretty share URL, but keep ?ids= so selection/remove stays correct
+          const path = comparePairPath(rows);
+          const qs = new URLSearchParams();
+          qs.set("ids", rows.map((b) => b._id).join(","));
+          if (category) qs.set("category", category);
+          const next = `${path}?${qs.toString()}`;
+          const cur = `${window.location.pathname}${window.location.search}`;
+          if (cur !== next) navigate(next, { replace: true });
+        }
       })
       .catch((e) => {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to compare");
@@ -104,12 +173,7 @@ const ComparePage: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [ids, pairSlug]);
-
-  useEffect(() => {
-    if (pairSlug || items.length < 2) return;
-    navigate(comparePairPath(items), { replace: true });
-  }, [items, pairSlug, navigate]);
+  }, [idsFromUrl, category, navigate]);
 
   useEffect(() => {
     fetchBrokersPage({
@@ -123,19 +187,24 @@ const ComparePage: React.FC = () => {
   }, [search, category]);
 
   const addId = (id: string) => {
-    if (ids.includes(id) || ids.length >= 4) return;
-    const next = [...ids, id];
+    if (selectedIds.includes(id) || selectedIds.length >= 4) return;
+    const next = [...selectedIds, id];
     setCompareIds(next);
-    setParams({ ids: next.join(",") });
+    writeUrlIds(next);
   };
 
   const removeId = (id: string) => {
-    const next = ids.filter((x) => x !== id);
+    const next = selectedIds.filter((x) => x !== id);
     setCompareIds(next);
-    if (next.length) setParams({ ids: next.join(",") });
-    else {
-      setParams({});
+    if (next.length) {
+      writeUrlIds(next);
+      // Drop SEO slug path when editing selection so id-based load owns the page
+      if (pairSlug) navigate(`/compare?ids=${next.join(",")}${category ? `&category=${category}` : ""}`, { replace: true });
+    } else {
+      clearCompareIds();
       setItems([]);
+      if (pairSlug) navigate("/compare", { replace: true });
+      else writeUrlIds([]);
     }
   };
 
@@ -161,7 +230,10 @@ const ComparePage: React.FC = () => {
         <HeroInner>
           <h1>{t("compare.title")}</h1>
           <p>
-            {t("compare.body")}
+            {t("compare.body")}{" "}
+            <Link to="/spread-comparison" style={{ color: "#fbbf24", fontWeight: 700 }}>
+              Spread comparison →
+            </Link>
           </p>
         </HeroInner>
       </Hero>
@@ -182,6 +254,8 @@ const ComparePage: React.FC = () => {
               <option value="forex">Forex</option>
               <option value="crypto">Crypto</option>
               <option value="prop">Prop firms</option>
+              <option value="binary">Binary brokers</option>
+              <option value="ewallet">E-wallet</option>
             </select>
           </Filters>
           <Chips>
@@ -189,18 +263,18 @@ const ComparePage: React.FC = () => {
               <Chip
                 key={b._id}
                 type="button"
-                $on={ids.includes(b._id)}
-                disabled={ids.length >= 4 && !ids.includes(b._id)}
-                onClick={() => (ids.includes(b._id) ? removeId(b._id) : addId(b._id))}
+                $on={selectedIds.includes(b._id)}
+                disabled={selectedIds.length >= 4 && !selectedIds.includes(b._id)}
+                onClick={() => (selectedIds.includes(b._id) ? removeId(b._id) : addId(b._id))}
               >
                 {b.name}
               </Chip>
             ))}
           </Chips>
-          {ids.length > 0 && (
+          {selectedIds.length > 0 && (
             <Selected>
-              Selected: {ids.length}/4
-              {ids.length >= 2 && (
+              Selected: {selectedIds.length}/4
+              {selectedIds.length >= 2 && (
                 <Share type="button" onClick={share}>
                   {copied ? "Link copied" : "Copy share link"}
                 </Share>
@@ -209,8 +283,9 @@ const ComparePage: React.FC = () => {
                 type="button"
                 onClick={() => {
                   clearCompareIds();
-                  setParams({});
                   setItems([]);
+                  if (pairSlug) navigate("/compare", { replace: true });
+                  else writeUrlIds([]);
                 }}
               >
                 Clear
@@ -221,8 +296,9 @@ const ComparePage: React.FC = () => {
 
         {error && <Err>{error}</Err>}
         {loading && <Empty>Loading comparison…</Empty>}
-        {!loading && ids.length < 2 && <Empty>Select at least two brokers to see the comparison matrix.</Empty>}
-
+        {!loading && selectedIds.length < 2 && items.length < 2 && (
+          <Empty>Select at least two brokers to see the comparison matrix.</Empty>
+        )}
         {!loading && items.length >= 2 && (
           <TableWrap>
             <Table>
@@ -419,7 +495,7 @@ const ComparePage: React.FC = () => {
                     <td key={b._id}>
                       <Links>
                         <Link to={`/rebates/broker/${b._id}`}>Details</Link>
-                        <Link to={`/rebates/broker/${b._id}#reviews`}>Reviews</Link>
+                        <Link to={`/rebates/broker/${b._id}/reviews`}>Reviews</Link>
                         <Link to={`/complaints?broker=${b._id}`}>Complaint</Link>
                         <CompareToggle brokerId={b._id} />
                       </Links>

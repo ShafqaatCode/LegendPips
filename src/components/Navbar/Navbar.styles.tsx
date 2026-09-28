@@ -29,40 +29,48 @@ export const Topbar = styled.div`
   }
 `;
 
-export const Logo = styled.img`
-  min-width: 112px;
-  height: 40px;
+export const Logo = styled.img<{ $height?: number; $maxWidth?: number }>`
+  width: auto;
+  min-width: 0;
+  max-width: ${({ $maxWidth }) => $maxWidth ?? 160}px;
+  height: ${({ $height }) => $height ?? 40}px;
   object-fit: contain;
 `;
 
 export const LinkGroup = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.35rem 0.85rem;
+  gap: 0.5rem;
+
+  > a {
+    text-decoration: none;
+  }
 `;
 
 export const TopbarDivider = styled.span`
   width: 1px;
-  height: 1.1rem;
-  background: rgba(255, 255, 255, 0.18);
-  margin: 0 0.15rem;
+  height: 1rem;
+  background: rgba(255, 255, 255, 0.14);
+  margin: 0 0.35rem;
   flex-shrink: 0;
 `;
 
 export const HeaderItem = styled.div`
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  color: rgba(255, 255, 255, 0.82);
-  transition: color 0.2s ease;
+  gap: 0.4rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.78);
+  transition: color 0.15s ease, background 0.15s ease;
 
   &:hover {
     color: #fff;
+    background: rgba(255, 255, 255, 0.06);
   }
 
-  img {
-    height: 14px;
-    width: 14px;
+  svg {
+    flex-shrink: 0;
     opacity: 0.9;
   }
 
@@ -223,7 +231,7 @@ export const Navbar = styled.nav`
 export const NavList = styled.ul`
   display: flex;
   list-style: none;
-  gap: 1.35rem;
+  gap: 1rem;
   position: relative;
   overflow: visible;
   margin: 0;
@@ -232,7 +240,7 @@ export const NavList = styled.ul`
 
 export const NavItem = styled(NavLink)`
   color: white;
-  font-size: 13px;
+  font-size: 12px;
   text-decoration: none;
   padding-bottom: 4px;
   border-bottom: 2px solid transparent;
@@ -266,7 +274,7 @@ export const SubmenuToggle = styled.div`
   gap: 0.3rem;
   cursor: pointer;
   color: white;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   padding-bottom: 4px;
   border-bottom: 2px solid transparent;

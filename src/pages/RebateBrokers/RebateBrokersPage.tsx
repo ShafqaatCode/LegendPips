@@ -5,11 +5,12 @@ import styled from "styled-components";
 
 import RebatesBrokersSection from "./RebateBrokerBanner";
 import AllBrokersList from "../../components/Broker/AllBrokersList";
+import ContactAdviceSection from "../../components/Support/ContactAdviceSection";
 import type { RebateTabCategory } from "../../services/brokerService";
 
 const SectionWrapper = styled.section``;
 
-const TAB_VALUES: RebateTabCategory[] = ["forex", "prop", "crypto"];
+const TAB_VALUES: RebateTabCategory[] = ["forex", "prop", "crypto", "binary", "ewallet"];
 
 const RebateBrokers: React.FC = () => {
   const [params, setParams] = useSearchParams();
@@ -25,6 +26,12 @@ const RebateBrokers: React.FC = () => {
     return () => window.clearTimeout(t);
   }, [searchInput]);
 
+  useEffect(() => {
+    if (tabParam && TAB_VALUES.includes(tabParam) && tabParam !== activeTab) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam, activeTab]);
+
   const onTabChange = (tab: RebateTabCategory) => {
     setActiveTab(tab);
     setParams(tab === "forex" ? {} : { tab }, { replace: true });
@@ -39,6 +46,7 @@ const RebateBrokers: React.FC = () => {
         onTabChange={onTabChange}
       />
       <AllBrokersList showAll={true} search={debouncedSearch} category={activeTab} />
+      <ContactAdviceSection />
     </SectionWrapper>
   );
 };

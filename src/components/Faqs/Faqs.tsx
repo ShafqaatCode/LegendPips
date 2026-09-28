@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Section,
   Container,
@@ -111,10 +112,12 @@ const Faqs: React.FC = () => {
               <p>
                 {t("faq.contact")}
               </p>
-              <ButtonBase fontSize="11px" width="150px">
-                {t("faq.contactBtn")}{" "}
-                <img style={{ width: "16px" }} src={ArrowIcon} alt="" />
-              </ButtonBase>
+              <Link to="/support/contact" style={{ textDecoration: "none" }}>
+                <ButtonBase fontSize="11px" width="150px">
+                  {t("faq.contactBtn")}{" "}
+                  <img style={{ width: "16px" }} src={ArrowIcon} alt="" />
+                </ButtonBase>
+              </Link>
             </ContactWrapper>
           </LeftPanel>
 

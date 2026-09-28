@@ -92,7 +92,7 @@ const MyBrokerReviews: React.FC = () => {
                 <p style={{ margin: '0.4rem 0 0', fontSize: '0.75rem', color: '#9a3412' }}>{row.adminNote}</p>
               ) : null}
               <CardFooter>
-                <PrimaryButton $sm type="button" onClick={() => navigate(`/rebates/broker/${row.brokerId}#reviews`)}>
+                <PrimaryButton $sm type="button" onClick={() => navigate(`/rebates/broker/${row.brokerId}/reviews`)}>
                   View broker
                 </PrimaryButton>
                 {row.status !== 'approved' && (

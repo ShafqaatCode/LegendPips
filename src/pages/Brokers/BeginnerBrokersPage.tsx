@@ -5,6 +5,7 @@ import { FiArrowRight, FiCheckCircle, FiShield } from "react-icons/fi";
 import bannerBg from "../../assets/banner/BannerBg.jpg";
 import { fetchBeginnerBrokers, type ApiBroker } from "../../services/brokerService";
 import TopBeginnerBrokersWidget from "../../components/Broker/TopBeginnerBrokersWidget";
+import { normalizeBrokerLogoUrl } from "../../utils/brokerLogoUrl";
 
 const Hero = styled.section`
   position: relative;
@@ -335,8 +336,8 @@ const BeginnerBrokersPage: React.FC = () => {
             {items.map((b) => (
               <Card key={b._id}>
                 <CardTop>
-                  {b.logoUrl ? (
-                    <Logo src={b.logoUrl} alt="" />
+                  {normalizeBrokerLogoUrl(b.logoUrl) ? (
+                    <Logo src={normalizeBrokerLogoUrl(b.logoUrl)} alt="" />
                   ) : (
                     <LogoFallback>{b.name.slice(0, 2).toUpperCase()}</LogoFallback>
                   )}

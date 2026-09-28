@@ -5,7 +5,7 @@ import {
   FiHome, FiUsers, FiAward, FiFileText, FiVideo, FiSettings,
   FiLogOut, FiBarChart2, FiTrendingUp, FiShield, FiDatabase,
   FiX, FiInbox, FiActivity, FiDollarSign, FiGlobe, FiChevronDown, FiChevronUp,
-  FiUserPlus, FiShuffle, FiLink, FiStar, FiAlertTriangle,
+  FiUserPlus, FiShuffle, FiLink, FiStar, FiAlertTriangle, FiBell, FiMessageSquare, FiZap, FiGift,
 } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { USER_LIST_PRESETS } from '../../utils/userListFilters';
@@ -13,6 +13,8 @@ import { KYC_RECORD_PRESETS } from '../../utils/kycRecordFilters';
 import { adminColors } from './adminUi';
 import { hasPermission, isFullAdmin } from '../../utils/adminPermissions';
 import { useLocale } from '../../contexts/LocaleContext';
+import { useSiteLogo } from '../../contexts/SiteConfigContext';
+import { connectChatSocket, fetchAdminChatConversations } from '../../services/chatService';
 
 const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
   position: fixed;
@@ -66,9 +68,9 @@ const Brand = styled.div`
   min-width: 0;
 `;
 
-const BrandMark = styled.div`
-  width: 38px;
-  height: 38px;
+const BrandMark = styled.div<{ $size?: number }>`
+  width: ${({ $size }) => $size ?? 38}px;
+  height: ${({ $size }) => $size ?? 38}px;
   border-radius: 11px;
   background: linear-gradient(145deg, ${adminColors.gold} 0%, #f59e0b 100%);
   color: ${adminColors.navy};
@@ -78,6 +80,14 @@ const BrandMark = styled.div`
   font-size: 1.1rem;
   box-shadow: 0 4px 14px rgba(251, 191, 36, 0.35);
   flex-shrink: 0;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #fff;
+  }
 `;
 
 const BrandText = styled.div`
@@ -156,6 +166,21 @@ const NavLinkStyled = styled(NavLink)`
     box-shadow: inset 3px 0 0 ${adminColors.gold};
     svg { opacity: 1; }
   }
+`;
+
+const NavBadge = styled.span`
+  margin-left: auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const UsersGroupBtn = styled.button<{ $open?: boolean; $active?: boolean }>`
@@ -261,6 +286,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
   const location = useLocation();
   const { logout: authLogout, user } = useAuth();
   const { t } = useLocale();
+  const { src: logoSrc, alt: logoAlt, siteName, height: logoHeight } = useSiteLogo();
 
   const isUsersSection =
     location.pathname.startsWith('/admin-panel/users') ||
@@ -270,6 +296,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
 
   const [usersOpen, setUsersOpen] = useState(isUsersSection);
   const [kycOpen, setKycOpen] = useState(isKycSection);
+  const [chatUnread, setChatUnread] = useState(0);
 
   useEffect(() => {
     if (isUsersSection) setUsersOpen(true);
@@ -279,26 +306,58 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
     if (isKycSection) setKycOpen(true);
   }, [isKycSection]);
 
+  const show = (...perms: string[]) => hasPermission(user, ...perms);
+  const full = isFullAdmin(user);
+  const canLiveChat = show('live_chat');
+
+  useEffect(() => {
+    if (!canLiveChat) {
+      setChatUnread(0);
+      return;
+    }
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const data = await fetchAdminChatConversations({ status: 'open', page: 1, limit: 1 });
+        if (!cancelled) setChatUnread(data.unreadTotal || 0);
+      } catch {
+        // ignore
+      }
+    };
+    load();
+    const timer = window.setInterval(load, 45000);
+    const socket = connectChatSocket();
+    socket?.on('chat:conversation', load);
+    socket?.on('chat:message', load);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+      socket?.off('chat:conversation', load);
+      socket?.off('chat:message', load);
+    };
+  }, [canLiveChat]);
+
   const closeMobile = () => {
     if (window.innerWidth <= 992) onToggle();
   };
 
-  const link = (to: string, label: string, icon: React.ElementType, end?: boolean) => (
+  const link = (to: string, label: string, icon: React.ElementType, end?: boolean, badge?: number) => (
     <NavLinkStyled key={to} to={to} end={end} onClick={closeMobile}>
-      {React.createElement(icon)}<span>{label}</span>
+      {React.createElement(icon)}
+      <span>{label}</span>
+      {badge && badge > 0 ? <NavBadge>{badge > 9 ? '9+' : badge}</NavBadge> : null}
     </NavLinkStyled>
   );
-
-  const show = (...perms: string[]) => hasPermission(user, ...perms);
-  const full = isFullAdmin(user);
 
   return (
     <SidebarWrapper $isOpen={isOpen}>
       <SidebarHeader>
         <Brand>
-          <BrandMark><FiShield /></BrandMark>
+          <BrandMark $size={Math.min(44, logoHeight + 4)}>
+            <img src={logoSrc} alt={logoAlt} />
+          </BrandMark>
           <BrandText>
-            <div className="name">LegendPips</div>
+            <div className="name">{siteName}</div>
             <div className="tag">{full ? t("panel.adminConsole") : t("panel.staffConsole")}</div>
           </BrandText>
         </Brand>
@@ -358,6 +417,13 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
                     {t("panel.bulkEmail")}
                   </SubLink>
                 )}
+                <SubLink
+                  to="/admin-panel/users/account-managers"
+                  className={() => (location.pathname === '/admin-panel/users/account-managers' ? 'active' : '')}
+                  onClick={closeMobile}
+                >
+                  Account managers
+                </SubLink>
               </SubNav>
             )}
           </>
@@ -423,10 +489,17 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
         </NavSection>
       )}
 
-      {(show('feedback') || show('activity') || show('rebates') || show('traders') || show('live_accounts') || show('reports') || show('settings') || show('brokers') || full) && (
+      {(show('feedback') || show('live_chat') || show('activity') || show('rebates') || show('traders') || show('strategies') || show('live_accounts') || show('reports') || show('settings') || show('brokers') || show('bulk_email') || full) && (
         <NavSection>
           <SectionTitle>{t("panel.system")}</SectionTitle>
+          {(show('bulk_email') || show('activity') || show('settings') || full) &&
+            link('/admin-panel/push-alerts', 'Push alerts', FiBell)}
+          {(show('bulk_email') || show('activity') || show('settings') || full) &&
+            link('/admin-panel/panel-highlights', 'Panel highlights', FiZap)}
+          {(show('bulk_email') || show('activity') || show('settings') || full) &&
+            link('/admin-panel/corner-promos', 'Corner promos', FiGift)}
           {show('feedback') && link('/admin-panel/feedback-inbox', t("panel.feedback"), FiInbox)}
+          {show('live_chat') && link('/admin-panel/live-chat', 'Live chat', FiMessageSquare, false, chatUnread)}
           {(show('feedback') || show('brokers')) && link('/admin-panel/complaints', t("nav.complaints"), FiAlertTriangle)}
           {show('activity') && link('/admin-panel/user-activity', t("panel.activity"), FiActivity)}
           {show('referrals') && link('/admin-panel/referrals', t("panel.referrals"), FiUserPlus)}
@@ -434,6 +507,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
           {show('live_accounts') && link('/admin-panel/live-accounts', t("panel.qlLive"), FiLink)}
           {show('rebates') && link('/admin-panel/rebate-credits', t("nav.rebates"), FiDollarSign)}
           {show('traders') && link('/admin-panel/traders', t("nav.traders"), FiUsers)}
+          {show('strategies') && link('/admin-panel/strategies', 'Strategies', FiTrendingUp)}
           {show('reports') && link('/admin-panel/reports', t("panel.reports"), FiBarChart2)}
           {link('/admin-panel/security', t("panel.security"), FiShield)}
           {show('settings') && link('/admin-panel/settings', t("panel.settings"), FiSettings)}
@@ -442,7 +516,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
       )}
 
       {/* Always expose Security for any admin (2FA self-service) */}
-      {!(show('feedback') || show('activity') || show('rebates') || show('traders') || show('live_accounts') || show('reports') || show('settings') || show('brokers') || full) && (
+      {!(show('feedback') || show('live_chat') || show('activity') || show('rebates') || show('traders') || show('strategies') || show('live_accounts') || show('reports') || show('settings') || show('brokers') || full) && (
         <NavSection>
           <SectionTitle>{t("panel.system")}</SectionTitle>
           {link('/admin-panel/security', t("panel.security"), FiShield)}

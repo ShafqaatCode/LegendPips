@@ -4,6 +4,7 @@ import CompareBar from "./components/Broker/CompareBar";
 import Footer from "./components/Footer/Footer";
 import Header from "./components/Navbar/Navbar";
 import AutoTranslateRoot from "./components/i18n/AutoTranslateRoot";
+import CornerPromoPopups from "./components/Promo/CornerPromoPopups";
 import { usePageMeta } from "./contexts/SiteConfigContext";
 
 const Layout: React.FC = () => {
@@ -25,6 +26,9 @@ const Layout: React.FC = () => {
             </div>
             <div className="notranslate">
               <CompareBar />
+            </div>
+            <div className="notranslate">
+              <CornerPromoPopups />
             </div>
         </>
     )

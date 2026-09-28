@@ -285,6 +285,14 @@ const AdminLiveAccountRequests: React.FC = () => {
                   <div style={{ fontSize: '0.75rem', fontWeight: 700, color: adminColors.muted }}>
                     #{row.accountNumber}
                   </div>
+                  <div style={{ fontSize: '0.6875rem', marginTop: 2, color: adminColors.navy, fontWeight: 600 }}>
+                    {row.accountKind === 'existing' ? 'Existing account' : 'New account'}
+                  </div>
+                  {row.comment ? (
+                    <div style={{ fontSize: '0.6875rem', marginTop: 4, color: adminColors.muted, maxWidth: 220 }}>
+                      {row.comment}
+                    </div>
+                  ) : null}
                 </Td>
                 <Td>
                   <NoteInput

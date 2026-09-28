@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { FiArrowLeft, FiCheck, FiX, FiSlash, FiCheckCircle, FiTrash2, FiLogIn, FiActivity } from 'react-icons/fi';
+import { FiArrowLeft, FiCheck, FiX, FiSlash, FiCheckCircle, FiTrash2, FiLogIn, FiActivity, FiMail } from 'react-icons/fi';
 import {
   getAdminUserDetail, reviewKyc, KYC_STATUS_LABELS, DOCUMENT_LABELS,
   type KycStatus, type KycDocumentType,
 } from '../../../services/kycService';
-import { blockOrUnblockUser, deleteUser, impersonateUser } from '../../../services/userService';
-import { applyAuthSession } from '../../../services/authService';
+import { blockOrUnblockUser, deleteUser, impersonateUser, sendEmailToUser } from '../../../services/userService';
+import {
+  adminAssignUserCare,
+  adminListAccountManagers,
+  type AccountManager,
+} from '../../../services/accountManagerService';
+import { fetchBrokersPage, type ApiBroker } from '../../../services/brokerService';
+import { applyAuthSession, stashAdminSession } from '../../../services/authService';
 import { fetchAdminActivityFeed, type AdminActivityFeedRow } from '../../../services/adminEngagementService';
 import { useAuth } from '../../../contexts/AuthContext';
 import SimpleModal from '../../../components/AdminPanel/SimpleModal';
@@ -113,6 +119,35 @@ const TextArea = styled.textarea`
   &:focus { border-color: #132E58; }
 `;
 
+const CareGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+  }
+
+  select {
+    border: 1px solid #e8ecf1;
+    border-radius: 8px;
+    padding: 0.55rem 0.65rem;
+    font-size: 0.8125rem;
+    font-family: inherit;
+    color: #132e58;
+    background: #fff;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
 const UserDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -130,9 +165,23 @@ const UserDetail: React.FC = () => {
   const [rejectionReason, setRejectionReason] = useState('');
   const [reviewing, setReviewing] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [showBan, setShowBan] = useState(false);
+  const [banReason, setBanReason] = useState('');
+  const [banLoading, setBanLoading] = useState(false);
+  const [showEmail, setShowEmail] = useState(false);
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailMessage, setEmailMessage] = useState('');
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailSuccess, setEmailSuccess] = useState('');
   const [impersonating, setImpersonating] = useState(false);
   const [activity, setActivity] = useState<AdminActivityFeedRow[]>([]);
   const [activityLoading, setActivityLoading] = useState(false);
+  const [managers, setManagers] = useState<AccountManager[]>([]);
+  const [brokers, setBrokers] = useState<ApiBroker[]>([]);
+  const [managerId, setManagerId] = useState('');
+  const [brokerId, setBrokerId] = useState('');
+  const [careSaving, setCareSaving] = useState(false);
+  const [careMsg, setCareMsg] = useState('');
 
   const loadUser = async () => {
     if (!id) return;
@@ -148,6 +197,30 @@ const UserDetail: React.FC = () => {
   };
 
   useEffect(() => { loadUser(); }, [id]);
+
+  useEffect(() => {
+    if (!user) return;
+    setManagerId(user.assignedManagerId || '');
+    setBrokerId(user.recommendedBrokerId || '');
+  }, [user]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [mgrs, brokerPage] = await Promise.all([
+          adminListAccountManagers(true),
+          fetchBrokersPage({ page: 1, limit: 50 }),
+        ]);
+        if (cancelled) return;
+        setManagers(mgrs);
+        setBrokers(brokerPage.items || []);
+      } catch {
+        /* assignment UI still usable with empty lists */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -166,12 +239,51 @@ const UserDetail: React.FC = () => {
     return () => { cancelled = true; };
   }, [id]);
 
-  const handleReview = async (action: 'approve' | 'reject') => {
+  const saveCareAssignment = async () => {
     if (!id) return;
+    setCareSaving(true);
+    setCareMsg('');
+    setError('');
+    try {
+      const res = await adminAssignUserCare(id, {
+        assignedManagerId: managerId || null,
+        recommendedBrokerId: brokerId || null,
+      });
+      setUser(res.user);
+      setCareMsg(res.message || 'Assignment saved');
+    } catch (e: any) {
+      setError(e.message || 'Failed to save assignment');
+    } finally {
+      setCareSaving(false);
+    }
+  };
+
+  const handleReview = async (action: 'approve' | 'reject' | 'unverify') => {
+    if (!id) return;
+    if ((action === 'reject' || action === 'unverify') && !rejectionReason.trim()) {
+      setError(
+        action === 'unverify'
+          ? 'Please explain why this user is being marked unverified (e.g. expired ID).'
+          : 'Rejection reason is required.'
+      );
+      return;
+    }
+    if (
+      action === 'unverify' &&
+      !window.confirm(
+        'Mark this user unverified? They will be notified with your reason and must resubmit documents.'
+      )
+    ) {
+      return;
+    }
     setReviewing(true);
     setError('');
     try {
-      await reviewKyc(id, action, action === 'reject' ? rejectionReason : undefined);
+      await reviewKyc(
+        id,
+        action,
+        action === 'approve' ? undefined : rejectionReason.trim()
+      );
       await loadUser();
       setRejectionReason('');
     } catch (e: any) {
@@ -183,13 +295,69 @@ const UserDetail: React.FC = () => {
 
   const handleBlockToggle = async () => {
     if (!id || !user) return;
-    const action = user.status === 'blocked' ? 'unblock' : 'block';
-    if (!window.confirm(`${action === 'block' ? 'Ban' : 'Unban'} this user?`)) return;
+    if (user.status === 'blocked') {
+      if (!window.confirm('Re-enable this user? They will be able to sign in again and will get a notification email.')) return;
+      try {
+        await blockOrUnblockUser(id, 'unblock');
+        await loadUser();
+      } catch (e: any) {
+        setError(e.message);
+      }
+      return;
+    }
+    setBanReason('');
+    setShowBan(true);
+  };
+
+  const confirmBan = async () => {
+    if (!id) return;
+    if (!banReason.trim()) {
+      setError('Please provide a reason. The user will see this in their email.');
+      return;
+    }
+    setBanLoading(true);
+    setError('');
     try {
-      await blockOrUnblockUser(id, action);
+      await blockOrUnblockUser(id, 'block', banReason.trim());
+      setShowBan(false);
+      setBanReason('');
       await loadUser();
     } catch (e: any) {
       setError(e.message);
+    } finally {
+      setBanLoading(false);
+    }
+  };
+
+  const openEmail = () => {
+    setEmailSubject('');
+    setEmailMessage('');
+    setEmailSuccess('');
+    setError('');
+    setShowEmail(true);
+  };
+
+  const confirmEmail = async () => {
+    if (!id) return;
+    if (!emailSubject.trim() || !emailMessage.trim()) {
+      setError('Subject and message are required.');
+      return;
+    }
+    setEmailSending(true);
+    setError('');
+    setEmailSuccess('');
+    try {
+      const res = await sendEmailToUser(id, {
+        subject: emailSubject.trim(),
+        message: emailMessage.trim(),
+      });
+      setEmailSuccess(res.message || 'Email sent.');
+      setEmailSubject('');
+      setEmailMessage('');
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setEmailSending(false);
     }
   };
 
@@ -206,11 +374,17 @@ const UserDetail: React.FC = () => {
   const handleLoginAsUser = async () => {
     if (!id || !user) return;
     if (user.role === 'admin') return;
-    if (!window.confirm(`Sign in as ${user.firstName} ${user.lastName}? You will be taken to their user panel.`)) return;
+    if (
+      !window.confirm(
+        `Sign in as ${user.firstName} ${user.lastName}? You will open their user panel. Use “Return to admin” anytime to come back to the admin panel.`
+      )
+    )
+      return;
     setImpersonating(true);
     setError('');
     try {
       const data = await impersonateUser(id);
+      stashAdminSession();
       applyAuthSession(data.token, data.user);
       setAuthUser(data.user);
       window.location.href = '/user-panel';
@@ -258,8 +432,11 @@ const UserDetail: React.FC = () => {
           >
             <FiLogIn /> {impersonating ? 'Signing in…' : 'Login as user'}
           </PrimaryButton>
+          <GhostButton $sm type="button" onClick={openEmail} disabled={!user.email}>
+            <FiMail /> Email
+          </GhostButton>
           <GhostButton $sm type="button" onClick={handleBlockToggle} disabled={user.role === 'admin'}>
-            {user.status === 'blocked' ? <><FiCheckCircle /> Unban</> : <><FiSlash /> Ban</>}
+            {user.status === 'blocked' ? <><FiCheckCircle /> Enable</> : <><FiSlash /> Disable</>}
           </GhostButton>
           <GhostButton $sm $danger type="button" onClick={() => setShowDelete(true)} disabled={user.role === 'admin'}>
             <FiTrash2 /> Delete
@@ -268,15 +445,85 @@ const UserDetail: React.FC = () => {
       </ProfileRow>
 
       {error && <ErrorBanner>{error}</ErrorBanner>}
+      {careMsg && (
+        <div style={{
+          padding: '0.625rem 0.875rem',
+          background: '#ecfdf5',
+          border: '1px solid #a7f3d0',
+          borderRadius: 8,
+          color: '#047857',
+          fontSize: '0.8125rem',
+          marginBottom: '0.875rem',
+        }}>
+          {careMsg}
+        </div>
+      )}
+      {emailSuccess && !showEmail && (
+        <div style={{
+          padding: '0.625rem 0.875rem',
+          background: '#ecfdf5',
+          border: '1px solid #a7f3d0',
+          borderRadius: 8,
+          color: '#047857',
+          fontSize: '0.8125rem',
+          marginBottom: '0.875rem',
+        }}>
+          {emailSuccess}
+        </div>
+      )}
+
+      <SectionCard style={{ marginBottom: '0.75rem' }}>
+        <SectionHead>
+          <h2>Account manager & recommended broker</h2>
+        </SectionHead>
+        <SectionBody>
+          <CareGrid>
+            <label>
+              Account manager
+              <select value={managerId} onChange={(e) => setManagerId(e.target.value)}>
+                <option value="">— Not assigned —</option>
+                {managers.map((m) => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Recommended broker
+              <select value={brokerId} onChange={(e) => setBrokerId(e.target.value)}>
+                <option value="">— Not assigned —</option>
+                {brokers.map((b) => (
+                  <option key={b._id} value={b._id}>{b.name}</option>
+                ))}
+              </select>
+            </label>
+          </CareGrid>
+          <div style={{ marginTop: '0.75rem' }}>
+            <PrimaryButton type="button" $sm onClick={saveCareAssignment} disabled={careSaving}>
+              {careSaving ? 'Saving…' : 'Save assignment'}
+            </PrimaryButton>
+          </div>
+        </SectionBody>
+      </SectionCard>
 
       <Grid>
         <SectionCard style={{ margin: 0 }}>
           <SectionHead><h2>Account</h2></SectionHead>
           <SectionBody>
             <InfoRow><span>Joined</span><span>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—'}</span></InfoRow>
+            {user.status === 'blocked' && user.blockReason && (
+              <InfoRow><span>Disable reason</span><span>{user.blockReason}</span></InfoRow>
+            )}
+            {user.status === 'blocked' && user.blockedAt && (
+              <InfoRow><span>Disabled at</span><span>{new Date(user.blockedAt).toLocaleString()}</span></InfoRow>
+            )}
             {profile?.submittedAt && <InfoRow><span>KYC submitted</span><span>{new Date(profile.submittedAt).toLocaleString()}</span></InfoRow>}
             {profile?.reviewedAt && <InfoRow><span>Reviewed</span><span>{new Date(profile.reviewedAt).toLocaleString()}</span></InfoRow>}
-            {profile?.rejectionReason && <InfoRow><span>Rejection</span><span>{profile.rejectionReason}</span></InfoRow>}
+            {profile?.rejectionReason && (
+              <InfoRow>
+                <span>{kycStatus === 'rejected' ? 'Unverified reason' : 'Rejection'}</span>
+                <span>{profile.rejectionReason}</span>
+              </InfoRow>
+            )}
           </SectionBody>
         </SectionCard>
 
@@ -297,38 +544,72 @@ const UserDetail: React.FC = () => {
         </SectionCard>
       </Grid>
 
-      {user.kycDocuments?.length > 0 && (
+      {(user.kycDocuments?.length > 0 || kycStatus === 'approved' || kycStatus === 'rejected' || kycStatus === 'pending') && (
         <SectionCard>
-          <SectionHead><h2>Documents</h2></SectionHead>
+          <SectionHead><h2>Documents & verification actions</h2></SectionHead>
           <SectionBody>
-            <DocGrid>
-              {user.kycDocuments.map((doc: { type: KycDocumentType; url: string }) => (
-                <DocCard key={doc.type} href={doc.url} target="_blank" rel="noopener noreferrer">
-                  {doc.url.toLowerCase().includes('.pdf') ? (
-                    <div style={{ height: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f1f5f9', fontSize: '0.75rem' }}>PDF</div>
-                  ) : (
-                    <img src={doc.url} alt={DOCUMENT_LABELS[doc.type]} />
-                  )}
-                  <div>{DOCUMENT_LABELS[doc.type]}</div>
-                </DocCard>
-              ))}
-            </DocGrid>
+            {user.kycDocuments?.length > 0 ? (
+              <DocGrid>
+                {user.kycDocuments.map((doc: { type: KycDocumentType; url: string }) => (
+                  <DocCard key={doc.type} href={doc.url} target="_blank" rel="noopener noreferrer">
+                    {doc.url.toLowerCase().includes('.pdf') ? (
+                      <div style={{ height: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f1f5f9', fontSize: '0.75rem' }}>PDF</div>
+                    ) : (
+                      <img src={doc.url} alt={DOCUMENT_LABELS[doc.type]} />
+                    )}
+                    <div>{DOCUMENT_LABELS[doc.type]}</div>
+                  </DocCard>
+                ))}
+              </DocGrid>
+            ) : (
+              <p style={{ margin: '0 0 0.75rem', fontSize: '0.8125rem', color: '#94a3b8' }}>No documents on file.</p>
+            )}
 
-            {kycStatus === 'pending' && (
+            {(kycStatus === 'pending' || kycStatus === 'approved' || kycStatus === 'rejected') && (
               <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
-                <TextArea
-                  placeholder="Rejection reason (required if rejecting)…"
-                  value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
-                />
+                {(kycStatus === 'pending' || kycStatus === 'approved') && (
+                  <TextArea
+                    placeholder={
+                      kycStatus === 'approved'
+                        ? 'Reason for marking unverified (required) — e.g. ID expired, blurry selfie, address proof outdated…'
+                        : 'Rejection reason (required if rejecting)…'
+                    }
+                    value={rejectionReason}
+                    onChange={(e) => setRejectionReason(e.target.value)}
+                  />
+                )}
                 <ActionGroup>
-                  <PrimaryButton $sm type="button" disabled={reviewing} onClick={() => handleReview('approve')}>
-                    <FiCheck /> Approve
-                  </PrimaryButton>
-                  <GhostButton $sm $danger type="button" disabled={reviewing} onClick={() => handleReview('reject')}>
-                    <FiX /> Reject
-                  </GhostButton>
+                  {kycStatus === 'pending' && (
+                    <>
+                      <PrimaryButton $sm type="button" disabled={reviewing} onClick={() => handleReview('approve')}>
+                        <FiCheck /> Approve / Verify
+                      </PrimaryButton>
+                      <GhostButton $sm $danger type="button" disabled={reviewing} onClick={() => handleReview('reject')}>
+                        <FiX /> Reject
+                      </GhostButton>
+                    </>
+                  )}
+                  {kycStatus === 'approved' && (
+                    <GhostButton $sm $danger type="button" disabled={reviewing} onClick={() => handleReview('unverify')}>
+                      <FiX /> Mark unverified
+                    </GhostButton>
+                  )}
+                  {kycStatus === 'rejected' && (
+                    <PrimaryButton $sm type="button" disabled={reviewing} onClick={() => handleReview('approve')}>
+                      <FiCheck /> Re-verify user
+                    </PrimaryButton>
+                  )}
                 </ActionGroup>
+                {kycStatus === 'approved' && (
+                  <p style={{ margin: '0.55rem 0 0', fontSize: '0.75rem', color: '#64748b' }}>
+                    Use this if documents expired or failed a check. The user is notified with your reason and must resubmit.
+                  </p>
+                )}
+                {kycStatus === 'rejected' && (
+                  <p style={{ margin: '0.55rem 0 0', fontSize: '0.75rem', color: '#64748b' }}>
+                    User can resubmit after fixing the issue. Or re-verify here if the previous decision should be reversed.
+                  </p>
+                )}
               </div>
             )}
           </SectionBody>
@@ -385,6 +666,95 @@ const UserDetail: React.FC = () => {
         }
       >
         <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748b' }}>Permanently delete {user.firstName} {user.lastName}?</p>
+      </SimpleModal>
+
+      <SimpleModal
+        isOpen={showBan}
+        title="Disable account"
+        onClose={() => !banLoading && setShowBan(false)}
+        footer={
+          <>
+            <GhostButton type="button" onClick={() => setShowBan(false)} disabled={banLoading}>Cancel</GhostButton>
+            <GhostButton $danger type="button" onClick={confirmBan} disabled={banLoading || !banReason.trim()}>
+              <FiSlash /> {banLoading ? 'Disabling…' : 'Disable & email user'}
+            </GhostButton>
+          </>
+        }
+      >
+        <p style={{ margin: '0 0 0.75rem', fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.5 }}>
+          {user.firstName} will not be able to sign in. They will receive an email with your reason and a link to contact support.
+        </p>
+        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: 6 }}>
+          Reason (required — included in email)
+        </label>
+        <TextArea
+          value={banReason}
+          onChange={(e) => setBanReason(e.target.value)}
+          placeholder="e.g. Multiple ToS violations / suspected fraud / requested by compliance…"
+          maxLength={1000}
+        />
+      </SimpleModal>
+
+      <SimpleModal
+        isOpen={showEmail}
+        title={`Email ${user.firstName}`}
+        onClose={() => !emailSending && setShowEmail(false)}
+        footer={
+          <>
+            <GhostButton type="button" onClick={() => setShowEmail(false)} disabled={emailSending}>
+              {emailSuccess ? 'Close' : 'Cancel'}
+            </GhostButton>
+            <PrimaryButton
+              type="button"
+              onClick={confirmEmail}
+              disabled={emailSending || !emailSubject.trim() || !emailMessage.trim()}
+            >
+              <FiMail /> {emailSending ? 'Sending…' : 'Send email'}
+            </PrimaryButton>
+          </>
+        }
+      >
+        <p style={{ margin: '0 0 0.75rem', fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.5 }}>
+          Sending to <strong style={{ color: '#132E58' }}>{user.email}</strong>
+        </p>
+        {emailSuccess && (
+          <div style={{
+            padding: '0.55rem 0.75rem',
+            background: '#ecfdf5',
+            border: '1px solid #a7f3d0',
+            borderRadius: 8,
+            color: '#047857',
+            fontSize: '0.8125rem',
+            marginBottom: '0.75rem',
+          }}>
+            {emailSuccess}
+          </div>
+        )}
+        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: 6 }}>
+          Subject
+        </label>
+        <input
+          value={emailSubject}
+          onChange={(e) => setEmailSubject(e.target.value)}
+          placeholder="Email subject"
+          style={{
+            width: '100%',
+            marginBottom: 12,
+            padding: '0.55rem 0.65rem',
+            border: '1px solid #e8ecf1',
+            borderRadius: 8,
+            fontSize: '0.8125rem',
+            boxSizing: 'border-box',
+          }}
+        />
+        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: 6 }}>
+          Message
+        </label>
+        <TextArea
+          value={emailMessage}
+          onChange={(e) => setEmailMessage(e.target.value)}
+          placeholder="Write your message…"
+        />
       </SimpleModal>
     </PageWrap>
   );

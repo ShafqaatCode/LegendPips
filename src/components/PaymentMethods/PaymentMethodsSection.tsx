@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import RegisterModal from "../../pages/Register/RegisterModal";
@@ -11,9 +11,6 @@ import bankIcon from "../../assets/icons/bank-transfer 1.svg";
 import paypalLogo from "../../assets/payment/paypal-ar21.svg";
 import skrillLogo from "../../assets/payment/skrill.svg";
 import netellerLogo from "../../assets/payment/neteller.svg";
-import fasapayLogo from "../../assets/payment/fasapay.svg";
-import perfectMoneyLogo from "../../assets/payment/perfectmoney.svg";
-import voletLogo from "../../assets/payment/volet.svg";
 import usdtTrc20Logo from "../../assets/payment/usdt-trc20.svg";
 import usdtBep20Logo from "../../assets/payment/usdt-bep20.svg";
 import usdcLogo from "../../assets/payment/usdc.svg";
@@ -24,17 +21,14 @@ type PaymentMethod = {
   id: string;
   alt: string;
   src?: string;
-  variant?: "wire";
+  variant?: "wire" | "ewallet";
 };
 
 const PAYMENT_METHODS: PaymentMethod[] = [
   { id: "paypal", alt: "PayPal", src: paypalLogo },
   { id: "skrill", alt: "Skrill", src: skrillLogo },
-  { id: "neteller", alt: "NETELLER", src: netellerLogo },
-  { id: "fasapay", alt: "FasaPay", src: fasapayLogo },
+  { id: "ewallet", alt: "E-wallet", variant: "ewallet" },
   { id: "wire", alt: "Wire Transfer", variant: "wire" },
-  { id: "perfectmoney", alt: "Perfect Money", src: perfectMoneyLogo },
-  { id: "volet", alt: "Volet", src: voletLogo },
   { id: "usdt-trc20", alt: "USDT TRC20", src: usdtTrc20Logo },
   { id: "usdt-bep20", alt: "USDT BEP20", src: usdtBep20Logo },
   { id: "usdc", alt: "USDC", src: usdcLogo },
@@ -63,7 +57,7 @@ const LogoPanel = styled.div`
   background: linear-gradient(180deg, #fafbfc 0%, ${({ theme }) => theme.colors.WHITE} 100%);
   border: 1px solid #e8eaef;
   border-radius: 14px;
-  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  padding: clamp(1.1rem, 2.2vw, 1.5rem) 0;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 28px rgba(15, 23, 42, 0.06);
   position: relative;
   overflow: hidden;
@@ -76,34 +70,58 @@ const LogoPanel = styled.div`
     right: 0;
     height: 3px;
     background: linear-gradient(90deg, ${({ theme }) => theme.colors.primary} 0%, ${({ theme }) => theme.colors.gold} 100%);
+    z-index: 2;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    background: linear-gradient(
+      90deg,
+      ${({ theme }) => theme.colors.WHITE} 0%,
+      transparent 8%,
+      transparent 92%,
+      ${({ theme }) => theme.colors.WHITE} 100%
+    );
   }
 `;
 
-const LogoRows = styled.div`
+const marquee = keyframes`
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+`;
+
+const MarqueeTrack = styled.div`
   display: flex;
-  flex-direction: column;
+  width: max-content;
   gap: 0.85rem;
-`;
+  animation: ${marquee} 32s linear infinite;
+  padding: 0.35rem 0.85rem;
+  will-change: transform;
 
-const LogoGrid = styled.div<{ $columns?: number; $center?: boolean }>`
-  display: grid;
-  grid-template-columns: repeat(${({ $columns }) => $columns ?? 4}, minmax(0, 1fr));
-  gap: 0.85rem;
-  width: ${({ $center }) => ($center ? "min(100%, 720px)" : "100%")};
-  margin: ${({ $center }) => ($center ? "0 auto" : "0")};
-
-  @media (max-width: 900px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    width: 100%;
-    margin: 0;
+  &:hover {
+    animation-play-state: paused;
   }
 
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+    transform: none;
   }
 `;
 
 const BrandTile = styled.div`
+  flex: 0 0 auto;
+  width: 168px;
   background: ${({ theme }) => theme.colors.WHITE};
   border: 1px solid #e8eaef;
   border-radius: 12px;
@@ -118,6 +136,11 @@ const BrandTile = styled.div`
     border-color: rgba(251, 191, 36, 0.55);
     box-shadow: 0 4px 16px rgba(19, 46, 88, 0.08);
     transform: translateY(-2px);
+  }
+
+  @media (max-width: 480px) {
+    width: 140px;
+    min-height: 72px;
   }
 `;
 
@@ -150,6 +173,38 @@ const WireMark = styled.div`
     letter-spacing: 0.12em;
     color: ${({ theme }) => theme.colors.primary};
     line-height: 1.2;
+  }
+`;
+
+const EwalletMark = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+
+  .label {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: ${({ theme }) => theme.colors.primary};
+    line-height: 1.2;
+  }
+
+  .logos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+  }
+
+  img {
+    max-height: 22px;
+    max-width: 64px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
   }
 `;
 
@@ -205,18 +260,28 @@ const PaymentMethodsSection: React.FC = () => {
     setSignupOpen(true);
   };
 
-  const renderBrand = (method: PaymentMethod) => (
-    <BrandTile key={method.id}>
+  const renderBrand = (method: PaymentMethod, key: string) => (
+    <BrandTile key={key}>
       {method.variant === "wire" ? (
         <WireMark>
           <img src={bankIcon} alt="" aria-hidden />
           <span>WIRE TRANSFER</span>
         </WireMark>
+      ) : method.variant === "ewallet" ? (
+        <EwalletMark>
+          <span className="label">E-WALLET</span>
+          <div className="logos">
+            <img src={skrillLogo} alt="Skrill" loading="lazy" />
+            <img src={netellerLogo} alt="Neteller" loading="lazy" />
+          </div>
+        </EwalletMark>
       ) : (
         <BrandLogo src={method.src} alt={method.alt} loading="lazy" />
       )}
     </BrandTile>
   );
+
+  const loop = [...PAYMENT_METHODS, ...PAYMENT_METHODS];
 
   return (
     <Section aria-labelledby="payment-methods-heading">
@@ -228,9 +293,11 @@ const PaymentMethodsSection: React.FC = () => {
         />
 
         <LogoPanel>
-          <LogoRows>
-            <LogoGrid $columns={4}>{PAYMENT_METHODS.map(renderBrand)}</LogoGrid>
-          </LogoRows>
+          <MarqueeTrack aria-label="Supported payment methods">
+            {loop.map((method, index) =>
+              renderBrand(method, `${method.id}-${index}`)
+            )}
+          </MarqueeTrack>
         </LogoPanel>
 
         <SignupButton type="button" onClick={handleSignup}>

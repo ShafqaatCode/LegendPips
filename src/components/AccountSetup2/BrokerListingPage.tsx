@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { FaStar } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import {
   Container,
   CardContainer,
@@ -10,6 +11,7 @@ import {
   InfoSection,
   TitleRow,
   VerifiedBadge,
+  DisabledBadge,
   FeaturedRibbon,
   RatingBox,
   StarRow,
@@ -31,12 +33,14 @@ import {
   BROKER_KIND_ORDER,
   type BrokerKind,
 } from "../../utils/brokerTypes";
-import { FiGlobe, FiCpu, FiAward } from "react-icons/fi";
+import { FiGlobe, FiCpu, FiAward, FiTarget, FiCreditCard } from "react-icons/fi";
 
 const KIND_ICONS: Record<BrokerKind, React.ReactNode> = {
   forex: <FiGlobe />,
   crypto: <FiCpu />,
   prop: <FiAward />,
+  binary: <FiTarget />,
+  ewallet: <FiCreditCard />,
 };
 
 export type Broker = {
@@ -61,6 +65,8 @@ export type Broker = {
   platforms?: string;
   commission?: string;
   legendScore?: number;
+  temporarilyDisabled?: boolean;
+  setupUrl?: string;
 };
 
 export type AccountType = {
@@ -85,8 +91,8 @@ type BrokerListingPageProps = {
   totalPages: number;
   totalItems: number;
   onPageChange: (page: number) => void;
-  category?: "forex" | "crypto" | "prop";
-  onCategoryChange?: (cat: "forex" | "crypto" | "prop") => void;
+  category?: BrokerKind;
+  onCategoryChange?: (cat: BrokerKind) => void;
   filters?: {
     search: string;
     country: string;
@@ -103,6 +109,8 @@ type BrokerListingPageProps = {
     maxMinDeposit: string;
     minScore: string;
   }) => void;
+  /** Fill parent column (e.g. brokers page with sidebar) instead of site contentMax */
+  embedded?: boolean;
 };
 
 const ITEMS_PER_PAGE = 10;
@@ -162,13 +170,14 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({
   onCategoryChange,
   filters,
   onFiltersChange,
+  embedded = false,
 }) => {
   const heading = BROKER_KIND_LABELS[category] || "Brokers";
   const sub = BROKER_KIND_DESCRIPTIONS[category];
 
   return (
-    <PageWrapper>
-      <SectionInner>
+    <PageWrapper $embedded={embedded}>
+      <SectionInner $embedded={embedded}>
         <Header>
           <Heading>{heading}</Heading>
           <Subheading>{sub}</Subheading>
@@ -256,7 +265,11 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({
                     <InfoSection>
                       <TitleRow>
                         <h2>{broker.name}</h2>
-                        {broker.verified ? <VerifiedBadge>✔ Verified Broker</VerifiedBadge> : null}
+                        {broker.temporarilyDisabled ? (
+                          <DisabledBadge>Disabled</DisabledBadge>
+                        ) : broker.verified ? (
+                          <VerifiedBadge>✔ Verified Broker</VerifiedBadge>
+                        ) : null}
                       </TitleRow>
                       {broker.description?.trim() ? (
                         <BodyBlurb>{broker.description.trim()}</BodyBlurb>
@@ -298,12 +311,25 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({
                     </RatingBox>
 
                     <ActionSection>
-                      <TermsText>Terms & Conditions Apply</TermsText>
-                      <PrimaryButton type="button" onClick={() => onBrokerSelect(broker)}>
-                        Setup Account
+                      <TermsText>
+                        {broker.temporarilyDisabled
+                          ? "Temporarily unavailable for new setups"
+                          : "Terms & Conditions Apply"}
+                      </TermsText>
+                      <PrimaryButton
+                        type="button"
+                        disabled={!!broker.temporarilyDisabled}
+                        onClick={() => !broker.temporarilyDisabled && onBrokerSelect(broker)}
+                        style={
+                          broker.temporarilyDisabled
+                            ? { opacity: 0.55, cursor: "not-allowed" }
+                            : undefined
+                        }
+                      >
+                        {broker.temporarilyDisabled ? "Disabled" : "Setup Account"}
                       </PrimaryButton>
-                      <SecondaryButton as="button" type="button" onClick={() => onBrokerSelect(broker)}>
-                        Broker Reviews →
+                      <SecondaryButton as={Link} to={`/rebates/broker/${broker.id}/reviews`}>
+                        Broker Reviews
                       </SecondaryButton>
                       <CompareToggle brokerId={broker.id} />
                     </ActionSection>
@@ -327,16 +353,17 @@ const BrokerListingPage: React.FC<BrokerListingPageProps> = ({
 
 export default BrokerListingPage;
 
-const PageWrapper = styled.section`
-  background: #f8fafc;
+const PageWrapper = styled.section<{ $embedded?: boolean }>`
+  background: ${({ $embedded }) => ($embedded ? "transparent" : "#f8fafc")};
   padding: 0 0 2rem;
   box-sizing: border-box;
 `;
 
-const SectionInner = styled.div`
-  max-width: ${({ theme }) => theme.typography.contentMax};
+const SectionInner = styled.div<{ $embedded?: boolean }>`
+  max-width: ${({ $embedded, theme }) => ($embedded ? "none" : theme.typography.contentMax)};
   margin: 0 auto;
-  padding: 1.25rem ${({ theme }) => theme.typography.pageGutter} 0;
+  padding: ${({ $embedded, theme }) =>
+    $embedded ? "0.35rem 0 0" : `1.25rem ${theme.typography.pageGutter} 0`};
   box-sizing: border-box;
 `;
 

@@ -43,9 +43,11 @@ export const Topbar = styled.div`
 `;
 
 // Logo
-export const Logo = styled.img`
-  min-width: 150px;
-  height: 56px;
+export const Logo = styled.img<{ $height?: number; $maxWidth?: number }>`
+  width: auto;
+  max-width: ${({ $maxWidth }) => $maxWidth ?? 160}px;
+  height: ${({ $height }) => $height ?? 56}px;
+  object-fit: contain;
 `;
 
 // Link Section in Topbar

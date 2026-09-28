@@ -1,6 +1,7 @@
 export type Messages = {
   header: {
     liveChat: string;
+    supportTickets: string;
     rebateCalculator: string;
     location: string;
     signIn: string;
@@ -27,6 +28,8 @@ export type Messages = {
     signals: string;
     rewards: string;
     analysis: string;
+    news: string;
+    support: string;
     forum: string;
     traders: string;
     copyTrading: string;
@@ -104,6 +107,7 @@ export type Messages = {
 export const en: Messages = {
   header: {
     liveChat: "Live Chat",
+    supportTickets: "Tickets",
     rebateCalculator: "Rebate Calculator",
     location: "United States",
     signIn: "Sign In",
@@ -120,7 +124,7 @@ export const en: Messages = {
   },
   nav: {
     home: "Home",
-    howItWorks: "How It Works?",
+    howItWorks: "How It Works",
     rebates: "Rebates Brokers",
     propFirms: "Prop Firms",
     contests: "Contests",
@@ -130,6 +134,8 @@ export const en: Messages = {
     signals: "Signals",
     rewards: "Rewards",
     analysis: "Analysis",
+    news: "News",
+    support: "Support",
     forum: "Forum",
     traders: "Traders",
     copyTrading: "Copy Trading",

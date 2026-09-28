@@ -3,10 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   CardContainer,
   LogoSection,
-  LogoImg,
   InfoSection,
   TitleRow,
   VerifiedBadge,
+  DisabledBadge,
   Description,
   FeaturedRibbon,
   RatingBox,
@@ -23,7 +23,26 @@ import { FaStar } from "react-icons/fa";
 import { motion } from "framer-motion";
 import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 import CompareToggle from "./CompareToggle";
+import styled from "styled-components";
+import BrokerLogo from "./BrokerLogo";
 
+const CardLogo = styled(BrokerLogo)`
+  height: 64px;
+  width: 64px;
+  border-radius: 50%;
+  background-color: #fff;
+  object-fit: contain;
+  object-position: center;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #eef0f4;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+
+  @media (max-width: 768px) {
+    height: 72px;
+    width: 72px;
+  }
+`;
 
 //animation varient
 const fadeInUp = {
@@ -52,6 +71,7 @@ interface BrokerCardProps {
   logoSrc: string;
   rating: number;
   reviewsCount: string;
+  temporarilyDisabled?: boolean;
 }
 
 const BrokerCard: React.FC<BrokerCardProps> = ({
@@ -63,6 +83,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
   logoSrc,
   rating,
   reviewsCount,
+  temporarilyDisabled,
 }) => {
   const navigate = useNavigate();
   return (
@@ -73,13 +94,17 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
           <TopIndex>{index}</TopIndex>
 
           <LogoSection>
-            <LogoImg src={logoSrc} alt={`${title} Logo`} />
+            <CardLogo src={logoSrc} name={title} alt={`${title} Logo`} />
           </LogoSection>
 
           <InfoSection>
             <TitleRow>
               <h2>{title}</h2>
-              <VerifiedBadge>✔ Verified Broker</VerifiedBadge>
+              {temporarilyDisabled ? (
+                <DisabledBadge>Disabled</DisabledBadge>
+              ) : (
+                <VerifiedBadge>✔ Verified Broker</VerifiedBadge>
+              )}
             </TitleRow>
             <Description>{description}</Description>
           </InfoSection>
@@ -107,7 +132,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
               View Details <img src={ArrowIcon} alt="Arrow" />
             </PrimaryButton>
             {brokerId ? (
-              <SecondaryButton as={Link} to={`/rebates/broker/${brokerId}#reviews`}>
+              <SecondaryButton as={Link} to={`/rebates/broker/${brokerId}/reviews`}>
                 Broker Reviews
               </SecondaryButton>
             ) : (

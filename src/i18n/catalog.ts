@@ -4,6 +4,7 @@ import { en, type Messages } from "./en";
 const ar: Messages = {
   header: {
     liveChat: "دردشة مباشرة",
+    supportTickets: "التذاكر",
     rebateCalculator: "حاسبة الاسترداد",
     location: "الولايات المتحدة",
     signIn: "تسجيل الدخول",
@@ -30,6 +31,8 @@ const ar: Messages = {
     signals: "الإشارات",
     rewards: "المكافآت",
     analysis: "التحليل",
+    news: "الأخبار",
+    support: "الدعم",
     forum: "المنتدى",
     traders: "المتداولون",
     copyTrading: "نسخ الصفقات",
@@ -106,6 +109,7 @@ const ar: Messages = {
 const es: Messages = {
   header: {
     liveChat: "Chat en vivo",
+    supportTickets: "Tickets",
     rebateCalculator: "Calculadora de reembolsos",
     location: "Estados Unidos",
     signIn: "Iniciar sesión",
@@ -132,6 +136,8 @@ const es: Messages = {
     signals: "Señales",
     rewards: "Recompensas",
     analysis: "Análisis",
+    news: "Noticias",
+    support: "Soporte",
     forum: "Foro",
     traders: "Traders",
     copyTrading: "Copy trading",
@@ -208,6 +214,7 @@ const es: Messages = {
 const pt: Messages = {
   header: {
     liveChat: "Chat ao vivo",
+    supportTickets: "Tickets",
     rebateCalculator: "Calculadora de rebate",
     location: "Estados Unidos",
     signIn: "Entrar",
@@ -234,6 +241,8 @@ const pt: Messages = {
     signals: "Sinais",
     rewards: "Recompensas",
     analysis: "Análise",
+    news: "Notícias",
+    support: "Suporte",
     forum: "Fórum",
     traders: "Traders",
     copyTrading: "Copy trading",
@@ -310,6 +319,7 @@ const pt: Messages = {
 const id: Messages = {
   header: {
     liveChat: "Obrolan langsung",
+    supportTickets: "Tickets",
     rebateCalculator: "Kalkulator rebate",
     location: "Amerika Serikat",
     signIn: "Masuk",
@@ -336,6 +346,8 @@ const id: Messages = {
     signals: "Sinyal",
     rewards: "Hadiah",
     analysis: "Analisis",
+    news: "Berita",
+    support: "Dukungan",
     forum: "Forum",
     traders: "Trader",
     copyTrading: "Copy trading",
@@ -412,6 +424,7 @@ const id: Messages = {
 const vi: Messages = {
   header: {
     liveChat: "Trò chuyện trực tiếp",
+    supportTickets: "Tickets",
     rebateCalculator: "Máy tính hoàn tiền",
     location: "Hoa Kỳ",
     signIn: "Đăng nhập",
@@ -438,6 +451,8 @@ const vi: Messages = {
     signals: "Tín hiệu",
     rewards: "Phần thưởng",
     analysis: "Phân tích",
+    news: "Tin tức",
+    support: "Hỗ trợ",
     forum: "Diễn đàn",
     traders: "Trader",
     copyTrading: "Copy trading",
@@ -514,6 +529,7 @@ const vi: Messages = {
 const fr: Messages = {
   header: {
     liveChat: "Chat en direct",
+    supportTickets: "Tickets",
     rebateCalculator: "Calculateur de rebate",
     location: "États-Unis",
     signIn: "Connexion",
@@ -540,6 +556,8 @@ const fr: Messages = {
     signals: "Signaux",
     rewards: "Récompenses",
     analysis: "Analyse",
+    news: "Actualités",
+    support: "Support",
     forum: "Forum",
     traders: "Traders",
     copyTrading: "Copy trading",
@@ -616,6 +634,7 @@ const fr: Messages = {
 const tr: Messages = {
   header: {
     liveChat: "Canlı sohbet",
+    supportTickets: "Tickets",
     rebateCalculator: "İade hesaplayıcı",
     location: "Amerika Birleşik Devletleri",
     signIn: "Giriş yap",
@@ -642,6 +661,8 @@ const tr: Messages = {
     signals: "Sinyaller",
     rewards: "Ödüller",
     analysis: "Analiz",
+    news: "Haberler",
+    support: "Destek",
     forum: "Forum",
     traders: "Traderlar",
     copyTrading: "Copy trading",
@@ -718,6 +739,7 @@ const tr: Messages = {
 const ur: Messages = {
   header: {
     liveChat: "لائیو چیٹ",
+    supportTickets: "Tickets",
     rebateCalculator: "ریبیٹ کیلکولیٹر",
     location: "ریاستہائے متحدہ",
     signIn: "سائن ان",
@@ -744,6 +766,8 @@ const ur: Messages = {
     signals: "سگنلز",
     rewards: "انعامات",
     analysis: "تجزیہ",
+    news: "خبریں",
+    support: "سپورٹ",
     forum: "فورم",
     traders: "ٹریڈرز",
     copyTrading: "کاپی ٹریڈنگ",

@@ -100,4 +100,19 @@ export const CALCULATORS_CATALOG: CalculatorItem[] = [
     path: "/crypto-profit-calculator",
     description: "Simple buy versus sell profit for a crypto quantity.",
   },
+  {
+    id: "risk-of-ruin",
+    title: "Risk of Ruin Calculator",
+    shortLabel: "Account survival",
+    path: "/risk-of-ruin-calculator",
+    description:
+      "Estimate the chance of losing your account given win rate, risk per trade, and reward-to-risk ratio.",
+  },
+  {
+    id: "crypto-exchange-fees",
+    title: "Crypto Exchange Fees Calculator",
+    shortLabel: "Round-trip fees",
+    path: "/crypto-exchange-fees-calculator",
+    description: "Calculate buy and sell fees for a round-trip crypto trade on an exchange.",
+  },
 ];

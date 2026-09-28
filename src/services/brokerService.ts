@@ -74,6 +74,8 @@ export interface ApiBroker {
   fundingMethods: string[];
   cashbackRate?: string;
   published?: boolean;
+  /** Soft-disable: still visible when published, shown as Disabled. */
+  temporarilyDisabled?: boolean;
   sortOrder?: number;
   /** Public /rebates list: brokers with rebatesListOrder >= 1 */
   rebatesListOrder?: number;
@@ -86,7 +88,7 @@ export interface ApiBroker {
   rebateNotes?: string;
   rebateScheduleUrl?: string;
   setupUrl?: string;
-  rebateCategory?: "forex" | "crypto" | "prop" | "both";
+  rebateCategory?: "forex" | "crypto" | "prop" | "binary" | "ewallet" | "both";
   propOffers?: PropCashbackOffer[];
   propPromoCodes?: PropPromoCode[];
   country?: string;
@@ -94,6 +96,7 @@ export interface ApiBroker {
   leverage?: string;
   platforms?: string;
   commission?: string;
+  swapFrom?: string;
   slug?: string;
   legendScore?: number;
   legendScoreParts?: {
@@ -106,7 +109,7 @@ export interface ApiBroker {
   };
 }
 
-export type RebateTabCategory = "forex" | "crypto" | "prop";
+export type RebateTabCategory = "forex" | "crypto" | "prop" | "binary" | "ewallet";
 
 export interface BrokersPagination {
   totalItems: number;
@@ -146,6 +149,8 @@ export const mapApiBrokerToBroker = (b: ApiBroker, defaultLogo: string): Broker 
   platforms: b.platforms,
   commission: b.commission,
   legendScore: b.legendScore,
+  temporarilyDisabled: !!b.temporarilyDisabled,
+  setupUrl: b.setupUrl,
 });
 
 const fetchJson = async (url: string, options?: RequestInit) => {

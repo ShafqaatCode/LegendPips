@@ -1,4 +1,5 @@
 import { API_CONFIG, getAuthHeaders, getAuthHeadersMultipart, parseJsonResponse } from "../utils/apiConfig";
+import { compressKycFiles } from "../utils/compressImage";
 
 export type KycStatus = "incomplete" | "pending" | "approved" | "rejected";
 
@@ -6,7 +7,8 @@ export type KycDocumentType =
   | "identity_front"
   | "identity_back"
   | "proof_of_address"
-  | "selfie_with_id";
+  | "selfie_with_id"
+  | "portrait_photo";
 
 export interface KycProfile {
   dateOfBirth?: string;
@@ -53,6 +55,7 @@ export interface KycSubmitPayload {
   identityBack?: File;
   proofOfAddress?: File;
   selfieWithId?: File;
+  portraitPhoto?: File;
 }
 
 const fetchWithTimeout = (url: string, options: RequestInit = {}, timeout = API_CONFIG.TIMEOUT) =>
@@ -73,6 +76,14 @@ export const getMyKyc = async (): Promise<KycData> => {
 };
 
 export const submitKyc = async (payload: KycSubmitPayload): Promise<KycData & { message: string }> => {
+  const compressed = await compressKycFiles({
+    identityFront: payload.identityFront,
+    identityBack: payload.identityBack,
+    proofOfAddress: payload.proofOfAddress,
+    selfieWithId: payload.selfieWithId,
+    portraitPhoto: payload.portraitPhoto,
+  });
+
   const formData = new FormData();
   formData.append("dateOfBirth", payload.dateOfBirth);
   formData.append("nationality", payload.nationality);
@@ -86,10 +97,11 @@ export const submitKyc = async (payload: KycSubmitPayload): Promise<KycData & { 
   formData.append("idDocumentNumber", payload.idDocumentNumber);
   if (payload.phone) formData.append("phone", payload.phone);
 
-  if (payload.identityFront) formData.append("identity_front", payload.identityFront);
-  if (payload.identityBack) formData.append("identity_back", payload.identityBack);
-  if (payload.proofOfAddress) formData.append("proof_of_address", payload.proofOfAddress);
-  if (payload.selfieWithId) formData.append("selfie_with_id", payload.selfieWithId);
+  if (compressed.identityFront) formData.append("identity_front", compressed.identityFront);
+  if (compressed.identityBack) formData.append("identity_back", compressed.identityBack);
+  if (compressed.proofOfAddress) formData.append("proof_of_address", compressed.proofOfAddress);
+  if (compressed.selfieWithId) formData.append("selfie_with_id", compressed.selfieWithId);
+  if (compressed.portraitPhoto) formData.append("portrait_photo", compressed.portraitPhoto);
 
   const response = await fetchWithTimeout(
     `${API_CONFIG.BASE_URL}/kyc/submit`,
@@ -107,7 +119,7 @@ export const submitKyc = async (payload: KycSubmitPayload): Promise<KycData & { 
 
 export const reviewKyc = async (
   userId: string,
-  action: "approve" | "reject",
+  action: "approve" | "reject" | "unverify",
   rejectionReason?: string
 ): Promise<KycData & { message: string }> => {
   const response = await fetchWithTimeout(
@@ -136,7 +148,7 @@ export const KYC_STATUS_LABELS: Record<KycStatus, string> = {
   incomplete: "Not Started",
   pending: "Under Review",
   approved: "Verified",
-  rejected: "Rejected",
+  rejected: "Unverified",
 };
 
 export const KYC_STATUS_COLORS: Record<KycStatus, { bg: string; color: string }> = {
@@ -151,4 +163,5 @@ export const DOCUMENT_LABELS: Record<KycDocumentType, string> = {
   identity_back: "ID Document (Back)",
   proof_of_address: "Proof of Address",
   selfie_with_id: "Selfie with ID",
+  portrait_photo: "Uploaded Photo",
 };

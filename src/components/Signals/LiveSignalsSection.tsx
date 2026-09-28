@@ -105,11 +105,11 @@ const defaultForex: TabSignal[] = [
   { pair: 'CAD/JPY', entry: '110.45', tp: '110.75', sl: '110.25', status: 'buy' },
 ];
 
-const defaultCrypto: TabSignal[] = [
+const defaultCryptoGold: TabSignal[] = [
+  { pair: 'XAU/USD', entry: '2340', tp: '2365', sl: '2320', status: 'buy' },
   { pair: 'BTC/USD', entry: '43250', tp: '44500', sl: '42500', status: 'buy' },
   { pair: 'ETH/USD', entry: '2650', tp: '2750', sl: '2600', status: 'buy' },
-  { pair: 'XRP/USD', entry: '0.65', tp: '0.68', sl: '0.63', status: 'buy' },
-  { pair: 'LTC/USD', entry: '98', tp: '105', sl: '95', status: 'buy' },
+  { pair: 'XAG/USD', entry: '28.40', tp: '29.10', sl: '27.80', status: 'buy' },
 ];
 
 const LiveSignalsSection: React.FC<LiveSignalsSectionProps> = ({
@@ -117,10 +117,10 @@ const LiveSignalsSection: React.FC<LiveSignalsSectionProps> = ({
   forexSignals: forexProp,
   cryptoSignals: cryptoProp,
 }) => {
-  const [activeTab, setActiveTab] = useState<'forex' | 'crypto'>('forex');
+  const [activeTab, setActiveTab] = useState<'forex' | 'cryptoGold'>('forex');
 
   const forexSignals = forexProp?.length ? forexProp : defaultForex;
-  const cryptoSignals = cryptoProp?.length ? cryptoProp : defaultCrypto;
+  const cryptoGoldSignals = cryptoProp?.length ? cryptoProp : defaultCryptoGold;
 
   return (
     <SectionWrapper>
@@ -136,13 +136,13 @@ const LiveSignalsSection: React.FC<LiveSignalsSectionProps> = ({
             active={activeTab === 'forex'}
             onClick={() => setActiveTab('forex')}
           >
-            Forex signals
+            Forex
           </Tab>
           <Tab
-            active={activeTab === 'crypto'}
-            onClick={() => setActiveTab('crypto')}
+            active={activeTab === 'cryptoGold'}
+            onClick={() => setActiveTab('cryptoGold')}
           >
-            Crypto signals
+            Crypto
           </Tab>
         </TabsWrapper>
       </TabsContainer>
@@ -151,7 +151,7 @@ const LiveSignalsSection: React.FC<LiveSignalsSectionProps> = ({
         <RecentSignals
           title="Recent Signal Performance"
           isLive={true}
-          signals={activeTab === 'forex' ? forexSignals : cryptoSignals}
+          signals={activeTab === 'forex' ? forexSignals : cryptoGoldSignals}
           ctaText="Get Premium Signals"
           onCtaClick={onCtaClick}
         />

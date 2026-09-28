@@ -2,7 +2,18 @@ export interface Analysis {
   _id: string;
   title: string;
   subtitle?: string;
-  category: "Market Outlook" | "Forex" | "Gold" | "Crypto" | "Indices" | "Stock";
+  category:
+    | "Market Outlook"
+    | "Market News"
+    | "Market Analysis"
+    | "Prop Firm News"
+    | "Industry News"
+    | "Press Releases"
+    | "Forex"
+    | "Gold"
+    | "Crypto"
+    | "Indices"
+    | "Stock";
   author: string;
   authorImage?: string;
   content: string;

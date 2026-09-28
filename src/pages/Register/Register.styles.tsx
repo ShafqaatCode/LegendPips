@@ -47,6 +47,11 @@ export const GoogleButton = styled.button`
   &:hover {
     background-color: #173066;
   }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
 `;
 
 export const GoogleIcon = styled.img`
@@ -117,11 +122,125 @@ export const ErrorMsg = styled.div`
 
 export const PhoneRow = styled.div`
   margin-bottom: 1rem;
+  position: relative;
+  z-index: 5;
+
+  .react-tel-input {
+    width: 100%;
+    font-family: inherit;
+    position: relative;
+  }
 `;
 
 export const PhoneInputStyled = styled(PhoneInput)`
+  width: 100%;
+
+  .flag-dropdown {
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    height: 40px !important;
+    z-index: 3;
+    background: transparent !important;
+    border: none !important;
+    pointer-events: auto !important;
+  }
+
+  .selected-flag {
+    pointer-events: auto !important;
+    position: relative !important;
+    width: 74px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 8px 0 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px;
+    border-radius: 8px 0 0 8px !important;
+    background: #f4f6f9 !important;
+    border: 1px solid #bfbfd4 !important;
+    border-right: 1px solid #d7dbe5 !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+  }
+
+  .selected-flag:hover,
+  .selected-flag:focus,
+  .selected-flag.open {
+    background: #eef1f6 !important;
+  }
+
+  .selected-flag .flag {
+    position: static !important;
+    margin: 0 !important;
+    transform: scale(1.05);
+  }
+
+  .selected-flag .arrow {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    margin: 0 0 0 2px !important;
+    border-top: 4px solid #64748b !important;
+    border-left: 3px solid transparent !important;
+    border-right: 3px solid transparent !important;
+  }
+
+  .selected-flag .arrow.up {
+    border-top: none !important;
+    border-bottom: 4px solid #64748b !important;
+  }
+
   .form-control {
     width: 100% !important;
+    height: 40px !important;
+    padding: 0 0.75rem 0 86px !important;
+    border-radius: 8px !important;
+    border: 1px solid #bfbfd4 !important;
+    font-size: 0.875rem !important;
+    color: #132e58 !important;
+    background: #fff !important;
+    box-sizing: border-box !important;
+    position: relative;
+    z-index: 1;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #132e58 !important;
+    box-shadow: 0 0 0 2px rgba(19, 46, 88, 0.1);
+  }
+
+  .country-list {
+    pointer-events: auto !important;
+    z-index: 10050 !important;
+    max-height: 240px;
+    width: 280px !important;
+    border-radius: 8px;
+    margin-top: 4px;
+    box-shadow: 0 12px 32px rgba(19, 46, 88, 0.15);
+    overflow-y: auto;
+  }
+
+  .country-list .country {
+    padding: 0.55rem 0.75rem !important;
+  }
+
+  .country-list .search {
+    padding: 0.5rem !important;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 1;
+  }
+
+  .country-list .search-box {
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding: 0.45rem 0.6rem !important;
+    border: 1px solid #d7dbe5 !important;
+    border-radius: 6px !important;
   }
 `;
 

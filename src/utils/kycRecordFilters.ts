@@ -35,9 +35,9 @@ export const KYC_RECORD_PRESETS: KycRecordPreset[] = [
   },
   {
     id: 'rejected',
-    label: 'Rejected',
-    title: 'Rejected KYC',
-    subtitle: 'Submissions that were declined',
+    label: 'Unverified',
+    title: 'Unverified KYC',
+    subtitle: 'Users marked unverified — waiting to fix issues and resubmit',
     params: { kycStatus: 'rejected' },
   },
 ];

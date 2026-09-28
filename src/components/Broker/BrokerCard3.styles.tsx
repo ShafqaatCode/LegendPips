@@ -85,12 +85,16 @@ export const LogoImg = styled.img`
   width: 140px;
   border-radius: 50%;
   background-color: #fff;
-  object-fit: cover;
-  // box-shadow: 0 0 0 4px #fbc113;
+  object-fit: contain;
+  object-position: center;
+  padding: 18px;
+  box-sizing: border-box;
+  border: 1px solid #eef0f4;
 
   @media (max-width: 768px) {
     height: 100px;
     width: 100px;
+    padding: 12px;
   }
 `;
 
@@ -130,6 +134,15 @@ export const TitleRow = styled.div`
 
 export const VerifiedBadge = styled.span`
   background-color: #2563eb;
+  color: #ffffff;
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+`;
+
+export const DisabledBadge = styled.span`
+  background-color: #64748b;
   color: #ffffff;
   font-size: 13px;
   padding: 4px 10px;

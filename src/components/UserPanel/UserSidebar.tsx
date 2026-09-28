@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { getMyKyc, type KycStatus } from '../../services/kycService';
 import { useLocale } from '../../contexts/LocaleContext';
+import { useSiteLogo } from '../../contexts/SiteConfigContext';
+import { isImpersonating, restoreAdminSession } from '../../services/authService';
 import {
   FiHome, FiUser, FiAward, FiTrendingUp, FiVideo, FiBook, FiFileText,
-  FiMessageSquare, FiSettings, FiLogOut, FiBarChart2, FiCalendar, FiX,
+  FiMessageSquare, FiSettings, FiLogOut, FiBarChart2, FiCalendar, FiX, FiBell,
   FiDollarSign, FiGlobe, FiShield, FiUserPlus, FiShuffle, FiLink, FiStar, FiAlertTriangle, FiUsers, FiShare2,
+  FiMessageCircle, FiLifeBuoy, FiZap,
 } from 'react-icons/fi';
 
 const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
@@ -27,7 +30,7 @@ const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
     linear-gradient(180deg, #0c1f3d 0%, #132E58 45%, #0f2448 100%);
   color: white;
   z-index: 1000;
-  overflow-y: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   transition: transform 0.25s ease;
@@ -40,9 +43,6 @@ const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
       transform: translateX(${({ $isOpen }) => ($isOpen ? '0' : '100%')});
     }
   }
-
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 `;
 
 const SidebarHeader = styled.div`
@@ -53,27 +53,29 @@ const SidebarHeader = styled.div`
   justify-content: space-between;
 `;
 
-const Logo = styled.div`
+const Logo = styled(Link)`
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: #Fbbf24;
-  letter-spacing: -0.02em;
+  text-decoration: none;
+  min-width: 0;
 
-  span.mark {
-    width: 32px;
-    height: 32px;
-    border-radius: 9px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(145deg, #Fbbf24 0%, #f59e0b 100%);
-    color: #0c1f3d;
-    font-size: 0.72rem;
-    font-weight: 900;
-    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.35);
+  img {
+    display: block;
+    height: 36px;
+    width: auto;
+    max-width: 148px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  .tag {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(251, 191, 36, 0.9);
+    white-space: nowrap;
   }
 `;
 
@@ -191,10 +193,20 @@ const NavBadge = styled.span<{ $variant?: string }>`
     $variant === 'approved' ? '#6ee7b7' : 'rgba(255,255,255,0.6)'};
 `;
 
+const NavScroll = styled.div`
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+`;
+
 const Footer = styled.div`
-  margin-top: auto;
-  padding: 0.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  padding: 0.55rem 0.5rem 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.18);
 `;
 
 const LogoutButton = styled.button`
@@ -202,17 +214,19 @@ const LogoutButton = styled.button`
   align-items: center;
   gap: 0.625rem;
   width: calc(100% - 1rem);
-  margin: 0.25rem 0.5rem;
-  padding: 0.5rem 0.75rem;
-  border: none;
-  border-radius: 7px;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.7);
+  margin: 0.25rem 0.5rem 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  border-radius: 9px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
   font-size: 0.8125rem;
+  font-weight: 700;
   cursor: pointer;
   text-align: left;
+  font-family: inherit;
 
-  &:hover { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
+  &:hover { background: rgba(239, 68, 68, 0.22); color: #fecaca; }
   svg { font-size: 1rem; }
 `;
 
@@ -225,6 +239,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
   const navigate = useNavigate();
   const { user, logout: authLogout } = useAuth();
   const { t } = useLocale();
+  const { src: logoSrc, alt: logoAlt, height: logoHeight, maxWidth: logoMaxWidth } = useSiteLogo();
   const [kycStatus, setKycStatus] = useState<KycStatus | undefined>(
     user?.kycStatus as KycStatus | undefined
   );
@@ -253,7 +268,16 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
   return (
     <SidebarWrapper $isOpen={isOpen}>
       <SidebarHeader>
-        <Logo><span className="mark">LP</span> {t("panel.member")}</Logo>
+        <Logo to="/" aria-label={logoAlt}>
+          <img
+            src={logoSrc}
+            alt={logoAlt}
+            style={{
+              height: Math.min(40, Math.max(28, logoHeight)),
+              maxWidth: Math.min(160, logoMaxWidth),
+            }}
+          />
+        </Logo>
         <CloseButton onClick={onToggle}><FiX /></CloseButton>
       </SidebarHeader>
 
@@ -267,43 +291,67 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
         </ProfileText>
       </UserProfile>
 
-      <NavSection>
-        <SectionTitle>{t("panel.main")}</SectionTitle>
-        {link('/user-panel', t("panel.dashboard"), FiHome, true)}
-        {link('/user-panel/profile', t("panel.profile"), FiUser)}
-        {link('/user-panel/verification', t("panel.verification"), FiShield, false, kycBadge)}
-        {link('/user-panel/contests', t("panel.contests"), FiAward)}
-        {link('/user-panel/signals', t("panel.signals"), FiTrendingUp)}
-        {link('/user-panel/rebates', t("panel.rebates"), FiDollarSign)}
-        {link('/user-panel/live-accounts', t("panel.liveAccounts"), FiLink)}
-        {link('/user-panel/invite', t("panel.invite"), FiUserPlus)}
-        {link('/user-panel/ib-change', t("panel.ibChange"), FiShuffle)}
-        {link('/user-panel/trader-profile', t("panel.traderProfile"), FiUsers)}
-        {link('/user-panel/copy-trading', t("panel.copyTrading"), FiShare2)}
-      </NavSection>
+      <NavScroll>
+        <NavSection>
+          <SectionTitle>{t("panel.main")}</SectionTitle>
+          {link('/user-panel', t("panel.dashboard"), FiHome, true)}
+          {link('/user-panel/alerts', t("panel.alerts"), FiBell)}
+          {link('/user-panel/profile', t("panel.profile"), FiUser)}
+          {link('/user-panel/verification', t("panel.verification"), FiShield, false, kycBadge)}
+          {link('/user-panel/contests', t("panel.contests"), FiAward)}
+          {link('/user-panel/signals', t("panel.signals"), FiTrendingUp)}
+          {link('/user-panel/rebates', t("panel.rebates"), FiDollarSign)}
+          {link('/user-panel/live-accounts', t("panel.liveAccounts"), FiLink)}
+          {link('/user-panel/invite', t("panel.invite"), FiUserPlus)}
+          {link('/user-panel/ib-change', t("panel.ibChange"), FiShuffle)}
+          {link('/user-panel/trader-profile', t("panel.traderProfile"), FiUsers)}
+          {link('/user-panel/copy-trading', t("panel.copyTrading"), FiShare2)}
+          {link('/user-panel/strategies', t("panel.strategies"), FiTrendingUp)}
+          {link('/user-panel/streak', t("panel.streak"), FiZap)}
+        </NavSection>
 
-      <NavSection>
-        <SectionTitle>{t("panel.content")}</SectionTitle>
-        {link('/user-panel/webinars', t("panel.webinars"), FiVideo)}
-        {link('/user-panel/courses', t("panel.courses"), FiBook)}
-        {link('/user-panel/trading-videos', t("panel.videos"), FiVideo)}
-        {link('/user-panel/analysis', t("panel.analysis"), FiFileText)}
-      </NavSection>
+        <NavSection>
+          <SectionTitle>{t("panel.content")}</SectionTitle>
+          {link('/user-panel/webinars', t("panel.webinars"), FiVideo)}
+          {link('/user-panel/courses', t("panel.courses"), FiBook)}
+          {link('/user-panel/trading-videos', t("panel.videos"), FiVideo)}
+          {link('/user-panel/analysis', t("panel.analysis"), FiFileText)}
+        </NavSection>
 
-      <NavSection>
-        <SectionTitle>{t("panel.community")}</SectionTitle>
-        {link('/user-panel/forum', t("panel.forum"), FiMessageSquare)}
-        {link('/user-panel/broker-reviews', t("panel.reviews"), FiStar)}
-        {link('/user-panel/complaints', t("panel.complaints"), FiAlertTriangle)}
-        {link('/user-panel/activity', t("panel.activity"), FiBarChart2)}
-        {link('/user-panel/calendar', t("panel.calendar"), FiCalendar)}
-        {link('/user-panel/settings', t("panel.settings"), FiSettings)}
-      </NavSection>
+        <NavSection>
+          <SectionTitle>{t("panel.community")}</SectionTitle>
+          {link('/user-panel/forum', t("panel.forum"), FiMessageSquare)}
+          {link('/live-chat', 'Live chat', FiMessageCircle)}
+          {link('/user-panel/tickets', t("panel.tickets"), FiLifeBuoy)}
+          {link('/user-panel/broker-reviews', t("panel.reviews"), FiStar)}
+          {link('/user-panel/complaints', t("panel.complaints"), FiAlertTriangle)}
+          {link('/user-panel/activity', t("panel.activity"), FiBarChart2)}
+          {link('/user-panel/calendar', t("panel.calendar"), FiCalendar)}
+          {link('/user-panel/settings', t("panel.settings"), FiSettings)}
+        </NavSection>
+      </NavScroll>
 
       <Footer>
         {link('/', t("panel.homepage"), FiGlobe, true)}
-        <LogoutButton onClick={() => { authLogout(); navigate('/'); window.location.reload(); }}>
-          <FiLogOut /><span>{t("panel.logout")}</span>
+        <LogoutButton
+          type="button"
+          onClick={() => {
+            if (isImpersonating()) {
+              if (restoreAdminSession()) {
+                window.location.href = '/admin-panel';
+                return;
+              }
+            }
+            authLogout();
+            navigate('/');
+            window.location.reload();
+          }}
+        >
+          {isImpersonating() ? (
+            <><FiShield /><span>Return to admin</span></>
+          ) : (
+            <><FiLogOut /><span>{t("panel.logout")}</span></>
+          )}
         </LogoutButton>
       </Footer>
     </SidebarWrapper>

@@ -64,7 +64,7 @@ const AdminRebateCredits: React.FC = () => {
   const [formUsd, setFormUsd] = useState('25');
   const [formBroker, setFormBroker] = useState('');
   const [formNotes, setFormNotes] = useState('');
-  const [formCategory, setFormCategory] = useState<'forex' | 'crypto' | 'prop' | ''>('');
+  const [formCategory, setFormCategory] = useState<'forex' | 'crypto' | 'prop' | 'binary' | 'ewallet' | ''>('');
   const [formPurchaseType, setFormPurchaseType] = useState<'first' | 'repeat' | ''>('');
   const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState<'credits' | 'withdrawals'>('credits');
@@ -365,6 +365,8 @@ const AdminRebateCredits: React.FC = () => {
             <option value="forex">Forex</option>
             <option value="crypto">Crypto</option>
             <option value="prop">Prop trading</option>
+            <option value="binary">Binary</option>
+            <option value="ewallet">E-wallet</option>
           </select>
         </FormField>
         <FormField>Purchase type (prop)

@@ -45,6 +45,8 @@ export const ROUTE_NAV_KEY: Record<string, string> = {
   "/signals": "signals",
   "/rewards": "rewards",
   "/analysis": "analysis",
+  "/news": "news",
+  "/support": "support",
   "/forum": "forum",
   "/traders": "traders",
   "/copy-trading": "copyTrading",

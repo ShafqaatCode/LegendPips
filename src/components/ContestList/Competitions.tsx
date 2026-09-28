@@ -58,7 +58,7 @@ const Competitions: React.FC = () => {
 
   const bumpContests = () => setRefetchTick((t) => t + 1);
   return (
-    <Wrapper>
+    <Wrapper id="competitions">
       <Header>
         <Title>
           <img src={TrophyImg} alt="TrophyIcon" /> Competitions

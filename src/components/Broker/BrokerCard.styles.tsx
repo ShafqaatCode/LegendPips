@@ -91,9 +91,33 @@ export const LogoImg = styled.img`
   width: 64px;
   border-radius: 50%;
   background-color: #fff;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
+  padding: 8px;
+  box-sizing: border-box;
   border: 1px solid #eef0f4;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+
+  @media (max-width: 768px) {
+    height: 72px;
+    width: 72px;
+  }
+`;
+
+export const LogoFallbackBox = styled.span`
+  height: 64px;
+  width: 64px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #132e58 0%, #1a3d6e 100%);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  border: 1px solid #eef0f4;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  box-sizing: border-box;
 
   @media (max-width: 768px) {
     height: 72px;
@@ -140,6 +164,17 @@ export const TitleRow = styled.div`
 
 export const VerifiedBadge = styled.span`
   background-color: #1d4ed8;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+`;
+
+export const DisabledBadge = styled.span`
+  background-color: #64748b;
   color: #ffffff;
   font-size: 0.65rem;
   font-weight: 600;
@@ -216,11 +251,11 @@ export const ReviewText = styled.div`
 `;
 
 export const ActionSection = styled.div`
-  min-width: 7.5rem;
+  min-width: 9.5rem;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.35rem;
+  gap: 0.4rem;
 
   @media (max-width: 768px) {
     align-items: center;
@@ -234,13 +269,14 @@ export const TermsText = styled.span`
   color: #64748b;
   text-align: center;
   line-height: 1.3;
+  margin-bottom: 0.1rem;
 `;
 
 export const PrimaryButton = styled.button`
   background-color: ${({ theme }) => theme.colors.primary};
   color: #fff;
   border: none;
-  padding: 0.45rem 0.9rem;
+  padding: 0.5rem 0.9rem;
   border-radius: 999px;
   font-size: 0.8125rem;
   font-weight: 600;
@@ -252,6 +288,9 @@ export const PrimaryButton = styled.button`
   max-width: 9.5rem;
   margin: 0 auto;
   justify-content: center;
+  font-family: inherit;
+  line-height: 1.2;
+  box-sizing: border-box;
   transition: background 0.2s ease, transform 0.15s ease;
 
   img {
@@ -270,17 +309,34 @@ export const PrimaryButton = styled.button`
 
 export const SecondaryButton = styled.a`
   color: #132e58;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
   cursor: pointer;
-  margin-top: 0.1rem;
+  width: 100%;
+  max-width: 9.5rem;
+  margin: 0 auto;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  box-sizing: border-box;
+  font-family: inherit;
+  line-height: 1.2;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+  img {
+    width: 14px;
+    height: 14px;
+  }
 
   &:hover {
-    text-decoration: underline;
+    background: #e8eef6;
+    border-color: #cbd5e1;
+    text-decoration: none;
   }
 `;

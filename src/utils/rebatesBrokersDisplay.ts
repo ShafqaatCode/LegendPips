@@ -5,6 +5,7 @@ import XmLogo from '../assets/TradeMarketBrands/Ellipse 2-1.png';
 import ExnessLogo from '../assets/TradeMarketBrands/Ellipse 2-2.png';
 import FpLogo from '../assets/TradeMarketBrands/Ellipse 2-3.png';
 import FocusLogo from '../assets/TradeMarketBrands/Ellipse 1.png';
+import { normalizeBrokerLogoUrl } from './brokerLogoUrl';
 
 /** When API `logoUrl` is empty, use the same bundled assets as legacy brokers_data.tsx */
 export const REBATES_BROKER_FALLBACK_LOGOS: Record<string, string> = {
@@ -28,11 +29,16 @@ export type RebateBrokerCardRow = {
   accountTypes?: ApiBroker['accountTypes'];
   rebateCategory?: ApiBroker['rebateCategory'];
   propOffers?: ApiBroker['propOffers'];
+  propPromoCodes?: ApiBroker['propPromoCodes'];
   setupUrl?: string;
+  temporarilyDisabled?: boolean;
 };
 
 export function mapApiBrokerToRebateCardRow(b: ApiBroker): RebateBrokerCardRow {
-  const logoSrc = (b.logoUrl && b.logoUrl.trim()) || REBATES_BROKER_FALLBACK_LOGOS[b.name] || ICLogo;
+  const logoSrc =
+    normalizeBrokerLogoUrl(b.logoUrl) ||
+    REBATES_BROKER_FALLBACK_LOGOS[b.name] ||
+    ICLogo;
   const liveCount = b.reviewStats?.count || 0;
   const rating = liveCount
     ? Math.round(b.reviewStats?.average || 0)
@@ -53,6 +59,35 @@ export function mapApiBrokerToRebateCardRow(b: ApiBroker): RebateBrokerCardRow {
     accountTypes: b.accountTypes?.length ? b.accountTypes : undefined,
     rebateCategory: b.rebateCategory,
     propOffers: b.propOffers,
+    propPromoCodes: b.propPromoCodes,
     setupUrl: b.setupUrl,
+    temporarilyDisabled: !!b.temporarilyDisabled,
   };
+}
+
+/** Featured / top-cashback brokers first, then list order. */
+export function sortBrokersFeaturedFirst<T extends { featured?: boolean; index?: number; title?: string }>(
+  rows: T[]
+): T[] {
+  return [...rows].sort((a, b) => {
+    const af = a.featured ? 1 : 0;
+    const bf = b.featured ? 1 : 0;
+    if (bf !== af) return bf - af;
+    const ai = a.index ?? 0;
+    const bi = b.index ?? 0;
+    if (ai !== bi) return ai - bi;
+    return String(a.title || "").localeCompare(String(b.title || ""));
+  });
+}
+
+export function sortApiBrokersFeaturedFirst(items: ApiBroker[]): ApiBroker[] {
+  return [...items].sort((a, b) => {
+    const af = a.rebatesFeatured || a.topCashback ? 1 : 0;
+    const bf = b.rebatesFeatured || b.topCashback ? 1 : 0;
+    if (bf !== af) return bf - af;
+    const ao = a.rebatesListOrder ?? a.sortOrder ?? 0;
+    const bo = b.rebatesListOrder ?? b.sortOrder ?? 0;
+    if (ao !== bo) return ao - bo;
+    return String(a.name || "").localeCompare(String(b.name || ""));
+  });
 }

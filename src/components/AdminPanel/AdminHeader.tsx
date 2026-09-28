@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useLocation } from 'react-router-dom';
-import { FiMenu, FiBell, FiSearch } from 'react-icons/fi';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { FiMenu, FiBell, FiSearch, FiLogOut, FiChevronDown } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { adminColors } from './adminUi';
-import { isFullAdmin } from '../../utils/adminPermissions';
+import { isFullAdmin, hasPermission } from '../../utils/adminPermissions';
 import { useLocale } from '../../contexts/LocaleContext';
 import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher';
+import { fetchAdminChatConversations } from '../../services/chatService';
+import { connectChatSocket } from '../../services/chatService';
 
 const HeaderWrapper = styled.header`
   background: rgba(255, 255, 255, 0.82);
@@ -148,15 +150,28 @@ const Badge = styled.span`
   box-shadow: 0 2px 6px rgba(251, 191, 36, 0.4);
 `;
 
-const UserChip = styled.div`
+const UserChipWrap = styled.div`
+  position: relative;
+`;
+
+const UserChip = styled.button`
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  padding: 0.28rem 0.65rem 0.28rem 0.28rem;
+  padding: 0.28rem 0.55rem 0.28rem 0.28rem;
   background: white;
   border: 1px solid #e8ecf1;
   border-radius: 999px;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover,
+  &[aria-expanded='true'] {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+  }
 `;
 
 const Avatar = styled.div`
@@ -175,7 +190,8 @@ const Avatar = styled.div`
 
 const UserMeta = styled.div`
   line-height: 1.15;
-  padding-right: 0.2rem;
+  padding-right: 0.1rem;
+  text-align: left;
 
   .name {
     font-size: 0.75rem;
@@ -195,10 +211,58 @@ const UserMeta = styled.div`
   }
 `;
 
+const ChipChevron = styled(FiChevronDown)<{ $open?: boolean }>`
+  color: ${adminColors.muted};
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  transition: transform 0.15s;
+  transform: rotate(${({ $open }) => ($open ? '180deg' : '0deg')});
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    display: none;
+  }
+`;
+
+const UserMenu = styled.div`
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 180px;
+  background: #fff;
+  border: 1px solid #e8ecf1;
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+  padding: 0.35rem;
+  z-index: 120;
+`;
+
+const UserMenuItem = styled.button`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #b91c1c;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    background: #fef2f2;
+  }
+`;
+
 const PAGE_TITLE_KEYS: Record<string, string> = {
   '/admin-panel': 'panel.dashboard',
   '/admin-panel/users': 'panel.users',
   '/admin-panel/users/bulk-email': 'panel.bulkEmail',
+  '/admin-panel/push-alerts': 'Push alerts',
+  '/admin-panel/panel-highlights': 'Panel highlights',
   '/admin-panel/kyc-records': 'panel.kycRecords',
   '/admin-panel/brokers': 'panel.brokers',
   '/admin-panel/broker-reviews': 'panel.brokerReviews',
@@ -209,6 +273,7 @@ const PAGE_TITLE_KEYS: Record<string, string> = {
   '/admin-panel/analysis': 'nav.analysis',
   '/admin-panel/courses': 'nav.courses',
   '/admin-panel/feedback-inbox': 'panel.feedback',
+  '/admin-panel/live-chat': 'Live chat',
   '/admin-panel/user-activity': 'panel.activity',
   '/admin-panel/rebate-credits': 'nav.rebates',
   '/admin-panel/reports': 'panel.reports',
@@ -228,15 +293,68 @@ interface AdminHeaderProps {
 }
 
 const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuClick }) => {
-  const { user } = useAuth();
+  const { user, logout: authLogout } = useAuth();
   const { t, locale } = useLocale();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [clock, setClock] = useState(() => new Date());
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [chatUnread, setChatUnread] = useState(0);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const canLiveChat = hasPermission(user, 'live_chat');
 
   useEffect(() => {
     const t = window.setInterval(() => setClock(new Date()), 60000);
     return () => window.clearInterval(t);
   }, []);
+
+  useEffect(() => {
+    if (!canLiveChat) {
+      setChatUnread(0);
+      return;
+    }
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const data = await fetchAdminChatConversations({ status: 'open', page: 1, limit: 1 });
+        if (!cancelled) setChatUnread(data.unreadTotal || 0);
+      } catch {
+        // ignore
+      }
+    };
+    load();
+    const timer = window.setInterval(load, 45000);
+    const socket = connectChatSocket();
+    const onConv = (conv: { unreadByAdmin?: number }) => {
+      // Soft bump — refresh totals from API for accuracy
+      load();
+      void conv;
+    };
+    socket?.on('chat:conversation', onConv);
+    socket?.on('chat:message', load);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+      socket?.off('chat:conversation', onConv);
+      socket?.off('chat:message', load);
+    };
+  }, [canLiveChat]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onDocClick = (e: MouseEvent) => {
+      if (!menuRef.current?.contains(e.target as Node)) setMenuOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', onDocClick);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDocClick);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [menuOpen]);
 
   const title = t(resolveTitleKey(pathname));
   const timeLabel = clock.toLocaleString(locale, {
@@ -246,6 +364,13 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuClick }) => {
     hour: '2-digit',
     minute: '2-digit',
   });
+
+  const handleLogout = () => {
+    setMenuOpen(false);
+    authLogout();
+    navigate('/');
+    window.location.reload();
+  };
 
   return (
     <HeaderWrapper>
@@ -264,17 +389,54 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuClick }) => {
           <span>{t("panel.search")}</span>
           <kbd>{timeLabel}</kbd>
         </SearchPill>
-        <IconButton type="button" aria-label={t("panel.notifications")}>
-          <FiBell />
-          <Badge>5</Badge>
-        </IconButton>
-        <UserChip>
-          <Avatar>{user ? `${user.firstName[0]}${user.lastName[0]}` : 'A'}</Avatar>
-          <UserMeta>
-            <div className="name">{user ? `${user.firstName} ${user.lastName}` : t("panel.admin")}</div>
-            <div className="role">{isFullAdmin(user) ? t("panel.superAdmin") : t("panel.staff")}</div>
-          </UserMeta>
-        </UserChip>
+        {canLiveChat && (
+          <IconButton
+            type="button"
+            aria-label="Live chat"
+            title={chatUnread ? `${chatUnread} unread live chat` : 'Live chat'}
+            onClick={() => navigate('/admin-panel/live-chat')}
+          >
+            <FiBell />
+            {chatUnread > 0 && <Badge>{chatUnread > 9 ? '9+' : chatUnread}</Badge>}
+          </IconButton>
+        )}
+        <UserChipWrap ref={menuRef}>
+          <UserChip
+            type="button"
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((o) => !o)}
+          >
+            <Avatar>{user ? `${user.firstName[0]}${user.lastName[0]}` : 'A'}</Avatar>
+            <UserMeta>
+              <div className="name">{user ? `${user.firstName} ${user.lastName}` : t("panel.admin")}</div>
+              <div className="role">{isFullAdmin(user) ? t("panel.superAdmin") : t("panel.staff")}</div>
+            </UserMeta>
+            <ChipChevron $open={menuOpen} />
+          </UserChip>
+          {menuOpen && (
+            <UserMenu role="menu">
+              {canLiveChat && (
+                <UserMenuItem
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    navigate('/admin-panel/live-chat');
+                  }}
+                  style={{ color: adminColors.navy }}
+                >
+                  <FiBell size={15} />
+                  Live chat{chatUnread > 0 ? ` (${chatUnread})` : ''}
+                </UserMenuItem>
+              )}
+              <UserMenuItem type="button" role="menuitem" onClick={handleLogout}>
+                <FiLogOut size={15} />
+                {t("panel.logout")}
+              </UserMenuItem>
+            </UserMenu>
+          )}
+        </UserChipWrap>
       </RightSection>
     </HeaderWrapper>
   );

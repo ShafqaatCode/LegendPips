@@ -43,7 +43,7 @@ export async function createAdminStaff(payload: {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
+  password?: string;
   phone?: string;
   permissions: AdminPermission[];
 }) {
@@ -51,7 +51,7 @@ export async function createAdminStaff(payload: {
     method: "POST",
     body: JSON.stringify(payload),
   });
-  return data.member as AdminStaffMember;
+  return data.member as AdminStaffMember & { promoted?: boolean };
 }
 
 export async function updateAdminStaff(

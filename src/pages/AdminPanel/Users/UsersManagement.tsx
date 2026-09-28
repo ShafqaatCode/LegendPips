@@ -5,6 +5,7 @@ import { getAllUsers, deleteUser, blockOrUnblockUser, type AdminUser } from '../
 import { KYC_STATUS_LABELS, type KycStatus } from '../../../services/kycService';
 import { getUserListPreset } from '../../../utils/userListFilters';
 import SimpleModal from '../../../components/AdminPanel/SimpleModal';
+import { TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
 import {
   PageWrap, PageHeader, PageTitleGroup, PageTitle, PageSubtitle,
   FilterBar, SearchInput, FilterSelect, FilterCount,
@@ -31,6 +32,8 @@ const UsersManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [banTarget, setBanTarget] = useState<AdminUser | null>(null);
+  const [banReason, setBanReason] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
@@ -71,11 +74,35 @@ const UsersManagement: React.FC = () => {
   }, [loadUsers]);
 
   const handleBlockToggle = async (user: AdminUser) => {
-    const action = user.status === 'blocked' ? 'unblock' : 'block';
-    if (!window.confirm(`${action === 'block' ? 'Ban' : 'Unban'} ${user.firstName} ${user.lastName}?`)) return;
-    setActionLoading(user.id);
+    if (user.status === 'blocked') {
+      if (!window.confirm(`Re-enable ${user.firstName} ${user.lastName}? They will get a notification email.`)) return;
+      setActionLoading(user.id);
+      try {
+        await blockOrUnblockUser(user.id, 'unblock');
+        await loadUsers();
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
+        setActionLoading(null);
+      }
+      return;
+    }
+    setBanReason('');
+    setBanTarget(user);
+  };
+
+  const confirmBan = async () => {
+    if (!banTarget) return;
+    if (!banReason.trim()) {
+      setError('Please provide a reason. The user will see this in their email.');
+      return;
+    }
+    setActionLoading(banTarget.id);
+    setError('');
     try {
-      await blockOrUnblockUser(user.id, action);
+      await blockOrUnblockUser(banTarget.id, 'block', banReason.trim());
+      setBanTarget(null);
+      setBanReason('');
       await loadUsers();
     } catch (e: any) {
       setError(e.message);
@@ -117,10 +144,10 @@ const UsersManagement: React.FC = () => {
 
       <FilterBar>
         <SearchInput>
-          <FiSearch />
-          <input
+        <FiSearch />
+        <input
             placeholder="Search name or email…"
-            value={searchTerm}
+          value={searchTerm}
             onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
           />
         </SearchInput>
@@ -148,7 +175,7 @@ const UsersManagement: React.FC = () => {
         {hasExtraFilters && (
           <GhostButton $sm type="button" onClick={clearFilters}>Clear search</GhostButton>
         )}
-        <FilterCount>{totalItems} user{totalItems !== 1 ? 's' : ''}</FilterCount>
+        <FilterCount>{loading ? 'Loading…' : `${totalItems} user${totalItems !== 1 ? 's' : ''}`}</FilterCount>
       </FilterBar>
 
       {error && <ErrorBanner>{error}</ErrorBanner>}
@@ -167,7 +194,7 @@ const UsersManagement: React.FC = () => {
           </thead>
           <tbody>
             {loading ? (
-              <tr><EmptyCell colSpan={6}>Loading…</EmptyCell></tr>
+              <TableBodySkeleton rows={8} cols={6} />
             ) : users.length === 0 ? (
               <tr><EmptyCell colSpan={6}>No users match this view.</EmptyCell></tr>
             ) : (
@@ -177,8 +204,8 @@ const UsersManagement: React.FC = () => {
                     <UserCell>
                       <UserAvatar>{user.firstName[0]}{user.lastName[0]}</UserAvatar>
                       <div>
-                        <UserName>{user.firstName} {user.lastName}</UserName>
-                        <UserEmail>{user.email}</UserEmail>
+                      <UserName>{user.firstName} {user.lastName}</UserName>
+                      <UserEmail>{user.email}</UserEmail>
                       </div>
                     </UserCell>
                   </Td>
@@ -199,19 +226,19 @@ const UsersManagement: React.FC = () => {
                       </IconBtn>
                       <IconBtn
                         $success={user.status === 'blocked'}
-                        title={user.status === 'blocked' ? 'Unban' : 'Ban'}
+                        title={user.status === 'blocked' ? 'Enable' : 'Disable'}
                         disabled={actionLoading === user.id || user.role === 'admin'}
                         onClick={() => handleBlockToggle(user)}
                       >
                         {user.status === 'blocked' ? <FiCheckCircle /> : <FiSlash />}
                       </IconBtn>
                       <IconBtn
-                        $danger
+                      $danger
                         title="Delete"
                         disabled={actionLoading === user.id || user.role === 'admin'}
                         onClick={() => setDeleteId(user.id)}
-                      >
-                        <FiTrash2 />
+                    >
+                      <FiTrash2 />
                       </IconBtn>
                     </ActionGroup>
                   </Td>
@@ -253,6 +280,50 @@ const UsersManagement: React.FC = () => {
         <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748b' }}>
           This action cannot be undone.
         </p>
+      </SimpleModal>
+
+      <SimpleModal
+        isOpen={!!banTarget}
+        title="Disable account"
+        onClose={() => !actionLoading && setBanTarget(null)}
+        footer={
+            <>
+            <GhostButton type="button" onClick={() => setBanTarget(null)} disabled={!!actionLoading}>Cancel</GhostButton>
+            <GhostButton
+                $danger
+              type="button"
+              onClick={confirmBan}
+              disabled={!!actionLoading || !banReason.trim()}
+            >
+              <FiSlash /> {actionLoading ? 'Disabling…' : 'Disable & email user'}
+            </GhostButton>
+          </>
+        }
+      >
+        <p style={{ margin: '0 0 0.75rem', fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.5 }}>
+          {banTarget ? `${banTarget.firstName} ${banTarget.lastName}` : 'This user'} will not be able to sign in.
+          They will receive an email with your reason and a link to contact support.
+        </p>
+        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: 6 }}>
+          Reason (required — included in email)
+            </label>
+        <textarea
+          value={banReason}
+          onChange={(e) => setBanReason(e.target.value)}
+          placeholder="e.g. Multiple ToS violations / suspected fraud…"
+          maxLength={1000}
+          style={{
+            width: '100%',
+            minHeight: 88,
+            padding: '0.625rem',
+            border: '1px solid #e8ecf1',
+            borderRadius: 8,
+            fontSize: '0.8125rem',
+            resize: 'vertical',
+            outline: 'none',
+            boxSizing: 'border-box',
+          }}
+        />
       </SimpleModal>
     </PageWrap>
   );

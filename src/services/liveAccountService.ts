@@ -2,6 +2,9 @@ import { API_CONFIG, getAuthHeaders } from "../utils/apiConfig";
 
 export type LiveAccountStatus = "pending" | "in_progress" | "approved" | "rejected" | string;
 
+/** new = opened with LegendPips IB link; existing = already had the account */
+export type LiveAccountKind = "new" | "existing";
+
 export type LiveAccountRequestRow = {
   id: string;
   userEmail?: string;
@@ -9,6 +12,8 @@ export type LiveAccountRequestRow = {
   brokerId?: string;
   brokerName: string;
   accountNumber: string;
+  accountKind?: LiveAccountKind;
+  comment?: string;
   termsAccepted?: boolean;
   status: LiveAccountStatus;
   adminNote?: string;
@@ -36,6 +41,8 @@ export async function submitLiveAccountRequest(payload: {
   brokerId?: string;
   brokerName: string;
   accountNumber: string;
+  accountKind: LiveAccountKind;
+  comment?: string;
   termsAccepted: boolean;
 }): Promise<{ message: string; item: LiveAccountRequestRow }> {
   const data = await fetchJson(`${API_CONFIG.BASE_URL}/me/live-accounts`, {
@@ -66,4 +73,9 @@ export function liveAccountStatusLabel(status: string): string {
     default:
       return status;
   }
+}
+
+export function liveAccountKindLabel(kind?: string): string {
+  if (kind === "existing") return "Existing account";
+  return "New account";
 }

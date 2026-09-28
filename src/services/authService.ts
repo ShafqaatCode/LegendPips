@@ -93,6 +93,7 @@ export const login = async (credentials: LoginRequest): Promise<AuthResponse> =>
     }
 
     if (data.success && data.token) {
+      clearAdminSessionStash();
       setAuthToken(data.token);
       if (data.user) {
         localStorage.setItem("user", JSON.stringify({
@@ -109,6 +110,54 @@ export const login = async (credentials: LoginRequest): Promise<AuthResponse> =>
   }
 };
 
+export const loginWithGoogle = async (
+  idToken: string,
+  opts?: { referralCode?: string }
+): Promise<AuthResponse> => {
+  const response = await fetchWithTimeout(
+    `${API_CONFIG.BASE_URL}/login/google`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        idToken,
+        ...(opts?.referralCode ? { referralCode: opts.referralCode } : {}),
+      }),
+    },
+    API_CONFIG.TIMEOUT
+  );
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Google login failed");
+  }
+
+  if (data.requires2fa && data.tempToken) {
+    return {
+      success: true,
+      requires2fa: true,
+      tempToken: data.tempToken,
+      message: data.message || "2FA required",
+    };
+  }
+
+  if (data.success && data.token) {
+    clearAdminSessionStash();
+    setAuthToken(data.token);
+    if (data.user) {
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          ...data.user,
+          kycStatus: data.user.kycStatus || "incomplete",
+        })
+      );
+    }
+  }
+
+  return data;
+};
+
 export const verifyLogin2fa = async (body: Login2faRequest): Promise<AuthResponse> => {
   const response = await fetchWithTimeout(
     `${API_CONFIG.BASE_URL}/login/2fa`,
@@ -123,6 +172,7 @@ export const verifyLogin2fa = async (body: Login2faRequest): Promise<AuthRespons
   if (!response.ok) throw new Error(data.message || "2FA verification failed");
 
   if (data.success && data.token) {
+    clearAdminSessionStash();
     setAuthToken(data.token);
     if (data.user) {
       localStorage.setItem(
@@ -209,8 +259,40 @@ export const register = async (userData: RegisterRequest): Promise<AuthResponse>
 
 // Logout
 export const logout = (): void => {
+  clearAdminSessionStash();
   removeAuthToken();
   localStorage.removeItem("user");
+};
+
+const ADMIN_SESSION_TOKEN_KEY = "adminSessionToken";
+const ADMIN_SESSION_USER_KEY = "adminSessionUser";
+
+/** Save current admin session before switching into a user account. */
+export const stashAdminSession = (): void => {
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("user");
+  if (token) localStorage.setItem(ADMIN_SESSION_TOKEN_KEY, token);
+  if (user) localStorage.setItem(ADMIN_SESSION_USER_KEY, user);
+};
+
+export const clearAdminSessionStash = (): void => {
+  localStorage.removeItem(ADMIN_SESSION_TOKEN_KEY);
+  localStorage.removeItem(ADMIN_SESSION_USER_KEY);
+};
+
+export const isImpersonating = (): boolean => {
+  return Boolean(localStorage.getItem(ADMIN_SESSION_TOKEN_KEY));
+};
+
+/** Restore stashed admin session. Returns false if nothing was saved. */
+export const restoreAdminSession = (): boolean => {
+  const token = localStorage.getItem(ADMIN_SESSION_TOKEN_KEY);
+  const userStr = localStorage.getItem(ADMIN_SESSION_USER_KEY);
+  if (!token || !userStr) return false;
+  setAuthToken(token);
+  localStorage.setItem("user", userStr);
+  clearAdminSessionStash();
+  return true;
 };
 
 /** Store token + user after login or admin impersonation */

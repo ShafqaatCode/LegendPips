@@ -181,20 +181,23 @@ export const ToggleRow = styled.label`
   }
 `;
 
-export const LogoPreview = styled.div`
-  width: 160px;
-  height: 56px;
+export const LogoPreview = styled.div<{ $height?: number; $maxWidth?: number }>`
+  width: ${({ $maxWidth }) => Math.max(160, ($maxWidth ?? 160) + 24)}px;
+  height: ${({ $height }) => Math.max(56, ($height ?? 40) + 24)}px;
+  max-width: 100%;
   border: 1px dashed ${adminColors.border};
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f8fafc;
+  background: #0c1f3d;
   overflow: hidden;
+  padding: 8px;
 
   img {
-    max-width: 100%;
-    max-height: 100%;
+    width: auto;
+    max-width: ${({ $maxWidth }) => $maxWidth ?? 160}px;
+    height: ${({ $height }) => $height ?? 40}px;
     object-fit: contain;
   }
 `;

@@ -5,10 +5,10 @@ import { FiAward, FiCheckCircle, FiCopy, FiSearch, FiAlertTriangle, FiStar } fro
 import bannerBg from "../../assets/banner/BannerBg.jpg";
 import CompareToggle from "../../components/Broker/CompareToggle";
 import PropFirmCard from "../../components/Broker/PropFirmCard";
-import { fetchBrokersPage, type ApiBroker, type PropCashbackOffer } from "../../services/brokerService";
+import { fetchBrokersPage, type ApiBroker } from "../../services/brokerService";
 import { fetchRecentPayoutReviews, type PublicBrokerReview } from "../../services/brokerReviewService";
 import { fetchComplaintBlacklist, type BlacklistBroker } from "../../services/complaintService";
-import { formatPropCardSummary } from "../../utils/propTradingDisplay";
+import { resolvePropDiscount, copyTextToClipboard } from "../../utils/propTradingDisplay";
 import { mapApiBrokerToRebateCardRow } from "../../utils/rebatesBrokersDisplay";
 import { comparePath, getCompareIds } from "../../utils/compareBrokers";
 import { useLocale } from "../../contexts/LocaleContext";
@@ -16,11 +16,6 @@ import { useLocale } from "../../contexts/LocaleContext";
 function cashbackNum(v?: string) {
   const n = parseFloat(String(v || "").replace(/[^\d.]/g, ""));
   return Number.isFinite(n) ? n : -1;
-}
-
-function bestOffer(offers: PropCashbackOffer[]) {
-  const best = offers.reduce((m, o) => Math.max(m, cashbackNum(o.firstPurchaseCashback)), -1);
-  return offers.find((o) => cashbackNum(o.firstPurchaseCashback) === best) || offers[0];
 }
 
 function collectCodes(b: ApiBroker) {
@@ -42,7 +37,13 @@ function collectCodes(b: ApiBroker) {
       firm: b.name,
       brokerId: b._id,
     }));
-  return [...fromPromo, ...fromOffers];
+  const seen = new Set<string>();
+  return [...fromPromo, ...fromOffers].filter((c) => {
+    const key = `${c.brokerId}:${c.code}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 const PropFirmHubPage: React.FC = () => {
@@ -95,12 +96,10 @@ const PropFirmHubPage: React.FC = () => {
   const discountCodes = useMemo(() => filtered.flatMap(collectCodes), [filtered]);
 
   const copyCode = async (code: string) => {
-    try {
-      await navigator.clipboard.writeText(code);
+    const ok = await copyTextToClipboard(code);
+    if (ok) {
       setCopied(code);
       setTimeout(() => setCopied(null), 1600);
-    } catch {
-      /* ignore */
     }
   };
 
@@ -167,82 +166,127 @@ const PropFirmHubPage: React.FC = () => {
 
         {error && <Empty>{error}</Empty>}
 
-        <TableWrap>
-          <table>
-            <thead>
-              <tr>
-                <th>Firm</th>
-                <th>Cashback</th>
-                <th>Discount / code</th>
-                <th>Fee</th>
-                <th>Target / DD</th>
-                <th>Payout</th>
-                <th>Eval / split</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((b) => {
-                const offers = b.propOffers || [];
-                const top = bestOffer(offers);
-                const code =
-                  top?.discountCode ||
-                  (b.propPromoCodes || []).find((p) => p.active !== false)?.code ||
-                  "";
-                return (
-                  <tr key={b._id}>
-                    <td>
-                      <strong>{b.name}</strong>
-                      {b.verified !== false && (
-                        <Verified>
-                          <FiCheckCircle /> Verified
-                        </Verified>
-                      )}
-                    </td>
-                    <td>
-                      {top?.firstPurchaseCashback || "—"}
-                      {top?.repeatPurchaseCashback ? (
-                        <small> / {top.repeatPurchaseCashback} repeat</small>
-                      ) : null}
-                    </td>
-                    <td>
-                      {top?.discountPercent || "—"}
-                      {code ? (
-                        <CodeBtn type="button" onClick={() => copyCode(code)} title="Copy code">
-                          <FiCopy /> {code}
-                        </CodeBtn>
-                      ) : null}
-                    </td>
-                    <td>{top?.challengeFee || "—"}</td>
-                    <td>
-                      {[top?.profitTarget, top?.dailyDrawdown && `Daily ${top.dailyDrawdown}`, top?.maxDrawdown && `Max ${top.maxDrawdown}`]
-                        .filter(Boolean)
-                        .join(" · ") || "—"}
-                    </td>
-                    <td>{top?.payoutCycle || "—"}</td>
-                    <td>
-                      {[top?.evaluationType, top?.profitSplit, top?.accountSize].filter(Boolean).join(" · ") ||
-                        formatPropCardSummary(offers)}
-                    </td>
-                    <td>
-                      <RowActions>
-                        <Link to={`/rebates/broker/${b._id}`}>Details</Link>
-                        <Link to={`/rebates/broker/${b._id}#reviews`}>Payout reviews</Link>
-                        <Link to={`/complaints?broker=${b._id}`}>Complaint</Link>
-                        <CompareToggle brokerId={b._id} />
-                      </RowActions>
-                    </td>
-                  </tr>
-                );
-              })}
-              {!error && filtered.length === 0 && (
+        <ListHead>
+          <h2>
+            <FiAward /> Partnered prop firms
+          </h2>
+          <p>
+            {filtered.length} firm{filtered.length === 1 ? "" : "s"} — cashback, discount codes, and Start Challenge.
+          </p>
+        </ListHead>
+
+        <CardList>
+          {filtered.map((b) => {
+            const row = mapApiBrokerToRebateCardRow(b);
+            return (
+              <PropFirmCard
+                key={row.key}
+                title={row.title}
+                brokerId={row.key}
+                logoSrc={row.logoSrc}
+                rating={row.rating}
+                reviewsCount={row.reviewsCount}
+                propOffers={row.propOffers || []}
+                propPromoCodes={row.propPromoCodes}
+                setupUrl={row.setupUrl}
+                temporarilyDisabled={row.temporarilyDisabled}
+              />
+            );
+          })}
+        </CardList>
+
+        {!error && filtered.length === 0 && (
+          <Empty style={{ color: "#64748b" }}>No prop firms match these filters yet.</Empty>
+        )}
+
+        <Section>
+          <h2>Quick compare</h2>
+          <p>Scan cashback and partner codes side by side, then open a firm or add it to compare.</p>
+          <TableWrap>
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan={8}>No prop firms match these filters yet.</td>
+                  <th>Firm</th>
+                  <th>Cashback</th>
+                  <th>Discount / code</th>
+                  <th>Programs</th>
+                  <th>Actions</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </TableWrap>
+              </thead>
+              <tbody>
+                {filtered.map((b) => {
+                  const offers = b.propOffers || [];
+                  const deal = resolvePropDiscount(offers, b.propPromoCodes);
+                  const programs = [
+                    ...new Set(
+                      offers
+                        .map((o) => [o.evaluationType, o.profitSplit, o.accountSize].filter(Boolean).join(" · "))
+                        .filter(Boolean)
+                    ),
+                  ];
+                  return (
+                    <tr key={b._id}>
+                      <td>
+                        <FirmCell>
+                          <strong>{b.name}</strong>
+                          {b.verified !== false && (
+                            <Verified>
+                              <FiCheckCircle /> Verified
+                            </Verified>
+                          )}
+                        </FirmCell>
+                      </td>
+                      <td>
+                        {deal.firstPurchase ? (
+                          <>
+                            <CashStrong>{deal.firstPurchase}</CashStrong>
+                            <small>first purchase</small>
+                            {deal.repeatPurchase && <small>{deal.repeatPurchase} repeat</small>}
+                          </>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td>
+                        <DiscountCell>
+                          {deal.discountPercent && <OffPill>{deal.discountPercent.replace(/\s*off$/i, "")} OFF</OffPill>}
+                          {deal.code ? (
+                            <CodeBtn type="button" onClick={() => copyCode(deal.code!)} title="Copy code">
+                              <FiCopy /> {copied === deal.code ? "Copied" : deal.code}
+                            </CodeBtn>
+                          ) : (
+                            !deal.discountPercent && "—"
+                          )}
+                        </DiscountCell>
+                      </td>
+                      <td>
+                        {programs.length > 0 ? (
+                          <Programs>{programs.slice(0, 2).join(" · ")}</Programs>
+                        ) : offers.length > 0 ? (
+                          <Programs>{offers.map((o) => o.label).filter(Boolean).join(" · ") || "Standard"}</Programs>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td>
+                        <RowActions>
+                          <Link to={`/rebates/broker/${b._id}?setup=1`}>Start Challenge</Link>
+                          <Link to={`/rebates/broker/${b._id}`}>Details</Link>
+                          <CompareToggle brokerId={b._id} />
+                        </RowActions>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {!error && filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={5}>No prop firms match these filters yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </TableWrap>
+        </Section>
 
         {discountCodes.length > 0 && (
           <Section>
@@ -252,7 +296,10 @@ const PropFirmHubPage: React.FC = () => {
               {discountCodes.map((c) => (
                 <CodeCard key={`${c.brokerId}-${c.code}-${c.label}`}>
                   <strong>{c.firm}</strong>
-                  <span>{c.label}{c.percent ? ` · ${c.percent}` : ""}</span>
+                  <span>
+                    {c.label}
+                    {c.percent ? ` · ${c.percent}` : ""}
+                  </span>
                   <button type="button" onClick={() => copyCode(c.code)}>
                     <FiCopy /> {copied === c.code ? "Copied" : c.code}
                   </button>
@@ -281,9 +328,7 @@ const PropFirmHubPage: React.FC = () => {
                     <span className="speed">{r.payoutSpeedDays} days to payout</span>
                   )}
                   <p>{r.comment}</p>
-                  {r.brokerId && (
-                    <Link to={`/rebates/broker/${r.brokerId}#reviews`}>View firm →</Link>
-                  )}
+                  {r.brokerId && <Link to={`/rebates/broker/${r.brokerId}`}>View firm →</Link>}
                 </ReviewCard>
               ))}
             </ReviewGrid>
@@ -294,9 +339,7 @@ const PropFirmHubPage: React.FC = () => {
           <h2>
             <FiAlertTriangle /> Complaints & warnings
           </h2>
-          <p>
-            Report payout, challenge-rule, or support issues. Screenshots help our team investigate faster.
-          </p>
+          <p>Report payout, challenge-rule, or support issues. Screenshots help our team investigate faster.</p>
           <ComplaintBar>
             <Link to="/complaints">Open complaint center</Link>
             {filtered[0] && <Link to={`/complaints?broker=${filtered[0]._id}`}>File against a listed firm</Link>}
@@ -313,30 +356,6 @@ const PropFirmHubPage: React.FC = () => {
           )}
         </Section>
 
-        <ListHead>
-          <h2>
-            <FiAward /> Partnered prop firms
-          </h2>
-          <p>Same firms as the Prop tab on Rebates, with challenge cashback cards.</p>
-        </ListHead>
-        <CardList>
-          {filtered.map((b) => {
-            const row = mapApiBrokerToRebateCardRow(b);
-            return (
-              <PropFirmCard
-                key={row.key}
-                title={row.title}
-                brokerId={row.key}
-                logoSrc={row.logoSrc}
-                rating={row.rating}
-                reviewsCount={row.reviewsCount}
-                propOffers={row.propOffers || []}
-                setupUrl={row.setupUrl}
-              />
-            );
-          })}
-        </CardList>
-
         <Faq>
           <h2>Prop hub FAQ</h2>
           <details open>
@@ -350,7 +369,8 @@ const PropFirmHubPage: React.FC = () => {
           <details>
             <summary>Can I compare firms?</summary>
             <p>
-              Add firms with Compare, then open the matrix — prop rows include fee, drawdown, payout cycle, and discount codes.
+              Add firms with Compare, then open the matrix — prop rows include fee, drawdown, payout cycle, and discount
+              codes.
             </p>
           </details>
         </Faq>
@@ -463,41 +483,129 @@ const Search = styled.label`
   input { border: 0; outline: none; font: inherit; min-width: 160px; }
 `;
 const TableWrap = styled.div`
-  max-width: ${({ theme }) => theme.typography.contentMax};
-  margin: 0 auto 1.5rem;
-  padding: 0 ${({ theme }) => theme.typography.pageGutter};
+  margin-top: 0.35rem;
   overflow-x: auto;
-  table { width: 100%; border-collapse: collapse; background: #fff; min-width: 920px; }
-  th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #eef2f7; font-size: 0.85rem; vertical-align: top; }
-  th { background: #f8fafc; color: #132e58; }
-  small { color: #64748b; display: block; margin-top: 0.15rem; }
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 640px;
+  }
+  th,
+  td {
+    text-align: left;
+    padding: 0.85rem 0.9rem;
+    border-bottom: 1px solid #eef2f7;
+    font-size: 0.85rem;
+    vertical-align: middle;
+  }
+  th {
+    background: #f8fafc;
+    color: #132e58;
+    font-weight: 800;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  tbody tr:hover td {
+    background: #fafbfc;
+  }
+  small {
+    color: #64748b;
+    display: block;
+    margin-top: 0.12rem;
+    font-size: 0.72rem;
+  }
+`;
+const FirmCell = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  strong {
+    color: #132e58;
+    font-size: 0.95rem;
+  }
 `;
 const Verified = styled.span`
-  display: inline-flex; gap: 0.25rem; align-items: center;
-  margin-left: 0.4rem; color: #059669; font-size: 0.7rem; font-weight: 700;
+  display: inline-flex;
+  gap: 0.2rem;
+  align-items: center;
+  color: #059669;
+  font-size: 0.68rem;
+  font-weight: 700;
+`;
+const CashStrong = styled.span`
+  display: block;
+  color: #132e58;
+  font-weight: 800;
+  font-size: 1rem;
+`;
+const DiscountCell = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+`;
+const OffPill = styled.span`
+  display: inline-flex;
+  align-items: center;
+  background: #fbbf24;
+  color: #132e58;
+  font-weight: 900;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  white-space: nowrap;
 `;
 const CodeBtn = styled.button`
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  margin-top: 0.25rem;
-  border: 1px dashed #cbd5e1;
-  background: #f8fafc;
-  border-radius: 6px;
-  padding: 0.2rem 0.45rem;
+  gap: 0.3rem;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.3rem 0.55rem;
   font: inherit;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 800;
   color: #132e58;
+  letter-spacing: 0.03em;
   cursor: pointer;
+  &:hover {
+    border-color: #1d4ed8;
+    color: #1d4ed8;
+  }
+`;
+const Programs = styled.span`
+  color: #64748b;
+  font-size: 0.8rem;
+  text-transform: capitalize;
 `;
 const RowActions = styled.div`
-  display: flex; flex-direction: column; gap: 0.35rem; align-items: flex-start;
-  a { color: #132e58; font-weight: 700; font-size: 0.8rem; }
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.75rem;
+  align-items: center;
+  a {
+    color: #1d4ed8;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-decoration: none;
+    white-space: nowrap;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;
 const Section = styled.section`
   max-width: ${({ theme }) => theme.typography.contentMax};
-  margin: 0 auto 1.5rem;
+  margin: 1.35rem auto 0;
   padding: 0 ${({ theme }) => theme.typography.pageGutter};
   h2 {
     margin: 0;
@@ -507,7 +615,11 @@ const Section = styled.section`
     gap: 0.4rem;
     font-size: 1.1rem;
   }
-  > p { margin: 0.35rem 0 0.75rem; color: #64748b; font-size: 0.85rem; }
+  > p {
+    margin: 0.35rem 0 0.75rem;
+    color: #64748b;
+    font-size: 0.85rem;
+  }
 `;
 const CodeGrid = styled.div`
   display: grid;
@@ -616,7 +728,7 @@ const Muted = styled.p`
 `;
 const CardList = styled.div`
   max-width: ${({ theme }) => theme.typography.contentMax};
-  margin: 0 auto;
+  margin: 0 auto 0.5rem;
   padding: 0 ${({ theme }) => theme.typography.pageGutter};
   display: flex;
   flex-direction: column;
@@ -624,10 +736,21 @@ const CardList = styled.div`
 `;
 const ListHead = styled.div`
   max-width: ${({ theme }) => theme.typography.contentMax};
-  margin: 0 auto 0.5rem;
+  margin: 0.35rem auto 0.65rem;
   padding: 0 ${({ theme }) => theme.typography.pageGutter};
-  h2 { margin: 0; color: #132e58; display: flex; gap: 0.4rem; align-items: center; font-size: 1.1rem; }
-  p { margin: 0.25rem 0 0; color: #64748b; font-size: 0.85rem; }
+  h2 {
+    margin: 0;
+    color: #132e58;
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    font-size: 1.1rem;
+  }
+  p {
+    margin: 0.25rem 0 0;
+    color: #64748b;
+    font-size: 0.85rem;
+  }
 `;
 const Faq = styled.section`
   max-width: ${({ theme }) => theme.typography.contentMax};

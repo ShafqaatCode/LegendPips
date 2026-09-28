@@ -2,7 +2,11 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { FiActivity, FiRefreshCw, FiSearch } from 'react-icons/fi';
-import { fetchAdminActivityFeed, type AdminActivityFeedRow } from '../../../services/adminEngagementService';
+import {
+  fetchAdminActivityFeed,
+  type ActivityFeedScope,
+  type AdminActivityFeedRow,
+} from '../../../services/adminEngagementService';
 import { TableBodySkeleton } from '../../../components/SharedComponents/Shimmer';
 import {
   PageWrap, PageHeader, PageTitleGroup, PageTitle, PageSubtitle,
@@ -33,6 +37,13 @@ const ACTIVITY_TYPES = [
   'system',
 ];
 
+const SCOPES: { id: ActivityFeedScope; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'mine', label: 'My activity' },
+  { id: 'team', label: 'Team' },
+  { id: 'users', label: 'Members' },
+];
+
 const TypeSelect = styled.select`
   min-width: 160px;
   padding: 0.5rem 0.7rem;
@@ -42,6 +53,24 @@ const TypeSelect = styled.select`
   font-size: 0.8125rem;
   color: ${adminColors.navy};
   font-weight: 600;
+`;
+
+const ScopeBtn = styled.button<{ $on?: boolean }>`
+  border: 1px solid ${({ $on }) => ($on ? adminColors.navy : adminColors.border)};
+  background: ${({ $on }) => ($on ? adminColors.navy : '#fff')};
+  color: ${({ $on }) => ($on ? '#fff' : adminColors.muted)};
+  border-radius: 999px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: ${adminColors.navy};
+    color: ${({ $on }) => ($on ? '#fff' : adminColors.navy)};
+  }
 `;
 
 const StatsRow = styled.div`
@@ -67,6 +96,7 @@ const AdminUserActivityFeed: React.FC = () => {
   const [q, setQ] = useState('');
   const [appliedQ, setAppliedQ] = useState('');
   const [type, setType] = useState('');
+  const [scope, setScope] = useState<ActivityFeedScope>('all');
   const [page, setPage] = useState(1);
   const [items, setItems] = useState<AdminActivityFeedRow[]>([]);
   const [pagination, setPagination] = useState<{
@@ -86,6 +116,7 @@ const AdminUserActivityFeed: React.FC = () => {
       const data = await fetchAdminActivityFeed(page, 30, {
         q: appliedQ.trim() || undefined,
         type: type || undefined,
+        scope,
       });
       setItems(data.items);
       setPagination(data.pagination);
@@ -94,9 +125,11 @@ const AdminUserActivityFeed: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, appliedQ, type]);
+  }, [page, appliedQ, type, scope]);
 
   useEffect(() => { refresh(); }, [refresh]);
+
+  const hasFilters = Boolean(appliedQ || type || scope !== 'all');
 
   return (
     <PageWrap>
@@ -115,7 +148,8 @@ const AdminUserActivityFeed: React.FC = () => {
           <h3>Full member history</h3>
           <p>
             Tracks login, KYC, profile, contests, signals, forum, rebates, complaints, referrals,
-            live accounts, IB changes, traders, and more. Filter by email/name or activity type.
+            live accounts, IB changes, traders, and more. Filter by username, your own actions,
+            team (admins), or members.
           </p>
         </HeroNote>
       </StatsRow>
@@ -148,6 +182,19 @@ const AdminUserActivityFeed: React.FC = () => {
             </option>
           ))}
         </TypeSelect>
+        {SCOPES.map((s) => (
+          <ScopeBtn
+            key={s.id}
+            type="button"
+            $on={scope === s.id}
+            onClick={() => {
+              setPage(1);
+              setScope(s.id);
+            }}
+          >
+            {s.label}
+          </ScopeBtn>
+        ))}
         <GhostButton
           $sm
           type="button"
@@ -155,7 +202,7 @@ const AdminUserActivityFeed: React.FC = () => {
         >
           Apply
         </GhostButton>
-        {(appliedQ || type) && (
+        {hasFilters && (
           <GhostButton
             $sm
             type="button"
@@ -163,6 +210,7 @@ const AdminUserActivityFeed: React.FC = () => {
               setQ('');
               setAppliedQ('');
               setType('');
+              setScope('all');
               setPage(1);
             }}
           >
@@ -207,6 +255,7 @@ const AdminUserActivityFeed: React.FC = () => {
                   </div>
                   <div style={{ fontSize: '0.6875rem', color: adminColors.muted }}>
                     {row.userEmail || row.userId || '—'}
+                    {row.userRole === 'admin' ? ' · Admin' : ''}
                   </div>
                 </Td>
                 <Td><Pill $variant="user">{row.type}</Pill></Td>

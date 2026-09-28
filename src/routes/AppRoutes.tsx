@@ -8,6 +8,8 @@ import CountryBrokerMatcherPage from "../pages/Brokers/CountryBrokerMatcherPage"
 import Contests from "../pages/Contests/Contestspage";
 import RebateBrokers from "../pages/RebateBrokers/RebateBrokersPage";
 import RebateBrokerDetailPage from "../pages/RebateBrokers/RebateBrokerDetailPage";
+import BrokerReviewsPage from "../pages/RebateBrokers/BrokerReviewsPage";
+import AccountTypeSelectionPage from "../pages/AccountTypes/AccountTypeSelectionPage";
 import Analysis from "../pages/Analysis/Analysis";
 import AnalysisDetail from "../components/Analysis/AnalysisDetail";
 import HitWorksPage from "../pages/HitWorksPage/HitWorksPage";
@@ -33,7 +35,9 @@ import SavedAnalysis from "../pages/UserPanel/Analysis/SavedAnalysis";
 import ForumPosts from "../pages/UserPanel/Forum/ForumPosts";
 import MyBrokerReviews from "../pages/UserPanel/Reviews/MyBrokerReviews";
 import MyComplaints from "../pages/UserPanel/Complaints/MyComplaints";
+import MyTickets from "../pages/UserPanel/Tickets/MyTickets";
 import Activity from "../pages/UserPanel/Activity/Activity";
+import Alerts from "../pages/UserPanel/Alerts/Alerts";
 import MyRebates from "../pages/UserPanel/Rebates/MyRebates";
 import InviteFriends from "../pages/UserPanel/Referrals/InviteFriends";
 import RequestIbChange from "../pages/UserPanel/IbChange/RequestIbChange";
@@ -46,6 +50,10 @@ import AdminDashboard from "../pages/AdminPanel/Dashboard/AdminDashboard";
 import UsersManagement from "../pages/AdminPanel/Users/UsersManagement";
 import UserDetail from "../pages/AdminPanel/Users/UserDetail";
 import AdminBulkEmail from "../pages/AdminPanel/Users/AdminBulkEmail";
+import AdminAccountManagers from "../pages/AdminPanel/Users/AdminAccountManagers";
+import AdminPushAlerts from "../pages/AdminPanel/Engagement/AdminPushAlerts";
+import AdminPanelHighlights from "../pages/AdminPanel/Engagement/AdminPanelHighlights";
+import AdminCornerPromos from "../pages/AdminPanel/Engagement/AdminCornerPromos";
 import KycRecordsManagement from "../pages/AdminPanel/Kyc/KycRecordsManagement";
 import BrokersManagement from "../pages/AdminPanel/Brokers/BrokersManagement";
 import AdminBrokerReviews from "../pages/AdminPanel/Brokers/AdminBrokerReviews";
@@ -63,6 +71,7 @@ import Reports from "../pages/AdminPanel/Reports/Reports";
 import AdminSecurity from "../pages/AdminPanel/Security/AdminSecurity";
 import AdminSettings from "../pages/AdminPanel/Settings/AdminSettings";
 import AdminFeedbackInbox from "../pages/AdminPanel/Engagement/AdminFeedbackInbox";
+import AdminLiveChat from "../pages/AdminPanel/Engagement/AdminLiveChat";
 import AdminUserActivityFeed from "../pages/AdminPanel/Engagement/AdminUserActivityFeed";
 import AdminReferralsProgress from "../pages/AdminPanel/Engagement/AdminReferralsProgress";
 import AdminIbChangeRequests from "../pages/AdminPanel/Engagement/AdminIbChangeRequests";
@@ -71,6 +80,7 @@ import AdminRebateCredits from "../pages/AdminPanel/Rebates/AdminRebateCredits";
 import AdminTeamManagement from "../pages/AdminPanel/Team/AdminTeamManagement";
 import ProtectedAdminRoute from "../components/AdminPanel/ProtectedAdminRoute";
 import MyLiveAccounts from "../pages/UserPanel/LiveAccounts/MyLiveAccounts";
+import HighlightDetailPage from "../pages/UserPanel/Highlights/HighlightDetailPage";
 
 import MarginCalculatorPage from "../pages/MarginCalculator/MarginCalculatorPage";
 import RebateCalculatorPage from "../pages/RebateCalculator/RebateCalculatorPage";
@@ -88,14 +98,31 @@ import {
   JournalistsPage,
 } from "../pages/About/AboutExtraPages";
 import ComplaintsPage from "../pages/Complaints/ComplaintsPage";
+import SpreadComparisonPage from "../pages/Tools/SpreadComparisonPage";
+import LiveChartsPage from "../pages/Tools/LiveChartsPage";
+import EconomicCalendarPage from "../pages/Tools/EconomicCalendarPage";
+import SwapsComparisonPage from "../pages/Tools/SwapsComparisonPage";
+import CurrencyConverterPage from "../pages/Tools/CurrencyConverterPage";
+import TradingStatsHubPage from "../pages/Tools/TradingStatsHubPage";
+import PublicAlertsPage from "../pages/Alerts/PublicAlertsPage";
 import ComparePage from "../pages/Compare/ComparePage";
 import PropFirmHubPage from "../pages/PropFirms/PropFirmHubPage";
 import TradersPage, { CopyTradingPage } from "../pages/Traders/TradersPage";
 import TraderDetailPage from "../pages/Traders/TraderDetailPage";
 import MyTraderProfile from "../pages/UserPanel/Traders/MyTraderProfile";
 import MyCopyTrading from "../pages/UserPanel/Traders/MyCopyTrading";
+import MyStrategies from "../pages/UserPanel/Strategies/MyStrategies";
+import MyStreak from "../pages/UserPanel/Streak/MyStreak";
+import StrategiesPage from "../pages/Strategies/StrategiesPage";
+import StrategyDetailPage from "../pages/Strategies/StrategyDetailPage";
+import StreaksPage from "../pages/Strategies/StreaksPage";
 import AdminTraderProfiles from "../pages/AdminPanel/Traders/AdminTraderProfiles";
+import AdminStrategies from "../pages/AdminPanel/Strategies/AdminStrategies";
 import LegalPage from "../pages/Legal/LegalPage";
+import { ContactSupportPage, BrokerAdvicePage, FaqsPage, KnowledgeBasePage } from "../pages/Support/SupportPages";
+import SupportTicketsPage from "../pages/Support/SupportTicketsPage";
+import LiveChatPage from "../pages/Support/LiveChatPage";
+import ResetPasswordPage from "../pages/Login/ResetPasswordPage";
 import {
   ProfitCalculatorPage,
   RiskRewardCalculatorPage,
@@ -103,6 +130,8 @@ import {
   CompoundCalculatorPage,
   CryptoProfitCalculatorPage,
   LotCalculatorPage,
+  RiskOfRuinCalculatorPage,
+  CryptoExchangeFeesCalculatorPage,
 } from "../pages/ExtraCalculators/ExtraCalculatorPages";
 
 // 👇 Add these imports
@@ -113,6 +142,7 @@ const AppRoutes: React.FC = () => {
     <Routes>
       
       <Route path="/signin" element={<SignInPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
       {/* ⬇ Admin Panel Layout */}
@@ -126,6 +156,10 @@ const AppRoutes: React.FC = () => {
       >
         <Route index element={<AdminDashboard />} />
         <Route path="users/bulk-email" element={<AdminBulkEmail />} />
+        <Route path="users/account-managers" element={<AdminAccountManagers />} />
+        <Route path="push-alerts" element={<AdminPushAlerts />} />
+        <Route path="panel-highlights" element={<AdminPanelHighlights />} />
+        <Route path="corner-promos" element={<AdminCornerPromos />} />
         <Route path="kyc-records" element={<KycRecordsManagement />} />
         <Route path="kyc-records/:id" element={<UserDetail />} />
         <Route path="users" element={<UsersManagement />} />
@@ -143,12 +177,14 @@ const AppRoutes: React.FC = () => {
         <Route path="reports" element={<Reports />} />
         <Route path="security" element={<AdminSecurity />} />
         <Route path="feedback-inbox" element={<AdminFeedbackInbox />} />
+        <Route path="live-chat" element={<AdminLiveChat />} />
         <Route path="user-activity" element={<AdminUserActivityFeed />} />
         <Route path="referrals" element={<AdminReferralsProgress />} />
         <Route path="ib-change" element={<AdminIbChangeRequests />} />
         <Route path="live-accounts" element={<AdminLiveAccountRequests />} />
         <Route path="rebate-credits" element={<AdminRebateCredits />} />
         <Route path="traders" element={<AdminTraderProfiles />} />
+        <Route path="strategies" element={<AdminStrategies />} />
         <Route path="settings" element={<AdminSettings />} />
         <Route path="team" element={<AdminTeamManagement />} />
       </Route>
@@ -174,13 +210,18 @@ const AppRoutes: React.FC = () => {
         <Route path="forum" element={<ForumPosts />} />
         <Route path="broker-reviews" element={<MyBrokerReviews />} />
         <Route path="complaints" element={<MyComplaints />} />
+        <Route path="tickets" element={<MyTickets />} />
         <Route path="activity" element={<Activity />} />
+        <Route path="alerts" element={<Alerts />} />
         <Route path="rebates" element={<MyRebates />} />
         <Route path="live-accounts" element={<MyLiveAccounts />} />
+        <Route path="highlights/:id" element={<HighlightDetailPage />} />
         <Route path="invite" element={<InviteFriends />} />
         <Route path="ib-change" element={<RequestIbChange />} />
         <Route path="trader-profile" element={<MyTraderProfile />} />
         <Route path="copy-trading" element={<MyCopyTrading />} />
+        <Route path="strategies" element={<MyStrategies />} />
+        <Route path="streak" element={<MyStreak />} />
         <Route path="calendar" element={<Calendar />} />
         <Route path="settings" element={<Settings />} />
       </Route>
@@ -201,8 +242,13 @@ const AppRoutes: React.FC = () => {
         <Route path="signals" element={<SignalsPage />} />
         <Route path="rewards/:rewardId" element={<RewardDetailPage />} />
         <Route path="rewards" element={<RewardsPage />} />
+        <Route path="rebates/broker/:brokerId/reviews" element={<BrokerReviewsPage />} />
         <Route path="rebates/broker/:brokerId" element={<RebateBrokerDetailPage />} />
         <Route path="rebates" element={<RebateBrokers />} />
+        <Route path="account-types" element={<AccountTypeSelectionPage />} />
+        <Route path="select-account-type" element={<AccountTypeSelectionPage />} />
+        <Route path="news" element={<Analysis />} />
+        <Route path="news/:slug" element={<Analysis />} />
         <Route path="analysis" element={<Analysis />} />
         <Route path="analysis/:id" element={<AnalysisDetail />} />
         {/* External/demo articles may include extra path segments; keep this route from breaking. */}
@@ -218,13 +264,31 @@ const AppRoutes: React.FC = () => {
         <Route path="broker-signup-bonuses" element={<BrokerSignupBonusesPage />} />
         <Route path="best-performing-stocks" element={<BestPerformingStocksPage />} />
         <Route path="complaints" element={<ComplaintsPage />} />
+        <Route path="support" element={<ContactSupportPage />} />
+        <Route path="live-chat" element={<LiveChatPage />} />
+        <Route path="support/contact" element={<ContactSupportPage />} />
+        <Route path="support/advice" element={<BrokerAdvicePage />} />
+        <Route path="support/tickets" element={<SupportTicketsPage />} />
+        <Route path="faqs" element={<FaqsPage />} />
+        <Route path="knowledge-base" element={<KnowledgeBasePage />} />
         <Route path="compare/:pairSlug" element={<ComparePage />} />
         <Route path="compare" element={<ComparePage />} />
+        <Route path="spread-comparison" element={<SpreadComparisonPage />} />
+        <Route path="swaps-comparison" element={<SwapsComparisonPage />} />
+        <Route path="live-charts" element={<LiveChartsPage />} />
+        <Route path="economic-calendar" element={<EconomicCalendarPage />} />
+        <Route path="currency-converter" element={<CurrencyConverterPage />} />
+        <Route path="trading-stats" element={<TradingStatsHubPage />} />
+        <Route path="alerts" element={<PublicAlertsPage />} />
         <Route path="prop-firms" element={<PropFirmHubPage />} />
         <Route path="traders/:id" element={<TraderDetailPage />} />
         <Route path="traders" element={<TradersPage />} />
         <Route path="copy-trading" element={<CopyTradingPage />} />
+        <Route path="strategies/:id" element={<StrategyDetailPage />} />
+        <Route path="strategies" element={<StrategiesPage />} />
+        <Route path="streaks" element={<StreaksPage />} />
 
+        <Route path="forum/latest" element={<Forum />} />
         <Route path="forum" element={<Forum />} />
         <Route path="forum/thread/:threadId" element={<ForumThreadDetail />} />
         <Route path="courses" element={<Courses />} />
@@ -244,6 +308,8 @@ const AppRoutes: React.FC = () => {
         <Route path="drawdown-calculator" element={<DrawdownCalculatorPage />} />
         <Route path="compound-calculator" element={<CompoundCalculatorPage />} />
         <Route path="crypto-profit-calculator" element={<CryptoProfitCalculatorPage />} />
+        <Route path="risk-of-ruin-calculator" element={<RiskOfRuinCalculatorPage />} />
+        <Route path="crypto-exchange-fees-calculator" element={<CryptoExchangeFeesCalculatorPage />} />
         <Route path="cashback-calculator" element={<RebateCalculatorPage />} />
         <Route path="legal/:slug" element={<LegalPage />} />
         <Route path="terms" element={<LegalPage slug="terms" />} />

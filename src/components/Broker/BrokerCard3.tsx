@@ -2,10 +2,10 @@ import React from "react";
 import {
   CardContainer,
   LogoSection,
-  LogoImg,
   InfoSection,
   TitleRow,
   VerifiedBadge,
+  DisabledBadge,
   FeaturedRibbon,
  
   ActionSection,
@@ -19,6 +19,25 @@ import {
 import { motion } from "framer-motion";
 import ArrowIcon from "../../assets/icons/blueCircle.svg";
 import styled from "styled-components";
+import BrokerLogo from "./BrokerLogo";
+
+const CardLogo = styled(BrokerLogo)`
+  height: 140px;
+  width: 140px;
+  border-radius: 50%;
+  background-color: #fff;
+  object-fit: contain;
+  object-position: center;
+  padding: 18px;
+  box-sizing: border-box;
+  border: 1px solid #eef0f4;
+
+  @media (max-width: 768px) {
+    height: 100px;
+    width: 100px;
+    padding: 12px;
+  }
+`;
 
 export const Description = styled.p`
   font-size: 16px;
@@ -86,6 +105,7 @@ interface BrokerCardProps {
   rating?: number;
   reviewsCount?: string;
   features: { name: string; value: string }[];
+  temporarilyDisabled?: boolean;
 }
 
 const BrokerCard: React.FC<BrokerCardProps> = ({
@@ -93,7 +113,8 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
   featured,
   title,
   logoSrc,
- features,
+  features,
+  temporarilyDisabled,
 }) => {
   return (
     <Container>
@@ -103,13 +124,17 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
           <TopIndex>{index}</TopIndex>
 
           <LogoSection>
-            <LogoImg src={logoSrc} alt={`${title} Logo`} />
+            <CardLogo src={logoSrc} name={title} alt={`${title} Logo`} />
           </LogoSection>
 
           <InfoSection>
             <TitleRow>
               <h2>{title}</h2>
-              <VerifiedBadge>✔ Verified Broker</VerifiedBadge>
+              {temporarilyDisabled ? (
+                <DisabledBadge>Disabled</DisabledBadge>
+              ) : (
+                <VerifiedBadge>✔ Verified Broker</VerifiedBadge>
+              )}
             </TitleRow>
             <Description>
 
@@ -120,31 +145,16 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
                 </div>
               ))}
 
-              {/* <div>
-                <h4>Standard Account</h4>
-                <p>Up to 0.5 pips</p>
-              </div>
-              <div>
-                <h4>Raw Account</h4>
-                <p>Up to 0.3 pips</p>
-              </div>
-              <div>
-                <h4>CTrader</h4>
-                <p>Up to 0.2 pips</p>
-              </div>
-              <div>
-                <h4>CTrader</h4>
-                <p>Up to 0.2 pips</p>
-              </div> */}
-
             </Description>
           </InfoSection>
 
          
            <ActionSection>
-            <TermsText>Terms & Conditions Apply</TermsText>
-            <PrimaryButton>
-              Setup Account 
+            <TermsText>
+              {temporarilyDisabled ? "Temporarily unavailable for new setups" : "Terms & Conditions Apply"}
+            </TermsText>
+            <PrimaryButton disabled={temporarilyDisabled} style={temporarilyDisabled ? { opacity: 0.55, cursor: "not-allowed" } : undefined}>
+              {temporarilyDisabled ? "Disabled" : "Setup Account"}
             </PrimaryButton>
             <SecondaryButton>Broker Reviews <img src={ArrowIcon} alt="Arrow" /></SecondaryButton>
           </ActionSection>

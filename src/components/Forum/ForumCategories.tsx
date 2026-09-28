@@ -716,7 +716,7 @@ const Toast = styled.div`
 
 const PAGE_SIZE = 10;
 
-const ForumCategories: React.FC = () => {
+const ForumCategories: React.FC<{ latestFocus?: boolean }> = ({ latestFocus = false }) => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { openSignIn } = useAuthModal();
@@ -801,6 +801,12 @@ const ForumCategories: React.FC = () => {
   useEffect(() => {
     loadPosts(1, false);
   }, [loadPosts]);
+
+  useEffect(() => {
+    if (!latestFocus) return;
+    const el = document.getElementById('community-feed');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [latestFocus]);
 
   const requireAuth = (from = '/forum') => {
     openSignIn({ returnTo: from });
@@ -1007,9 +1013,11 @@ const ForumCategories: React.FC = () => {
     <SectionWrapper id="community-feed">
       <ContentWrapper>
         <SectionHead>
-        <SectionTitle>Trader Community Forums</SectionTitle>
+        <SectionTitle>{latestFocus ? 'Latest posts' : 'Trader Community Forums'}</SectionTitle>
           <SectionSub>
-            Post chart takes, ask questions, and discuss markets with other traders.
+            {latestFocus
+              ? 'Fresh discussions from traders — jump in or start your own thread.'
+              : 'Post chart takes, ask questions, and discuss markets with other traders.'}
           </SectionSub>
         </SectionHead>
         

@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import GirlImage from "../../assets/bannerGirl.png";
 import { FaPen } from "react-icons/fa";
-import { FiGlobe, FiCpu, FiAward } from "react-icons/fi";
+import { FiGlobe, FiCpu, FiAward, FiTarget, FiCreditCard } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import type { RebateTabCategory } from "../../services/brokerService";
 import {
   BROKER_KIND_COLORS,
   BROKER_KIND_DESCRIPTIONS,
+  BROKER_KIND_ORDER,
   REBATE_TAB_LABELS,
 } from "../../utils/brokerTypes";
 
@@ -15,6 +16,8 @@ const TAB_ICONS: Record<RebateTabCategory, React.ReactNode> = {
   forex: <FiGlobe />,
   prop: <FiAward />,
   crypto: <FiCpu />,
+  binary: <FiTarget />,
+  ewallet: <FiCreditCard />,
 };
 
 export interface RebatesBannerSearchProps {
@@ -64,6 +67,20 @@ const TAB_COPY: Record<
       "As an example, active traders placing 20 round-turn trades per week with a $1.50 per-lot rebate could earn over $120 a month in cashback, on top of your regular trading results.",
     ],
   },
+  binary: {
+    subtitle: "How does binary broker cashback work for you?",
+    descriptions: [
+      "Open an account with a partnered binary options broker through LegendPips and earn cashback on eligible deposits or trading volume, depending on each broker’s rebate schedule.",
+      "Rates vary by platform — compare cashback offers below, sign up via our partner links, and track rewards in your LegendPips account.",
+    ],
+  },
+  ewallet: {
+    subtitle: "How does e-wallet cashback work for you?",
+    descriptions: [
+      "Earn cashback when you use partnered e-wallet services — currently focused on the two biggest providers, Skrill and Neteller. Open or link through LegendPips and get rewarded on eligible activity.",
+      "Compare offers below, complete signup via our partner links, and track e-wallet cashback in your LegendPips account alongside broker rebates.",
+    ],
+  },
 };
 
 const PROP_INTRO_SHORT =
@@ -91,7 +108,7 @@ const RebatesBrokersSection = ({
             <Title>Partner platforms</Title>
 
             <Tabs role="tablist" aria-label="Broker categories">
-              {(["forex", "prop", "crypto"] as RebateTabCategory[]).map((tab) => (
+              {BROKER_KIND_ORDER.map((tab) => (
                 <Tab
                   key={tab}
                   type="button"
@@ -124,6 +141,16 @@ const RebatesBrokersSection = ({
                 <>
                   Featuring curated <Highlight>crypto exchanges</Highlight> with trading{" "}
                   <Highlight>cashback</Highlight> on eligible volume
+                </>
+              ) : activeTab === "binary" ? (
+                <>
+                  Featuring partnered <Highlight>binary brokers</Highlight> with{" "}
+                  <Highlight>cashback</Highlight> offers
+                </>
+              ) : activeTab === "ewallet" ? (
+                <>
+                  Featuring <Highlight>Skrill</Highlight> &amp; <Highlight>Neteller</Highlight>{" "}
+                  e-wallet <Highlight>cashback</Highlight>
                 </>
               ) : (
                 <>
@@ -183,7 +210,11 @@ const RebatesBrokersSection = ({
                 ? "Search prop firms…"
                 : activeTab === "crypto"
                   ? "Search crypto exchanges…"
-                  : "Search forex brokers…"
+                  : activeTab === "binary"
+                    ? "Search binary brokers…"
+                    : activeTab === "ewallet"
+                      ? "Search e-wallet services…"
+                      : "Search forex brokers…"
             }
             autoComplete="off"
             aria-label={
@@ -191,7 +222,11 @@ const RebatesBrokersSection = ({
                 ? "Search prop firms"
                 : activeTab === "crypto"
                   ? "Search crypto exchanges"
-                  : "Search forex brokers"
+                  : activeTab === "binary"
+                    ? "Search binary brokers"
+                    : activeTab === "ewallet"
+                      ? "Search e-wallet services"
+                      : "Search forex brokers"
             }
           />
           <ReportButton type="button">

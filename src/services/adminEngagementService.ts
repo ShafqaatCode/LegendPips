@@ -57,6 +57,7 @@ export type PlatformMetrics = {
   complaintsOpen?: number;
   complaintsResolved?: number;
   complaintsLast7d?: number;
+  liveChatUnread?: number;
 };
 
 export type DashboardPreviews = {
@@ -94,7 +95,9 @@ export type DashboardPreviews = {
   }[];
   recentActivity: {
     id: string;
+    userId?: string;
     userLabel: string;
+    userRole?: string;
     type: string;
     title: string;
     time: string;
@@ -164,10 +167,15 @@ export async function fetchEngagementSummary() {
 
 export type AdminFeedbackRow = {
   _id: string;
+  ticketId?: string;
   email: string;
+  subject?: string;
   message: string;
+  category?: string;
   status: string;
   page?: string;
+  adminReply?: string;
+  repliedAt?: string | null;
   userNameSnapshot?: string;
   createdAt: string;
   userId?: { firstName?: string; lastName?: string; email?: string } | null;
@@ -193,11 +201,15 @@ export async function fetchAdminFeedback(page = 1, limit = 20, status?: string) 
   };
 }
 
-export async function patchFeedbackStatus(id: string, status: "new" | "read" | "archived") {
+export async function patchFeedbackStatus(
+  id: string,
+  status: "new" | "read" | "archived",
+  adminReply?: string
+) {
   const res = await fetch(`${base}/feedback/${id}`, {
     method: "PATCH",
     headers: getAuthHeaders(),
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ status, ...(adminReply !== undefined ? { adminReply } : {}) }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Failed");
@@ -214,11 +226,14 @@ export async function deleteFeedbackAdmin(id: string) {
   return data;
 }
 
+export type ActivityFeedScope = "all" | "mine" | "team" | "users";
+
 export type AdminActivityFeedRow = {
   id: string;
   userId?: string;
   userLabel: string;
   userEmail?: string;
+  userRole?: string;
   type: string;
   title: string;
   description: string;
@@ -229,12 +244,13 @@ export type AdminActivityFeedRow = {
 export async function fetchAdminActivityFeed(
   page = 1,
   limit = 50,
-  opts?: { userId?: string; type?: string; q?: string }
+  opts?: { userId?: string; type?: string; q?: string; scope?: ActivityFeedScope }
 ) {
   const qs = new URLSearchParams({ page: String(page), limit: String(limit) });
   if (opts?.userId) qs.set("userId", opts.userId);
   if (opts?.type) qs.set("type", opts.type);
   if (opts?.q) qs.set("q", opts.q);
+  if (opts?.scope && opts.scope !== "all") qs.set("scope", opts.scope);
   const res = await fetch(`${base}/activity?${qs}`, { headers: getAuthHeaders() });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Failed");
@@ -371,6 +387,8 @@ export type AdminLiveAccountRow = {
   brokerId?: string;
   brokerName: string;
   accountNumber: string;
+  accountKind?: "new" | "existing" | string;
+  comment?: string;
   status: string;
   adminNote?: string;
   createdAt?: string;

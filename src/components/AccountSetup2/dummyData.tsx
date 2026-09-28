@@ -31,7 +31,7 @@ const RetryBtn = styled.button`
 
 type PageType = "listing" | "detail" | "setup";
 
-const BrokerList: React.FC = () => {
+const BrokerList: React.FC<{ embedded?: boolean }> = ({ embedded = false }) => {
   const [currentPage, setCurrentPage] = useState<PageType>("listing");
   const [selectedBroker, setSelectedBroker] = useState<Broker | null>(null);
   const [brokers, setBrokers] = useState<Broker[]>([]);
@@ -103,6 +103,7 @@ const BrokerList: React.FC = () => {
   };
 
   const handleSetupAccount = () => {
+    if (selectedBroker?.temporarilyDisabled) return;
     setCurrentPage("setup");
   };
 
@@ -157,6 +158,7 @@ const BrokerList: React.FC = () => {
           onCategoryChange={handleCategoryChange}
           filters={filters}
           onFiltersChange={setFilters}
+          embedded={embedded}
         />
       )}
 

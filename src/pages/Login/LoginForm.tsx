@@ -20,6 +20,7 @@ import ForgetPasswordModal from "./ForgetPasswordModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { firstAdminPath } from "../../utils/adminPermissions";
 import { useLocale } from "../../contexts/LocaleContext";
+import TermsAcceptLabel from "../../components/Auth/TermsAcceptLabel";
 
 interface LoginFormProps {
   onSwitchToRegister?: () => void;
@@ -34,7 +35,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onLoginSucces
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
-  const { login, complete2fa } = useAuth();
+  const { login, loginWithGoogle, complete2fa } = useAuth();
   const { t } = useLocale();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -58,6 +59,27 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onLoginSucces
       }
       window.location.reload();
     }, 200);
+  };
+
+  const onGoogleClick = async () => {
+    setIsLoading(true);
+    setError("");
+    try {
+      const response = await loginWithGoogle();
+      if (response.success && "requires2fa" in response && response.requires2fa) {
+        setTempToken(response.tempToken);
+        return;
+      }
+      if (response.success) {
+        finishLogin();
+      } else {
+        setError(response.message || t("panel.authFail"));
+      }
+    } catch (err: any) {
+      setError(err.message || t("panel.authFail"));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const onSubmit = async (data: any) => {
@@ -146,7 +168,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onLoginSucces
     <Container>
       <Heading>{t("panel.authLogin")}</Heading>
 
-      <GoogleButton type="button">
+      <GoogleButton type="button" onClick={onGoogleClick} disabled={isLoading}>
         {t("panel.authGoogle")} <GoogleIcon src={GLogo} alt="G" />
       </GoogleButton>
 
@@ -175,7 +197,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onLoginSucces
         <Terms>
           <input type="checkbox" {...register("terms", { required: true })} />
           <label>
-            {t("panel.authTerms")}
+            <TermsAcceptLabel variant="login" />
           </label>
         </Terms>
         {errors.terms && <ErrorMsg>{t("panel.authTermsReq")}</ErrorMsg>}

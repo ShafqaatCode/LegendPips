@@ -17,16 +17,66 @@ import {
   Pagination, PageButtons, PageBtn, ActionGroup,
 } from '../../../components/AdminPanel/adminUi';
 
-const Details = styled.div`
-  max-width: 280px;
+const Details = styled.div<{ $expanded?: boolean }>`
+  max-width: 320px;
   font-size: 0.8rem;
-  line-height: 1.4;
+  line-height: 1.45;
   color: ${adminColors.text};
+  white-space: pre-wrap;
   word-break: break-word;
+  overflow-wrap: anywhere;
+
+  ${({ $expanded }) =>
+    $expanded
+      ? `
+    max-height: 160px;
+    overflow-y: auto;
+  `
+      : `
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+    white-space: normal;
+  `}
+`;
+
+const MoreBtn = styled.button`
+  margin-top: 0.25rem;
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: ${adminColors.navy};
+  cursor: pointer;
+  font-family: inherit;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const IssueCell = styled(Td)`
+  vertical-align: top;
+  max-width: 340px;
+  min-width: 180px;
+`;
+
+const TopTd = styled(Td)`
+  vertical-align: top;
+`;
+
+const CompactActions = styled(ActionGroup)`
+  flex-wrap: wrap;
+  align-items: flex-start;
+  max-width: 280px;
+  gap: 0.35rem;
 `;
 
 const NoteInput = styled.input`
   min-width: 140px;
+  width: 100%;
   padding: 0.35rem 0.5rem;
   border: 1px solid ${adminColors.border};
   border-radius: 7px;
@@ -48,6 +98,12 @@ const EvidenceThumbs = styled.div`
   }
 `;
 
+const needsClamp = (text?: string) => {
+  const t = (text || '').trim();
+  if (!t) return false;
+  return t.length > 160 || t.split(/\n/).length > 4;
+};
+
 const AdminComplaints: React.FC = () => {
   const [status, setStatus] = useState('pending');
   const [q, setQ] = useState('');
@@ -57,6 +113,7 @@ const AdminComplaints: React.FC = () => {
   const [pendingCount, setPendingCount] = useState(0);
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [brokerReplies, setBrokerReplies] = useState<Record<string, string>>({});
+  const [expandedIssues, setExpandedIssues] = useState<Record<string, boolean>>({});
   const [pagination, setPagination] = useState<{
     totalPages: number;
     currentPage: number;
@@ -196,23 +253,33 @@ const AdminComplaints: React.FC = () => {
             ) : (
               items.map((row) => (
                 <Tr key={row.id}>
-                  <Td>
+                  <TopTd>
                     <strong>{row.ticketId}</strong>
                     <div style={{ fontSize: 11, color: adminColors.muted }}>
                       {row.createdAt ? new Date(row.createdAt).toLocaleString() : ''}
                     </div>
-                  </Td>
-                  <Td>
+                  </TopTd>
+                  <TopTd>
                     {row.brokerName}
                     {row.publicWarning ? <div style={{ fontSize: 11, color: '#c2410c' }}>On warning list</div> : null}
-                  </Td>
-                  <Td>
+                  </TopTd>
+                  <TopTd>
                     {row.authorName}
                     <div style={{ fontSize: 11, color: adminColors.muted }}>{row.authorEmail}</div>
-                  </Td>
-                  <Td>
+                  </TopTd>
+                  <IssueCell>
                     <div style={{ fontWeight: 700, marginBottom: 4 }}>{row.category} · {row.subject}</div>
-                    <Details>{row.details}</Details>
+                    <Details $expanded={!!expandedIssues[row.id]}>{row.details}</Details>
+                    {needsClamp(row.details) && (
+                      <MoreBtn
+                        type="button"
+                        onClick={() =>
+                          setExpandedIssues((prev) => ({ ...prev, [row.id]: !prev[row.id] }))
+                        }
+                      >
+                        {expandedIssues[row.id] ? 'Show less' : 'Show more'}
+                      </MoreBtn>
+                    )}
                     {(row.amount || row.incidentDate || row.accountRef) && (
                       <div style={{ fontSize: 11, color: adminColors.muted, marginTop: 4 }}>
                         {[row.amount && `Amt: ${row.amount}`, row.incidentDate && `Date: ${row.incidentDate}`, row.accountRef && `Ref: ${row.accountRef}`]
@@ -230,12 +297,14 @@ const AdminComplaints: React.FC = () => {
                       </EvidenceThumbs>
                     )}
                     {row.brokerResponse ? (
-                      <div style={{ fontSize: 11, color: '#1e40af', marginTop: 4 }}>Broker: {row.brokerResponse}</div>
+                      <div style={{ fontSize: 11, color: '#1e40af', marginTop: 4, maxWidth: 320, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        Broker: {row.brokerResponse}
+                      </div>
                     ) : null}
-                  </Td>
-                  <Td><Pill $variant={row.status === 'resolved' ? 'approved' : row.status === 'dismissed' ? 'rejected' : 'pending'}>{row.status}</Pill></Td>
-                  <Td>
-                    <ActionGroup>
+                  </IssueCell>
+                  <TopTd><Pill $variant={row.status === 'resolved' ? 'approved' : row.status === 'dismissed' ? 'rejected' : 'pending'}>{row.status}</Pill></TopTd>
+                  <TopTd>
+                    <CompactActions>
                       <NoteInput
                         placeholder="Note / resolution"
                         value={notes[row.id] || ''}
@@ -270,8 +339,8 @@ const AdminComplaints: React.FC = () => {
                       </GhostButton>
                       <GhostButton $sm type="button" onClick={() => blacklist(row.id, true)}>Blacklist broker</GhostButton>
                       <GhostButton $sm type="button" onClick={() => remove(row.id)}><FiTrash2 /> Delete</GhostButton>
-                    </ActionGroup>
-                  </Td>
+                    </CompactActions>
+                  </TopTd>
                 </Tr>
               ))
             )}

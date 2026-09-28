@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   FiSettings, FiGlobe, FiImage, FiMenu, FiShield, FiSearch,
   FiUsers, FiMessageSquare, FiSave, FiPlus, FiEdit2, FiTrash2,
-  FiChevronUp, FiChevronDown, FiUpload,
+  FiChevronUp, FiChevronDown, FiUpload, FiRotateCcw,
 } from 'react-icons/fi';
 import {
   PageWrap, PageHeader, PageTitleGroup, PageTitle, PageSubtitle,
@@ -10,7 +10,7 @@ import {
 } from '../../../components/AdminPanel/adminUi';
 import {
   fetchAdminPlatformSettings, saveAdminPlatformSettings,
-  uploadSiteLogo, removeSiteLogo, uploadOgImage,
+  uploadSiteLogo, restoreSiteLogo, uploadOgImage,
   type PlatformSettings,
 } from '../../../services/platformSettingsService';
 import type { NavItem } from '../../../services/siteConfigService';
@@ -28,6 +28,8 @@ import {
   FieldGrid, Field, ToggleRow, LogoPreview, NavItemRow, MemberCard, ReviewCard,
   ModalOverlay, ModalBox, StatusMsg, SectionTabs,
 } from './settingsUi';
+import { useSiteConfig } from '../../../contexts/SiteConfigContext';
+import defaultLogo from '../../../assets/icons/image 2.svg';
 
 type Tab = 'overview' | 'branding' | 'navigation' | 'registration' | 'seo' | 'team' | 'reviews';
 
@@ -42,6 +44,7 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
 ];
 
 const AdminSettings: React.FC = () => {
+  const { refresh: refreshSiteConfig, applyBranding } = useSiteConfig();
   const [tab, setTab] = useState<Tab>('overview');
   const [settings, setSettings] = useState<PlatformSettings | null>(null);
   const [navSection, setNavSection] = useState<'main' | 'tools'>('main');
@@ -78,12 +81,36 @@ const AdminSettings: React.FC = () => {
   const flash = (ok: string) => { setMsg(ok); setErr(''); setTimeout(() => setMsg(''), 3000); };
   const flashErr = (e: string) => { setErr(e); setMsg(''); };
 
+  const syncPublicBranding = async (next: PlatformSettings) => {
+    applyBranding({
+      siteName: next.siteName,
+      siteTagline: next.siteTagline || "",
+      siteLogoUrl: next.siteLogoUrl?.trim() || null,
+      siteLogoHeight: next.siteLogoHeight,
+      siteLogoMaxWidth: next.siteLogoMaxWidth,
+      defaultMetaTitle: next.defaultMetaTitle,
+      defaultMetaDescription: next.defaultMetaDescription,
+      defaultOgImageUrl: next.defaultOgImageUrl || null,
+      maintenanceMode: next.maintenanceMode,
+      allowRegistrations: next.allowRegistrations,
+      emailVerificationEnabled: next.emailVerificationEnabled,
+      navItems: next.navItems,
+      pageMeta: next.pageMeta,
+    });
+    try {
+      await refreshSiteConfig();
+    } catch {
+      // applyBranding already updated live UI; refetch is best-effort
+    }
+  };
+
   const persistSettings = async (patch: Partial<PlatformSettings>) => {
     if (!settings) return;
     setSaving(true);
     try {
       const next = await saveAdminPlatformSettings(patch);
       setSettings(next);
+      await syncPublicBranding(next);
       flash('Settings saved.');
     } catch (e: unknown) {
       flashErr(e instanceof Error ? e.message : 'Save failed');
@@ -204,11 +231,28 @@ const AdminSettings: React.FC = () => {
 
           {tab === 'branding' && (
             <>
-              <PanelHead><div><h2>Branding</h2><p>Website logo shown in the navbar</p></div></PanelHead>
+              <PanelHead>
+                <div>
+                  <h2>Branding</h2>
+                  <p>Upload a logo, restore a previous one, and set display size</p>
+                </div>
+                <PrimaryButton $sm disabled={saving} onClick={() => persistSettings({
+                  siteLogoHeight: settings.siteLogoHeight || 40,
+                  siteLogoMaxWidth: settings.siteLogoMaxWidth || 160,
+                })}>
+                  <FiSave /> Save size
+                </PrimaryButton>
+              </PanelHead>
               <PanelBody>
-                <LogoPreview>
-                  {settings.siteLogoUrl ? <img src={settings.siteLogoUrl} alt="Site logo" /> : <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>No logo uploaded</span>}
+                <LogoPreview
+                  $height={settings.siteLogoHeight || 40}
+                  $maxWidth={settings.siteLogoMaxWidth || 160}
+                >
+                  <img src={settings.siteLogoUrl || defaultLogo} alt="Site logo" />
                 </LogoPreview>
+                <p style={{ margin: '0.55rem 0 0', fontSize: '0.75rem', color: '#64748b' }}>
+                  {settings.siteLogoUrl ? 'Custom logo is live on the site.' : 'Original LegendPips logo is in use.'}
+                </p>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
                   <label style={{ cursor: 'pointer' }}>
                     <span style={{
@@ -226,20 +270,64 @@ const AdminSettings: React.FC = () => {
                       try {
                         const next = await uploadSiteLogo(f);
                         setSettings(next);
-                        flash('Logo uploaded.');
+                        await syncPublicBranding(next);
+                        flash('Logo uploaded. Navbar, footer, and panels update immediately.');
                       } catch (ex: unknown) { flashErr(ex instanceof Error ? ex.message : 'Upload failed'); }
                       finally { setSaving(false); e.target.value = ''; }
                     }} />
                   </label>
-                  {settings.siteLogoUrl && (
-                    <GhostButton $sm onClick={async () => {
-                      setSaving(true);
-                      try { setSettings(await removeSiteLogo()); flash('Logo removed.'); }
-                      catch (ex: unknown) { flashErr(ex instanceof Error ? ex.message : 'Failed'); }
-                      finally { setSaving(false); }
-                    }}>Remove</GhostButton>
-                  )}
+                  <GhostButton $sm disabled={saving || !settings.previousSiteLogoUrl} onClick={async () => {
+                    setSaving(true);
+                    try {
+                      const next = await restoreSiteLogo('previous');
+                      setSettings(next);
+                      await syncPublicBranding(next);
+                      flash('Previous logo restored.');
+                    } catch (ex: unknown) { flashErr(ex instanceof Error ? ex.message : 'Nothing to restore'); }
+                    finally { setSaving(false); }
+                  }}><FiRotateCcw /> Restore previous</GhostButton>
+                  <GhostButton $sm disabled={saving || !settings.siteLogoUrl} onClick={async () => {
+                    setSaving(true);
+                    try {
+                      const next = await restoreSiteLogo('default');
+                      setSettings(next);
+                      await syncPublicBranding(next);
+                      flash('Original logo restored.');
+                    } catch (ex: unknown) { flashErr(ex instanceof Error ? ex.message : 'Failed'); }
+                    finally { setSaving(false); }
+                  }}><FiRotateCcw /> Restore original</GhostButton>
                 </div>
+                {settings.previousSiteLogoUrl && (
+                  <div style={{ marginTop: '0.85rem' }}>
+                    <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#132E58', marginBottom: '0.35rem' }}>Previous logo</div>
+                    <img src={settings.previousSiteLogoUrl} alt="Previous logo" style={{ height: 32, width: 'auto', maxWidth: 120, objectFit: 'contain' }} />
+                  </div>
+                )}
+                <FieldGrid style={{ marginTop: '1.15rem' }}>
+                  <Field>
+                    Height ({settings.siteLogoHeight || 40}px)
+                    <input
+                      type="range"
+                      min={24}
+                      max={80}
+                      value={settings.siteLogoHeight || 40}
+                      onChange={(e) => setSettings({ ...settings, siteLogoHeight: Number(e.target.value) })}
+                    />
+                  </Field>
+                  <Field>
+                    Max width ({settings.siteLogoMaxWidth || 160}px)
+                    <input
+                      type="range"
+                      min={80}
+                      max={280}
+                      value={settings.siteLogoMaxWidth || 160}
+                      onChange={(e) => setSettings({ ...settings, siteLogoMaxWidth: Number(e.target.value) })}
+                    />
+                  </Field>
+                </FieldGrid>
+                <p style={{ margin: '0.5rem 0 0', fontSize: '0.72rem', color: '#94a3b8' }}>
+                  Adjust the sliders, then click Save size. The logo stays proportional (it will not stretch).
+                </p>
               </PanelBody>
             </>
           )}
@@ -321,7 +409,12 @@ const AdminSettings: React.FC = () => {
                   <input type="file" accept="image/*" hidden onChange={async (e) => {
                     const f = e.target.files?.[0]; if (!f) return;
                     setSaving(true);
-                    try { setSettings(await uploadOgImage(f)); flash('OG image uploaded.'); }
+                    try {
+                      const next = await uploadOgImage(f);
+                      setSettings(next);
+                      await syncPublicBranding(next);
+                      flash('OG image uploaded.');
+                    }
                     catch (ex: unknown) { flashErr(ex instanceof Error ? ex.message : 'Upload failed'); }
                     finally { setSaving(false); e.target.value = ''; }
                   }} />
@@ -551,7 +644,7 @@ const ReviewModal: React.FC<{
   return (
     <ModalOverlay onClick={onClose}>
       <ModalBox onClick={(e) => e.stopPropagation()}>
-        <div className="head"><h3>{review ? 'Edit Review' : 'Add Review'}</h3></div>
+        <div className="head"><h3>{review ? 'Edit client review' : 'Add client review'}</h3></div>
         <div className="content">
           <FieldGrid>
             <Field>Name<input value={name} onChange={(e) => setName(e.target.value)} /></Field>

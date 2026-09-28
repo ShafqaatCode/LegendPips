@@ -41,6 +41,11 @@ export const GoogleButton = styled.button`
   &:hover {
     background-color: #132e58ee;
   }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
 `;
 
 export const GoogleIcon = styled.img`

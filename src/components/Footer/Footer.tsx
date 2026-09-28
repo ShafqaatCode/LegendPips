@@ -1,298 +1,464 @@
 import styled from "styled-components";
-import type { FC } from "react";
-import logo_white from "../../assets/icons/Logo_Svg.svg";
+import type { FC, FormEvent } from "react";
 import { NavLink } from "react-router-dom";
-import { FaChevronUp } from "react-icons/fa";
+import { FaWhatsapp } from "react-icons/fa";
+import { FiMail, FiMessageCircle, FiArrowRight, FiChevronUp } from "react-icons/fi";
 import { useLocale } from "../../contexts/LocaleContext";
+import { useSiteLogo } from "../../contexts/SiteConfigContext";
+import {
+  WHATSAPP_SUPPORT_NUMBER_DISPLAY,
+  WHATSAPP_SUPPORT_URL,
+} from "../../utils/whatsappSupport";
 
-const GotoStart = styled.a`
-  display: block;
-  /* margin-top: 1.5rem; */
-  padding: 1rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #ffffff;
-  background-color: #102443;
-  border: none;
-  text-align: center;
-  
-  text-decoration: none;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #102443ee;
-  }
+const Shell = styled.footer`
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    ${({ theme }) => theme.colors.primary} 0%,
+    #0e2548 55%,
+    #0c1f3d 100%
+  );
+  color: rgba(226, 232, 240, 0.78);
 `;
 
-const Section = styled.section`
-  padding: 3rem 5rem;
-  background-color: ${({ theme }) => theme.colors.primary};
- 
-
-  @media (max-width: 768px) {
-    padding: 3rem 2rem;
-  }
+const AccentLine = styled.div`
+  height: 2px;
+  background: ${({ theme }) => theme.colors.Gold};
+  opacity: 0.9;
 `;
 
-const Container = styled.div`
-  max-width: 1280px;
-  margin: 0 auto;
- 
-`;
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
-//   border: 2px solid red;
-  text-align: center;
-
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-    text-align: left;
-  }
-
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
-`;
-
-const LogoContainer = styled.div`
-  // border: 2px solid red;
-  width: 350px;
-
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-const LogoImage = styled.img`
-  width: 150px;
-  height: auto;
-`;
-
-const Description = styled.p`
-  margin-top: 1.25rem;
-  font-size: 1rem;
-  color: #ffffff;
-  line-height: 1.6;
-`;
-
-const LinkContainer = styled.div`
-  // border: 2px solid red;
-`;
-
-const LinkHeading = styled.h4`
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: #94a3b8;
-`;
-
-const LinkList = styled.ul`
-  margin-top: 1.5rem;
+const BackTop = styled.a`
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-
-  @media (max-width: 800px) {
-    gap: 0.8rem;
-  }
-`;
-
-const LinkItem = styled.li``;
-
-const Link = styled(NavLink)`
-  font-size: 1rem;
-  color: #ffffff;
-  transition: color 0.2s ease;
+  align-items: center;
+  justify-content: center;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.WHITE};
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  text-decoration: none;
 
   &:hover {
-    color: #de992f;
+    color: ${({ theme }) => theme.colors.gold};
+    border-color: rgba(251, 191, 36, 0.5);
   }
 `;
 
-const NewsletterContainer = styled.div``;
+const Inner = styled.div`
+  max-width: ${({ theme }) => theme.typography.contentMax};
+  margin: 0 auto;
+  padding: 0 ${({ theme }) => theme.typography.pageGutter};
+`;
 
-const NewsletterHeading = styled.p`
-  font-size: 0.875rem;
-  font-weight: 600;
+const SubscribeBand = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 28rem);
+  gap: 1.25rem 2.5rem;
+  align-items: center;
+  padding: clamp(2rem, 4vw, 2.75rem) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const SubscribeCopy = styled.div``;
+
+const SubscribeKicker = styled.p`
+  margin: 0 0 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: ${({ theme }) => theme.colors.gold};
 `;
 
-const NewsletterForm = styled.form`
-  margin-top: 1.5rem;
+const SubscribeTitle = styled.h3`
+  margin: 0;
+  font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: ${({ theme }) => theme.colors.WHITE};
+  line-height: 1.3;
 `;
 
-const NewsletterInput = styled.input`
+const SubscribeHint = styled.p`
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: rgba(226, 232, 240, 0.72);
+  max-width: 40ch;
+`;
+
+const SubscribeForm = styled.form`
+  display: flex;
+  gap: 0;
   width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  color: #111827;
-  background: #fff;
-  border-radius: 0.375rem;
+  border-radius: 10px;
+  overflow: hidden;
+  background: ${({ theme }) => theme.colors.WHITE};
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+  }
+`;
+
+const SubscribeInput = styled.input`
+  flex: 1;
+  min-width: 0;
   border: none;
+  padding: 0.9rem 1rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: ${({ theme }) => theme.colors.primary};
+  background: transparent;
 
   &::placeholder {
-    color: #6b7280;
+    color: ${({ theme }) => theme.colors.muted};
   }
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 2px #de992f33;
-  }
-
-  @media (max-width: 768px) {
-    max-width: 300px;
   }
 `;
 
-const NewsletterButton = styled.button`
-  margin-top: 0.75rem;
-  width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #fff;
-  background-color: #de992f;
+const SubscribeButton = styled.button`
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
   border: none;
-  border-radius: 0.375rem;
+  padding: 0.9rem 1.2rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: ${({ theme }) => theme.colors.primary};
+  background: ${({ theme }) => theme.colors.Gold};
   cursor: pointer;
+  white-space: nowrap;
 
   &:hover {
-    background-color: #cc872b;
-  }
-
-  @media (max-width: 768px) {
-    max-width: 300px;
+    filter: brightness(1.05);
   }
 `;
 
-const Divider = styled.hr`
-  margin: 2rem 0;
-  border: none;
-  border-top: 1px solid #334155; // soft divider color
+const Main = styled.div`
+  display: grid;
+  grid-template-columns: minmax(200px, 1.4fr) repeat(3, minmax(0, 1fr));
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  padding: clamp(2.25rem, 4.5vw, 3rem) 0 2rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
-const FooterText = styled.p`
-  text-align: center;
+const BrandCol = styled.div`
+  @media (max-width: 900px) {
+    grid-column: 1 / -1;
+  }
+`;
+
+const LogoLink = styled(NavLink)`
+  display: inline-block;
+  text-decoration: none;
+  margin-bottom: 0.9rem;
+`;
+
+const LogoImage = styled.img`
+  display: block;
+  height: clamp(38px, 4.5vw, 48px);
+  width: auto;
+  max-width: min(200px, 65vw);
+  object-fit: contain;
+`;
+
+const Blurb = styled.p`
+  margin: 0 0 1.15rem;
+  max-width: 30ch;
   font-size: 0.875rem;
-  color: #ffffff;
-  //   border: 2px solid red;
+  line-height: 1.65;
+  color: rgba(226, 232, 240, 0.78);
 `;
 
-const Description2 = styled.p`
-  margin-top: 1.25rem;
-  font-size: 14px;
-  color: #ffffff;
-  line-height: 30px;
-  text-align: center;
+const ContactRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.15rem;
 `;
 
+const ContactA = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(248, 250, 252, 0.92);
+  text-decoration: none;
 
-const Footer2: FC = () => {
+  svg {
+    color: ${({ theme }) => theme.colors.gold};
+  }
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.gold};
+  }
+`;
+
+const ContactLink = styled(NavLink)`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(248, 250, 252, 0.92);
+  text-decoration: none;
+
+  svg {
+    color: ${({ theme }) => theme.colors.gold};
+  }
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.gold};
+  }
+`;
+
+const Col = styled.nav``;
+
+const ColTitle = styled.h4`
+  margin: 0 0 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.colors.gold};
+`;
+
+const LinkList = styled.ul`
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const FooterLink = styled(NavLink)`
+  font-size: 0.875rem;
+  color: rgba(226, 232, 240, 0.88);
+  text-decoration: none;
+  line-height: 1.4;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.secondary};
+  }
+`;
+
+const ExtLink = styled.a`
+  font-size: 0.875rem;
+  color: rgba(226, 232, 240, 0.88);
+  text-decoration: none;
+  line-height: 1.4;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.secondary};
+  }
+`;
+
+const Legal = styled.div`
+  padding: 1.15rem 0 0.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const LegalText = styled.p`
+  margin: 0 0 0.55rem;
+  font-size: 0.68rem;
+  line-height: 1.65;
+  color: rgba(148, 163, 184, 0.9);
+  max-width: 78rem;
+`;
+
+const BottomBar = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1.1rem 0 1.5rem;
+  margin-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const Copyright = styled.p`
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(148, 163, 184, 0.95);
+`;
+
+const BottomLinks = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+
+  a {
+    font-size: 0.72rem;
+    color: rgba(148, 163, 184, 0.95);
+    text-decoration: none;
+
+    &:hover {
+      color: ${({ theme }) => theme.colors.secondary};
+    }
+  }
+`;
+
+const Footer: FC = () => {
   const { t } = useLocale();
+  const { src: logoSrc, alt: logoAlt, height: logoHeight, maxWidth: logoMaxWidth } = useSiteLogo();
+
+  const onNewsletter = (e: FormEvent) => {
+    e.preventDefault();
+  };
+
   return (
-    <>
-      <GotoStart href="#top"><FaChevronUp size="1.3rem" /></GotoStart>
-      <Section>
+    <Shell>
+      <AccentLine />
+      <BackTop href="#top" aria-label="Back to top">
+        <FiChevronUp size={16} />
+      </BackTop>
 
-        <Container>
-          <Grid>
-            <LogoContainer>
-              <a href="/">
-                <LogoImage src={logo_white} alt="LegendPips" />
-              </a>
-              <Description>
-                {t("footer.blurb")}
-              </Description>
-            </LogoContainer>
+      <Inner>
+        <SubscribeBand>
+          <SubscribeCopy>
+            <SubscribeKicker>{t("footer.newsletter")}</SubscribeKicker>
+            <SubscribeTitle>Stay ahead of rebates & market moves</SubscribeTitle>
+            <SubscribeHint>
+              Short updates on cashback, brokers, and tools — unsubscribe anytime.
+            </SubscribeHint>
+          </SubscribeCopy>
+          <SubscribeForm onSubmit={onNewsletter}>
+            <SubscribeInput
+              type="email"
+              placeholder={t("footer.emailPlaceholder")}
+              aria-label={t("footer.emailPlaceholder")}
+              required
+            />
+            <SubscribeButton type="submit">
+              {t("footer.subscribe")}
+              <FiArrowRight size={15} />
+            </SubscribeButton>
+          </SubscribeForm>
+        </SubscribeBand>
 
-            <LinkContainer>
-              <LinkHeading>{t("footer.company")}</LinkHeading>
-              <LinkList>
-                <LinkItem>
-                  <Link to="/about">{t("footer.about")}</Link>
-                </LinkItem>
-                <LinkItem>
-                  <Link to="/about/team">The team</Link>
-                </LinkItem>
-                <LinkItem>
-                  <Link to="/about/methodology">Our methodology</Link>
-                </LinkItem>
-                <LinkItem>
-                  <Link to="/about/careers">Careers</Link>
-                </LinkItem>
-                <LinkItem>
-                  <Link to="/about/partners">For partners</Link>
-                </LinkItem>
-                <LinkItem>
-                  <Link to="/brokers">{t("footer.brokers")}</Link>
-                </LinkItem>
-                <LinkItem>
-                  <Link to="/tools">{t("footer.tools")}</Link>
-                </LinkItem>
-              </LinkList>
-            </LinkContainer>
+        <Main>
+          <BrandCol>
+            <LogoLink to="/" aria-label={logoAlt || "LegendPips home"}>
+              <LogoImage
+                src={logoSrc}
+                alt={logoAlt}
+                style={{
+                  height: Math.min(48, Math.max(36, logoHeight)),
+                  maxWidth: Math.min(200, Math.max(120, logoMaxWidth)),
+                }}
+              />
+            </LogoLink>
+            <Blurb>{t("footer.blurb")}</Blurb>
+            <ContactRow>
+              <ContactA href={WHATSAPP_SUPPORT_URL} target="_blank" rel="noopener noreferrer">
+                <FaWhatsapp size={14} />
+                {WHATSAPP_SUPPORT_NUMBER_DISPLAY}
+              </ContactA>
+              <ContactLink to="/live-chat">
+                <FiMessageCircle size={14} />
+                Live chat
+              </ContactLink>
+              <ContactA href="mailto:support@legendpips.com">
+                <FiMail size={14} />
+                Email
+              </ContactA>
+            </ContactRow>
+          </BrandCol>
 
-            <LinkContainer>
-              <LinkHeading>{t("footer.help")}</LinkHeading>
-              <LinkList>
-                <LinkItem>
-                  <Link to="/complaints">{t("footer.complaintCenter")}</Link>
-                </LinkItem>
-                <LinkItem>
-                  <Link to="/support">{t("footer.support")}</Link>
-                </LinkItem>
-                <LinkItem>
-                  <Link to="/delivery">{t("footer.delivery")}</Link>
-                </LinkItem>
-                <LinkItem>
-                  <Link to="/legal/terms">{t("footer.terms")}</Link>
-                </LinkItem>
-                <LinkItem>
-                  <Link to="/legal/privacy">{t("footer.privacy")}</Link>
-                </LinkItem>
-                <LinkItem>
-                  <Link to="/legal/risk-disclosure">{t("footer.risk")}</Link>
-                </LinkItem>
-                <LinkItem>
-                  <Link to="/legal/cashback-terms">{t("footer.cashback")}</Link>
-                </LinkItem>
-              </LinkList>
-            </LinkContainer>
+          <Col aria-label="Company">
+            <ColTitle>{t("footer.company")}</ColTitle>
+            <LinkList>
+              <li><FooterLink to="/about">{t("footer.about")}</FooterLink></li>
+              <li><FooterLink to="/about/team">The team</FooterLink></li>
+              <li><FooterLink to="/about/methodology">Methodology</FooterLink></li>
+              <li><FooterLink to="/about/careers">Careers</FooterLink></li>
+              <li><FooterLink to="/about/partners">Partners</FooterLink></li>
+            </LinkList>
+          </Col>
 
-            <NewsletterContainer>
-              <NewsletterHeading>{t("footer.newsletter")}</NewsletterHeading>
-              <NewsletterForm>
-                <NewsletterInput
-                  type="email"
-                  placeholder={t("footer.emailPlaceholder")}
-                />
-                <NewsletterButton type="submit">{t("footer.subscribe")}</NewsletterButton>
-              </NewsletterForm>
-            </NewsletterContainer>
-          </Grid>
+          <Col aria-label="Explore">
+            <ColTitle>Explore</ColTitle>
+            <LinkList>
+              <li><FooterLink to="/brokers">{t("footer.brokers")}</FooterLink></li>
+              <li><FooterLink to="/rebates">Rebates</FooterLink></li>
+              <li><FooterLink to="/find-broker">Find my broker</FooterLink></li>
+              <li><FooterLink to="/compare">Compare</FooterLink></li>
+              <li><FooterLink to="/tools">{t("footer.tools")}</FooterLink></li>
+              <li><FooterLink to="/signals">Signals</FooterLink></li>
+              <li><FooterLink to="/strategies">Strategies</FooterLink></li>
+              <li><FooterLink to="/streaks">Streaks</FooterLink></li>
+            </LinkList>
+          </Col>
 
-          <Divider />
-          <Description2>
-            LegendPips does not provide accounts to residents of the United States. The content of this website is not intended for individuals in any country or jurisdiction where such distribution or use would violate local laws or regulations.
-          </Description2>
-          <Description2>
-            Trading foreign exchange involves significant risk and may not be appropriate for all investors. The use of leverage can increase both potential gains and potential losses. Before engaging in forex trading, assess your investment objectives, trading experience, and risk appetite. You should be prepared to lose some or all of your invested capital. Only trade with money you can afford to lose. Make sure you understand the risks involved and, if necessary, seek independent financial or tax advice. All information provided is for educational purposes only and should not be considered investment advice.
-          </Description2>
+          <Col aria-label="Help">
+            <ColTitle>{t("footer.help")}</ColTitle>
+            <LinkList>
+              <li><FooterLink to="/support">{t("footer.support")}</FooterLink></li>
+              <li><FooterLink to="/support/advice">Broker advice</FooterLink></li>
+              <li><FooterLink to="/support/tickets">Tickets</FooterLink></li>
+              <li><FooterLink to="/complaints">{t("footer.complaintCenter")}</FooterLink></li>
+              <li><FooterLink to="/faqs">FAQs</FooterLink></li>
+              <li><FooterLink to="/knowledge-base">Knowledge base</FooterLink></li>
+              <li>
+                <ExtLink href={WHATSAPP_SUPPORT_URL} target="_blank" rel="noopener noreferrer">
+                  WhatsApp
+                </ExtLink>
+              </li>
+            </LinkList>
+          </Col>
+        </Main>
 
+        <Legal>
+          <LegalText>
+            LegendPips does not provide accounts to residents of the United States. The content of
+            this website is not intended for individuals in any country or jurisdiction where such
+            distribution or use would violate local laws or regulations.
+          </LegalText>
+          <LegalText>
+            Trading foreign exchange involves significant risk and may not be appropriate for all
+            investors. Only trade with money you can afford to lose. Information on this site is for
+            educational purposes only and is not investment advice.
+          </LegalText>
+        </Legal>
 
-          <Divider />
-          <FooterText>
-            © Copyright 2022, All Rights Reserved by LegendPips
-          </FooterText>
-        </Container>
-      </Section>
-    </>
+        <BottomBar>
+          <Copyright>© {new Date().getFullYear()} LegendPips. All rights reserved.</Copyright>
+          <BottomLinks>
+            <FooterLink to="/legal/terms">{t("footer.terms")}</FooterLink>
+            <FooterLink to="/legal/privacy">{t("footer.privacy")}</FooterLink>
+            <FooterLink to="/legal/risk-disclosure">{t("footer.risk")}</FooterLink>
+            <FooterLink to="/legal/cashback-terms">{t("footer.cashback")}</FooterLink>
+          </BottomLinks>
+        </BottomBar>
+      </Inner>
+    </Shell>
   );
 };
 
-export default Footer2;
+export default Footer;

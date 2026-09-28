@@ -10,12 +10,14 @@ export type AdminPermission =
   | "analysis"
   | "courses"
   | "feedback"
+  | "live_chat"
   | "activity"
   | "referrals"
   | "ib_change"
   | "live_accounts"
   | "rebates"
   | "traders"
+  | "strategies"
   | "reports"
   | "settings"
   | "team";
@@ -28,14 +30,15 @@ export const ADMIN_PERMISSION_META: {
   { key: "dashboard", label: "Dashboard", description: "View admin overview and charts" },
   { key: "users", label: "Users", description: "View and manage members" },
   { key: "kyc", label: "KYC records", description: "Review and approve identity documents" },
-  { key: "bulk_email", label: "Bulk email", description: "Send emails to user segments" },
+  { key: "bulk_email", label: "Bulk email & alerts", description: "Send emails and push platform alerts to users" },
   { key: "brokers", label: "Brokers", description: "Manage Forex, Crypto, and Prop listings" },
   { key: "contests", label: "Contests", description: "Create and manage contests" },
   { key: "signals", label: "Signals", description: "Publish trading signals" },
   { key: "webinars", label: "Webinars", description: "Manage webinars" },
   { key: "analysis", label: "Analysis", description: "Manage market analysis posts" },
   { key: "courses", label: "Courses", description: "Manage education courses" },
-  { key: "feedback", label: "Feedback inbox", description: "Read and manage feedback" },
+  { key: "feedback", label: "Support tickets", description: "Read and manage support tickets" },
+  { key: "live_chat", label: "Live chat", description: "Receive and reply to member live chat" },
   { key: "activity", label: "User activity", description: "View platform activity feed" },
   { key: "referrals", label: "Referrals", description: "Track friend invites members have sent" },
   { key: "ib_change", label: "IB change", description: "Handle broker / IB change requests" },
@@ -46,6 +49,7 @@ export const ADMIN_PERMISSION_META: {
   },
   { key: "rebates", label: "Rebates", description: "Grant and view rebate credits" },
   { key: "traders", label: "Traders", description: "Verify trader profiles and copy requests" },
+  { key: "strategies", label: "Strategies", description: "Approve or reject shared trading strategies" },
   { key: "reports", label: "Reports", description: "View and export reports" },
   { key: "settings", label: "Settings", description: "Platform branding, SEO, CMS" },
   { key: "team", label: "Admin team", description: "Add and manage staff access" },
@@ -91,16 +95,18 @@ export function firstAdminPath(user: AuthUserLike | null | undefined): string {
     ["analysis", "/admin-panel/analysis"],
     ["courses", "/admin-panel/courses"],
     ["feedback", "/admin-panel/feedback-inbox"],
+    ["live_chat", "/admin-panel/live-chat"],
     ["activity", "/admin-panel/user-activity"],
     ["referrals", "/admin-panel/referrals"],
     ["ib_change", "/admin-panel/ib-change"],
     ["live_accounts", "/admin-panel/live-accounts"],
     ["rebates", "/admin-panel/rebate-credits"],
     ["traders", "/admin-panel/traders"],
+    ["strategies", "/admin-panel/strategies"],
     ["reports", "/admin-panel/reports"],
     ["settings", "/admin-panel/settings"],
     ["team", "/admin-panel/team"],
-    ["bulk_email", "/admin-panel/users/bulk-email"],
+    ["bulk_email", "/admin-panel/push-alerts"],
   ];
   for (const [perm, path] of map) {
     if (hasPermission(user, perm)) return path;
@@ -109,6 +115,9 @@ export function firstAdminPath(user: AuthUserLike | null | undefined): string {
 }
 
 export const PERM_ROUTE_MAP: { pathPrefix: string; permissions: string[] }[] = [
+  { pathPrefix: "/admin-panel/push-alerts", permissions: ["bulk_email", "activity", "settings"] },
+  { pathPrefix: "/admin-panel/panel-highlights", permissions: ["bulk_email", "activity", "settings"] },
+  { pathPrefix: "/admin-panel/corner-promos", permissions: ["bulk_email", "activity", "settings"] },
   { pathPrefix: "/admin-panel/users/bulk-email", permissions: ["bulk_email"] },
   { pathPrefix: "/admin-panel/users", permissions: ["users"] },
   { pathPrefix: "/admin-panel/kyc-records", permissions: ["kyc"] },
@@ -123,12 +132,14 @@ export const PERM_ROUTE_MAP: { pathPrefix: string; permissions: string[] }[] = [
   { pathPrefix: "/admin-panel/analysis", permissions: ["analysis"] },
   { pathPrefix: "/admin-panel/courses", permissions: ["courses"] },
   { pathPrefix: "/admin-panel/feedback-inbox", permissions: ["feedback"] },
+  { pathPrefix: "/admin-panel/live-chat", permissions: ["live_chat"] },
   { pathPrefix: "/admin-panel/user-activity", permissions: ["activity"] },
   { pathPrefix: "/admin-panel/referrals", permissions: ["referrals"] },
   { pathPrefix: "/admin-panel/ib-change", permissions: ["ib_change"] },
   { pathPrefix: "/admin-panel/live-accounts", permissions: ["live_accounts"] },
   { pathPrefix: "/admin-panel/rebate-credits", permissions: ["rebates"] },
   { pathPrefix: "/admin-panel/traders", permissions: ["traders"] },
+  { pathPrefix: "/admin-panel/strategies", permissions: ["strategies"] },
   { pathPrefix: "/admin-panel/reports", permissions: ["reports"] },
   { pathPrefix: "/admin-panel/settings", permissions: ["settings"] },
   { pathPrefix: "/admin-panel/team", permissions: ["team"] },

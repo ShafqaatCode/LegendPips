@@ -130,7 +130,7 @@ const BrokerReviewsSection: React.FC<Props> = ({ brokerId, brokerName, allowPayo
     setFormError(null);
     setFormOk(null);
     if (!isAuthenticated) {
-      openSignIn({ returnTo: `${window.location.pathname}#reviews` });
+      openSignIn({ returnTo: window.location.pathname });
       return;
     }
     const safety = findContentSafetyIssue(`${title}\n${comment}`);
@@ -243,7 +243,7 @@ const BrokerReviewsSection: React.FC<Props> = ({ brokerId, brokerName, allowPayo
                 onMouseLeave={() => setHoverRating(0)}
                 onClick={() => setRating(n)}
               >
-                <FaStar size={22} color={n <= (hoverRating || rating) ? "#FBAF00" : "#d1d5db"} />
+                <FaStar size={18} color={n <= (hoverRating || rating) ? "#FBAF00" : "#d1d5db"} />
               </StarBtn>
             ))}
             <span>{rating} / 5</span>
@@ -282,7 +282,7 @@ const BrokerReviewsSection: React.FC<Props> = ({ brokerId, brokerName, allowPayo
             }
             value={comment}
             maxLength={2000}
-            rows={5}
+            rows={4}
             onChange={(e) => setComment(e.target.value)}
           />
           {formError && <Err>{formError}</Err>}
@@ -358,18 +358,19 @@ const BrokerReviewsSection: React.FC<Props> = ({ brokerId, brokerName, allowPayo
 export default BrokerReviewsSection;
 
 const Wrap = styled.section`
-  margin-top: 1.5rem;
+  margin-top: 0.85rem;
   background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 1.35rem 1.25rem 1.5rem;
+  border: 1px solid rgba(19, 46, 88, 0.08);
+  border-radius: 14px;
+  padding: 1rem 1.1rem 1.15rem;
+  box-shadow: 0 6px 20px rgba(19, 46, 88, 0.05);
   scroll-margin-top: 5.5rem;
 `;
 
 const Head = styled.div`
   display: flex;
   justify-content: space-between;
-  gap: 1.25rem;
+  gap: 1rem;
   align-items: flex-start;
   flex-wrap: wrap;
 `;
@@ -377,33 +378,35 @@ const Head = styled.div`
 const Eyebrow = styled.div`
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
   color: #b45309;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.25rem;
 `;
 
 const Title = styled.h2`
-  margin: 0 0 0.35rem;
-  font-size: 1.35rem;
-  color: #132e58;
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #0f1c46;
 `;
 
 const Sub = styled.p`
   margin: 0;
-  max-width: 36rem;
+  max-width: 34rem;
   color: #64748b;
-  font-size: 0.875rem;
-  line-height: 1.55;
+  font-size: 0.8rem;
+  line-height: 1.5;
 `;
 
 const Tabs = styled.div`
   display: flex;
-  gap: 0.4rem;
-  margin-top: 0.85rem;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
 `;
 
 const Tab = styled.button<{ $on?: boolean }>`
@@ -411,69 +414,74 @@ const Tab = styled.button<{ $on?: boolean }>`
   background: ${({ $on }) => ($on ? "#132e58" : "#fff")};
   color: ${({ $on }) => ($on ? "#fff" : "#475569")};
   border-radius: 999px;
-  padding: 0.35rem 0.8rem;
+  padding: 0.3rem 0.7rem;
   font: inherit;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 700;
   cursor: pointer;
 `;
 
 const PayoutFields = styled.div`
   display: grid;
-  gap: 0.55rem;
-  margin-bottom: 0.65rem;
+  gap: 0.45rem;
+  margin-bottom: 0.55rem;
   label {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    font-size: 0.82rem;
+    gap: 0.35rem;
+    font-size: 0.78rem;
     color: #475569;
   }
 `;
 
 const ScoreCard = styled.div`
-  min-width: 140px;
+  min-width: 118px;
   text-align: center;
   background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #eef2f7;
   border-radius: 12px;
-  padding: 0.85rem 1rem;
+  padding: 0.65rem 0.85rem;
 `;
 
 const ScoreNum = styled.div`
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 800;
-  color: #132e58;
+  color: #0f1c46;
   line-height: 1;
 `;
 
 const Stars = styled.div`
   display: flex;
-  gap: 0.15rem;
+  gap: 0.12rem;
   justify-content: center;
-  margin: 0.35rem 0 0.2rem;
+  margin: 0.3rem 0 0.15rem;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
 `;
 
 const ScoreMeta = styled.div`
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   color: #64748b;
   font-weight: 600;
 `;
 
 const Bars = styled.div`
-  margin: 1.1rem 0 0.4rem;
+  margin: 0.85rem 0 0.25rem;
   display: grid;
-  gap: 0.35rem;
-  max-width: 420px;
+  gap: 0.28rem;
+  max-width: 360px;
 `;
 
 const BarRow = styled.div`
   display: grid;
-  grid-template-columns: 52px 1fr 28px;
-  gap: 0.5rem;
+  grid-template-columns: 48px 1fr 24px;
+  gap: 0.4rem;
   align-items: center;
-  font-size: 0.72rem;
-  color: #475569;
+  font-size: 0.68rem;
+  color: #64748b;
   em {
     font-style: normal;
     text-align: right;
@@ -482,8 +490,8 @@ const BarRow = styled.div`
 `;
 
 const BarTrack = styled.div`
-  height: 7px;
-  background: #e2e8f0;
+  height: 6px;
+  background: #e8eef6;
   border-radius: 99px;
   overflow: hidden;
 `;
@@ -495,22 +503,23 @@ const BarFill = styled.div<{ $pct: number }>`
 `;
 
 const FormCard = styled.div`
-  margin: 1.25rem 0 1.5rem;
-  padding: 1rem 1.05rem 1.1rem;
-  border: 1px dashed #cbd5e1;
+  margin: 0.95rem 0 1.1rem;
+  padding: 0.85rem 0.9rem 0.95rem;
+  border: 1px solid #e8eef6;
   border-radius: 12px;
-  background: #fafbfc;
+  background: #fbfcfe;
 `;
 
 const FormTitle = styled.h3`
-  margin: 0 0 0.65rem;
-  font-size: 1rem;
-  color: #132e58;
+  margin: 0 0 0.55rem;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #0f1c46;
 `;
 
 const Notice = styled.p<{ $ok?: boolean; $warn?: boolean }>`
-  margin: 0 0 0.75rem;
-  font-size: 0.8125rem;
+  margin: 0 0 0.6rem;
+  font-size: 0.78rem;
   line-height: 1.45;
   color: ${({ $ok, $warn }) => ($warn ? "#9a3412" : $ok ? "#166534" : "#1e3a8a")};
 `;
@@ -518,11 +527,11 @@ const Notice = styled.p<{ $ok?: boolean; $warn?: boolean }>`
 const StarPicker = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.2rem;
-  margin-bottom: 0.65rem;
+  gap: 0.15rem;
+  margin-bottom: 0.55rem;
   span {
-    margin-left: 0.5rem;
-    font-size: 0.8rem;
+    margin-left: 0.45rem;
+    font-size: 0.75rem;
     font-weight: 700;
     color: #132e58;
   }
@@ -531,28 +540,31 @@ const StarPicker = styled.div`
 const StarBtn = styled.button`
   background: none;
   border: 0;
-  padding: 0.1rem;
+  padding: 0.05rem;
   cursor: pointer;
 `;
 
 const Field = styled.input`
   width: 100%;
-  margin-bottom: 0.55rem;
-  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.45rem;
+  padding: 0.5rem 0.7rem;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 9px;
   font: inherit;
+  font-size: 0.8125rem;
   box-sizing: border-box;
 `;
 
 const Area = styled.textarea`
   width: 100%;
-  margin-bottom: 0.55rem;
-  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.45rem;
+  padding: 0.5rem 0.7rem;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 9px;
   font: inherit;
+  font-size: 0.8125rem;
   resize: vertical;
+  min-height: 88px;
   box-sizing: border-box;
 `;
 
@@ -560,10 +572,11 @@ const Submit = styled.button`
   background: #132e58;
   color: #fff;
   border: 0;
-  border-radius: 8px;
-  padding: 0.6rem 1.15rem;
+  border-radius: 999px;
+  padding: 0.5rem 1.05rem;
   font-weight: 700;
   font: inherit;
+  font-size: 0.8125rem;
   cursor: pointer;
   &:disabled {
     opacity: 0.65;
@@ -576,50 +589,50 @@ const Submit = styled.button`
 
 const Err = styled.p`
   color: #b91c1c;
-  font-size: 0.8125rem;
-  margin: 0 0 0.55rem;
+  font-size: 0.78rem;
+  margin: 0 0 0.45rem;
 `;
 
 const Ok = styled.p`
   color: #166534;
-  font-size: 0.8125rem;
-  margin: 0 0 0.55rem;
+  font-size: 0.78rem;
+  margin: 0 0 0.45rem;
 `;
 
 const Empty = styled.p`
   color: #64748b;
-  font-size: 0.9rem;
-  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  margin: 0.35rem 0 0;
 `;
 
 const List = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0;
 `;
 
 const Item = styled.article`
   display: grid;
-  grid-template-columns: 42px 1fr;
-  gap: 0.75rem;
-  padding-bottom: 1rem;
+  grid-template-columns: 36px 1fr;
+  gap: 0.65rem;
+  padding: 0.75rem 0;
   border-bottom: 1px solid #eef2f7;
   &:last-child {
     border-bottom: 0;
-    padding-bottom: 0;
+    padding-bottom: 0.15rem;
   }
 `;
 
 const Avatar = styled.div`
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: #132e58;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #132e58 0%, #1a3f72 100%);
   color: #fbbf24;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   font-weight: 800;
 `;
 
@@ -627,14 +640,14 @@ const ItemTop = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.4rem 0.55rem;
+  gap: 0.3rem 0.45rem;
   strong {
-    color: #132e58;
-    font-size: 0.95rem;
+    color: #0f1c46;
+    font-size: 0.8125rem;
   }
   time {
     margin-left: auto;
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     color: #94a3b8;
   }
 `;
@@ -642,46 +655,49 @@ const ItemTop = styled.div`
 const Badge = styled.span<{ $gold?: boolean }>`
   display: inline-flex;
   align-items: center;
-  gap: 0.2rem;
-  font-size: 0.65rem;
+  gap: 0.15rem;
+  font-size: 0.62rem;
   font-weight: 700;
-  padding: 0.15rem 0.4rem;
+  padding: 0.12rem 0.4rem;
   border-radius: 99px;
   background: ${({ $gold }) => ($gold ? "#fef3c7" : "#ecfdf5")};
   color: ${({ $gold }) => ($gold ? "#92400e" : "#047857")};
 `;
 
 const ItemTitle = styled.div`
-  margin-top: 0.25rem;
+  margin-top: 0.2rem;
   font-weight: 700;
-  color: #132e58;
-  font-size: 0.9rem;
+  color: #0f1c46;
+  font-size: 0.8125rem;
 `;
 
 const ItemBody = styled.p`
-  margin: 0.3rem 0 0;
-  color: #334155;
-  font-size: 0.875rem;
-  line-height: 1.55;
+  margin: 0.25rem 0 0;
+  color: #475569;
+  font-size: 0.8125rem;
+  line-height: 1.5;
 `;
 
 const Pager = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.85rem;
-  margin-top: 1rem;
-  font-size: 0.8rem;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
   color: #64748b;
 `;
 
 const PageBtn = styled.button`
   border: 1px solid #e2e8f0;
   background: #fff;
-  border-radius: 8px;
-  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
   cursor: pointer;
   font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #132e58;
   &:disabled {
     opacity: 0.45;
     cursor: not-allowed;

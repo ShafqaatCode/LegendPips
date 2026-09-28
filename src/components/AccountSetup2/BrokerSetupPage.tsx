@@ -35,6 +35,8 @@ const BrokerSetupPage: React.FC<BrokerSetupPageProps> = ({
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [accountNumber, setAccountNumber] = useState('');
+  const [accountKind, setAccountKind] = useState<'new' | 'existing' | ''>('');
+  const [comment, setComment] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -69,6 +71,10 @@ const BrokerSetupPage: React.FC<BrokerSetupPageProps> = ({
       setError('Account number looks invalid. Use only letters, numbers, or hyphens.');
       return;
     }
+    if (accountKind !== 'new' && accountKind !== 'existing') {
+      setError('Please choose whether this is a new account or an existing account.');
+      return;
+    }
     if (!termsAccepted) {
       setError('Please accept the Terms and Conditions to continue.');
       return;
@@ -80,6 +86,8 @@ const BrokerSetupPage: React.FC<BrokerSetupPageProps> = ({
         brokerId: broker.id,
         brokerName: broker.name,
         accountNumber: num,
+        accountKind,
+        comment: comment.trim() || undefined,
         termsAccepted: true,
       });
       setSubmittedStatus(res.item?.status || 'pending');
@@ -119,6 +127,8 @@ const BrokerSetupPage: React.FC<BrokerSetupPageProps> = ({
                 onClick={() => {
                   setSubmitted(false);
                   setAccountNumber('');
+                  setAccountKind('');
+                  setComment('');
                   setTermsAccepted(false);
                 }}
               >
@@ -231,6 +241,46 @@ const BrokerSetupPage: React.FC<BrokerSetupPageProps> = ({
                         autoComplete="off"
                       />
                     </FieldRow>
+
+                    <KindHint>
+                      If you used our link to create this account, choose <strong>new</strong>. If you already
+                      had an account that was not opened with our link, choose <strong>existing</strong>.
+                    </KindHint>
+                    <KindOptions>
+                      <KindOption $active={accountKind === 'new'}>
+                        <input
+                          type="radio"
+                          name={`kind-${broker.id}`}
+                          checked={accountKind === 'new'}
+                          onChange={() => setAccountKind('new')}
+                        />
+                        This is a new account
+                      </KindOption>
+                      <KindOption $active={accountKind === 'existing'}>
+                        <input
+                          type="radio"
+                          name={`kind-${broker.id}`}
+                          checked={accountKind === 'existing'}
+                          onChange={() => setAccountKind('existing')}
+                        />
+                        This is an existing account
+                      </KindOption>
+                    </KindOptions>
+
+                    <FieldRow style={{ marginTop: '0.85rem', alignItems: 'flex-start' }}>
+                      <FieldLabel htmlFor={`comment-${broker.id}`} style={{ paddingTop: '0.45rem' }}>
+                        Comment
+                      </FieldLabel>
+                      <CommentInput
+                        id={`comment-${broker.id}`}
+                        placeholder="Optional — IB code used, broker email, etc."
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        maxLength={1000}
+                        rows={3}
+                      />
+                    </FieldRow>
+
                     <TermsRow>
                       <input
                         id={`terms-${broker.id}`}
@@ -582,6 +632,60 @@ const FieldInput = styled.input`
   &:focus {
     border-color: ${navy};
     box-shadow: 0 0 0 3px rgba(19, 46, 88, 0.1);
+  }
+`;
+
+const CommentInput = styled.textarea`
+  flex: 1;
+  min-width: 180px;
+  max-width: 420px;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid ${border};
+  background: #fff;
+  font-size: 0.875rem;
+  color: ${navy};
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+
+  &:focus {
+    border-color: ${navy};
+    box-shadow: 0 0 0 3px rgba(19, 46, 88, 0.1);
+  }
+`;
+
+const KindHint = styled.p`
+  margin: 0 0 0.55rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: ${muted};
+`;
+
+const KindOptions = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+`;
+
+const KindOption = styled.label<{ $active?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid ${({ $active }) => ($active ? navy : border)};
+  background: ${({ $active }) => ($active ? 'rgba(19, 46, 88, 0.06)' : '#fff')};
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: ${navy};
+
+  input {
+    accent-color: ${navy};
+    width: 15px;
+    height: 15px;
   }
 `;
 

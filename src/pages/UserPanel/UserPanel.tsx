@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Outlet } from 'react-router-dom';
 import UserSidebar from '../../components/UserPanel/UserSidebar';
 import UserHeader from '../../components/UserPanel/UserHeader';
+import UserPanelHighlightBanners from '../../components/UserPanel/UserPanelHighlightBanners';
 import AutoTranslateRoot from '../../components/i18n/AutoTranslateRoot';
 
 const PanelWrapper = styled.div`
@@ -45,6 +46,8 @@ const MainContent = styled.main`
 const ContentArea = styled.div`
   flex: 1;
   padding: 1.35rem 1.65rem 2.5rem;
+  display: flex;
+  flex-direction: column;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     padding: 0.95rem 0.9rem 1.75rem;
@@ -64,10 +67,12 @@ const UserPanel: React.FC = () => {
         <div className="notranslate">
           <UserHeader onMenuClick={() => setSidebarOpen(true)} />
         </div>
+        <UserPanelHighlightBanners placement="top" />
         <ContentArea>
           <AutoTranslateRoot>
             <Outlet />
           </AutoTranslateRoot>
+          <UserPanelHighlightBanners placement="bottom" />
         </ContentArea>
       </MainContent>
     </PanelWrapper>

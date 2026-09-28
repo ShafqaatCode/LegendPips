@@ -13,6 +13,7 @@ export const SESSION_EXPIRED_EVENT = "auth:session-expired";
 /** Auth endpoints that may return 401 for bad credentials — do not treat as session expiry. */
 const AUTH_EXEMPT_SUFFIXES = [
   "/login/2fa",
+  "/login/google",
   "/login",
   "/register/send-otp",
   "/register",
@@ -42,8 +43,22 @@ export function forceSessionLogout(redirectTo: string = "/"): void {
   if (sessionLogoutInProgress) return;
   sessionLogoutInProgress = true;
 
+  // If admin was viewing as a user, restore admin instead of a full logout.
+  const adminToken = localStorage.getItem("adminSessionToken");
+  const adminUser = localStorage.getItem("adminSessionUser");
+  if (adminToken && adminUser) {
+    localStorage.setItem("token", adminToken);
+    localStorage.setItem("user", adminUser);
+    localStorage.removeItem("adminSessionToken");
+    localStorage.removeItem("adminSessionUser");
+    window.location.replace("/admin-panel");
+    return;
+  }
+
   removeAuthToken();
   localStorage.removeItem("user");
+  localStorage.removeItem("adminSessionToken");
+  localStorage.removeItem("adminSessionUser");
 
   try {
     window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT));
@@ -143,7 +158,7 @@ export function assertApiOk(
     throw new Error("Session expired");
   }
   if (!response.ok) {
-    throw new Error(data?.message || fallback);
+    throw new Error(apiFailureMessage(response, data, fallback));
   }
 }
 
@@ -172,12 +187,41 @@ export async function parseJsonResponse<T = Record<string, unknown>>(
   try {
     return JSON.parse(text) as T;
   } catch {
-    if (text.trimStart().startsWith("<!DOCTYPE") || text.trimStart().startsWith("<html")) {
+    if (response.status === 413) {
       throw new Error(
-        `API returned HTML instead of JSON. Check VITE_API_BASE_URL (currently ${API_CONFIG.BASE_URL}). ` +
-          "For local dev use http://localhost:5000/api and ensure the backend is running."
+        "Upload is too large for the server. Your photos were compressed automatically — if this persists, the server nginx limit must be raised (client_max_body_size 25m) and the backend restarted."
+      );
+    }
+    if (response.status === 502 || response.status === 504) {
+      throw new Error(
+        "The server timed out while uploading your documents. Try again with smaller photos or ask support to increase the proxy timeout."
+      );
+    }
+    if (text.trimStart().startsWith("<!DOCTYPE") || text.trimStart().startsWith("<html")) {
+      const hint =
+        response.status === 404
+          ? "The API route may be missing on the server — pull latest backend, run npm run build, and restart PM2."
+          : "If you were uploading KYC documents, the server upload limit is likely too low (nginx client_max_body_size).";
+      throw new Error(
+        `Server returned an error page instead of JSON (HTTP ${response.status}). ${hint} API base: ${API_CONFIG.BASE_URL}`
       );
     }
     throw new Error("Invalid response from server");
   }
+}
+
+/** Prefer this when status has no JSON body (common for nginx/Express empty 404s). */
+export function apiFailureMessage(
+  response: Response,
+  data?: { message?: string },
+  fallback = "Request failed"
+): string {
+  if (data?.message) return data.message;
+  if (response.status === 404) {
+    return `API route not found (HTTP 404). Production backend needs a redeploy (git pull + npm run build + pm2 restart). API base: ${API_CONFIG.BASE_URL}`;
+  }
+  if (response.status === 502 || response.status === 504) {
+    return "The API server is unreachable or restarting. Try again in a moment.";
+  }
+  return `${fallback} (HTTP ${response.status})`;
 }

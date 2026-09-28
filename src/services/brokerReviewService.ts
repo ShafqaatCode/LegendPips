@@ -59,16 +59,25 @@ export type BrokerReviewsPage = {
 };
 
 const fetchJson = async (url: string, options?: RequestInit) => {
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(options?.headers || {}),
-    },
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error((data as { message?: string }).message || "Request failed");
-  return data;
+  try {
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options?.headers || {}),
+      },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error((data as { message?: string }).message || "Request failed");
+    return data;
+  } catch (err) {
+    if (err instanceof TypeError) {
+      throw new Error(
+        "Could not reach the server. Check your connection, sign in again, and try once more."
+      );
+    }
+    throw err;
+  }
 };
 
 export const fetchBrokerReviews = async (

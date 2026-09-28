@@ -16,29 +16,35 @@ const fallbackForex: Row[] = [
   { pair: 'GBP/USD', entry: '1.2645', tp: '1.2675', sl: '1.2625', status: 'buy' },
 ];
 
-const fallbackCrypto: Row[] = [
+const fallbackCryptoGold: Row[] = [
+  { pair: 'XAU/USD', entry: '2340', tp: '2365', sl: '2320', status: 'buy' },
   { pair: 'BTC/USD', entry: '43250', tp: '44500', sl: '42500', status: 'buy' },
   { pair: 'ETH/USD', entry: '2650', tp: '2750', sl: '2600', status: 'buy' },
 ];
 
 const SignalsPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
-  const [forexSignals, setForexSignals] = useState<Row[]>(fallbackForex);
-  const [cryptoSignals, setCryptoSignals] = useState<Row[]>(fallbackCrypto);
+  const [forexSignals, setForexSignals] = useState<Row[]>([]);
+  const [cryptoGoldSignals, setCryptoGoldSignals] = useState<Row[]>([]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const [fx, cr] = await Promise.all([
+        const [fx, crypto, commodities] = await Promise.all([
           fetchPublicSignals({ assetClass: 'forex', limit: 8, tradeStatus: 'active' }),
           fetchPublicSignals({ assetClass: 'crypto', limit: 8, tradeStatus: 'active' }),
+          fetchPublicSignals({ assetClass: 'commodities', limit: 8, tradeStatus: 'active' }),
         ]);
         if (cancelled) return;
-        if (fx.items?.length) setForexSignals(mapRows(fx.items));
-        if (cr.items?.length) setCryptoSignals(mapRows(cr.items));
+        setForexSignals(fx.items?.length ? mapRows(fx.items) : fallbackForex);
+        const merged = [...(commodities.items || []), ...(crypto.items || [])];
+        setCryptoGoldSignals(merged.length ? mapRows(merged).slice(0, 8) : fallbackCryptoGold);
       } catch {
-        /* keep fallbacks */
+        if (!cancelled) {
+          setForexSignals(fallbackForex);
+          setCryptoGoldSignals(fallbackCryptoGold);
+        }
       }
     })();
     return () => {
@@ -52,11 +58,11 @@ const SignalsPage: React.FC = () => {
       <LiveSignalsSection
         onCtaClick={() => setShowModal(true)}
         forexSignals={forexSignals}
-        cryptoSignals={cryptoSignals}
+        cryptoSignals={cryptoGoldSignals}
       />
       <SignalsSection title="Forex Signals" signals={forexSignals} onCtaClick={() => setShowModal(true)} />
       <XMBanner />
-      <SignalsSection title="Crypto signals" signals={cryptoSignals} onCtaClick={() => setShowModal(true)} />
+      <SignalsSection title="Crypto Signals" signals={cryptoGoldSignals} onCtaClick={() => setShowModal(true)} />
       <Testimonials />
       <SubscriptionModal isOpen={showModal} onClose={() => setShowModal(false)} />
     </>

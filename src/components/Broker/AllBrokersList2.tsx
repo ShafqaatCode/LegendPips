@@ -5,7 +5,7 @@ import { fetchBrokersPage } from "../../services/brokerService";
 import type { ApiBroker } from "../../services/brokerService";
 import { BrokerListSkeleton } from "../SharedComponents/Shimmer";
 import ListPagination from "../SharedComponents/ListPagination";
-import { mapApiBrokerToRebateCardRow } from "../../utils/rebatesBrokersDisplay";
+import { mapApiBrokerToRebateCardRow, sortApiBrokersFeaturedFirst } from "../../utils/rebatesBrokersDisplay";
 
 const BrokerSectionWrapper = styled.section`
   padding: 1rem 0;
@@ -57,7 +57,7 @@ const AllBrokersListPaginated: React.FC = () => {
           limit: ITEMS_PER_PAGE,
         });
         if (!cancelled) {
-          setBrokers(result.items);
+          setBrokers(sortApiBrokersFeaturedFirst(result.items));
           setTotalPages(Math.max(1, result.pagination.totalPages));
           setTotalItems(result.pagination.totalItems);
         }
@@ -99,17 +99,18 @@ const AllBrokersListPaginated: React.FC = () => {
       <BrokerWrapper>
         {visibleBrokers.map((b, idx) => {
           const row = mapApiBrokerToRebateCardRow(b);
-          const uniqueKey = (currentPage - 1) * ITEMS_PER_PAGE + idx;
+          const rank = (currentPage - 1) * ITEMS_PER_PAGE + idx + 1;
           return (
             <BrokerCard3
-              key={b._id || String(uniqueKey)}
-              index={row.index}
+              key={b._id || String(rank)}
+              index={rank}
               featured={row.featured}
               title={row.title}
               logoSrc={row.logoSrc}
               rating={row.rating}
               reviewsCount={row.reviewsCount}
               features={parseFeatures(b)}
+              temporarilyDisabled={row.temporarilyDisabled}
             />
           );
         })}

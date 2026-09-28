@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import {
-  FiUsers, FiAward, FiShield, FiInbox, FiActivity, FiClock, FiUserPlus, FiShuffle,
+  FiUsers, FiAward, FiShield, FiInbox, FiActivity, FiClock, FiUserPlus, FiShuffle, FiSearch,
 } from 'react-icons/fi';
 import type { DashboardPreviews } from '../../services/adminEngagementService';
 import { KYC_STATUS_LABELS, type KycStatus } from '../../services/kycService';
@@ -11,11 +11,14 @@ import {
   ShowAllBtn, Pill, EmptyPreview, adminColors,
 } from './adminUi';
 import { ShimmerBar } from '../SharedComponents/Shimmer';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface AdminDashboardPreviewsProps {
   previews?: DashboardPreviews;
   loading?: boolean;
 }
+
+type ActivityScope = 'all' | 'mine' | 'team';
 
 const Grid = styled.div`
   display: grid;
@@ -145,6 +148,68 @@ const ActivityDot = styled.span<{ $color: string }>`
   box-shadow: 0 0 0 3px ${({ $color }) => `${$color}22`};
 `;
 
+const ActivityFilters = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.15rem 0.65rem;
+`;
+
+const SearchBox = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 0 1 220px;
+  width: 220px;
+  max-width: 100%;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid ${adminColors.border};
+  border-radius: 10px;
+  background: #f8fafc;
+  color: ${adminColors.muted};
+
+  input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    min-width: 0;
+    font-size: 0.75rem;
+    font-family: inherit;
+    color: ${adminColors.navy};
+  }
+`;
+
+const ScopeGroup = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  flex: 0 0 auto;
+  margin-left: auto;
+`;
+
+const ScopeBtn = styled.button<{ $on?: boolean }>`
+  border: 1px solid ${({ $on }) => ($on ? adminColors.navy : adminColors.border)};
+  background: ${({ $on }) => ($on ? adminColors.navy : '#fff')};
+  color: ${({ $on }) => ($on ? '#fff' : adminColors.muted)};
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &:hover {
+    border-color: ${adminColors.navy};
+    color: ${({ $on }) => ($on ? '#fff' : adminColors.navy)};
+  }
+`;
+
 const CountBadge = styled.span`
   margin-left: 0.35rem;
   display: inline-flex;
@@ -189,6 +254,36 @@ const TYPE_COLORS: Record<string, string> = {
 
 const AdminDashboardPreviews: React.FC<AdminDashboardPreviewsProps> = ({ previews, loading }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [activityQuery, setActivityQuery] = useState('');
+  const [activityScope, setActivityScope] = useState<ActivityScope>('all');
+
+  const myId = user?.id || '';
+  const myName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim().toLowerCase();
+  const myEmail = (user?.email || '').toLowerCase();
+
+  const filteredActivity = useMemo(() => {
+    const list = previews?.recentActivity || [];
+    const q = activityQuery.trim().toLowerCase();
+    return list.filter((a) => {
+      if (activityScope === 'mine') {
+        const isMine =
+          (a.userId && myId && a.userId === myId) ||
+          (!a.userId && myName && a.userLabel.toLowerCase() === myName) ||
+          (!a.userId && myEmail && a.userLabel.toLowerCase() === myEmail);
+        if (!isMine) return false;
+      }
+      if (activityScope === 'team') {
+        const isAdminActor = a.userRole === 'admin' || /admin/i.test(a.userLabel);
+        if (!isAdminActor) return false;
+      }
+      if (q) {
+        const hay = `${a.userLabel} ${a.title} ${a.type}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [previews?.recentActivity, activityQuery, activityScope, myId, myName, myEmail]);
 
   if (loading || !previews) {
     return (
@@ -429,17 +524,41 @@ const AdminDashboardPreviews: React.FC<AdminDashboardPreviewsProps> = ({ preview
           <h2>
             <HeadIcon><FiActivity /></HeadIcon>
             Recent activity
-            <CountBadge>{previews.recentActivity.length}</CountBadge>
+            <CountBadge>{filteredActivity.length}</CountBadge>
           </h2>
           <ShowAllBtn type="button" onClick={() => navigate('/admin-panel/user-activity')}>
             Show all →
           </ShowAllBtn>
         </SectionHead>
         <SectionBody style={{ paddingTop: 0 }}>
+          <ActivityFilters>
+            <SearchBox>
+              <FiSearch size={13} />
+              <input
+                value={activityQuery}
+                onChange={(e) => setActivityQuery(e.target.value)}
+                placeholder="Search by username…"
+                aria-label="Search activity by username"
+              />
+            </SearchBox>
+            <ScopeGroup>
+              <ScopeBtn type="button" $on={activityScope === 'all'} onClick={() => setActivityScope('all')}>
+                All
+              </ScopeBtn>
+              <ScopeBtn type="button" $on={activityScope === 'mine'} onClick={() => setActivityScope('mine')}>
+                My activity
+              </ScopeBtn>
+              <ScopeBtn type="button" $on={activityScope === 'team'} onClick={() => setActivityScope('team')}>
+                Team
+              </ScopeBtn>
+            </ScopeGroup>
+          </ActivityFilters>
           {previews.recentActivity.length === 0 ? (
             <EmptyPreview>No activity logged yet</EmptyPreview>
+          ) : filteredActivity.length === 0 ? (
+            <EmptyPreview>No activity matches your filters</EmptyPreview>
           ) : (
-            previews.recentActivity.map((a) => (
+            filteredActivity.map((a) => (
               <Row key={a.id} type="button" onClick={() => navigate('/admin-panel/user-activity')}>
                 <ActivityDot $color={TYPE_COLORS[a.type] || adminColors.muted} />
                 <RowMain>

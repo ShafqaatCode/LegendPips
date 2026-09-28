@@ -21,14 +21,18 @@ export type PanelCopy = {
   ibChange: string;
   traderProfile: string;
   copyTrading: string;
+  strategies: string;
+  streak: string;
   webinars: string;
   courses: string;
   videos: string;
   analysis: string;
   forum: string;
   reviews: string;
+  tickets: string;
   complaints: string;
   activity: string;
+  alerts: string;
   calendar: string;
   settings: string;
   adminConsole: string;
@@ -106,6 +110,9 @@ export type PanelCopy = {
   authEmailReq: string;
   authPassReq: string;
   authTerms: string;
+  authTermsBefore: string;
+  authTermsLink: string;
+  authTermsSuffix: string;
   authTermsReq: string;
   authForgot: string;
   authLogging: string;
@@ -126,6 +133,8 @@ export type PanelCopy = {
   authConfirm: string;
   authConfirmReq: string;
   authUnderstand: string;
+  authUnderstandBefore: string;
+  authUnderstandSuffix: string;
   authRegistering: string;
   authEnterEmail: string;
   authValidEmail: string;
@@ -160,14 +169,18 @@ const en: PanelCopy = {
   ibChange: "IB change",
   traderProfile: "Trader profile",
   copyTrading: "Copy trading",
+  strategies: "My strategies",
+  streak: "Trading streak",
   webinars: "My Webinars",
   courses: "My Courses",
   videos: "Trading Videos",
   analysis: "Saved Analysis",
   forum: "Forum Posts",
   reviews: "Broker reviews",
+  tickets: "Support tickets",
   complaints: "My complaints",
   activity: "Activity",
+  alerts: "Alerts",
   calendar: "Calendar",
   settings: "Settings",
   adminConsole: "Admin console",
@@ -177,7 +190,7 @@ const en: PanelCopy = {
   kycRecords: "KYC Records",
   brokers: "Brokers",
   brokerReviews: "Broker reviews",
-  feedback: "Feedback",
+  feedback: "Support tickets",
   referrals: "Referrals",
   reports: "Analytics",
   security: "Security",
@@ -245,6 +258,9 @@ const en: PanelCopy = {
   authEmailReq: "Email is required",
   authPassReq: "Password is required",
   authTerms: "I Accept The Terms And Disclaimer Set Forth By Legend Pips.",
+  authTermsBefore: "I Accept The ",
+  authTermsLink: "Terms And Disclaimer",
+  authTermsSuffix: " Set Forth By Legend Pips.",
   authTermsReq: "You must accept the terms",
   authForgot: "Forget The Password?",
   authLogging: "Logging in...",
@@ -265,6 +281,8 @@ const en: PanelCopy = {
   authConfirm: "Confirm Password",
   authConfirmReq: "Confirm your password",
   authUnderstand: "I Understand And Accept The Terms And Disclaimer Set Forth By Legend Pips.",
+  authUnderstandBefore: "I Understand And Accept The ",
+  authUnderstandSuffix: " Set Forth By Legend Pips.",
   authRegistering: "Registering...",
   authEnterEmail: "Enter your email first, then request a code.",
   authValidEmail: "Enter a valid email address.",
@@ -305,14 +323,18 @@ const ur = fill({
   ibChange: "IB تبدیلی",
   traderProfile: "ٹریڈر پروفائل",
   copyTrading: "کاپی ٹریڈنگ",
+  strategies: "میری اسٹریٹجیز",
+  streak: "ٹریڈنگ اسٹریک",
   webinars: "میرے ویبینارز",
   courses: "میرے کورسز",
   videos: "ٹریڈنگ ویڈیوز",
   analysis: "محفوظ تجزیے",
   forum: "فورم پوسٹس",
   reviews: "بروکر ریویوز",
+  tickets: "سپورٹ ٹکٹس",
   complaints: "میری شکایات",
   activity: "سرگرمی",
+  alerts: "الرٹس",
   calendar: "کیلنڈر",
   settings: "ترتیبات",
   adminConsole: "ایڈمن کنسول",
@@ -390,6 +412,9 @@ const ur = fill({
   authEmailReq: "ای میل ضروری ہے",
   authPassReq: "پاس ورڈ ضروری ہے",
   authTerms: "میں Legend Pips کی شرائط اور ڈس کلیمر قبول کرتا/کرتی ہوں۔",
+  authTermsBefore: "میں ",
+  authTermsLink: "شرائط اور ڈس کلیمر",
+  authTermsSuffix: " Legend Pips کی قبول کرتا/کرتی ہوں۔",
   authTermsReq: "شرائط قبول کرنا ضروری ہے",
   authForgot: "پاس ورڈ بھول گئے؟",
   authLogging: "لاگ ان ہو رہا ہے...",
@@ -410,6 +435,8 @@ const ur = fill({
   authConfirm: "پاس ورڈ تصدیق",
   authConfirmReq: "پاس ورڈ تصدیق کریں",
   authUnderstand: "میں Legend Pips کی شرائط اور ڈس کلیمر سمجھتا/سمجھتی اور قبول کرتا/کرتی ہوں۔",
+  authUnderstandBefore: "میں ",
+  authUnderstandSuffix: " Legend Pips کی سمجھتا/سمجھتی اور قبول کرتا/کرتی ہوں۔",
   authRegistering: "رجسٹر ہو رہا ہے...",
   authEnterEmail: "پہلے ای میل درج کریں، پھر کوڈ مانگیں۔",
   authValidEmail: "درست ای میل درج کریں۔",
@@ -444,14 +471,18 @@ const ar = fill({
   ibChange: "تغيير الوسيط المعرّف",
   traderProfile: "ملف المتداول",
   copyTrading: "نسخ التداول",
+  strategies: "استراتيجياتي",
+  streak: "سلسلة التداول",
   webinars: "ندواتي",
   courses: "دوراتي",
   videos: "فيديوهات التداول",
   analysis: "تحليلات محفوظة",
   forum: "منشورات المنتدى",
   reviews: "مراجعات الوسطاء",
+  tickets: "تذاكر الدعم",
   complaints: "شكاواي",
   activity: "النشاط",
+  alerts: "التنبيهات",
   calendar: "التقويم",
   settings: "الإعدادات",
   adminConsole: "لوحة المشرف",
@@ -529,6 +560,9 @@ const ar = fill({
   authEmailReq: "البريد مطلوب",
   authPassReq: "كلمة المرور مطلوبة",
   authTerms: "أوافق على الشروط والإخلاء الصادرة عن Legend Pips.",
+  authTermsBefore: "أوافق على ",
+  authTermsLink: "الشروط والإخلاء",
+  authTermsSuffix: " الصادرة عن Legend Pips.",
   authTermsReq: "يجب قبول الشروط",
   authForgot: "نسيت كلمة المرور؟",
   authLogging: "جارٍ تسجيل الدخول...",
@@ -549,6 +583,8 @@ const ar = fill({
   authConfirm: "تأكيد كلمة المرور",
   authConfirmReq: "أكد كلمة المرور",
   authUnderstand: "أفهم وأوافق على شروط وإخلاء Legend Pips.",
+  authUnderstandBefore: "أفهم وأوافق على ",
+  authUnderstandSuffix: " الصادرة عن Legend Pips.",
   authRegistering: "جارٍ التسجيل...",
   authEnterEmail: "أدخل بريدك أولًا ثم اطلب الرمز.",
   authValidEmail: "أدخل بريدًا صالحًا.",

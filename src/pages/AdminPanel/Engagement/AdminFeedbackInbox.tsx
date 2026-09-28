@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { FiInbox, FiTrash2, FiEye, FiArchive, FiRefreshCw, FiMail } from 'react-icons/fi';
+import { FiInbox, FiTrash2, FiEye, FiArchive, FiRefreshCw, FiMail, FiSend } from 'react-icons/fi';
 import {
   fetchAdminFeedback,
   patchFeedbackStatus,
@@ -12,7 +12,7 @@ import {
   PageWrap, PageHeader, PageTitleGroup, PageTitle, PageSubtitle,
   GhostButton, FilterBar, FilterSelect, FilterCount,
   TableCard, DataTable, Th, Td, Tr, Pill, ErrorBanner, adminColors,
-  Pagination, PageButtons, PageBtn, ActionGroup,
+  Pagination, PageButtons, PageBtn, ActionGroup, PrimaryButton,
 } from '../../../components/AdminPanel/adminUi';
 
 const StatsRow = styled.div`
@@ -49,6 +49,22 @@ const Msg = styled.div`
   word-break: break-word;
 `;
 
+const ReplyBox = styled.div`
+  margin-top: 0.45rem;
+  display: grid;
+  gap: 0.35rem;
+  textarea {
+    width: 100%;
+    min-height: 64px;
+    border: 1px solid ${adminColors.border};
+    border-radius: 8px;
+    padding: 0.45rem 0.55rem;
+    font: inherit;
+    font-size: 0.75rem;
+    resize: vertical;
+  }
+`;
+
 const statusPill = (s: string) => {
   if (s === 'new') return 'pending';
   if (s === 'read') return 'user';
@@ -67,6 +83,7 @@ const AdminFeedbackInbox: React.FC = () => {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [replies, setReplies] = useState<Record<string, string>>({});
 
   const refresh = useCallback(async () => {
     try {
@@ -75,6 +92,11 @@ const AdminFeedbackInbox: React.FC = () => {
       const data = await fetchAdminFeedback(page, 15, statusFilter || undefined);
       setItems(data.items);
       setPagination(data.pagination);
+      const next: Record<string, string> = {};
+      data.items.forEach((row) => {
+        next[row._id] = row.adminReply || '';
+      });
+      setReplies(next);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load');
     } finally {
@@ -84,13 +106,19 @@ const AdminFeedbackInbox: React.FC = () => {
 
   useEffect(() => { refresh(); }, [refresh]);
 
-  const setStatus = async (id: string, status: 'new' | 'read' | 'archived') => {
-    await patchFeedbackStatus(id, status);
+  const setStatus = async (id: string, status: 'new' | 'read' | 'archived', adminReply?: string) => {
+    await patchFeedbackStatus(id, status, adminReply);
     await refresh();
   };
 
+  const sendReply = async (id: string) => {
+    const reply = (replies[id] || '').trim();
+    if (!reply) return;
+    await setStatus(id, 'read', reply);
+  };
+
   const remove = async (id: string) => {
-    if (!window.confirm('Delete this feedback permanently?')) return;
+    if (!window.confirm('Delete this ticket permanently?')) return;
     await deleteFeedbackAdmin(id);
     await refresh();
   };
@@ -115,8 +143,8 @@ const AdminFeedbackInbox: React.FC = () => {
     <PageWrap>
       <PageHeader>
         <PageTitleGroup>
-          <PageTitle><FiInbox /> Feedback</PageTitle>
-          <PageSubtitle>Review user messages, mark as read, and archive tickets</PageSubtitle>
+          <PageTitle><FiInbox /> Support tickets</PageTitle>
+          <PageSubtitle>Review tickets, reply to users, and archive resolved cases</PageSubtitle>
         </PageTitleGroup>
         <GhostButton type="button" onClick={refresh} disabled={loading}>
           <FiRefreshCw /> Refresh
@@ -134,7 +162,7 @@ const AdminFeedbackInbox: React.FC = () => {
         </MiniStat>
         <MiniStat>
           <div className="icon" style={{ background: '#dbeafe', color: '#2563eb' }}><FiEye /></div>
-          <div><div className="val">{loading ? '…' : counts.read}</div><div className="lbl">Read</div></div>
+          <div><div className="val">{loading ? '…' : counts.read}</div><div className="lbl">In review</div></div>
         </MiniStat>
       </StatsRow>
 
@@ -145,10 +173,10 @@ const AdminFeedbackInbox: React.FC = () => {
         >
           <option value="">All statuses</option>
           <option value="new">New</option>
-          <option value="read">Read</option>
+          <option value="read">In review</option>
           <option value="archived">Archived</option>
         </FilterSelect>
-        <FilterCount>{loading ? 'Loading…' : `${items.length} messages`}</FilterCount>
+        <FilterCount>{loading ? 'Loading…' : `${items.length} tickets`}</FilterCount>
       </FilterBar>
 
       {error && <ErrorBanner>{error}</ErrorBanner>}
@@ -157,29 +185,45 @@ const AdminFeedbackInbox: React.FC = () => {
         <DataTable>
           <thead>
             <tr>
-              <Th>When</Th>
+              <Th>Ticket</Th>
               <Th>From</Th>
               <Th>Message</Th>
-              <Th>Page</Th>
               <Th>Status</Th>
               <Th>Actions</Th>
             </tr>
           </thead>
           <tbody>
-            {loading && <TableBodySkeleton rows={6} cols={6} />}
+            {loading && <TableBodySkeleton rows={6} cols={5} />}
             {!loading && items.map((row) => {
               const id = row._id;
+              const ticketLabel = row.ticketId || `LP-T-${id.slice(-6).toUpperCase()}`;
               return (
                 <Tr key={id}>
-                  <Td style={{ whiteSpace: 'nowrap', fontSize: '0.75rem', color: adminColors.muted }}>
-                    {row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}
+                  <Td>
+                    <div style={{ fontWeight: 800, color: adminColors.navy, fontSize: '0.8125rem' }}>{ticketLabel}</div>
+                    <div style={{ fontSize: '0.75rem', color: adminColors.muted }}>{row.subject || 'Support request'}</div>
+                    <div style={{ whiteSpace: 'nowrap', fontSize: '0.6875rem', color: adminColors.muted, marginTop: 4 }}>
+                      {row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}
+                    </div>
                   </Td>
                   <Td>
                     <div style={{ fontWeight: 700, color: adminColors.navy, fontSize: '0.8125rem' }}>{userLabel(row)}</div>
                     <div style={{ fontSize: '0.6875rem', color: adminColors.muted }}>{row.email}</div>
+                    <div style={{ fontSize: '0.6875rem', color: adminColors.muted }}>{row.category || 'general'}</div>
                   </Td>
-                  <Td><Msg>{row.message}</Msg></Td>
-                  <Td style={{ fontSize: '0.75rem' }}>{row.page || '—'}</Td>
+                  <Td>
+                    <Msg>{row.message}</Msg>
+                    <ReplyBox>
+                      <textarea
+                        placeholder="Write a reply for the user…"
+                        value={replies[id] ?? ''}
+                        onChange={(e) => setReplies((prev) => ({ ...prev, [id]: e.target.value }))}
+                      />
+                      <PrimaryButton $sm type="button" onClick={() => sendReply(id)}>
+                        <FiSend /> Send reply
+                      </PrimaryButton>
+                    </ReplyBox>
+                  </Td>
                   <Td><Pill $variant={statusPill(row.status)}>{row.status}</Pill></Td>
                   <Td>
                     <ActionGroup style={{ flexWrap: 'wrap' }}>
@@ -199,7 +243,7 @@ const AdminFeedbackInbox: React.FC = () => {
               );
             })}
             {!loading && items.length === 0 && (
-              <Tr><Td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: adminColors.muted }}>No feedback messages.</Td></Tr>
+              <Tr><Td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: adminColors.muted }}>No support tickets.</Td></Tr>
             )}
           </tbody>
         </DataTable>

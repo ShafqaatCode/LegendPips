@@ -285,7 +285,7 @@ const AdminTeamManagement: React.FC = () => {
       setModalError("Name and email are required");
       return;
     }
-    if (mode === "add" && password.trim().length < 6) {
+    if (mode === "add" && password.trim() && password.trim().length < 6) {
       setModalError("Password must be at least 6 characters");
       return;
     }
@@ -302,7 +302,7 @@ const AdminTeamManagement: React.FC = () => {
           firstName: firstName.trim(),
           lastName: lastName.trim(),
           email: email.trim(),
-          password: password.trim(),
+          password: password.trim() || undefined,
           phone: phone.trim() || undefined,
           permissions: perms,
         });
@@ -339,7 +339,7 @@ const AdminTeamManagement: React.FC = () => {
         <PageTitleGroup>
           <PageTitle><FiUsers /> Admin team</PageTitle>
           <PageSubtitle>
-            Add staff accounts and choose which admin areas they can access
+            Add staff accounts or promote existing members. Choose which admin areas they can access.
           </PageSubtitle>
         </PageTitleGroup>
         <PrimaryButton type="button" onClick={openAdd}>
@@ -449,11 +449,29 @@ const AdminTeamManagement: React.FC = () => {
           </div>
         )}
         {mode === "delete" ? (
-          <div style={{ color: adminColors.muted, fontSize: 14 }}>
-            Remove this staff account? They will no longer be able to sign in to the admin panel.
+          <div style={{ color: adminColors.muted, fontSize: 14, lineHeight: 1.55 }}>
+            Remove staff access for this account? They will become a normal member again
+            (user panel still works). Their account is not deleted.
           </div>
         ) : (
           <>
+            {mode === "add" && (
+              <div
+                style={{
+                  marginBottom: 14,
+                  padding: "10px 12px",
+                  borderRadius: 10,
+                  background: "#eff6ff",
+                  border: "1px solid #bfdbfe",
+                  color: "#1e3a5f",
+                  fontSize: 13,
+                  lineHeight: 1.5,
+                }}
+              >
+                If this email is already registered as a member, they will be promoted to staff on the
+                same account. Leave password blank to keep their existing login password.
+              </div>
+            )}
             <FormGrid>
               <FormField>
                 First name
@@ -472,12 +490,15 @@ const AdminTeamManagement: React.FC = () => {
                 />
               </FormField>
               <FormField>
-                {mode === "add" ? "Password" : "New password (optional)"}
+                {mode === "add"
+                  ? "Password (required for new emails; optional if already registered)"
+                  : "New password (optional)"}
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="new-password"
+                  placeholder={mode === "add" ? "Leave blank to keep member password" : ""}
                 />
               </FormField>
               <FormField>

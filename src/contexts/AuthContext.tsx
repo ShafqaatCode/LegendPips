@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import {
   login as loginApi,
+  loginWithGoogle as loginWithGoogleApi,
   verifyLogin2fa,
   getCurrentUser,
   getMe,
@@ -8,6 +9,7 @@ import {
   logout as logoutApi,
 } from '../services/authService';
 import { SESSION_EXPIRED_EVENT, forceSessionLogout } from '../utils/apiConfig';
+import { requestGoogleIdToken } from '../utils/googleIdentity';
 
 export interface User {
   id: string;
@@ -34,6 +36,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<LoginResult>;
+  loginWithGoogle: (opts?: { referralCode?: string }) => Promise<LoginResult>;
   complete2fa: (tempToken: string, code: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   setUser: (user: User | null) => void;
@@ -130,6 +133,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = async (opts?: { referralCode?: string }): Promise<LoginResult> => {
+    try {
+      const idToken = await requestGoogleIdToken();
+      const response = await loginWithGoogleApi(idToken, opts);
+      if (response.requires2fa && response.tempToken) {
+        return {
+          success: true,
+          requires2fa: true,
+          tempToken: response.tempToken,
+          message: response.message,
+        };
+      }
+      if (response.success && response.user) {
+        setUser(response.user as User);
+        return { success: true };
+      }
+      return { success: false, message: response.message || 'Google login failed' };
+    } catch (error: any) {
+      return { success: false, message: error.message || 'Google login failed' };
+    }
+  };
+
   const complete2fa = async (tempToken: string, code: string) => {
     try {
       const response = await verifyLogin2fa({ tempToken, code });
@@ -152,6 +177,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     isAuthenticated: !!user,
     login,
+    loginWithGoogle,
     complete2fa,
     logout,
     setUser,

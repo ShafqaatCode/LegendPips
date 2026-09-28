@@ -22,6 +22,8 @@ export interface PublicSiteConfig {
   siteName: string;
   siteTagline: string;
   siteLogoUrl: string | null;
+  siteLogoHeight: number;
+  siteLogoMaxWidth: number;
   maintenanceMode: boolean;
   allowRegistrations: boolean;
   emailVerificationEnabled: boolean;
@@ -63,14 +65,19 @@ export interface ClientReview {
 }
 
 const json = async (url: string, init?: RequestInit) => {
-  const res = await fetch(url, init);
+  const res = await fetch(url, {
+    cache: "no-store",
+    ...init,
+  });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Request failed");
   return data;
 };
 
 export const fetchPublicSiteConfig = async (): Promise<PublicSiteConfig> => {
-  const data = await json(`${API_CONFIG.BASE_URL}/site-config`);
+  const data = await json(`${API_CONFIG.BASE_URL}/site-config?_=${Date.now()}`, {
+    cache: "no-store",
+  });
   return data.config;
 };
 

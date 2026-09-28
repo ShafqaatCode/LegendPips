@@ -72,6 +72,7 @@ const KycVerification: React.FC = () => {
   const [identityBack, setIdentityBack] = useState<CaptureState>(emptyCapture());
   const [proofOfAddress, setProofOfAddress] = useState<CaptureState>(emptyCapture());
   const [selfieWithId, setSelfieWithId] = useState<CaptureState>(emptyCapture());
+  const [portraitPhoto, setPortraitPhoto] = useState<CaptureState>(emptyCapture());
 
   const canEdit = !kyc || kyc.kycStatus === 'incomplete' || kyc.kycStatus === 'rejected';
 
@@ -114,8 +115,8 @@ const KycVerification: React.FC = () => {
     e.preventDefault();
     setError('');
 
-    if (!identityFront.file || !proofOfAddress.file || !selfieWithId.file) {
-      setError('Please upload all required documents and capture your selfie before submitting.');
+    if (!identityFront.file || !proofOfAddress.file || !selfieWithId.file || !portraitPhoto.file) {
+      setError('Please upload all required documents, your photo, and capture your live selfie before submitting.');
       return;
     }
     if (idDocumentType !== 'passport' && !identityBack.file) {
@@ -132,6 +133,7 @@ const KycVerification: React.FC = () => {
         identityBack: identityBack.file || undefined,
         proofOfAddress: proofOfAddress.file,
         selfieWithId: selfieWithId.file,
+        portraitPhoto: portraitPhoto.file,
       });
       setKyc({
         kycStatus: result.kycStatus,
@@ -161,7 +163,8 @@ const KycVerification: React.FC = () => {
     incomplete: 'Complete your profile and upload documents below to begin verification.',
     pending: 'Your submission is being reviewed by our team. This usually takes 1–2 business days.',
     approved: 'Congratulations — your identity has been verified. You now have full platform access.',
-    rejected: 'Your submission was not approved. Please review the reason below and resubmit.',
+    rejected:
+      'An admin marked your verification as unverified. Please fix the issue below and resubmit your documents.',
   };
 
   return (
@@ -169,7 +172,7 @@ const KycVerification: React.FC = () => {
       <PageHeader>
         <PageTitle><FiShield /> {t("panel.verification")}</PageTitle>
         <PageSubtitle>
-          Upload your ID and proof of address, then capture a live selfie holding your ID.
+          Upload your ID, proof of address, and a clear photo of yourself, then capture a live selfie holding your ID.
         </PageSubtitle>
       </PageHeader>
 
@@ -196,7 +199,7 @@ const KycVerification: React.FC = () => {
           <p>{statusMessage[status]}</p>
           {status === 'rejected' && profile?.rejectionReason && (
             <RejectionBox>
-              <strong>Reason for rejection</strong>
+              <strong>What the admin said — please fix this</strong>
               <p>{profile.rejectionReason}</p>
             </RejectionBox>
           )}
@@ -324,7 +327,7 @@ const KycVerification: React.FC = () => {
             <SectionHead><h2>Documents</h2></SectionHead>
             <SectionBody>
               <PageSubtitle style={{ marginBottom: '0.75rem' }}>
-                Upload ID and proof of address (JPEG, PNG, WebP, or PDF). Selfie must be captured live with your camera.
+                Upload ID, proof of address, and your photo (JPEG, PNG, WebP, or PDF). Selfie with ID must be captured live with your camera.
               </PageSubtitle>
               <DocGrid>
                 <DocumentUpload
@@ -350,9 +353,17 @@ const KycVerification: React.FC = () => {
                   previewUrl={proofOfAddress.preview}
                   onChange={setCapture(setProofOfAddress, proofOfAddress)}
                 />
+                <DocumentUpload
+                  label="Upload Your Photo *"
+                  hint="Clear face photo — no sunglasses or filters"
+                  accept="image/*"
+                  value={portraitPhoto.file}
+                  previewUrl={portraitPhoto.preview}
+                  onChange={setCapture(setPortraitPhoto, portraitPhoto)}
+                />
                 <DocCameraRow>
                   <LiveCameraCapture
-                    label="Selfie Holding ID *"
+                    label="Live Selfie Holding ID *"
                     hint="Your face and ID must both be visible — live camera only"
                     fileName="selfie-with-id"
                     facingMode="user"

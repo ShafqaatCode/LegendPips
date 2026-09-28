@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import {
   FiPlus, FiEdit2, FiTrash2, FiSearch, FiCheck, FiDatabase,
-  FiShield, FiStar, FiDollarSign, FiTrendingUp, FiGlobe, FiCpu, FiAward,
+  FiShield, FiStar, FiDollarSign, FiTrendingUp, FiGlobe, FiCpu, FiAward, FiTarget, FiCreditCard,
 } from "react-icons/fi";
 import SimpleModal from "../../../components/AdminPanel/SimpleModal";
 import { CourseGridSkeleton } from "../../../components/SharedComponents/Shimmer";
@@ -30,6 +30,8 @@ import {
   type BrokerCategoryValue,
   type BrokerKind,
 } from "../../../utils/brokerTypes";
+import { normalizeBrokerLogoUrl } from "../../../utils/brokerLogoUrl";
+import BrokerLogo from "../../../components/Broker/BrokerLogo";
 
 function brokerRegulationsToInput(b: ApiBroker): string {
   if (Array.isArray(b.regulations) && b.regulations.length) return b.regulations.join(", ");
@@ -75,11 +77,12 @@ const emptyPromo = () => ({ code: "", label: "", percent: "", expiresAt: "", act
 
 const StatsRow = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 0.75rem;
   margin-bottom: 1rem;
 
-  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 1100px) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 700px) { grid-template-columns: repeat(2, 1fr); }
   @media (max-width: 520px) { grid-template-columns: 1fr; }
 `;
 
@@ -184,7 +187,7 @@ const TypeBadge = styled.span<{ $kind: BrokerKind | "both" }>`
 const TypePicker = styled.div`
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.55rem;
   margin-bottom: 0.25rem;
 
@@ -258,6 +261,8 @@ const KIND_ICONS: Record<BrokerKind, React.ReactNode> = {
   forex: <FiGlobe />,
   crypto: <FiCpu />,
   prop: <FiAward />,
+  binary: <FiTarget />,
+  ewallet: <FiCreditCard />,
 };
 
 const BrokersGrid = styled.div`
@@ -485,6 +490,7 @@ const defaultBrokerPayload = (): Partial<ApiBroker> => ({
   reviews: [{ name: "Trader", rating: 5, comment: "Solid execution." }],
   fundingMethods: ["Bank transfer", "Card"],
   published: true,
+  temporarilyDisabled: false,
 });
 
 const BrokersManagement: React.FC = () => {
@@ -507,6 +513,8 @@ const BrokersManagement: React.FC = () => {
   const [formCashbackRate, setFormCashbackRate] = useState("0.35 pip");
   const [formTopCashback, setFormTopCashback] = useState(false);
   const [formVerified, setFormVerified] = useState(true);
+  const [formTemporarilyDisabled, setFormTemporarilyDisabled] = useState(false);
+  const [formPublished, setFormPublished] = useState(true);
   const [formForBeginners, setFormForBeginners] = useState(false);
   const [formBeginnerBlurb, setFormBeginnerBlurb] = useState("");
   const [formBeginnerSortOrder, setFormBeginnerSortOrder] = useState("0");
@@ -530,6 +538,7 @@ const BrokersManagement: React.FC = () => {
   const [formLeverage, setFormLeverage] = useState("");
   const [formPlatforms, setFormPlatforms] = useState("");
   const [formCommission, setFormCommission] = useState("");
+  const [formSwapFrom, setFormSwapFrom] = useState("");
   const [formScoreReg, setFormScoreReg] = useState("");
   const [formScoreCond, setFormScoreCond] = useState("");
   const [formScoreWd, setFormScoreWd] = useState("");
@@ -570,6 +579,8 @@ const BrokersManagement: React.FC = () => {
     setFormCashbackRate("0.35 pip");
     setFormTopCashback(false);
     setFormVerified(true);
+    setFormTemporarilyDisabled(false);
+    setFormPublished(true);
     setFormForBeginners(false);
     setFormBeginnerBlurb("");
     setFormBeginnerSortOrder("0");
@@ -592,6 +603,7 @@ const BrokersManagement: React.FC = () => {
     setFormLeverage("");
     setFormPlatforms("");
     setFormCommission("");
+    setFormSwapFrom("");
     setFormScoreReg("");
     setFormScoreCond("");
     setFormScoreWd("");
@@ -612,6 +624,8 @@ const BrokersManagement: React.FC = () => {
     setFormCashbackRate(b.cashbackRate || "0.35 pip");
     setFormTopCashback(!!b.topCashback);
     setFormVerified(!!b.verified);
+    setFormTemporarilyDisabled(!!b.temporarilyDisabled);
+    setFormPublished(b.published !== false);
     setFormForBeginners(!!b.forBeginners);
     setFormBeginnerBlurb(b.beginnerBlurb || "");
     setFormBeginnerSortOrder(String(b.beginnerSortOrder ?? 0));
@@ -639,6 +653,7 @@ const BrokersManagement: React.FC = () => {
     setFormLeverage(b.leverage || "");
     setFormPlatforms(b.platforms || "");
     setFormCommission(b.commission || "");
+    setFormSwapFrom(b.swapFrom || "");
     setFormScoreReg(b.legendScoreParts?.regulation != null ? String(b.legendScoreParts.regulation) : "");
     setFormScoreCond(b.legendScoreParts?.tradingConditions != null ? String(b.legendScoreParts.tradingConditions) : "");
     setFormScoreWd(b.legendScoreParts?.withdrawals != null ? String(b.legendScoreParts.withdrawals) : "");
@@ -677,7 +692,11 @@ const BrokersManagement: React.FC = () => {
     setModalError(null);
     try {
       const rebateCategory: BrokerCategoryValue =
-        formBothTabs && formRebateCategory !== "prop" ? "both" : formRebateCategory;
+        formBothTabs && (formRebateCategory === "forex" || formRebateCategory === "crypto")
+          ? "both"
+          : formRebateCategory === "both"
+            ? "forex"
+            : formRebateCategory;
 
       const base = {
         name,
@@ -687,6 +706,8 @@ const BrokersManagement: React.FC = () => {
         cashbackRate: formCashbackRate.trim(),
         topCashback: formTopCashback,
         verified: formVerified,
+        temporarilyDisabled: formTemporarilyDisabled,
+        published: formPublished,
         forBeginners: formForBeginners && !formBlacklisted,
         beginnerBlurb: formBeginnerBlurb.trim(),
         beginnerSortOrder: Number(formBeginnerSortOrder) || 0,
@@ -694,7 +715,7 @@ const BrokersManagement: React.FC = () => {
         blacklistReason: formBlacklistReason.trim(),
         crypto: formCrypto,
         description: formDescription.trim(),
-        logoUrl: formLogoUrl.trim() || undefined,
+        logoUrl: normalizeBrokerLogoUrl(formLogoUrl) || undefined,
         rebateCategory,
         rebatesListOrder: rebatesListOrder > 0 ? rebatesListOrder : 0,
         setupUrl: formSetupUrl.trim() || undefined,
@@ -706,6 +727,7 @@ const BrokersManagement: React.FC = () => {
         leverage: formLeverage.trim(),
         platforms: formPlatforms.trim(),
         commission: formCommission.trim(),
+        swapFrom: formSwapFrom.trim(),
         legendScoreParts: {
           regulation: formScoreReg ? Number(formScoreReg) : undefined,
           tradingConditions: formScoreCond ? Number(formScoreCond) : undefined,
@@ -847,6 +869,20 @@ const BrokersManagement: React.FC = () => {
             <div className="lbl">Prop firms</div>
           </div>
         </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: BROKER_KIND_COLORS.binary.bg, color: BROKER_KIND_COLORS.binary.color }}><FiTarget /></div>
+          <div>
+            <div className="val">{listLoading ? "…" : countByKind("binary")}</div>
+            <div className="lbl">Binary</div>
+          </div>
+        </MiniStat>
+        <MiniStat>
+          <div className="icon" style={{ background: BROKER_KIND_COLORS.ewallet.bg, color: BROKER_KIND_COLORS.ewallet.color }}><FiCreditCard /></div>
+          <div>
+            <div className="val">{listLoading ? "…" : countByKind("ewallet")}</div>
+            <div className="lbl">E-wallet</div>
+          </div>
+        </MiniStat>
       </StatsRow>
 
       <TypeFilterBar>
@@ -922,8 +958,8 @@ const BrokersManagement: React.FC = () => {
             filteredBrokers.map((broker) => (
               <BrokerCard key={broker._id}>
                 <CardTop>
-                  <LogoBox $img={broker.logoUrl || undefined}>
-                    {!broker.logoUrl && broker.name.slice(0, 2).toUpperCase()}
+                  <LogoBox $img={normalizeBrokerLogoUrl(broker.logoUrl) || undefined}>
+                    {!normalizeBrokerLogoUrl(broker.logoUrl) && broker.name.slice(0, 2).toUpperCase()}
                   </LogoBox>
                   <CardTitle>
                     <h3 title={broker.name}>{broker.name}</h3>
@@ -933,7 +969,9 @@ const BrokersManagement: React.FC = () => {
                           broker.rebateCategory === "both"
                             ? "both"
                             : broker.rebateCategory === "crypto" ||
-                                broker.rebateCategory === "prop"
+                                broker.rebateCategory === "prop" ||
+                                broker.rebateCategory === "binary" ||
+                                broker.rebateCategory === "ewallet"
                               ? broker.rebateCategory
                               : "forex"
                         }
@@ -941,6 +979,8 @@ const BrokersManagement: React.FC = () => {
                         {brokerKindLabel(broker.rebateCategory)}
                       </TypeBadge>
                       {broker.verified && <Pill $variant="approved">Verified</Pill>}
+                      {broker.temporarilyDisabled && <Pill $variant="rejected">Disabled</Pill>}
+                      {broker.published === false && <Pill $variant="incomplete">Hidden</Pill>}
                       {broker.topCashback && <Pill $variant="pending">Top cashback</Pill>}
                       {broker.forBeginners && <Pill $variant="admin">New traders</Pill>}
                       {broker.blacklisted && <Pill $variant="rejected">Scam Shield</Pill>}
@@ -1048,7 +1088,7 @@ const BrokersManagement: React.FC = () => {
                 </TypeCard>
               ))}
             </TypePicker>
-            {formRebateCategory !== "prop" && (
+            {(formRebateCategory === "forex" || formRebateCategory === "crypto") && (
               <BothOption>
                 <input
                   type="checkbox"
@@ -1097,6 +1137,10 @@ const BrokersManagement: React.FC = () => {
             <FormField>
               Commission
               <input value={formCommission} onChange={(e) => setFormCommission(e.target.value)} placeholder="$3.5 / lot" />
+            </FormField>
+            <FormField>
+              Overnight swap
+              <input value={formSwapFrom} onChange={(e) => setFormSwapFrom(e.target.value)} placeholder="Swap-free or From -1.2 pips" />
             </FormField>
             <FormField>
               LegendScore regulation 0–10 (blank = auto)
@@ -1155,8 +1199,34 @@ const BrokersManagement: React.FC = () => {
               <input
                 value={formLogoUrl}
                 onChange={(e) => setFormLogoUrl(e.target.value)}
-                placeholder="https://…"
+                onBlur={() => setFormLogoUrl((v) => normalizeBrokerLogoUrl(v) || v.trim())}
+                placeholder="https://cdn.brandfetch.io/… or https://brandfetch.com/exness.com"
               />
+              <span style={{ fontSize: "0.7rem", color: "#64748b", marginTop: 4, lineHeight: 1.4 }}>
+                Paste a direct image URL, or a Brandfetch page like brandfetch.com/exness.com — we’ll convert it to a CDN image automatically.
+              </span>
+              {(normalizeBrokerLogoUrl(formLogoUrl) || formLogoUrl.trim()) && (
+                <div style={{
+                  marginTop: 10,
+                  width: 72,
+                  height: 72,
+                  borderRadius: 16,
+                  border: `1px solid ${adminColors.border}`,
+                  background: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                  padding: 8,
+                }}>
+                  <BrokerLogo
+                    src={formLogoUrl}
+                    name={formName || "Broker"}
+                    alt="Logo preview"
+                    style={{ width: "100%", height: "100%", objectFit: "contain" } as React.CSSProperties}
+                  />
+                </div>
+              )}
             </FormField>
             <FormField>
               Challenge / signup URL
@@ -1481,6 +1551,49 @@ const BrokersManagement: React.FC = () => {
               <input type="checkbox" checked={formVerified} onChange={(e) => setFormVerified(e.target.checked)} />
               <span>Verified</span>
             </CheckboxRow>
+            <CheckboxRow>
+              <input
+                type="checkbox"
+                checked={formTemporarilyDisabled}
+                onChange={(e) => setFormTemporarilyDisabled(e.target.checked)}
+              />
+              <span>Temporarily disable broker</span>
+            </CheckboxRow>
+            {formTemporarilyDisabled && (
+              <FormField $full>
+                Visibility while disabled
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 6 }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontWeight: 400 }}>
+                    <input
+                      type="radio"
+                      name="brokerVisibility"
+                      checked={formPublished}
+                      onChange={() => setFormPublished(true)}
+                    />
+                    Keep on website (shows as Disabled — no new setups)
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontWeight: 400 }}>
+                    <input
+                      type="radio"
+                      name="brokerVisibility"
+                      checked={!formPublished}
+                      onChange={() => setFormPublished(false)}
+                    />
+                    Hide from website
+                  </label>
+                </div>
+              </FormField>
+            )}
+            {!formTemporarilyDisabled && (
+              <CheckboxRow>
+                <input
+                  type="checkbox"
+                  checked={formPublished}
+                  onChange={(e) => setFormPublished(e.target.checked)}
+                />
+                <span>Show on website</span>
+              </CheckboxRow>
+            )}
             <CheckboxRow>
               <input
                 type="checkbox"

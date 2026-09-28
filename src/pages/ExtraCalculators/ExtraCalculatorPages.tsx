@@ -1,6 +1,7 @@
 import SimpleNumberCalculator from "../../components/Calculators/SimpleNumberCalculator";
 import TradingSlider from "../../components/TradingCard/TradingSlider";
 import InstructionsSection from "../../components/Calculators/InstructionSet";
+import { calcCryptoExchangeFees, calcRiskOfRuin } from "../../utils/marketTools";
 
 function ExtraCalculatorPage({
   title,
@@ -124,6 +125,60 @@ export function LotCalculatorPage() {
       fields={[{ key: "units", label: "Units", defaultValue: "100000" }]}
       compute={(v) => ({ ok: true, text: `Standard lots: ${(v.units / 100000).toFixed(4)}` })}
       steps={["Enter position size in units of the base currency."]}
+    />
+  );
+}
+
+export function RiskOfRuinCalculatorPage() {
+  return (
+    <ExtraCalculatorPage
+      title="Risk of Ruin Calculator"
+      description="Estimate the probability of blowing your account with a fixed risk % and reward:risk ratio."
+      fields={[
+        { key: "winRate", label: "Win rate (%)", defaultValue: "55" },
+        { key: "riskPct", label: "Risk per trade (% of account)", defaultValue: "2" },
+        { key: "rr", label: "Reward : Risk", defaultValue: "1.5" },
+      ]}
+      compute={(v) => {
+        const res = calcRiskOfRuin(v.winRate, v.riskPct, v.rr);
+        if (!res.ok) return res;
+        return {
+          ok: true,
+          text: `Estimated risk of ruin: ${res.percent.toFixed(2)}% (edge: ${(res.edge * 100).toFixed(2)}% per R)`,
+        };
+      }}
+      steps={[
+        "Enter your historical or planned win rate.",
+        "Enter risk per trade as % of account.",
+        "Enter average reward relative to risk (e.g. 2 = 2:1).",
+      ]}
+    />
+  );
+}
+
+export function CryptoExchangeFeesCalculatorPage() {
+  return (
+    <ExtraCalculatorPage
+      title="Crypto Exchange Fees Calculator"
+      description="Estimate total buy + sell fees for a round-trip crypto trade."
+      fields={[
+        { key: "amount", label: "Trade size (USD)", defaultValue: "1000" },
+        { key: "buyFee", label: "Buy fee (%)", defaultValue: "0.1" },
+        { key: "sellFee", label: "Sell fee (%)", defaultValue: "0.1" },
+      ]}
+      compute={(v) => {
+        const res = calcCryptoExchangeFees(v.amount, v.buyFee, v.sellFee);
+        if (!res.ok) return res;
+        return {
+          ok: true,
+          text: `Buy fee: $${res.buyFee.toFixed(2)} · Sell fee: $${res.sellFee.toFixed(2)} · Total: $${res.total.toFixed(2)} (net after round-trip: $${res.netAfterRoundTrip.toFixed(2)})`,
+        };
+      }}
+      steps={[
+        "Enter notional trade size in USD.",
+        "Enter exchange buy fee %.",
+        "Enter exchange sell fee %.",
+      ]}
     />
   );
 }

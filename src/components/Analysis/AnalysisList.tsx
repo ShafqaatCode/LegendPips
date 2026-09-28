@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { fetchAnalysis } from '../../services/analysisService';
 import type { Analysis } from '../../types/analysis.types';
 import AnalysisCard from './AnalysisCard';
 import XMBanner from '../Signals/XMBanner';
 import { ShimmerBar } from '../SharedComponents/Shimmer';
 import ListPagination from '../SharedComponents/ListPagination';
+import { NEWS_SECTIONS } from '../../data/newsNav';
 
 const SectionWrapper = styled.section`
   background: #fafbfc;
@@ -215,9 +217,7 @@ const PageButton = styled.button<{ active?: boolean; disabled?: boolean }>`
   }
 `;
 
-const categories = ['All', 'Market Outlook', 'Forex', 'Gold', 'Crypto', 'Indices', 'Stock'];
-
-const TAB_SHIMMER_WIDTHS = [44, 112, 64, 52, 72, 76, 56];
+const TAB_SHIMMER_WIDTHS = [44, 96, 112, 108, 52, 64, 104, 108];
 
 const AnalysisListSkeleton: React.FC = () => (
   <SectionWrapper>
@@ -247,8 +247,11 @@ const AnalysisListSkeleton: React.FC = () => (
   </SectionWrapper>
 );
 
-const AnalysisList: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState<string>('All');
+const AnalysisList: React.FC<{ categorySlug?: string }> = ({ categorySlug = "" }) => {
+  const navigate = useNavigate();
+  const activeSection =
+    NEWS_SECTIONS.find((section) => section.slug === categorySlug) ?? NEWS_SECTIONS[0];
+  const activeCategory = activeSection.apiCategory;
   const [analysis, setAnalysis] = useState<Analysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -256,6 +259,10 @@ const AnalysisList: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const limit = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [categorySlug]);
 
   useEffect(() => {
     loadAnalysis();
@@ -266,8 +273,7 @@ const AnalysisList: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const category = activeCategory === 'All' ? undefined : activeCategory;
-      const response = await fetchAnalysis(category, currentPage, limit);
+      const response = await fetchAnalysis(activeCategory, currentPage, limit);
       
       // Show all items in grid (no separate featured section)
       setAnalysis(response.items);
@@ -281,9 +287,9 @@ const AnalysisList: React.FC = () => {
     }
   };
 
-  const handleCategoryChange = (category: string) => {
-    setActiveCategory(category);
-    setCurrentPage(1);
+  const handleCategoryChange = (slug: string) => {
+    const target = slug ? `/news/${slug}` : "/news";
+    navigate(target);
   };
 
   if (loading && analysis.length === 0) {
@@ -310,13 +316,13 @@ const AnalysisList: React.FC = () => {
       <ContentWrapper>
         <TabsContainer>
           <TabsWrapper>
-            {categories.map((category) => (
+            {NEWS_SECTIONS.map((section) => (
               <Tab
-                key={category}
-                $active={activeCategory === category}
-                onClick={() => handleCategoryChange(category)}
+                key={section.slug || "all"}
+                $active={activeSection.slug === section.slug}
+                onClick={() => handleCategoryChange(section.slug)}
               >
-                {category}
+                {section.label}
               </Tab>
             ))}
           </TabsWrapper>

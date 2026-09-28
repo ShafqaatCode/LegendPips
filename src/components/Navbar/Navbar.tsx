@@ -1,5 +1,5 @@
 // Header.tsx
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   HeaderWrapper,
   Topbar,
@@ -33,7 +33,7 @@ import {
   MobileToolsHeading,
 } from "./Navbar.styles";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FaBars } from "react-icons/fa";
+import { FaBars, FaWhatsapp } from "react-icons/fa";
 import {
   FiChevronDown,
   FiChevronUp,
@@ -41,48 +41,36 @@ import {
   FiUser,
   FiLogOut,
   FiGrid,
+  FiBell,
+  FiMessageCircle,
+  FiLifeBuoy,
 } from "react-icons/fi";
 import { useAuth } from "../../contexts/AuthContext";
-import { useSiteConfig } from "../../contexts/SiteConfigContext";
-import LogoImg from "../../assets/icons/image 2.svg";
-import SupportIcon from "../../assets/icons/SupportIcon.svg";
-import CalculatorIcon from "../../assets/icons/calculator-svgrepo-com (1) 1.svg";
-import LocationIcon from "../../assets/icons/Location marker.svg";
+import NotificationBell from "../UserPanel/NotificationBell";
+import { useSiteConfig, useSiteLogo } from "../../contexts/SiteConfigContext";
 
 import { useAuthModal } from "../../contexts/AuthModalContext";
 import { useLocale } from "../../contexts/LocaleContext";
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
-import { ABOUT_NESTED_PATHS, ABOUT_SUBMENU } from "../../data/aboutPages";
+import { BROKER_NESTED_PATHS, BROKER_SUBMENU } from "../../data/brokerNav";
+import { FORUM_NESTED_PATHS, FORUM_SUBMENU } from "../../data/forumNav";
+import { HELP_NESTED_PATHS, HELP_SUBMENU } from "../../data/helpNav";
+import { NEWS_NESTED_PATHS, NEWS_SUBMENU } from "../../data/newsNav";
+import {
+  WHATSAPP_SUPPORT_NUMBER_DISPLAY,
+  WHATSAPP_SUPPORT_URL,
+} from "../../utils/whatsappSupport";
 
 const FALLBACK_NAV = [
   { to: "/", label: "Home", end: true },
-  { to: "/how-it-works", label: "How It Works?" },
-  { to: "/rebates", label: "Rebates Brokers" },
-  { to: "/prop-firms", label: "Prop Firms" },
+  { to: "/how-it-works", label: "How It Works" },
   { to: "/contests", label: "Contests" },
-  { to: "/compare", label: "Compare" },
-  { to: "/complaints", label: "Complaints" },
   { to: "/signals", label: "Signals" },
   { to: "/rewards", label: "Rewards" },
-  { to: "/analysis", label: "Analysis" },
+  { to: "/news", label: "News" },
   { to: "/forum", label: "Forum" },
   { to: "/traders", label: "Traders" },
-];
-
-/** Broker-related paths belong under the Brokers submenu, not the top bar. */
-const BROKER_NESTED_PATHS = new Set([
-  "/brokers",
-  "/brokers/beginners",
-  "/find-broker",
-  "/brokers/match",
-  "/scam-broker-shield",
-]);
-
-const BROKER_SUBMENU = [
-  { to: "/brokers", label: "All Brokers", end: true },
-  { to: "/brokers/beginners", label: "Best for New Traders" },
-  { to: "/find-broker", label: "Find My Broker" },
-  { to: "/scam-broker-shield", label: "Scam Broker Shield" },
+  { to: "/strategies", label: "Strategies" },
 ];
 
 const EDUCATION_PATHS = new Set([
@@ -94,7 +82,24 @@ const EDUCATION_PATHS = new Set([
   "/best-performing-stocks",
 ]);
 
+const CALCULATOR_TOOL_INJECT = [
+  "/spread-comparison",
+  "/swaps-comparison",
+  "/live-charts",
+  "/economic-calendar",
+  "/currency-converter",
+  "/trading-stats",
+  "/risk-of-ruin-calculator",
+  "/crypto-exchange-fees-calculator",
+];
+
 const FALLBACK_TOOLS = [
+  { to: "/spread-comparison", label: "Spread Comparison" },
+  { to: "/swaps-comparison", label: "Swaps Comparison" },
+  { to: "/live-charts", label: "Live Forex Charts" },
+  { to: "/economic-calendar", label: "Economic Calendar" },
+  { to: "/currency-converter", label: "Currency Converter" },
+  { to: "/trading-stats", label: "Trading Stats Hub" },
   { to: "/broker-signup-bonuses", label: "Broker Signup Bonuses", badge: "NEW" },
   { to: "/best-performing-stocks", label: "Best Performing Stocks", badge: "NEW" },
   { to: "/copy-trading", label: "Copy Trading" },
@@ -113,6 +118,8 @@ const FALLBACK_TOOLS = [
   { to: "/drawdown-calculator", label: "Drawdown Calculator" },
   { to: "/compound-calculator", label: "Compound Calculator" },
   { to: "/crypto-profit-calculator", label: "Crypto Profit" },
+  { to: "/risk-of-ruin-calculator", label: "Risk of Ruin Calculator" },
+  { to: "/crypto-exchange-fees-calculator", label: "Crypto Exchange Fees" },
 ];
 
 const Header: React.FC = () => {
@@ -120,41 +127,102 @@ const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [submenuOpen, setSubmenuOpen] = useState(false);
   const [brokersMenuOpen, setBrokersMenuOpen] = useState(false);
-  const [aboutMenuOpen, setAboutMenuOpen] = useState(false);
+  const [forumMenuOpen, setForumMenuOpen] = useState(false);
+  const [newsMenuOpen, setNewsMenuOpen] = useState(false);
+  const [helpMenuOpen, setHelpMenuOpen] = useState(false);
   const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState(false);
   const [mobileBrokersOpen, setMobileBrokersOpen] = useState(false);
-  const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
+  const [mobileForumOpen, setMobileForumOpen] = useState(false);
+  const [mobileNewsOpen, setMobileNewsOpen] = useState(false);
+  const [mobileHelpOpen, setMobileHelpOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const desktopAccountRef = useRef<HTMLDivElement | null>(null);
   const mobileAccountRef = useRef<HTMLDivElement | null>(null);
   const toolsCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const brokersCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const aboutCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const forumCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const newsCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const helpCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { isAuthenticated, user, logout } = useAuth();
   const { openSignIn } = useAuthModal();
-  const { mainNav, toolsNav, config } = useSiteConfig();
+  const { mainNav, toolsNav } = useSiteConfig();
   const { t, labelForPath } = useLocale();
 
   const navLinks = (
     mainNav.length
       ? mainNav.map((n) => ({ to: n.path, label: labelForPath(n.path, n.label), end: n.end }))
       : FALLBACK_NAV.map((n) => ({ ...n, label: labelForPath(n.to, n.label) }))
-  ).filter((n) => !BROKER_NESTED_PATHS.has(n.to) && !ABOUT_NESTED_PATHS.has(n.to));
+  ).filter(
+    (n) =>
+      !BROKER_NESTED_PATHS.has(n.to) &&
+      !HELP_NESTED_PATHS.has(n.to) &&
+      !FORUM_NESTED_PATHS.has(n.to) &&
+      !NEWS_NESTED_PATHS.has(n.to)
+  );
 
-  const brokersInsertAt = (() => {
-    const compareIdx = navLinks.findIndex((l) => l.to === "/compare");
-    if (compareIdx >= 0) return compareIdx;
-    const contestsIdx = navLinks.findIndex((l) => l.to === "/contests");
-    if (contestsIdx >= 0) return contestsIdx + 1;
-    return Math.min(5, navLinks.length);
+  const navSourcePaths = mainNav.length
+    ? mainNav.map((n) => n.path)
+    : FALLBACK_NAV.map((n) => n.to);
+
+  const isHiddenNavPath = (path: string) =>
+    BROKER_NESTED_PATHS.has(path) ||
+    HELP_NESTED_PATHS.has(path) ||
+    FORUM_NESTED_PATHS.has(path) ||
+    NEWS_NESTED_PATHS.has(path);
+
+  const newsInsertAt = (() => {
+    const newsIdx = navSourcePaths.findIndex((p) => p === "/news" || p === "/analysis");
+    if (newsIdx < 0) return -1;
+    let visibleBefore = 0;
+    for (let i = 0; i < newsIdx; i++) {
+      if (!isHiddenNavPath(navSourcePaths[i])) visibleBefore++;
+    }
+    return visibleBefore;
   })();
 
-  const toolsSubmenu = toolsNav.length
-    ? toolsNav.map((n) => ({ to: n.path, label: labelForPath(n.path, n.label) }))
-    : FALLBACK_TOOLS.map((n) => ({ ...n, label: labelForPath(n.to, n.label) }));
+  const forumInsertAt = (() => {
+    const forumIdx = navSourcePaths.indexOf("/forum");
+    if (forumIdx < 0) return -1;
+    let visibleBefore = 0;
+    for (let i = 0; i < forumIdx; i++) {
+      if (!isHiddenNavPath(navSourcePaths[i])) visibleBefore++;
+    }
+    return visibleBefore;
+  })();
+
+  const brokersInsertAt = (() => {
+    const howIdx = navLinks.findIndex((l) => l.to === "/how-it-works");
+    if (howIdx >= 0) return howIdx + 1;
+    const homeIdx = navLinks.findIndex((l) => l.to === "/");
+    return homeIdx >= 0 ? homeIdx + 1 : 1;
+  })();
+
+  const toolsSubmenu = useMemo(() => {
+    const fallback = FALLBACK_TOOLS.map((n) => ({ ...n, label: labelForPath(n.to, n.label) }));
+    if (!toolsNav.length) return fallback;
+
+    const fromConfig = toolsNav.map((n) => ({ to: n.path, label: labelForPath(n.path, n.label) }));
+    const paths = new Set(fromConfig.map((n) => n.to));
+    const missing = fallback.filter((n) => !paths.has(n.to));
+    const merged = [...fromConfig];
+    let insertAt = merged.findIndex((n) => n.to === "/calculators");
+    insertAt = insertAt >= 0 ? insertAt + 1 : merged.length;
+
+    for (const path of CALCULATOR_TOOL_INJECT) {
+      if (paths.has(path)) continue;
+      const item = missing.find((n) => n.to === path);
+      if (!item) continue;
+      merged.splice(insertAt, 0, item);
+      insertAt += 1;
+      paths.add(path);
+    }
+
+    const restMissing = missing.filter((n) => !paths.has(n.to));
+    return [...merged, ...restMissing];
+  }, [toolsNav, labelForPath]);
   const educationTools = toolsSubmenu.filter((n) => EDUCATION_PATHS.has(n.to));
   const calculatorTools = toolsSubmenu.filter((n) => !EDUCATION_PATHS.has(n.to));
-  const logoSrc = config?.siteLogoUrl || LogoImg;
+  const { src: logoSrc, alt: logoAlt, height: logoHeight, maxWidth: logoMaxWidth } = useSiteLogo();
 
   const portalPath = user?.role === "admin" ? "/admin-panel" : "/user-panel";
   const isAdmin = user?.role === "admin";
@@ -164,7 +232,9 @@ const Header: React.FC = () => {
     return () => {
       if (toolsCloseTimer.current) clearTimeout(toolsCloseTimer.current);
       if (brokersCloseTimer.current) clearTimeout(brokersCloseTimer.current);
-      if (aboutCloseTimer.current) clearTimeout(aboutCloseTimer.current);
+      if (forumCloseTimer.current) clearTimeout(forumCloseTimer.current);
+      if (newsCloseTimer.current) clearTimeout(newsCloseTimer.current);
+      if (helpCloseTimer.current) clearTimeout(helpCloseTimer.current);
     };
   }, []);
 
@@ -174,7 +244,9 @@ const Header: React.FC = () => {
       toolsCloseTimer.current = null;
     }
     setBrokersMenuOpen(false);
-    setAboutMenuOpen(false);
+    setForumMenuOpen(false);
+    setNewsMenuOpen(false);
+    setHelpMenuOpen(false);
     setSubmenuOpen(true);
   };
 
@@ -189,7 +261,9 @@ const Header: React.FC = () => {
       brokersCloseTimer.current = null;
     }
     setSubmenuOpen(false);
-    setAboutMenuOpen(false);
+    setForumMenuOpen(false);
+    setNewsMenuOpen(false);
+    setHelpMenuOpen(false);
     setBrokersMenuOpen(true);
   };
 
@@ -198,19 +272,55 @@ const Header: React.FC = () => {
     brokersCloseTimer.current = setTimeout(() => setBrokersMenuOpen(false), 180);
   };
 
-  const openAboutMenu = () => {
-    if (aboutCloseTimer.current) {
-      clearTimeout(aboutCloseTimer.current);
-      aboutCloseTimer.current = null;
+  const openForumMenu = () => {
+    if (forumCloseTimer.current) {
+      clearTimeout(forumCloseTimer.current);
+      forumCloseTimer.current = null;
     }
     setSubmenuOpen(false);
     setBrokersMenuOpen(false);
-    setAboutMenuOpen(true);
+    setNewsMenuOpen(false);
+    setHelpMenuOpen(false);
+    setForumMenuOpen(true);
   };
 
-  const closeAboutMenu = () => {
-    if (aboutCloseTimer.current) clearTimeout(aboutCloseTimer.current);
-    aboutCloseTimer.current = setTimeout(() => setAboutMenuOpen(false), 180);
+  const closeForumMenu = () => {
+    if (forumCloseTimer.current) clearTimeout(forumCloseTimer.current);
+    forumCloseTimer.current = setTimeout(() => setForumMenuOpen(false), 180);
+  };
+
+  const openNewsMenu = () => {
+    if (newsCloseTimer.current) {
+      clearTimeout(newsCloseTimer.current);
+      newsCloseTimer.current = null;
+    }
+    setSubmenuOpen(false);
+    setBrokersMenuOpen(false);
+    setForumMenuOpen(false);
+    setHelpMenuOpen(false);
+    setNewsMenuOpen(true);
+  };
+
+  const closeNewsMenu = () => {
+    if (newsCloseTimer.current) clearTimeout(newsCloseTimer.current);
+    newsCloseTimer.current = setTimeout(() => setNewsMenuOpen(false), 180);
+  };
+
+  const openHelpMenu = () => {
+    if (helpCloseTimer.current) {
+      clearTimeout(helpCloseTimer.current);
+      helpCloseTimer.current = null;
+    }
+    setSubmenuOpen(false);
+    setBrokersMenuOpen(false);
+    setForumMenuOpen(false);
+    setNewsMenuOpen(false);
+    setHelpMenuOpen(true);
+  };
+
+  const closeHelpMenu = () => {
+    if (helpCloseTimer.current) clearTimeout(helpCloseTimer.current);
+    helpCloseTimer.current = setTimeout(() => setHelpMenuOpen(false), 180);
   };
 
   useEffect(() => {
@@ -265,6 +375,17 @@ const Header: React.FC = () => {
             <AccountDropdownItem
               type="button"
               role="menuitem"
+              onClick={() => {
+                setAccountOpen(false);
+                navigate("/user-panel/alerts");
+              }}
+            >
+              <FiBell size={15} />
+              My alerts
+            </AccountDropdownItem>
+            <AccountDropdownItem
+              type="button"
+              role="menuitem"
               className="danger"
               onClick={handleLogout}
             >
@@ -286,38 +407,57 @@ const Header: React.FC = () => {
               setMenuOpen(false);
               setMobileSubmenuOpen(false);
               setMobileBrokersOpen(false);
-              setMobileAboutOpen(false);
+              setMobileForumOpen(false);
+              setMobileNewsOpen(false);
+              setMobileHelpOpen(false);
             }}
           />
         )}
 
         <Topbar>
           <NavLink to="/">
-            <Logo src={logoSrc} alt={`${config?.siteName || "LegendPips"} Logo`} />
+            <Logo src={logoSrc} alt={logoAlt} $height={logoHeight} $maxWidth={logoMaxWidth} />
           </NavLink>
 
           <LinkGroup>
-            <NavLink to="/live-chat">
+            <NavLink to="/live-chat" aria-label={t("header.liveChat")}>
               <HeaderItem>
-                <img src={SupportIcon} alt="Live Chat" />
+                <FiMessageCircle size={15} aria-hidden />
                 <span>{t("header.liveChat")}</span>
               </HeaderItem>
             </NavLink>
-            <NavLink to="/rebate-calculator">
+            <NavLink to="/support/tickets" aria-label={t("header.supportTickets")}>
               <HeaderItem>
-                <img src={CalculatorIcon} alt="Calculator" />
-                <span>{t("header.rebateCalculator")}</span>
+                <FiLifeBuoy size={15} aria-hidden />
+                <span>{t("header.supportTickets")}</span>
               </HeaderItem>
             </NavLink>
-            <NavLink to="/location">
+            <a
+              href={WHATSAPP_SUPPORT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`WhatsApp ${WHATSAPP_SUPPORT_NUMBER_DISPLAY}`}
+              style={{ textDecoration: "none" }}
+            >
               <HeaderItem>
-                <img src={LocationIcon} alt="" />
-                <span>{t("header.location")}</span>
+                <FaWhatsapp size={15} color="#25D366" aria-hidden />
+                <span>WhatsApp</span>
+              </HeaderItem>
+            </a>
+            {!isAuthenticated && (
+              <NavLink to="/alerts" aria-label="Alerts">
+                <HeaderItem>
+                  <FiBell size={15} aria-hidden />
+                  <span>Alerts</span>
               </HeaderItem>
             </NavLink>
+            )}
             <TopbarDivider aria-hidden />
             {isAuthenticated ? (
-              renderAccountMenu(false, desktopAccountRef)
+              <>
+                <NotificationBell variant="navbar" />
+                {renderAccountMenu(false, desktopAccountRef)}
+              </>
             ) : (
               <SignInButton onClick={() => openSignIn()}>{t("header.signIn")}</SignInButton>
             )}
@@ -339,43 +479,111 @@ const Header: React.FC = () => {
               </SubmenuToggle>
               {brokersMenuOpen && (
                 <BrokersDropMenu role="menu" aria-label={t("nav.brokers")}>
-                  {BROKER_SUBMENU.map((item) => (
-                    <BrokersDropLink
-                      to={item.to}
-                      key={item.to}
-                      end={"end" in item ? item.end : false}
-                      role="menuitem"
-                    >
-                      {item.label}
-                    </BrokersDropLink>
-                  ))}
+                  {BROKER_SUBMENU.map((item, idx) =>
+                    item.kind === "label" ? (
+                      <DropSectionLabel key={`broker-label-${idx}`}>{item.label}</DropSectionLabel>
+                    ) : (
+                      <BrokersDropLink
+                        to={item.to}
+                        key={item.to}
+                        end={item.end ?? false}
+                        role="menuitem"
+                      >
+                        {item.label}
+                      </BrokersDropLink>
+                    )
+                  )}
                 </BrokersDropMenu>
               )}
             </SubmenuWrapper>
 
-            {navLinks.slice(brokersInsertAt).map((link) => (
+            {navLinks.slice(brokersInsertAt, newsInsertAt >= 0 ? newsInsertAt : forumInsertAt >= 0 ? forumInsertAt : undefined).map((link) => (
               <NavItem to={link.to} key={link.to} end={link.end || false}>
                 {link.label}
               </NavItem>
             ))}
 
-            <SubmenuWrapper onMouseEnter={openAboutMenu} onMouseLeave={closeAboutMenu}>
-              <SubmenuToggle data-open={aboutMenuOpen ? "true" : "false"}>
-                About us {aboutMenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+            {newsInsertAt >= 0 && (
+              <SubmenuWrapper onMouseEnter={openNewsMenu} onMouseLeave={closeNewsMenu}>
+                <SubmenuToggle data-open={newsMenuOpen ? "true" : "false"}>
+                  {labelForPath("/news", "News")} {newsMenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+                </SubmenuToggle>
+                {newsMenuOpen && (
+                  <BrokersDropMenu role="menu" aria-label="News">
+                    {NEWS_SUBMENU.map((item) => (
+                      <BrokersDropLink
+                        to={item.to}
+                        key={item.to}
+                        end={"end" in item ? Boolean(item.end) : false}
+                        role="menuitem"
+                      >
+                        {item.label}
+                      </BrokersDropLink>
+                    ))}
+                  </BrokersDropMenu>
+                )}
+              </SubmenuWrapper>
+            )}
+
+            {navLinks
+              .slice(
+                newsInsertAt >= 0 ? newsInsertAt : brokersInsertAt,
+                forumInsertAt >= 0 ? forumInsertAt : undefined
+              )
+              .map((link) => (
+              <NavItem to={link.to} key={link.to} end={link.end || false}>
+                {link.label}
+              </NavItem>
+            ))}
+
+            {forumInsertAt >= 0 && (
+              <SubmenuWrapper onMouseEnter={openForumMenu} onMouseLeave={closeForumMenu}>
+                <SubmenuToggle data-open={forumMenuOpen ? "true" : "false"}>
+                  Forum {forumMenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+                </SubmenuToggle>
+                {forumMenuOpen && (
+                  <BrokersDropMenu role="menu" aria-label="Forum">
+                    {FORUM_SUBMENU.map((item) => (
+                      <BrokersDropLink
+                        to={item.to}
+                        key={item.to}
+                        end={"end" in item ? Boolean(item.end) : false}
+                        role="menuitem"
+                      >
+                        {item.label}
+                      </BrokersDropLink>
+                    ))}
+                  </BrokersDropMenu>
+                )}
+              </SubmenuWrapper>
+            )}
+
+            {navLinks.slice(forumInsertAt >= 0 ? forumInsertAt : brokersInsertAt).map((link) => (
+              <NavItem to={link.to} key={link.to} end={link.end || false}>
+                {link.label}
+              </NavItem>
+            ))}
+
+            <SubmenuWrapper onMouseEnter={openHelpMenu} onMouseLeave={closeHelpMenu}>
+              <SubmenuToggle data-open={helpMenuOpen ? "true" : "false"}>
+                Help {helpMenuOpen ? <FiChevronUp /> : <FiChevronDown />}
               </SubmenuToggle>
-              {aboutMenuOpen && (
-                <BrokersDropMenu role="menu" aria-label="About us">
-                  <DropSectionLabel>Behind the scenes</DropSectionLabel>
-                  {ABOUT_SUBMENU.map((item) => (
-                    <BrokersDropLink
-                      to={item.to}
-                      key={item.to}
-                      end={"end" in item ? Boolean(item.end) : false}
-                      role="menuitem"
-                    >
-                      {item.label}
-                    </BrokersDropLink>
-                  ))}
+              {helpMenuOpen && (
+                <BrokersDropMenu role="menu" aria-label="Help">
+                  {HELP_SUBMENU.map((item, idx) =>
+                    item.kind === "label" ? (
+                      <DropSectionLabel key={`help-label-${idx}`}>{item.label}</DropSectionLabel>
+                    ) : (
+                      <BrokersDropLink
+                        to={item.to}
+                        key={item.to}
+                        end={item.end ?? false}
+                        role="menuitem"
+                      >
+                        {item.label}
+                      </BrokersDropLink>
+                    )
+                  )}
                 </BrokersDropMenu>
               )}
             </SubmenuWrapper>
@@ -419,9 +627,9 @@ const Header: React.FC = () => {
                       <ToolsMegaGrid>
                         {calculatorTools.map((tool) => (
                           <ToolsMegaLink to={tool.to} key={tool.to} role="menuitem">
-                            {tool.label}
+                      {tool.label}
                           </ToolsMegaLink>
-                        ))}
+                  ))}
                       </ToolsMegaGrid>
                     </ToolsMegaColumn>
                   )}
@@ -433,7 +641,7 @@ const Header: React.FC = () => {
 
         <MobileBar>
           <NavLink to="/">
-            <Logo src={logoSrc} alt={`${config?.siteName || "LegendPips"} Logo`} />
+            <Logo src={logoSrc} alt={logoAlt} $height={logoHeight} $maxWidth={logoMaxWidth} />
           </NavLink>
           <div style={{ display: "flex", alignItems: "center", gap: "0.65rem" }}>
             <LanguageSwitcher compact />
@@ -455,6 +663,15 @@ const Header: React.FC = () => {
           <MobileMenu>
             {isAuthenticated && (
               <>
+                <NavItem
+                  to="/user-panel/alerts"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setAccountOpen(false);
+                  }}
+                >
+                  My alerts
+                </NavItem>
                 <NavItem
                   to={portalPath}
                   onClick={() => {
@@ -492,6 +709,9 @@ const Header: React.FC = () => {
                 {link.label}
               </NavItem>
             ))}
+            <NavItem to="/alerts" onClick={() => setMenuOpen(false)}>
+              Alerts
+            </NavItem>
 
             <div>
               <SubmenuToggle onClick={() => setMobileBrokersOpen(!mobileBrokersOpen)}>
@@ -499,24 +719,105 @@ const Header: React.FC = () => {
               </SubmenuToggle>
               {mobileBrokersOpen && (
                 <MobileToolsGroup>
-                  {BROKER_SUBMENU.map((item) => (
-                    <NavItem
-                      to={item.to}
-                      key={item.to}
-                      end={"end" in item ? item.end : false}
-                      onClick={() => {
-                        setMenuOpen(false);
-                        setMobileBrokersOpen(false);
-                      }}
-                    >
-                      {item.label}
-                    </NavItem>
-                  ))}
+                  {BROKER_SUBMENU.map((item, idx) =>
+                    item.kind === "label" ? (
+                      <MobileToolsHeading key={`mobile-broker-label-${idx}`}>{item.label}</MobileToolsHeading>
+                    ) : (
+                      <NavItem
+                        to={item.to}
+                        key={item.to}
+                        end={item.end ?? false}
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setMobileBrokersOpen(false);
+                        }}
+                      >
+                        {item.label}
+                      </NavItem>
+                    )
+                  )}
                 </MobileToolsGroup>
               )}
             </div>
 
-            {navLinks.slice(brokersInsertAt).map((link) => (
+            {navLinks.slice(brokersInsertAt, newsInsertAt >= 0 ? newsInsertAt : forumInsertAt >= 0 ? forumInsertAt : undefined).map((link) => (
+              <NavItem
+                to={link.to}
+                key={link.to}
+                end={link.end || false}
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </NavItem>
+            ))}
+
+            {newsInsertAt >= 0 && (
+              <div>
+                <SubmenuToggle onClick={() => setMobileNewsOpen(!mobileNewsOpen)}>
+                  {labelForPath("/news", "News")} {mobileNewsOpen ? <FiChevronUp /> : <FiChevronDown />}
+                </SubmenuToggle>
+                {mobileNewsOpen && (
+                  <MobileToolsGroup>
+                    {NEWS_SUBMENU.map((item) => (
+                      <NavItem
+                        to={item.to}
+                        key={item.to}
+                        end={"end" in item ? Boolean(item.end) : false}
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setMobileNewsOpen(false);
+                        }}
+                      >
+                        {item.label}
+                      </NavItem>
+                    ))}
+                  </MobileToolsGroup>
+                )}
+              </div>
+            )}
+
+            {navLinks
+              .slice(
+                newsInsertAt >= 0 ? newsInsertAt : brokersInsertAt,
+                forumInsertAt >= 0 ? forumInsertAt : undefined
+              )
+              .map((link) => (
+              <NavItem
+                to={link.to}
+                key={link.to}
+                end={link.end || false}
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </NavItem>
+            ))}
+
+            {forumInsertAt >= 0 && (
+              <div>
+                <SubmenuToggle onClick={() => setMobileForumOpen(!mobileForumOpen)}>
+                  Forum {mobileForumOpen ? <FiChevronUp /> : <FiChevronDown />}
+                </SubmenuToggle>
+                {mobileForumOpen && (
+                  <MobileToolsGroup>
+                    {FORUM_SUBMENU.map((item) => (
+                      <NavItem
+                        to={item.to}
+                        key={item.to}
+                        end={"end" in item ? Boolean(item.end) : false}
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setMobileForumOpen(false);
+                        }}
+                      >
+                        {item.label}
+                      </NavItem>
+                    ))}
+                  </MobileToolsGroup>
+                )}
+              </div>
+            )}
+
+            {navLinks.slice(forumInsertAt >= 0 ? forumInsertAt : brokersInsertAt).map((link) => (
               <NavItem
                 to={link.to}
                 key={link.to}
@@ -528,25 +829,28 @@ const Header: React.FC = () => {
             ))}
 
             <div>
-              <SubmenuToggle onClick={() => setMobileAboutOpen(!mobileAboutOpen)}>
-                About us {mobileAboutOpen ? <FiChevronUp /> : <FiChevronDown />}
+              <SubmenuToggle onClick={() => setMobileHelpOpen(!mobileHelpOpen)}>
+                Help {mobileHelpOpen ? <FiChevronUp /> : <FiChevronDown />}
               </SubmenuToggle>
-              {mobileAboutOpen && (
+              {mobileHelpOpen && (
                 <MobileToolsGroup>
-                  <MobileToolsHeading>Behind the scenes</MobileToolsHeading>
-                  {ABOUT_SUBMENU.map((item) => (
-                    <NavItem
-                      to={item.to}
-                      key={item.to}
-                      end={"end" in item ? Boolean(item.end) : false}
-                      onClick={() => {
-                        setMenuOpen(false);
-                        setMobileAboutOpen(false);
-                      }}
-                    >
-                      {item.label}
-                    </NavItem>
-                  ))}
+                  {HELP_SUBMENU.map((item, idx) =>
+                    item.kind === "label" ? (
+                      <MobileToolsHeading key={`mobile-help-label-${idx}`}>{item.label}</MobileToolsHeading>
+                    ) : (
+                      <NavItem
+                        to={item.to}
+                        key={item.to}
+                        end={item.end ?? false}
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setMobileHelpOpen(false);
+                        }}
+                      >
+                        {item.label}
+                      </NavItem>
+                    )
+                  )}
                 </MobileToolsGroup>
               )}
             </div>
@@ -582,17 +886,17 @@ const Header: React.FC = () => {
                     <>
                       <MobileToolsHeading>{t("header.calculators")}</MobileToolsHeading>
                       {calculatorTools.map((tool) => (
-                        <NavItem
-                          to={tool.to}
-                          key={tool.to}
-                          onClick={() => {
-                            setMenuOpen(false);
-                            setMobileSubmenuOpen(false);
-                          }}
-                        >
-                          {tool.label}
-                        </NavItem>
-                      ))}
+                    <NavItem
+                      to={tool.to}
+                      key={tool.to}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setMobileSubmenuOpen(false);
+                      }}
+                    >
+                      {tool.label}
+                    </NavItem>
+                  ))}
                     </>
                   )}
                 </MobileToolsGroup>

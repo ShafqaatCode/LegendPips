@@ -3,10 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   CardContainer,
   LogoSection,
-  LogoImg,
   InfoSection,
   TitleRow,
   VerifiedBadge,
+  DisabledBadge,
   FeaturedRibbon,
   RatingBox,
   StarRow,
@@ -23,6 +23,25 @@ import { motion } from "framer-motion";
 import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 import styled from "styled-components";
 import CompareToggle from "./CompareToggle";
+import BrokerLogo from "./BrokerLogo";
+
+const CardLogo = styled(BrokerLogo)`
+  height: 64px;
+  width: 64px;
+  border-radius: 50%;
+  background-color: #fff;
+  object-fit: contain;
+  object-position: center;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #eef0f4;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+
+  @media (max-width: 768px) {
+    height: 72px;
+    width: 72px;
+  }
+`;
 
 export const Description = styled.div`
   font-size: 0.8125rem;
@@ -108,6 +127,7 @@ interface BrokerCardProps {
     minDeposit?: string;
     commission?: string;
   }>;
+  temporarilyDisabled?: boolean;
 }
 
 const DEFAULT_REBATE_ACCOUNT_ROWS = [
@@ -126,6 +146,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
   rating,
   reviewsCount,
   accountTypes,
+  temporarilyDisabled,
 }) => {
   const navigate = useNavigate();
   const accountRows =
@@ -143,13 +164,17 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
           <TopIndex>{index}</TopIndex>
 
           <LogoSection>
-            <LogoImg src={logoSrc} alt={`${title} Logo`} />
+            <CardLogo src={logoSrc} name={title} alt={`${title} Logo`} />
           </LogoSection>
 
           <InfoSection>
             <TitleRow>
               <h2>{title}</h2>
-              <VerifiedBadge>✔ Verified Broker</VerifiedBadge>
+              {temporarilyDisabled ? (
+                <DisabledBadge>Disabled</DisabledBadge>
+              ) : (
+                <VerifiedBadge>✔ Verified Broker</VerifiedBadge>
+              )}
             </TitleRow>
             {description?.trim() ? <BodyBlurb>{description.trim()}</BodyBlurb> : null}
             <Description>
@@ -184,7 +209,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
               View Details <img src={ArrowIcon} alt="Arrow" />
             </PrimaryButton>
             {brokerId ? (
-              <SecondaryButton as={Link} to={`/rebates/broker/${brokerId}#reviews`}>
+              <SecondaryButton as={Link} to={`/rebates/broker/${brokerId}/reviews`}>
                 Broker Reviews
               </SecondaryButton>
             ) : (

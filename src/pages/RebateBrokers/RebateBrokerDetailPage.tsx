@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { resolveRebateContentSections, resolveRebateNotes } from "../../utils/rebateDetailContent";
 import styled from "styled-components";
-import { FiMinus, FiPlus, FiArrowLeft } from "react-icons/fi";
+import { FiMinus, FiPlus, FiArrowLeft, FiCopy, FiCheck } from "react-icons/fi";
 import { BrokerDetailSkeleton } from "../../components/SharedComponents/Shimmer";
 import {
   fetchPublicBrokerById,
@@ -11,15 +11,18 @@ import {
   type RebateInfoSection,
   type PropCashbackOffer,
 } from "../../services/brokerService";
-import { formatPropOfferLines } from "../../utils/propTradingDisplay";
+import {
+  copyTextToClipboard,
+  formatPropOfferLines,
+  resolvePropDiscount,
+} from "../../utils/propTradingDisplay";
 import { REBATES_BROKER_FALLBACK_LOGOS } from "../../utils/rebatesBrokersDisplay";
 import ICLogo from "../../assets/icons/Ellipse 2.png";
 import BrokerSetupPage from "../../components/AccountSetup2/BrokerSetupPage";
-import BrokerReviewsSection from "../../components/Broker/BrokerReviewsSection";
 
 const PageShell = styled.main`
-  background: #eef1f6;
-  padding: 1rem 0 1.5rem;
+  background: #f4f6fa;
+  padding: 1.15rem 0 2.5rem;
   min-height: 60vh;
 `;
 
@@ -34,45 +37,43 @@ const BackLink = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  margin-bottom: 0.5rem;
-  font-size: ${({ theme }) => theme.typography.caption};
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.muted};
+  margin-bottom: 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
   text-decoration: none;
   transition: color 0.15s ease;
 
   &:hover {
-    color: ${({ theme }) => theme.colors.primary};
+    color: #132e58;
   }
 `;
 
 const PageTitle = styled.h1`
-  font-size: clamp(1.25rem, 2vw + 0.5rem, 1.625rem);
-  font-weight: 700;
+  font-size: clamp(1.15rem, 1.5vw + 0.6rem, 1.4rem);
+  font-weight: 800;
   line-height: 1.25;
   letter-spacing: -0.02em;
-  color: ${({ theme }) => theme.colors.primary};
-  margin: 0 0 0.75rem;
-  padding-bottom: 0.65rem;
-  border-bottom: 2px solid ${({ theme }) => theme.colors.primary};
+  color: #0f1c46;
+  margin: 0 0 0.85rem;
 `;
 
 const Panel = styled.div`
-  background: ${({ theme }) => theme.colors.WHITE};
-  border: 1px solid #d8dee8;
-  border-radius: 8px;
+  background: #fff;
+  border: 1px solid rgba(19, 46, 88, 0.08);
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 6px 20px rgba(19, 46, 88, 0.05);
 `;
 
 const HeroStrip = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem 1rem;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
+  gap: 0.85rem 1.15rem;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid #eef2f7;
+  background: linear-gradient(180deg, #fbfcfe 0%, #f8fafc 100%);
   flex-wrap: wrap;
 `;
 
@@ -91,58 +92,136 @@ const LogoWrap = styled.div`
 `;
 
 const BrokerLogo = styled.img`
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
-  border-radius: 50%;
+  border-radius: 12px;
   background: #fff;
-  border: 1px solid #e2e8f0;
-  padding: 4px;
+  border: 1px solid #e8eef6;
+  padding: 5px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+`;
+
+const HeroMeta = styled.div`
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+`;
+
+const HeroName = styled.div`
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f1c46;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 `;
 
 const QuickStats = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem 0.5rem;
+  gap: 0.3rem 0.4rem;
   min-width: 0;
 `;
 
 const StatChip = styled.span`
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.2rem 0.55rem;
-  font-size: 0.6875rem;
-  font-weight: 500;
-  color: #475569;
+  gap: 0.25rem;
+  padding: 0.18rem 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #64748b;
   background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px;
+  border: 1px solid #e8eef6;
+  border-radius: 999px;
   white-space: nowrap;
 
   strong {
-    color: ${({ theme }) => theme.colors.primary};
-    font-weight: 600;
+    color: #132e58;
+    font-weight: 700;
   }
 `;
 
 const SetupButton = styled.button`
   flex-shrink: 0;
-  background: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.WHITE};
+  background: #132e58;
+  color: #fff;
   border: none;
-  border-radius: 6px;
-  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  padding: 0.55rem 1.15rem;
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 700;
   font-family: inherit;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.15s ease;
+  box-shadow: 0 4px 12px rgba(19, 46, 88, 0.18);
+  transition: background 0.15s ease, transform 0.15s ease;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: #1a3d6e;
+    transform: translateY(-1px);
   }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background: #64748b;
+    box-shadow: none;
+  }
+`;
+
+const DisabledNotice = styled.p`
+  margin: 0 0 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+`;
+
+const PromoBanner = styled.div`
+  margin: 0 0 0.85rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #132e58 0%, #1d4ed8 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+
+  strong {
+    display: block;
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #fbbf24;
+    margin-bottom: 0.15rem;
+  }
+
+  span {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+`;
+
+const CopyCodeBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 0;
+  border-radius: 8px;
+  background: #fbbf24;
+  color: #132e58;
+  font-weight: 800;
+  font-size: 0.82rem;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  letter-spacing: 0.03em;
 `;
 
 const PanelBody = styled.div`
@@ -368,30 +447,30 @@ const ScheduleNote = styled.p`
 `;
 
 const ContentPanel = styled(Panel)`
-  margin-top: 0.75rem;
+  margin-top: 0.85rem;
 `;
 
 const ContentSection = styled.section`
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.1rem;
 
   &:not(:last-child) {
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #eef2f7;
   }
 `;
 
 const ContentTitle = styled.h3`
-  margin: 0 0 0.45rem;
-  font-size: 0.9375rem;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.primary};
+  margin: 0 0 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #0f1c46;
   letter-spacing: -0.01em;
 `;
 
 const ContentParagraph = styled.p`
-  margin: 0 0 0.55rem;
+  margin: 0 0 0.45rem;
   font-size: 0.8125rem;
-  line-height: 1.5;
-  color: #475569;
+  line-height: 1.55;
+  color: #64748b;
 
   &:last-child {
     margin-bottom: 0;
@@ -419,6 +498,52 @@ const CalcLink = styled(Link)`
     color: ${({ theme }) => theme.colors.primary};
     text-decoration: underline;
     text-underline-offset: 2px;
+  }
+`;
+
+const ReviewsTeaser = styled.div`
+  margin-top: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.95rem 1.1rem;
+  background: #fff;
+  border: 1px solid rgba(19, 46, 88, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(19, 46, 88, 0.05);
+`;
+
+const ReviewsTeaserTitle = styled.h2`
+  margin: 0 0 0.2rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f1c46;
+`;
+
+const ReviewsTeaserText = styled.p`
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #64748b;
+`;
+
+const ReviewsTeaserLink = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.95rem;
+  border-radius: 999px;
+  background: #132e58;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    background: #1a3d6e;
   }
 `;
 
@@ -513,10 +638,18 @@ const RebateBrokerDetailPage: React.FC = () => {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     "General Information": true,
   });
+  const [codeCopied, setCodeCopied] = useState(false);
 
   useEffect(() => {
     setShowSetup(searchParams.get("setup") === "1");
   }, [brokerId, searchParams]);
+
+  useEffect(() => {
+    if (broker?.temporarilyDisabled && searchParams.get("setup") === "1") {
+      setShowSetup(false);
+      setSearchParams({}, { replace: true });
+    }
+  }, [broker?.temporarilyDisabled, searchParams, setSearchParams]);
 
   useEffect(() => {
     if (!brokerId) {
@@ -576,6 +709,20 @@ const RebateBrokerDetailPage: React.FC = () => {
     [broker]
   );
 
+  const propDeal = useMemo(
+    () => resolvePropDiscount(broker?.propOffers, broker?.propPromoCodes),
+    [broker]
+  );
+
+  const copyPropCode = async () => {
+    if (!propDeal.code) return;
+    const ok = await copyTextToClipboard(propDeal.code);
+    if (ok) {
+      setCodeCopied(true);
+      window.setTimeout(() => setCodeCopied(false), 1800);
+    }
+  };
+
   const rebateNotes = useMemo(() => (broker ? resolveRebateNotes(broker) : ""), [broker]);
 
   const contentSections = useMemo(
@@ -605,6 +752,7 @@ const RebateBrokerDetailPage: React.FC = () => {
   const hasTable = isProp ? propOffers.length > 0 : tableRows.length > 0;
 
   const handleSetup = () => {
+    if (broker?.temporarilyDisabled) return;
     setShowSetup(true);
     setSearchParams({ setup: "1" }, { replace: false });
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -639,7 +787,9 @@ const RebateBrokerDetailPage: React.FC = () => {
     );
   }
 
-  if (showSetup) {
+  const isDisabled = !!broker.temporarilyDisabled;
+
+  if (showSetup && !isDisabled) {
     return (
       <PageShell>
         <PageInner>
@@ -679,23 +829,51 @@ const RebateBrokerDetailPage: React.FC = () => {
               <LogoWrap>
                 <BrokerLogo src={logoSrc} alt={broker.name} />
               </LogoWrap>
-              {quickStats.length > 0 && (
-                <QuickStats>
-                  {quickStats.map((stat) => (
-                    <StatChip key={stat.label}>
-                      {stat.label}: <strong>{stat.value}</strong>
-                    </StatChip>
-                  ))}
-                </QuickStats>
-              )}
+              <HeroMeta>
+                <HeroName>{broker.name}</HeroName>
+                {quickStats.length > 0 && (
+                  <QuickStats>
+                    {quickStats.map((stat) => (
+                      <StatChip key={stat.label}>
+                        {stat.label}: <strong>{stat.value}</strong>
+                      </StatChip>
+                    ))}
+                  </QuickStats>
+                )}
+              </HeroMeta>
             </HeroLeft>
-            <SetupButton type="button" onClick={handleSetup}>
-              {isProp ? "Open Account" : "Setup Account"}
+            <SetupButton type="button" onClick={handleSetup} disabled={isDisabled}>
+              {isDisabled ? "Disabled" : isProp ? "Start Challenge" : "Setup Account"}
             </SetupButton>
           </HeroStrip>
 
           <PanelBody>
             <MainCol>
+              {isDisabled && (
+                <DisabledNotice>
+                  This broker is temporarily disabled. You can still browse details, but new account
+                  setups are paused.
+                </DisabledNotice>
+              )}
+              {isProp && (propDeal.discountPercent || propDeal.code) && (
+                <PromoBanner>
+                  <div>
+                    <strong>Partner discount</strong>
+                    <span>
+                      {propDeal.discountPercent
+                        ? `${propDeal.discountPercent.replace(/\s*off$/i, "")} OFF`
+                        : "Exclusive code"}
+                      {propDeal.codeLabel ? ` · ${propDeal.codeLabel}` : ""}
+                    </span>
+                  </div>
+                  {propDeal.code && (
+                    <CopyCodeBtn type="button" onClick={copyPropCode}>
+                      {codeCopied ? <FiCheck /> : <FiCopy />}
+                      {codeCopied ? "Copied" : propDeal.code}
+                    </CopyCodeBtn>
+                  )}
+                </PromoBanner>
+              )}
               {isProp && propOffers.length > 0 && (
                 <TableSection>
                   <SectionHeading>Challenge cashback</SectionHeading>
@@ -711,6 +889,7 @@ const RebateBrokerDetailPage: React.FC = () => {
                             <th>First purchase</th>
                             <th>Repeat purchase</th>
                             <th>Discount</th>
+                            <th>Code</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -723,6 +902,7 @@ const RebateBrokerDetailPage: React.FC = () => {
                               <td>{offer.firstPurchaseCashback || "—"}</td>
                               <td>{offer.repeatPurchaseCashback || "—"}</td>
                               <td>{offer.discountPercent ? `+${offer.discountPercent}` : "—"}</td>
+                              <td>{offer.discountCode || "—"}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -850,11 +1030,17 @@ const RebateBrokerDetailPage: React.FC = () => {
           </ContentPanel>
         )}
 
-        <BrokerReviewsSection
-          brokerId={broker._id}
-          brokerName={broker.name}
-          allowPayoutReviews={broker.rebateCategory === "prop"}
-        />
+        <ReviewsTeaser>
+          <div>
+            <ReviewsTeaserTitle>Trader reviews</ReviewsTeaserTitle>
+            <ReviewsTeaserText>
+              Read moderated feedback for {broker.name}, or share your own experience.
+            </ReviewsTeaserText>
+          </div>
+          <ReviewsTeaserLink to={`/rebates/broker/${broker._id}/reviews`}>
+            Open broker reviews →
+          </ReviewsTeaserLink>
+        </ReviewsTeaser>
       </PageInner>
     </PageShell>
   );

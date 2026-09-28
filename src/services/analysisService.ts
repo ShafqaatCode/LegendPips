@@ -1,4 +1,4 @@
-import { API_CONFIG } from "../utils/apiConfig";
+import { API_CONFIG, getAuthHeaders } from "../utils/apiConfig";
 import type { Analysis, AnalysisResponse } from "../types/analysis.types";
 
 const fetchWithTimeout = (
@@ -27,8 +27,10 @@ export const fetchAnalysis = async (
     limit: limit.toString(),
   });
 
-  if (category && category !== "All") {
+  if (category) {
     params.append("category", category);
+  } else {
+    params.append("category", "All");
   }
 
   if (search) {
@@ -173,3 +175,50 @@ export const fetchLatestAnalysis = async (limit: number = 6): Promise<Analysis[]
 
   return data.analysis || [];
 };
+
+export type AnalysisWritePayload = {
+  title: string;
+  subtitle?: string;
+  category: Analysis["category"];
+  author: string;
+  content: string;
+  excerpt?: string;
+  featuredImage?: string;
+  chartImage?: string;
+  chartTitle?: string;
+  isFeatured?: boolean;
+  publishedAt?: string;
+  tags?: string[];
+};
+
+export async function createAnalysisAdmin(body: AnalysisWritePayload): Promise<Analysis> {
+  const res = await fetch(`${API_CONFIG.BASE_URL}/analysis`, {
+    method: "POST",
+    headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to create analysis");
+  return data.analysis as Analysis;
+}
+
+export async function updateAnalysisAdmin(id: string, body: Partial<AnalysisWritePayload>): Promise<Analysis> {
+  const res = await fetch(`${API_CONFIG.BASE_URL}/analysis/${id}`, {
+    method: "PUT",
+    headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to update analysis");
+  return data.analysis as Analysis;
+}
+
+export async function deleteAnalysisAdmin(id: string): Promise<void> {
+  const res = await fetch(`${API_CONFIG.BASE_URL}/analysis/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error((data as { message?: string }).message || "Failed to delete analysis");
+}
+

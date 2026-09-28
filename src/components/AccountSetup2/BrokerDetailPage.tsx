@@ -67,9 +67,22 @@ const BrokerDetailPage: React.FC<BrokerDetailPageProps> = ({
           </HeaderContent>
 
           <HeaderActions>
-            {broker.verified !== false && <VerifiedBadge>✓ Verified Broker</VerifiedBadge>}
-            <SetupButton type="button" onClick={onSetupAccount}>
-              {setupButtonLabel}
+            {broker.temporarilyDisabled ? (
+              <VerifiedBadge style={{ background: "#64748b" }}>Disabled</VerifiedBadge>
+            ) : broker.verified !== false ? (
+              <VerifiedBadge>✓ Verified Broker</VerifiedBadge>
+            ) : null}
+            <SetupButton
+              type="button"
+              onClick={onSetupAccount}
+              disabled={!!broker.temporarilyDisabled}
+              style={
+                broker.temporarilyDisabled
+                  ? { opacity: 0.55, cursor: "not-allowed", background: "#64748b" }
+                  : undefined
+              }
+            >
+              {broker.temporarilyDisabled ? "Disabled" : setupButtonLabel}
             </SetupButton>
             <ReportLink to={`/complaints?broker=${broker.id}`}>Report this broker</ReportLink>
           </HeaderActions>
@@ -197,8 +210,17 @@ const BrokerDetailPage: React.FC<BrokerDetailPageProps> = ({
             </TableWrapper>
 
             <CTAGroup>
-              <SetupButton type="button" onClick={onSetupAccount}>
-                {setupButtonLabel}
+              <SetupButton
+                type="button"
+                onClick={onSetupAccount}
+                disabled={!!broker.temporarilyDisabled}
+                style={
+                  broker.temporarilyDisabled
+                    ? { opacity: 0.55, cursor: "not-allowed", background: "#64748b" }
+                    : undefined
+                }
+              >
+                {broker.temporarilyDisabled ? "Disabled" : setupButtonLabel}
               </SetupButton>
 
               <VisitWebsiteButton href="#" target="_blank">

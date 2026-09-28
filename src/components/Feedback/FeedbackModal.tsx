@@ -9,6 +9,7 @@ interface FeedbackModalProps {
 
 const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
@@ -29,13 +30,19 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
     setSuccess(null);
 
     try {
-      await submitFeedback({
+      const res = await submitFeedback({
         email,
+        subject: subject.trim() || "Website feedback",
         message,
         page: typeof window !== "undefined" ? window.location.pathname : undefined,
       });
-      setSuccess("Thank you for your feedback!");
+      setSuccess(
+        res.ticketId
+          ? `Ticket ${res.ticketId} created. Thank you!`
+          : "Thank you for your feedback!"
+      );
       setEmail("");
+      setSubject("");
       setMessage("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
@@ -47,7 +54,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
   return (
     <Overlay>
       <Modal>
-        <Header>Feedback / Help improve this page</Header>
+        <Header>Support ticket / Feedback</Header>
         <Form onSubmit={handleSubmit}>
           <Input
             type="email"
@@ -55,15 +62,21 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
+          <Input
+            type="text"
+            placeholder="Subject (optional)"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+          />
           <Textarea
-            placeholder="Your feedback..."
+            placeholder="Your message..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
           {error && <ErrorMessage>{error}</ErrorMessage>}
           {success && <SuccessMessage>{success}</SuccessMessage>}
           <SubmitButton type="submit" disabled={loading}>
-            {loading ? "Sending..." : "Submit"}
+            {loading ? "Sending..." : "Submit ticket"}
           </SubmitButton>
         </Form>
         <CloseButton onClick={onClose}>×</CloseButton>

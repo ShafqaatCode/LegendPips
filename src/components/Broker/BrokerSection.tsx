@@ -8,7 +8,7 @@ import ArrowIcon from "../../assets/arrow-narrow-circle-broken-up-right-blue.png
 import { Link } from "react-router-dom";
 import { fetchBrokersPage } from "../../services/brokerService";
 import { BrokerListSkeleton } from "../SharedComponents/Shimmer";
-import { mapApiBrokerToRebateCardRow } from "../../utils/rebatesBrokersDisplay";
+import { mapApiBrokerToRebateCardRow, sortApiBrokersFeaturedFirst } from "../../utils/rebatesBrokersDisplay";
 import type { ApiBroker } from "../../services/brokerService";
 import { useLocale } from "../../contexts/LocaleContext";
 
@@ -56,7 +56,7 @@ const BrokerSection: React.FC<props> = ({ showAll = false }) => {
           page: 1,
           limit: showAll ? 50 : 5,
         });
-        const list = result.items;
+        const list = sortApiBrokersFeaturedFirst(result.items);
         if (!cancelled) {
           setItems(list);
           setError(null);
@@ -74,17 +74,18 @@ const BrokerSection: React.FC<props> = ({ showAll = false }) => {
   }, [showAll]);
 
   const list = items ?? [];
-  const cards = list.map((b) => {
+  const cards = list.map((b, idx) => {
     const row = mapApiBrokerToRebateCardRow(b);
     return {
       key: b._id,
-      index: row.index,
+      index: idx + 1,
       featured: row.featured,
       title: row.title,
       description: b.description || "",
       logoSrc: row.logoSrc,
       rating: row.rating,
       reviewsCount: row.reviewsCount,
+      temporarilyDisabled: row.temporarilyDisabled,
     };
   });
 
@@ -112,6 +113,7 @@ const BrokerSection: React.FC<props> = ({ showAll = false }) => {
             logoSrc={broker.logoSrc}
             rating={broker.rating}
             reviewsCount={broker.reviewsCount}
+            temporarilyDisabled={broker.temporarilyDisabled}
           />
         ))}
       </BrokerWrapper>

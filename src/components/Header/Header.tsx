@@ -21,9 +21,8 @@ import {
   SubmenuItem,
 } from "./Header.styles";
 import { NavLink } from "react-router-dom";
-import { FaBars } from "react-icons/fa";
+import { FaBars, FaWhatsapp } from "react-icons/fa";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
-import LogoImg from "../../assets/icons/image 2.svg";
 import SupportIcon from "../../assets/icons/SupportIcon.svg";
 import CalculatorIcon from "../../assets/icons/calculator-svgrepo-com (1) 1.svg";
 import LocationIcon from "../../assets/icons/Location marker.svg";
@@ -31,6 +30,11 @@ import LocationIcon from "../../assets/icons/Location marker.svg";
 import LoginModal from "../../pages/Login/LoginModal";
 import RegisterModal from "../../pages/Register/RegisterModal";
 import { useAuth } from "../../contexts/AuthContext";
+import { useSiteLogo } from "../../contexts/SiteConfigContext";
+import {
+  WHATSAPP_SUPPORT_NUMBER_DISPLAY,
+  WHATSAPP_SUPPORT_URL,
+} from "../../utils/whatsappSupport";
 
 const navLinks = [
   { to: "/", label: "Home", end: true },
@@ -58,6 +62,7 @@ const Header: React.FC = () => {
   const [signupOpen, setSignupOpen] = useState(false);
   const [signinOpen, setSigninOpen] = useState(false);
   const { isAuthenticated, user } = useAuth();
+  const { src: logoSrc, alt: logoAlt, height: logoHeight, maxWidth: logoMaxWidth } = useSiteLogo();
 
 
   const toggleSubmenu = () => {
@@ -80,7 +85,7 @@ const Header: React.FC = () => {
         {!isScrolled && (
           <Topbar>
             <NavLink to="/">
-              <Logo src={LogoImg} alt="LegendPips Logo" />
+              <Logo src={logoSrc} alt={logoAlt} $height={logoHeight} $maxWidth={logoMaxWidth} />
             </NavLink>
 
             <LinkGroup>
@@ -90,6 +95,24 @@ const Header: React.FC = () => {
                   <span>Live Chat</span>
                 </HeaderItem>
               </NavLink>
+              <NavLink to="/support/tickets">
+                <HeaderItem>
+                  <img src={SupportIcon} alt="Support Tickets" />
+                  <span>Support Tickets</span>
+                </HeaderItem>
+              </NavLink>
+              <a
+                href={WHATSAPP_SUPPORT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`WhatsApp ${WHATSAPP_SUPPORT_NUMBER_DISPLAY}`}
+                style={{ textDecoration: "none" }}
+              >
+                <HeaderItem>
+                  <FaWhatsapp size={16} color="#25D366" aria-hidden />
+                  <span>WhatsApp</span>
+                </HeaderItem>
+              </a>
               <NavLink to="/calculator">
                 <HeaderItem>
                   <img src={CalculatorIcon} alt="Calculator" />
@@ -149,7 +172,7 @@ const Header: React.FC = () => {
         {isScrolled && (
           <StickyBar>
             <NavLink to="/">
-              <Logo src={LogoImg} alt="LegendPips Logo" />
+              <Logo src={logoSrc} alt={logoAlt} $height={logoHeight} $maxWidth={logoMaxWidth} />
             </NavLink>
             <NavList>
               {navLinks.map((link) => (
@@ -189,7 +212,7 @@ const Header: React.FC = () => {
 
         <MobileBar>
           <NavLink to="/">
-            <Logo src={LogoImg} alt="LegendPips Logo" />
+            <Logo src={logoSrc} alt={logoAlt} $height={logoHeight} $maxWidth={logoMaxWidth} />
           </NavLink>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             {/* <NavLink to="/signin">

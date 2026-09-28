@@ -5,7 +5,7 @@ import {
   FiUsers, FiAward, FiVideo, FiInbox, FiTrendingUp, FiBook, FiDollarSign,
   FiActivity, FiArrowRight, FiShield, FiUserCheck, FiUserX, FiAlertCircle,
   FiZap, FiBarChart2, FiMail, FiClock, FiRefreshCw, FiBriefcase, FiLayers,
-  FiUserPlus, FiShuffle,
+  FiUserPlus, FiShuffle, FiMessageSquare,
 } from 'react-icons/fi';
 import {
   fetchAdminDashboard,
@@ -622,6 +622,7 @@ const AdminDashboard: React.FC = () => {
         { icon: FiBook, label: 'Courses', value: n(platform.coursesPublished), color: '#e0e7ff', ink: '#4f46e5', path: '/admin-panel/courses' },
         { icon: FiBriefcase, label: 'Brokers', value: n(platform.brokersPublished), color: '#cffafe', ink: '#0891b2', path: '/admin-panel/brokers' },
         { icon: FiInbox, label: 'Open feedback', value: summary.newFeedbackOpen, color: '#fce7f3', ink: '#db2777', path: '/admin-panel/feedback-inbox' },
+        { icon: FiMessageSquare, label: 'Live chat unread', value: n(platform.liveChatUnread), color: '#ffedd5', ink: '#c2410c', path: '/admin-panel/live-chat' },
         { icon: FiMail, label: 'Feedback total', value: n(platform.feedbackTotal), color: '#fbcfe8', ink: '#be185d', path: '/admin-panel/feedback-inbox' },
         { icon: FiUserPlus, label: 'Invites (7d)', value: n(platform.referralInvites7d), color: '#e0e7ff', ink: '#4338ca', path: '/admin-panel/referrals' },
         { icon: FiShuffle, label: 'IB change open', value: n(platform.ibChangeOpen), color: '#ccfbf1', ink: '#0f766e', path: '/admin-panel/ib-change' },
@@ -632,6 +633,7 @@ const AdminDashboard: React.FC = () => {
   const quickLinks = [
     { icon: FiUsers, title: 'Users', sub: 'Search & manage', path: '/admin-panel/users' },
     { icon: FiShield, title: 'KYC review', sub: 'Approve documents', path: '/admin-panel/kyc-records?filter=pending' },
+    { icon: FiMessageSquare, title: 'Live chat', sub: n(platform?.liveChatUnread) ? `${n(platform?.liveChatUnread)} unread` : 'Reply to members', path: '/admin-panel/live-chat' },
     { icon: FiMail, title: 'Bulk email', sub: 'Message members', path: '/admin-panel/users/bulk-email' },
     { icon: FiUserPlus, title: 'Referrals', sub: 'Invite progress', path: '/admin-panel/referrals' },
     { icon: FiShuffle, title: 'IB change', sub: 'Broker requests', path: '/admin-panel/ib-change' },
@@ -726,6 +728,24 @@ const AdminDashboard: React.FC = () => {
               {loading
                 ? 'Loading…'
                 : `${n(summary?.newFeedback24h)} new today · ${n(summary?.newFeedbackWeek)} this week`}
+            </div>
+          </div>
+        </AlertCard>
+        <AlertCard
+          type="button"
+          $tone={loading ? 'info' : insightTone(n(platform?.liveChatUnread))}
+          onClick={() => navigate('/admin-panel/live-chat')}
+        >
+          <div className="icon"><FiMessageSquare /></div>
+          <div>
+            <div className="count">{loading ? '…' : n(platform?.liveChatUnread)}</div>
+            <div className="label">Live chat unread</div>
+            <div className="hint">
+              {loading
+                ? 'Loading…'
+                : n(platform?.liveChatUnread)
+                  ? 'Open inbox and reply to members'
+                  : 'No pending chat messages'}
             </div>
           </div>
         </AlertCard>
