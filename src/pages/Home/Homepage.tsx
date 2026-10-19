@@ -13,6 +13,7 @@ import ContactAdviceSection from "../../components/Support/ContactAdviceSection"
 import FAQ from "../../components/Faqs/Faqs";
 import Tabs from "../../components/Signals/Tabs/Tabs";
 import CommunitySection from "../../components/Community/CommunitySection";
+import GlobalReachSection from "../../components/Community/GlobalReachSection";
 import ContestSection from "../../components/ContestList/ContestSection";
 import PaymentMethodsSection from "../../components/PaymentMethods/PaymentMethodsSection";
 import CalculatorsSection from "../../components/Calculators/CalculatorsSection";
@@ -34,6 +35,7 @@ const HomePage: React.FC = () => {
       <HomeLiveForexCharts />
       <ComplaintsSection />
       <CommunitySection />
+      <GlobalReachSection />
       <Tabs />
       <ChoosUs />
       <WhatWeDoSection />

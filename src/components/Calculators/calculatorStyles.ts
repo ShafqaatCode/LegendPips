@@ -62,12 +62,12 @@ export const CalcDescription = styled.p`
 export const CalcFormRow = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.7rem 1rem;
-  margin-bottom: 0.7rem;
+  gap: 0.85rem 1rem;
+  margin-bottom: 0.85rem;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     grid-template-columns: 1fr;
-    gap: 0.65rem;
+    gap: 0.75rem;
   }
 `;
 
@@ -175,49 +175,135 @@ export const CalcButton = styled.button`
   }
 `;
 
+/** @deprecated Prefer CalcMetricCard inside CalcResultPanel */
 export const CalcResult = styled.div<{ $muted?: boolean }>`
-  display: inline-flex;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: center;
-  background: ${({ $muted }) => ($muted ? "#eef1f6" : "#d69e2e")};
+  gap: 0.2rem;
+  background: ${({ $muted }) => ($muted ? "#f8fafc" : "linear-gradient(135deg, #132e58 0%, #1e3a5f 100%)")};
   color: ${({ $muted }) => ($muted ? "#132e58" : "#fff")};
   font-weight: 600;
-  padding: 0.5rem 1rem;
-  border-radius: 30px;
-  font-size: 0.8125rem;
-  text-align: center;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  font-size: 0.9375rem;
+  text-align: left;
   font-variant-numeric: tabular-nums;
-  line-height: 1.3;
+  line-height: 1.35;
+  width: 100%;
+  box-sizing: border-box;
+  white-space: normal;
+  word-break: break-word;
+  border: 1px solid ${({ $muted }) => ($muted ? "rgba(19, 46, 88, 0.1)" : "transparent")};
 
   span {
     font-weight: 700;
-    margin-left: 0.3rem;
+    margin-left: 0;
   }
 `;
 
 export const CalcResultsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.5rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.65rem;
+  margin-top: 0;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     grid-template-columns: 1fr;
   }
 `;
 
+export const CalcResultPanel = styled.div`
+  margin-top: 1.15rem;
+  padding: 1rem 1.05rem 1.1rem;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+  border: 1px solid rgba(19, 46, 88, 0.12);
+`;
+
+export const CalcResultHeading = styled.p`
+  margin: 0 0 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+`;
+
+export const CalcMetricCard = styled.div<{ $tone?: "primary" | "accent" | "muted" | "positive" | "negative" }>`
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: 12px;
+  min-height: 4.25rem;
+  box-sizing: border-box;
+  border: 1px solid
+    ${({ $tone }) =>
+      $tone === "accent"
+        ? "rgba(214, 158, 46, 0.35)"
+        : $tone === "primary"
+          ? "transparent"
+          : "rgba(19, 46, 88, 0.1)"};
+  background: ${({ $tone }) => {
+    if ($tone === "primary") return "linear-gradient(145deg, #132e58 0%, #1a3d6e 100%)";
+    if ($tone === "accent") return "linear-gradient(145deg, #f6e7c1 0%, #f0d78a 100%)";
+    if ($tone === "positive") return "#ecfdf5";
+    if ($tone === "negative") return "#fef2f2";
+    return "#fff";
+  }};
+  color: ${({ $tone }) => {
+    if ($tone === "primary") return "#fff";
+    if ($tone === "accent") return "#132e58";
+    if ($tone === "positive") return "#065f46";
+    if ($tone === "negative") return "#991b1b";
+    return "#132e58";
+  }};
+`;
+
+export const CalcMetricLabel = styled.span`
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.78;
+  line-height: 1.2;
+`;
+
+export const CalcMetricValue = styled.span`
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  word-break: break-word;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    font-size: 1.125rem;
+  }
+`;
+
+export const CalcMetricNote = styled.span`
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.85;
+  line-height: 1.35;
+  margin-top: 0.15rem;
+`;
+
 export const CalcResultTile = styled.div<{ $highlight?: boolean }>`
-  background: ${({ $highlight }) => ($highlight ? "#d69e2e" : "#f3f4f7")};
+  background: ${({ $highlight }) =>
+    $highlight ? "linear-gradient(145deg, #132e58 0%, #1a3d6e 100%)" : "#fff"};
   color: ${({ $highlight }) => ($highlight ? "#fff" : "#132e58")};
   font-weight: 500;
-  padding: 0.5rem 0.75rem;
+  padding: 0.65rem 0.85rem;
   border-radius: 12px;
   font-size: 0.8125rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 0.45rem;
-  border: 1px solid ${({ $highlight }) => ($highlight ? "transparent" : "rgba(0,0,0,0.06)")};
+  border: 1px solid ${({ $highlight }) => ($highlight ? "transparent" : "rgba(19, 46, 88, 0.1)")};
 
   span {
     font-weight: 700;

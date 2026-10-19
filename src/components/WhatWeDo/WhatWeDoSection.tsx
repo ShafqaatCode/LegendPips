@@ -1,9 +1,172 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { FiArrowRight, FiPercent, FiTrendingDown, FiDollarSign } from "react-icons/fi";
+import { FiArrowUpRight, FiPercent, FiTrendingDown, FiDollarSign } from "react-icons/fi";
 import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import { useLocale } from "../../contexts/LocaleContext";
+
+const viewport = { once: true, amount: 0.2 } as const;
+
+function parseNum(v: string): number {
+  const n = Number(String(v).replace(/,/g, "").trim());
+  return Number.isFinite(n) ? n : 0;
+}
+
+const WhatWeDoSection: React.FC = () => {
+  const { t } = useLocale();
+  const [lots, setLots] = useState("10");
+  const [rebatePerLot, setRebatePerLot] = useState("5");
+  const [instrument, setInstrument] = useState("XAU/USD");
+
+  const result = useMemo(
+    () => Math.max(0, parseNum(lots) * parseNum(rebatePerLot)),
+    [lots, rebatePerLot]
+  );
+
+  const stats = [
+    {
+      value: t("whatWeDo.statRebate"),
+      label: t("whatWeDo.statRebateLabel"),
+      icon: <FiPercent size={15} />,
+    },
+    {
+      value: t("whatWeDo.statCost"),
+      label: t("whatWeDo.statCostLabel"),
+      icon: <FiTrendingDown size={15} />,
+    },
+    {
+      value: t("whatWeDo.statCash"),
+      label: t("whatWeDo.statCashLabel"),
+      icon: <FiDollarSign size={15} />,
+    },
+  ];
+
+  return (
+    <Section aria-labelledby="what-we-do-heading">
+      <Inner>
+        <SectionHeadingSet
+          upperText={t("whatWeDo.kicker")}
+          mainHeading={t("whatWeDo.title")}
+          subText={t("whatWeDo.p1")}
+        />
+
+        <Layout>
+          <Story>
+            <Lead
+              initial={{ opacity: 0, y: 22 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={viewport}
+              transition={{ duration: 0.55 }}
+            >
+              {t("whatWeDo.p2")}
+            </Lead>
+            <Paragraph
+              initial={{ opacity: 0, y: 22 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={viewport}
+              transition={{ duration: 0.55, delay: 0.08 }}
+            >
+              {t("whatWeDo.p3")}
+            </Paragraph>
+            <Paragraph
+              initial={{ opacity: 0, y: 22 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={viewport}
+              transition={{ duration: 0.55, delay: 0.14 }}
+            >
+              {t("whatWeDo.p4")}
+            </Paragraph>
+
+            <Stats>
+              {stats.map((s, i) => (
+                <StatCard
+                  key={s.label}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={viewport}
+                  transition={{ duration: 0.5, delay: 0.1 + i * 0.08 }}
+                >
+                  <StatIcon aria-hidden>{s.icon}</StatIcon>
+                  <StatValue>{s.value}</StatValue>
+                  <StatLabel>{s.label}</StatLabel>
+                </StatCard>
+              ))}
+            </Stats>
+
+            <Closing
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={viewport}
+              transition={{ duration: 0.55, delay: 0.2 }}
+            >
+              {t("whatWeDo.p5")}
+            </Closing>
+          </Story>
+
+          <Visual
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.65, delay: 0.12 }}
+          >
+            <VisualKicker>Rebate calculator</VisualKicker>
+            <VisualTitle>Estimate your cashback</VisualTitle>
+
+            <Fields>
+              <Field>
+                <FieldLabel htmlFor="wwd-instrument">Instrument</FieldLabel>
+                <FieldSelect
+                  id="wwd-instrument"
+                  value={instrument}
+                  onChange={(e) => setInstrument(e.target.value)}
+                >
+                  <option>XAU/USD</option>
+                  <option>EUR/USD</option>
+                  <option>GBP/USD</option>
+                </FieldSelect>
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="wwd-rebate">Rebate / lot ($)</FieldLabel>
+                <FieldInput
+                  id="wwd-rebate"
+                  inputMode="decimal"
+                  value={rebatePerLot}
+                  onChange={(e) => setRebatePerLot(e.target.value)}
+                  placeholder="5"
+                />
+              </Field>
+              <Field $full>
+                <FieldLabel htmlFor="wwd-lots">Lots traded</FieldLabel>
+                <FieldInput
+                  id="wwd-lots"
+                  inputMode="decimal"
+                  value={lots}
+                  onChange={(e) => setLots(e.target.value)}
+                  placeholder="10"
+                />
+              </Field>
+            </Fields>
+
+            <ResultCard $profit>
+              <ResultLabel>Estimated rebate</ResultLabel>
+              <ResultValue $profit>${result.toFixed(2)}</ResultValue>
+              <ResultHint>
+                Formula: rebate per lot × lots · {instrument}
+              </ResultHint>
+            </ResultCard>
+
+            <CalcLink to="/rebate-calculator">
+              Open full rebate calculator <FiArrowUpRight />
+            </CalcLink>
+          </Visual>
+        </Layout>
+      </Inner>
+    </Section>
+  );
+};
+
+export default WhatWeDoSection;
 
 const Section = styled.section`
   position: relative;
@@ -106,7 +269,7 @@ const StatLabel = styled.div`
 const Visual = styled(motion.aside)`
   position: relative;
   border-radius: 18px;
-  padding: 1.25rem 1.2rem 1.35rem;
+  padding: 1.25rem 1.2rem 1.2rem;
   background: linear-gradient(165deg, #0f2448 0%, #132e58 48%, #0c1f3d 100%);
   color: #fff;
   box-shadow: 0 22px 44px rgba(8, 20, 40, 0.28);
@@ -126,7 +289,7 @@ const Visual = styled(motion.aside)`
 
 const VisualKicker = styled.p`
   position: relative;
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.35rem;
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -134,56 +297,120 @@ const VisualKicker = styled.p`
   color: rgba(251, 191, 36, 0.95);
 `;
 
-const CompareStack = styled.div`
+const VisualTitle = styled.h3`
   position: relative;
+  margin: 0 0 0.95rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+`;
+
+const Fields = styled.div`
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
+`;
+
+const Field = styled.div<{ $full?: boolean }>`
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.3rem;
+  grid-column: ${({ $full }) => ($full ? "1 / -1" : "auto")};
 `;
 
-const CompareRow = styled.div<{ $accent?: boolean }>`
+const FieldLabel = styled.label`
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+`;
+
+const fieldControlCss = `
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.22);
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  outline: none;
+
+  &:focus {
+    border-color: rgba(251, 191, 36, 0.55);
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.12);
+  }
+`;
+
+const FieldInput = styled.input`
+  ${fieldControlCss}
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+  }
+`;
+
+const FieldSelect = styled.select`
+  ${fieldControlCss}
+  cursor: pointer;
+
+  option {
+    color: #0f172a;
+  }
+`;
+
+const ResultCard = styled.div<{ $profit?: boolean }>`
   position: relative;
   border-radius: 12px;
-  padding: 0.85rem 0.95rem;
-  background: ${({ $accent }) =>
-    $accent ? "rgba(251, 191, 36, 0.14)" : "rgba(255, 255, 255, 0.07)"};
+  padding: 0.95rem 1rem;
+  background: ${({ $profit }) =>
+    $profit ? "rgba(251, 191, 36, 0.14)" : "rgba(248, 113, 113, 0.12)"};
   border: 1px solid
-    ${({ $accent }) => ($accent ? "rgba(251, 191, 36, 0.35)" : "rgba(255, 255, 255, 0.1)")};
+    ${({ $profit }) =>
+      $profit ? "rgba(251, 191, 36, 0.35)" : "rgba(248, 113, 113, 0.35)"};
+  margin-bottom: 0.85rem;
 `;
 
-const CompareLabel = styled.div`
+const ResultLabel = styled.div`
   font-size: 0.72rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.72);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
 `;
 
-const CompareValue = styled.div<{ $gold?: boolean }>`
-  font-size: 1.35rem;
+const ResultValue = styled.div<{ $profit?: boolean }>`
+  font-size: 1.65rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
-  color: ${({ $gold, theme }) => ($gold ? theme.colors.gold : "#fff")};
+  letter-spacing: -0.03em;
+  color: ${({ $profit, theme }) => ($profit ? theme.colors.gold : "#fca5a5")};
+  line-height: 1.15;
 `;
 
-const ArrowWrap = styled.div`
-  display: flex;
-  justify-content: center;
-  color: rgba(251, 191, 36, 0.9);
+const ResultHint = styled.div`
+  margin-top: 0.35rem;
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.5);
 `;
 
-const BarTrack = styled.div`
-  margin-top: 0.55rem;
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  overflow: hidden;
-`;
+const CalcLink = styled(Link)`
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(251, 191, 36, 0.95);
+  text-decoration: none;
 
-const BarFill = styled(motion.div)<{ $gold?: boolean }>`
-  height: 100%;
-  border-radius: 999px;
-  background: ${({ $gold, theme }) =>
-    $gold ? theme.colors.Gold : "rgba(148, 163, 184, 0.85)"};
+  &:hover {
+    color: #fff;
+  }
 `;
 
 const Closing = styled(motion.p)`
@@ -198,136 +425,3 @@ const Closing = styled(motion.p)`
   font-weight: 600;
   box-shadow: 0 8px 20px rgba(19, 46, 88, 0.04);
 `;
-
-const viewport = { once: true, amount: 0.2 } as const;
-
-const WhatWeDoSection: React.FC = () => {
-  const { t } = useLocale();
-
-  const stats = [
-    {
-      value: t("whatWeDo.statRebate"),
-      label: t("whatWeDo.statRebateLabel"),
-      icon: <FiPercent size={15} />,
-    },
-    {
-      value: t("whatWeDo.statCost"),
-      label: t("whatWeDo.statCostLabel"),
-      icon: <FiTrendingDown size={15} />,
-    },
-    {
-      value: t("whatWeDo.statCash"),
-      label: t("whatWeDo.statCashLabel"),
-      icon: <FiDollarSign size={15} />,
-    },
-  ];
-
-  return (
-    <Section aria-labelledby="what-we-do-heading">
-      <Inner>
-        <SectionHeadingSet
-          upperText={t("whatWeDo.kicker")}
-          mainHeading={t("whatWeDo.title")}
-          subText={t("whatWeDo.p1")}
-        />
-
-        <Layout>
-          <Story>
-            <Lead
-              initial={{ opacity: 0, y: 22 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={viewport}
-              transition={{ duration: 0.55 }}
-            >
-              {t("whatWeDo.p2")}
-            </Lead>
-            <Paragraph
-              initial={{ opacity: 0, y: 22 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={viewport}
-              transition={{ duration: 0.55, delay: 0.08 }}
-            >
-              {t("whatWeDo.p3")}
-            </Paragraph>
-            <Paragraph
-              initial={{ opacity: 0, y: 22 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={viewport}
-              transition={{ duration: 0.55, delay: 0.14 }}
-            >
-              {t("whatWeDo.p4")}
-            </Paragraph>
-
-            <Stats>
-              {stats.map((s, i) => (
-                <StatCard
-                  key={s.label}
-                  initial={{ opacity: 0, y: 18 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={viewport}
-                  transition={{ duration: 0.5, delay: 0.1 + i * 0.08 }}
-                >
-                  <StatIcon aria-hidden>{s.icon}</StatIcon>
-                  <StatValue>{s.value}</StatValue>
-                  <StatLabel>{s.label}</StatLabel>
-                </StatCard>
-              ))}
-            </Stats>
-
-            <Closing
-              initial={{ opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={viewport}
-              transition={{ duration: 0.55, delay: 0.2 }}
-            >
-              {t("whatWeDo.p5")}
-            </Closing>
-          </Story>
-
-          <Visual
-            initial={{ opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.65, delay: 0.12 }}
-          >
-            <VisualKicker>{t("whatWeDo.compareTitle")}</VisualKicker>
-            <CompareStack>
-              <CompareRow>
-                <CompareLabel>{t("whatWeDo.beforeLabel")}</CompareLabel>
-                <CompareValue>{t("whatWeDo.beforeValue")}</CompareValue>
-                <BarTrack>
-                  <BarFill
-                    initial={{ width: 0 }}
-                    whileInView={{ width: "100%" }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.7, delay: 0.25 }}
-                  />
-                </BarTrack>
-              </CompareRow>
-
-              <ArrowWrap aria-hidden>
-                <FiArrowRight size={18} />
-              </ArrowWrap>
-
-              <CompareRow $accent>
-                <CompareLabel>{t("whatWeDo.afterLabel")}</CompareLabel>
-                <CompareValue $gold>{t("whatWeDo.afterValue")}</CompareValue>
-                <BarTrack>
-                  <BarFill
-                    $gold
-                    initial={{ width: 0 }}
-                    whileInView={{ width: "33%" }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.7, delay: 0.4 }}
-                  />
-                </BarTrack>
-              </CompareRow>
-            </CompareStack>
-          </Visual>
-        </Layout>
-      </Inner>
-    </Section>
-  );
-};
-
-export default WhatWeDoSection;

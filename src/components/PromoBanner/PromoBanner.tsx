@@ -40,7 +40,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useLocale } from "../../contexts/LocaleContext";
 import { comparePath } from "../../utils/compareBrokers";
 import { fetchBrokersPage, type ApiBroker } from "../../services/brokerService";
-import { normalizeBrokerLogoUrl } from "../../utils/brokerLogoUrl";
+import { resolveBrokerLogoUrl } from "../../utils/brokerLogoUrl";
+import BrokerLogo from "../Broker/BrokerLogo";
 
 export const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 28 },
@@ -75,7 +76,6 @@ const PromoBanner = () => {
   const [signupOpen, setSignupOpen] = useState(false);
   const [brokers, setBrokers] = useState<ApiBroker[]>([]);
   const [totalBrokers, setTotalBrokers] = useState(0);
-  const [brokenLogos, setBrokenLogos] = useState<Record<string, boolean>>({});
   const { isAuthenticated, user } = useAuth();
   const { t } = useLocale();
   const navigate = useNavigate();
@@ -86,8 +86,11 @@ const PromoBanner = () => {
       .then((r) => {
         if (cancelled) return;
         const items = r.items || [];
-        const withLogos = items.filter((b) => normalizeBrokerLogoUrl(b.logoUrl));
-        const pool = withLogos.length >= 3 ? withLogos : items;
+        const pool = [...items].sort((a, b) => {
+          const ao = a.rebatesListOrder ?? a.sortOrder ?? 0;
+          const bo = b.rebatesListOrder ?? b.sortOrder ?? 0;
+          return ao - bo;
+        });
         setBrokers(pool.slice(0, LOGO_COUNT));
         setTotalBrokers(r.pagination?.totalItems ?? pool.length);
       })
@@ -235,10 +238,7 @@ const PromoBanner = () => {
             {shown.length > 0 ? (
               <>
                 <LogoStack>
-                  {shown.map((b, i) => {
-                    const src = normalizeBrokerLogoUrl(b.logoUrl);
-                    const broken = brokenLogos[b._id];
-                    return (
+                  {shown.map((b, i) => (
                       <LogoBubble
                         key={b._id}
                         type="button"
@@ -247,20 +247,18 @@ const PromoBanner = () => {
                         style={{ zIndex: shown.length - i }}
                         onClick={() => openBroker(b._id)}
                       >
-                        {src && !broken ? (
-                          <img
-                            src={src}
+                        {resolveBrokerLogoUrl(b.logoUrl, b.name, { preferBundled: true }) ? (
+                          <BrokerLogo
+                            src={b.logoUrl}
+                            name={b.name}
                             alt={b.name}
-                            onError={() =>
-                              setBrokenLogos((prev) => ({ ...prev, [b._id]: true }))
-                            }
+                            preferBundled
                           />
                         ) : (
                           <LogoFallback>{b.name.slice(0, 2).toUpperCase()}</LogoFallback>
                         )}
                       </LogoBubble>
-                    );
-                  })}
+                    ))}
                   {moreCount > 0 && (
                     <MoreBubble
                       type="button"
@@ -289,7 +287,7 @@ const PromoBanner = () => {
 
             <StatGrid>
               <StatCell>
-                <strong>80%</strong>
+                <strong>Up to 80%</strong>
                 <span>Rebates back</span>
               </StatCell>
               <StatCell>
@@ -297,8 +295,8 @@ const PromoBanner = () => {
                 <span>Traders</span>
               </StatCell>
               <StatCell>
-                <strong>0.4</strong>
-                <span>Pips effective</span>
+                <strong>5M+</strong>
+                <span>Commission paid</span>
               </StatCell>
             </StatGrid>
             <VisualCta type="button" onClick={() => navigate("/find-broker")}>

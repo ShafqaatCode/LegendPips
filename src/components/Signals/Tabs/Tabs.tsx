@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import RecentSignals from './SignalList';
 import SignalPerformance from './SignalPerformance';
 
 import SectionHeadingSet from '../../SharedComponents/SectionHeadingSet';
 import { useLocale } from '../../../contexts/LocaleContext';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useAuthModal } from '../../../contexts/AuthModalContext';
 import { fetchPublicSignals, toSignalListRow, type ApiSignal } from '../../../services/signalService';
 
 type SignalRow = ReturnType<typeof toSignalListRow>;
@@ -98,7 +101,10 @@ const CardsWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: stretch;
   gap: 32px;
+  max-width: 960px;
+  margin: 0 auto;
 
   @media (max-width: 768px) {
     gap: 16px;
@@ -123,10 +129,14 @@ const fallbackCryptoGold: SignalRow[] = [
 
 const RewardsAndBenefits: React.FC = () => {
   const { t } = useLocale();
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const { openRegister } = useAuthModal();
   const [activeTab, setActiveTab] = useState('Signals');
   const [marketTab, setMarketTab] = useState<MarketTab>('forex');
   const [forexSignals, setForexSignals] = useState<SignalRow[]>([]);
   const [cryptoGoldSignals, setCryptoGoldSignals] = useState<SignalRow[]>([]);
+  const [premiumAccess, setPremiumAccess] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -138,9 +148,10 @@ const RewardsAndBenefits: React.FC = () => {
           fetchPublicSignals({ assetClass: 'commodities', limit: 8, tradeStatus: 'active' }),
         ]);
         if (cancelled) return;
-        setForexSignals(fx.items?.length ? mapRows(fx.items) : fallbackForex);
+        setPremiumAccess(!!(fx.premiumAccess || crypto.premiumAccess || commodities.premiumAccess));
+        setForexSignals(mapRows(fx.items || []));
         const merged = [...(commodities.items || []), ...(crypto.items || [])];
-        setCryptoGoldSignals(merged.length ? mapRows(merged).slice(0, 8) : fallbackCryptoGold);
+        setCryptoGoldSignals(mapRows(merged).slice(0, 8));
       } catch {
         if (!cancelled) {
           setForexSignals(fallbackForex);
@@ -152,6 +163,23 @@ const RewardsAndBenefits: React.FC = () => {
       cancelled = true;
     };
   }, []);
+
+  const handlePremiumCta = () => {
+    if (isAuthenticated) {
+      if (premiumAccess || user?.hasPremiumSignals || user?.premiumSignalsAccess) {
+        navigate('/user-panel/signals');
+        return;
+      }
+      navigate('/user-panel/live-accounts');
+      return;
+    }
+    openRegister({ returnTo: '/user-panel/signals', redirectAfterLogin: true });
+  };
+
+  const ctaText =
+    premiumAccess || user?.hasPremiumSignals || user?.premiumSignalsAccess
+      ? 'Open my signals'
+      : 'Unlock premium signals';
 
   const tabs = [
     { id: 'Signals', label: t('signals.tab1') },
@@ -172,7 +200,8 @@ const RewardsAndBenefits: React.FC = () => {
               title={t('signals.recent')}
               isLive
               signals={activeSignals}
-              ctaText="Get Premium Signals"
+              ctaText={ctaText}
+              onCtaClick={handlePremiumCta}
             />
             <SignalPerformance />
           </CardsWrapper>
@@ -184,7 +213,8 @@ const RewardsAndBenefits: React.FC = () => {
               title={t('signals.recent')}
               isLive
               signals={activeSignals}
-              ctaText="Get Premium Signals"
+              ctaText={ctaText}
+              onCtaClick={handlePremiumCta}
             />
           </CardsWrapper>
         );
@@ -201,7 +231,8 @@ const RewardsAndBenefits: React.FC = () => {
               title={t('signals.recent')}
               isLive
               signals={activeSignals}
-              ctaText="Get Premium Signals"
+              ctaText={ctaText}
+              onCtaClick={handlePremiumCta}
             />
             <SignalPerformance />
           </CardsWrapper>

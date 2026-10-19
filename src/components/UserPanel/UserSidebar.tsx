@@ -10,7 +10,7 @@ import {
   FiHome, FiUser, FiAward, FiTrendingUp, FiVideo, FiBook, FiFileText,
   FiMessageSquare, FiSettings, FiLogOut, FiBarChart2, FiCalendar, FiX, FiBell,
   FiDollarSign, FiGlobe, FiShield, FiUserPlus, FiShuffle, FiLink, FiStar, FiAlertTriangle, FiUsers, FiShare2,
-  FiMessageCircle, FiLifeBuoy, FiZap,
+  FiMessageCircle, FiLifeBuoy, FiZap, FiGift,
 } from 'react-icons/fi';
 
 const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
@@ -298,7 +298,10 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
           {link('/user-panel/alerts', t("panel.alerts"), FiBell)}
           {link('/user-panel/profile', t("panel.profile"), FiUser)}
           {link('/user-panel/verification', t("panel.verification"), FiShield, false, kycBadge)}
+          {link('/user-panel/rewards', 'Rewards & streak', FiStar)}
           {link('/user-panel/contests', t("panel.contests"), FiAward)}
+          {link('/leaderboard', 'Leaderboard', FiBarChart2)}
+          {link('/rewards', 'Public rewards', FiGift)}
           {link('/user-panel/signals', t("panel.signals"), FiTrendingUp)}
           {link('/user-panel/rebates', t("panel.rebates"), FiDollarSign)}
           {link('/user-panel/live-accounts', t("panel.liveAccounts"), FiLink)}
@@ -307,7 +310,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ isOpen, onToggle }) => {
           {link('/user-panel/trader-profile', t("panel.traderProfile"), FiUsers)}
           {link('/user-panel/copy-trading', t("panel.copyTrading"), FiShare2)}
           {link('/user-panel/strategies', t("panel.strategies"), FiTrendingUp)}
-          {link('/user-panel/streak', t("panel.streak"), FiZap)}
+          {link('/streaks', 'Public streaks', FiGlobe)}
         </NavSection>
 
         <NavSection>

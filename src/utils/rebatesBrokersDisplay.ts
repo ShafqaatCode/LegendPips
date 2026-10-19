@@ -1,20 +1,14 @@
 import type { ApiBroker } from '../services/brokerService';
-import ICLogo from '../assets/icons/Ellipse 2.png';
-import XtremeLogo from '../assets/TradeMarketBrands/Ellipse 2.png';
-import XmLogo from '../assets/TradeMarketBrands/Ellipse 2-1.png';
-import ExnessLogo from '../assets/TradeMarketBrands/Ellipse 2-2.png';
-import FpLogo from '../assets/TradeMarketBrands/Ellipse 2-3.png';
-import FocusLogo from '../assets/TradeMarketBrands/Ellipse 1.png';
-import { normalizeBrokerLogoUrl } from './brokerLogoUrl';
+import { bundledBrokerLogo, normalizeBrokerLogoUrl, resolveBrokerLogoUrl } from './brokerLogoUrl';
 
 /** When API `logoUrl` is empty, use the same bundled assets as legacy brokers_data.tsx */
 export const REBATES_BROKER_FALLBACK_LOGOS: Record<string, string> = {
-  'IC Market': ICLogo,
-  'XTREAME Market': XtremeLogo,
-  'XM Market': XmLogo,
-  'EXNESS Market': ExnessLogo,
-  'FP Market': FpLogo,
-  'FOCUS Market': FocusLogo,
+  'IC Market': bundledBrokerLogo('IC Market'),
+  'XTREAME Market': bundledBrokerLogo('XTREAME Market'),
+  'XM Market': bundledBrokerLogo('XM Market'),
+  'EXNESS Market': bundledBrokerLogo('EXNESS Market'),
+  'FP Market': bundledBrokerLogo('FP Market'),
+  'FOCUS Market': bundledBrokerLogo('FOCUS Market'),
 };
 
 export type RebateBrokerCardRow = {
@@ -34,11 +28,16 @@ export type RebateBrokerCardRow = {
   temporarilyDisabled?: boolean;
 };
 
+function fallbackLogoAsset(name?: string): string | undefined {
+  return bundledBrokerLogo(name) || undefined;
+}
+
 export function mapApiBrokerToRebateCardRow(b: ApiBroker): RebateBrokerCardRow {
   const logoSrc =
+    resolveBrokerLogoUrl(b.logoUrl, b.name, { preferBundled: true }) ||
+    fallbackLogoAsset(b.name) ||
     normalizeBrokerLogoUrl(b.logoUrl) ||
-    REBATES_BROKER_FALLBACK_LOGOS[b.name] ||
-    ICLogo;
+    bundledBrokerLogo('IC Market');
   const liveCount = b.reviewStats?.count || 0;
   const rating = liveCount
     ? Math.round(b.reviewStats?.average || 0)

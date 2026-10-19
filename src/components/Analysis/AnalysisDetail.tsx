@@ -6,6 +6,7 @@ import type { Analysis } from '../../types/analysis.types';
 import XMBanner from '../Signals/XMBanner';
 import ArrowRight from '../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg';
 import { ArticleDetailSkeleton } from '../SharedComponents/Shimmer';
+import { resolveMediaUrl } from '../../utils/mediaUrl';
 
 const DetailWrapper = styled.section`
   background: #fafbfc;
@@ -359,6 +360,8 @@ const AnalysisDetail: React.FC = () => {
   const [latestAnalysis, setLatestAnalysis] = useState<Analysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [featuredBroken, setFeaturedBroken] = useState(false);
+  const [chartBroken, setChartBroken] = useState(false);
 
   // Get category from URL params if it's an external article
   const searchParams = new URLSearchParams(location.search);
@@ -380,6 +383,8 @@ const AnalysisDetail: React.FC = () => {
       // Pass category for external articles
       const data = await fetchAnalysisById(id, category);
       setAnalysis(data);
+      setFeaturedBroken(false);
+      setChartBroken(false);
     } catch (err: any) {
       setError(err.message || 'Failed to load analysis');
       console.error('Error loading analysis:', err);
@@ -491,8 +496,12 @@ const AnalysisDetail: React.FC = () => {
         <ContentWrapper>
           <MainContent>
             <HeaderImage>
-              {analysis.featuredImage ? (
-                <HeaderImageContent src={analysis.featuredImage} alt={analysis.title} />
+              {resolveMediaUrl(analysis.featuredImage) && !featuredBroken ? (
+                <HeaderImageContent
+                  src={resolveMediaUrl(analysis.featuredImage)}
+                  alt={analysis.title}
+                  onError={() => setFeaturedBroken(true)}
+                />
               ) : (
                 <PlaceholderHeader>{analysis.category.charAt(0)}</PlaceholderHeader>
               )}
@@ -515,14 +524,18 @@ const AnalysisDetail: React.FC = () => {
               ))}
             </Content>
 
-            {analysis.chartImage && (
+            {resolveMediaUrl(analysis.chartImage) && !chartBroken && (
               <ChartSection>
                 {analysis.chartTitle && <ChartTitle>{analysis.chartTitle}</ChartTitle>}
-                <ChartImage src={analysis.chartImage} alt={analysis.chartTitle || 'Chart'} />
+                <ChartImage
+                  src={resolveMediaUrl(analysis.chartImage)}
+                  alt={analysis.chartTitle || 'Chart'}
+                  onError={() => setChartBroken(true)}
+                />
               </ChartSection>
             )}
 
-            {!analysis.chartImage && analysis.chartTitle && (
+            {((!resolveMediaUrl(analysis.chartImage) || chartBroken) && analysis.chartTitle) && (
               <ChartSection>
                 <ChartTitle>{analysis.chartTitle}</ChartTitle>
                 <PlaceholderChart>Chart will be displayed here</PlaceholderChart>

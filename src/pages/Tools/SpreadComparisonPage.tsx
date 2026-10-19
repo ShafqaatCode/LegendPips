@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { FiArrowRight, FiBarChart2, FiSearch } from "react-icons/fi";
 import bannerBg from "../../assets/banner/BannerBg.jpg";
 import CompareToggle from "../../components/Broker/CompareToggle";
-import MyfxbookSpreadWidget from "../../components/MarketCharts/MyfxbookSpreadWidget";
+import LiveForexSpreadsDesk from "../../components/MarketCharts/LiveForexSpreadsDesk";
 import { fetchBrokersPage, type ApiBroker } from "../../services/brokerService";
 import { brokerBestSpreadPips, formatSpreadRank, parseMoneyishNumber, parseSpreadPips } from "../../utils/spreadComparison";
 import { normalizeBrokerLogoUrl } from "../../utils/brokerLogoUrl";
@@ -84,8 +84,8 @@ const SpreadComparisonPage: React.FC = () => {
           </Eyebrow>
           <Title>Spread comparison</Title>
           <Lead>
-            Live MyFXBook forex spreads plus LegendPips broker advertised spreads — compare real-time quotes and
-            our partner listings side by side.
+            Live forex spreads across major brokers, plus LegendPips advertised spreads — compare real-time
+            quotes and partner listings side by side.
           </Lead>
           <HeroLinks>
             <HeroLink to="/compare">
@@ -99,21 +99,7 @@ const SpreadComparisonPage: React.FC = () => {
 
       <Page>
         <WidgetSection>
-          <SectionHeading>
-            <h2>Live forex spreads</h2>
-            <p>
-              Real-time broker spread comparison powered by{" "}
-              <a
-                href="https://www.myfxbook.com/get-widget/18/broker_widgets"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                MyFXBook
-              </a>
-              . Best cells trend green; wider spreads trend red.
-            </p>
-          </SectionHeading>
-          <MyfxbookSpreadWidget height={640} />
+          <LiveForexSpreadsDesk height={760} defaultMode="all" />
         </WidgetSection>
 
         <SectionHeading>

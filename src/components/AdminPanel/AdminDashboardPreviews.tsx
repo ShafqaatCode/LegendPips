@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import {
-  FiUsers, FiAward, FiShield, FiInbox, FiActivity, FiClock, FiUserPlus, FiShuffle, FiSearch,
+  FiUsers, FiAward, FiShield, FiInbox, FiActivity, FiClock, FiUserPlus, FiShuffle, FiSearch, FiTrendingUp,
 } from 'react-icons/fi';
 import type { DashboardPreviews } from '../../services/adminEngagementService';
 import { KYC_STATUS_LABELS, type KycStatus } from '../../services/kycService';
@@ -369,6 +369,43 @@ const AdminDashboardPreviews: React.FC<AdminDashboardPreviewsProps> = ({ preview
                 <Right>
                   <Pill $variant="pending">Pending</Pill>
                   <span className="time"><FiClock /> {fmtDate(u.submittedAt)}</span>
+                </Right>
+              </Row>
+            ))
+          )}
+        </SectionBody>
+      </Card>
+
+      <Card>
+        <SectionHead>
+          <h2>
+            <HeadIcon><FiTrendingUp /></HeadIcon>
+            Pending strategies
+            <CountBadge>{(previews.pendingStrategies || []).length}</CountBadge>
+          </h2>
+          <ShowAllBtn type="button" onClick={() => navigate('/admin-panel/strategies')}>
+            Show all →
+          </ShowAllBtn>
+        </SectionHead>
+        <SectionBody style={{ paddingTop: 0, flex: 1 }}>
+          {(previews.pendingStrategies || []).length === 0 ? (
+            <EmptyPreview>No strategies waiting for review</EmptyPreview>
+          ) : (
+            (previews.pendingStrategies || []).map((s) => (
+              <Row key={s.id} type="button" onClick={() => navigate('/admin-panel/strategies')}>
+                <Avatar $tone="linear-gradient(135deg, #6366f1, #4338ca)">
+                  {(s.title || 'S').slice(0, 2).toUpperCase()}
+                </Avatar>
+                <RowMain>
+                  <div className="title">{s.title}</div>
+                  <div className="sub">
+                    {s.authorName || 'Trader'}
+                    {s.authorEmail ? ` · ${s.authorEmail}` : ''}
+                  </div>
+                </RowMain>
+                <Right>
+                  <Pill $variant="pending">Pending</Pill>
+                  <span className="time"><FiClock /> {fmtDate(s.createdAt)}</span>
                 </Right>
               </Row>
             ))

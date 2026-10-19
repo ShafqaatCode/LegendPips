@@ -55,6 +55,8 @@ type Signal = {
   tp: string;
   sl: string;
   status: 'buy' | 'sell';
+  premium?: boolean;
+  locked?: boolean;
 };
 
 interface SignalsSectionProps {

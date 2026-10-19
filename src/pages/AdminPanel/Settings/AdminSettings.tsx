@@ -367,7 +367,7 @@ const AdminSettings: React.FC = () => {
               <PanelHead><div><h2>Registration & Access</h2><p>Control sign-ups and email verification</p></div></PanelHead>
               <PanelBody style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <ToggleRow>
-                  <div className="info"><strong>Allow new registrations</strong><span>When off, the register form is blocked</span></div>
+                  <div className="info"><strong>Allow new registrations</strong><span>Must be ON for the register page to accept sign-ups (separate from maintenance mode)</span></div>
                   <input type="checkbox" checked={settings.allowRegistrations} onChange={(e) => setSettings({ ...settings, allowRegistrations: e.target.checked })} />
                 </ToggleRow>
                 <ToggleRow>
@@ -375,7 +375,7 @@ const AdminSettings: React.FC = () => {
                   <input type="checkbox" checked={settings.emailVerificationEnabled} onChange={(e) => setSettings({ ...settings, emailVerificationEnabled: e.target.checked })} />
                 </ToggleRow>
                 <ToggleRow>
-                  <div className="info"><strong>Maintenance mode</strong><span>Blocks registration and shows maintenance message</span></div>
+                  <div className="info"><strong>Maintenance mode</strong><span>Also blocks new registration and shows a maintenance banner on the register form</span></div>
                   <input type="checkbox" checked={settings.maintenanceMode} onChange={(e) => setSettings({ ...settings, maintenanceMode: e.target.checked })} />
                 </ToggleRow>
                 <PrimaryButton disabled={saving} style={{ marginTop: '0.5rem', alignSelf: 'flex-start' }} onClick={() => persistSettings({

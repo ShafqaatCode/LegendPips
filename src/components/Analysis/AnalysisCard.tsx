@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import type { Analysis } from '../../types/analysis.types';
+import { resolveMediaUrl } from '../../utils/mediaUrl';
 
 const Card = styled.div`
   background: white;
@@ -139,6 +140,11 @@ interface AnalysisCardProps {
 
 const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysis, featured = false }) => {
   const navigate = useNavigate();
+  const [imageSrc, setImageSrc] = useState(() => resolveMediaUrl(analysis.featuredImage));
+
+  useEffect(() => {
+    setImageSrc(resolveMediaUrl(analysis.featuredImage));
+  }, [analysis.featuredImage]);
 
   const formatDate = (dateString: string | Date | undefined) => {
     if (!dateString) return 'Date not available';
@@ -206,8 +212,8 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysis, featured = false 
   return (
     <Card onClick={handleClick}>
       <ImageWrapper $featured={featured}>
-        {analysis.featuredImage ? (
-          <Image src={analysis.featuredImage} alt={analysis.title} />
+        {imageSrc ? (
+          <Image src={imageSrc} alt={analysis.title} onError={() => setImageSrc("")} />
         ) : (
           <PlaceholderImage>
             {analysis.category.charAt(0)}

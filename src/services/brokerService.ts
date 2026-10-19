@@ -1,5 +1,5 @@
 import type { AccountType, Broker, Review } from "../components/AccountSetup2/BrokerListingPage";
-import { API_CONFIG, getAuthHeaders } from "../utils/apiConfig";
+import { API_CONFIG, getAuthHeaders, getAuthHeadersMultipart } from "../utils/apiConfig";
 
 export interface RebateCashbackRow {
   accountType: string;
@@ -323,6 +323,24 @@ export const adminDeleteBroker = async (id: string): Promise<void> => {
     headers: getAuthHeaders(),
   });
 };
+
+/** Upload broker icon (PNG/JPG/WebP/SVG). Optionally attach to existing broker id. */
+export async function adminUploadBrokerLogo(
+  file: File,
+  brokerId?: string
+): Promise<{ url: string; broker?: ApiBroker }> {
+  const fd = new FormData();
+  fd.append("logo", file);
+  if (brokerId) fd.append("brokerId", brokerId);
+  const res = await fetch(`${API_CONFIG.BASE_URL}/brokers/admin/logo-upload`, {
+    method: "POST",
+    headers: getAuthHeadersMultipart(),
+    body: fd,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Logo upload failed");
+  return { url: data.url as string, broker: data.broker as ApiBroker | undefined };
+}
 
 export const adminGetBroker = async (id: string): Promise<ApiBroker> => {
   const data = await fetchJson(`${API_CONFIG.BASE_URL}/brokers/admin/${id}`, { headers: getAuthHeaders() });

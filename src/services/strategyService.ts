@@ -70,7 +70,7 @@ type Paginated<T> = {
   };
 };
 
-const json = async (res: Response) => {
+const json = async (res: Response): Promise<any> => {
   const data = await parseJsonResponse<{ message?: string }>(res);
   assertApiOk(res, data, `Strategies API failed (HTTP ${res.status})`);
   return data;

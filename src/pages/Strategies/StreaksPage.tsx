@@ -33,9 +33,11 @@ const StreaksPage: React.FC = () => {
             and climb the discipline leaderboard with fellow traders.
           </p>
           <HeroActions>
-            <Cta to="/user-panel/streak">
+            <Cta to="/user-panel/rewards#trading-streak">
               <FiZap /> Start my streak
             </Cta>
+            <Ghost to="/leaderboard">Full leaderboard</Ghost>
+            <Ghost to="/user-panel/rewards">Rewards & LP</Ghost>
             <Ghost to="/strategies">Browse strategies</Ghost>
           </HeroActions>
         </HeroInner>
@@ -55,7 +57,7 @@ const StreaksPage: React.FC = () => {
         {!loading && items.length === 0 && (
           <Empty>
             No public streaks yet.{" "}
-            <Link to="/user-panel/streak">
+            <Link to="/user-panel/rewards#trading-streak">
               <FiPlus /> Check in today
             </Link>
           </Empty>

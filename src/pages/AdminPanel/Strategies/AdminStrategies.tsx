@@ -26,8 +26,25 @@ import {
   ErrorBanner,
   adminColors,
 } from "../../../components/AdminPanel/adminUi";
+import { useAuth } from "../../../contexts/AuthContext";
+import { isFullAdmin } from "../../../utils/adminPermissions";
+import styled from "styled-components";
+
+const StaffNote = styled.div`
+  margin-bottom: 0.85rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  background: rgba(251, 193, 19, 0.12);
+  border: 1px solid rgba(251, 193, 19, 0.35);
+  color: ${adminColors.navy};
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.4;
+`;
 
 const AdminStrategies: React.FC = () => {
+  const { user } = useAuth();
+  const canApprove = isFullAdmin(user);
   const [status, setStatus] = useState("pending");
   const [items, setItems] = useState<TradingStrategy[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,11 +85,18 @@ const AdminStrategies: React.FC = () => {
           <PageTitle>
             <FiTrendingUp /> Strategies
           </PageTitle>
-          <PageSubtitle>Review member-shared trading strategies before they go public</PageSubtitle>
+          <PageSubtitle>
+            Member strategies stay pending until a full admin approves — staff can review and reject spam.
+          </PageSubtitle>
         </PageTitleGroup>
       </PageHeader>
 
       {error && <ErrorBanner>{error}</ErrorBanner>}
+      {!canApprove && (
+        <StaffNote>
+          You can review and reject strategies. Public approval requires a full admin account (anti-spam).
+        </StaffNote>
+      )}
 
       <FilterBar>
         <select
@@ -132,7 +156,7 @@ const AdminStrategies: React.FC = () => {
                       </Pill>
                     </Td>
                     <Td>
-                      {row.moderationStatus !== "approved" && (
+                      {row.moderationStatus !== "approved" && canApprove && (
                         <GhostButton $sm type="button" onClick={() => moderate(row.id, "approved")}>
                           <FiCheck /> Approve
                         </GhostButton>

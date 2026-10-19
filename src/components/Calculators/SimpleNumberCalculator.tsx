@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   CalcPage,
   CalcContainer,
@@ -12,27 +12,93 @@ import {
   CalcInput,
   CalcButtonRow,
   CalcButton,
-  CalcResult,
   CalcError,
+  CalcHint,
 } from "./calculatorStyles";
+import CalcOutput, { type CalcMetric } from "./CalcOutput";
 
-export type SimpleField = { key: string; label: string; defaultValue?: string };
+export type SimpleField = {
+  key: string;
+  label: string;
+  defaultValue?: string;
+  step?: string;
+  min?: string;
+};
+
+export type ComputeOk = { ok: true; metrics: CalcMetric[]; heading?: string };
+export type ComputeFail = { ok: false; error: string };
 
 type Props = {
   title: string;
   description: string;
   fields: SimpleField[];
-  compute: (values: Record<string, number>) => { ok: true; text: string } | { ok: false; error: string };
+  compute: (values: Record<string, number>) => ComputeOk | ComputeFail;
+  live?: boolean;
+  hint?: string;
 };
 
-const SimpleNumberCalculator: React.FC<Props> = ({ title, description, fields, compute }) => {
-  const initial = useMemo(
-    () => Object.fromEntries(fields.map((f) => [f.key, f.defaultValue || ""])),
-    [fields]
-  );
-  const [values, setValues] = useState<Record<string, string>>(initial);
-  const [result, setResult] = useState<string | null>(null);
+function buildInitial(fields: SimpleField[]): Record<string, string> {
+  return Object.fromEntries(fields.map((f) => [f.key, f.defaultValue ?? ""]));
+}
+
+const SimpleNumberCalculator: React.FC<Props> = ({
+  title,
+  description,
+  fields,
+  compute,
+  live = true,
+  hint,
+}) => {
+  const fieldKeys = fields.map((f) => f.key).join("|");
+  const [values, setValues] = useState<Record<string, string>>(() => buildInitial(fields));
+  const [metrics, setMetrics] = useState<CalcMetric[]>([]);
+  const [heading, setHeading] = useState("Your result");
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setValues(buildInitial(fields));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset when field keys change
+  }, [fieldKeys]);
+
+  const run = (src: Record<string, string> = values) => {
+    const nums: Record<string, number> = {};
+    for (const f of fields) {
+      const raw = (src[f.key] ?? "").trim();
+      if (raw === "") {
+        setError(`Enter a value for ${f.label}.`);
+        setMetrics([]);
+        return;
+      }
+      const n = Number(raw);
+      if (!Number.isFinite(n)) {
+        setError(`Enter a valid number for ${f.label}.`);
+        setMetrics([]);
+        return;
+      }
+      nums[f.key] = n;
+    }
+    try {
+      const out = compute(nums);
+      if (!out.ok) {
+        setError(out.error);
+        setMetrics([]);
+        return;
+      }
+      setError(null);
+      setMetrics(out.metrics);
+      setHeading(out.heading || "Your result");
+    } catch {
+      setError("Could not calculate. Check your inputs.");
+      setMetrics([]);
+    }
+  };
+
+  useEffect(() => {
+    if (!live) return;
+    const id = window.setTimeout(() => run(values), 100);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values, live, fieldKeys]);
 
   return (
     <CalcPage>
@@ -43,24 +109,7 @@ const SimpleNumberCalculator: React.FC<Props> = ({ title, description, fields, c
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              const nums: Record<string, number> = {};
-              for (const f of fields) {
-                const n = parseFloat(values[f.key]);
-                if (!Number.isFinite(n)) {
-                  setError(`Enter a valid number for ${f.label}.`);
-                  setResult(null);
-                  return;
-                }
-                nums[f.key] = n;
-              }
-              const out = compute(nums);
-              if (!out.ok) {
-                setError(out.error);
-                setResult(null);
-                return;
-              }
-              setError(null);
-              setResult(out.text);
+              run();
             }}
           >
             <CalcFormRow>
@@ -70,7 +119,11 @@ const SimpleNumberCalculator: React.FC<Props> = ({ title, description, fields, c
                     <CalcLabel htmlFor={f.key}>{f.label}</CalcLabel>
                     <CalcInput
                       id={f.key}
-                      value={values[f.key] || ""}
+                      type="number"
+                      inputMode="decimal"
+                      step={f.step || "any"}
+                      min={f.min}
+                      value={values[f.key] ?? ""}
                       onChange={(e) => setValues((p) => ({ ...p, [f.key]: e.target.value }))}
                     />
                   </CalcField>
@@ -81,8 +134,9 @@ const SimpleNumberCalculator: React.FC<Props> = ({ title, description, fields, c
               <CalcButton type="submit">Calculate</CalcButton>
             </CalcButtonRow>
           </form>
-          {error && <CalcError>{error}</CalcError>}
-          {result && <CalcResult>{result}</CalcResult>}
+          {error && <CalcError role="alert">{error}</CalcError>}
+          {metrics.length > 0 && <CalcOutput heading={heading} metrics={metrics} />}
+          {hint && <CalcHint>{hint}</CalcHint>}
         </CalcCard>
       </CalcContainer>
     </CalcPage>

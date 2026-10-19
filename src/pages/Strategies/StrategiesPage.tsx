@@ -42,6 +42,8 @@ const StrategiesPage: React.FC = () => {
             <Ghost to="/streaks">
               <FiZap /> Trading streaks
             </Ghost>
+            <Ghost to="/leaderboard">Leaderboard</Ghost>
+            <Ghost to="/rewards">Rewards</Ghost>
           </HeroActions>
         </HeroInner>
       </Hero>

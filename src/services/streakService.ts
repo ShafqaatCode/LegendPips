@@ -18,11 +18,63 @@ export type TradingStreak = {
   lastCheckInDay?: string;
   visibility: "public" | "private";
   note?: string;
+  legendPoints?: number;
+  lifetimePoints?: number;
+  claimedMilestones?: number[];
+  shields?: number;
+  nextMilestone?: { days: number; lp: number; title: string; daysLeft: number } | null;
+  claimableMilestones?: { days: number; lp: number; title: string }[];
+  progressToNext?: { current: number; target: number };
   checkedInToday?: boolean;
   isOwner?: boolean;
   user?: StreakUser;
   createdAt?: string;
   updatedAt?: string;
+};
+
+export type RewardsDashboard = {
+  currency: string;
+  currencyLabel: string;
+  streak: TradingStreak;
+  wallet: { availableLp: number; lifetimeLp: number };
+  unlockPath: {
+    headline: string;
+    body: string;
+    unlockedCount: number;
+    totalTiers: number;
+    next: { tier: number; label: string; lpRequired: number; rewardLabel: string; eligible: number; remaining: number } | null;
+    tiers: {
+      tier: number;
+      label: string;
+      lpRequired: number;
+      rewardLabel: string;
+      eligible: number;
+      unlocked: boolean;
+      remaining: number;
+      status: string;
+    }[];
+  };
+  traderLevels: {
+    current: { id: string; level: number; name: string; minLp: number; perk: string };
+    next: { id: string; level: number; name: string; minLp: number; perk: string } | null;
+    levels: { id: string; level: number; name: string; minLp: number; perk: string; unlocked: boolean; current: boolean }[];
+    progressToNext: { current: number; target: number; remaining: number } | null;
+  };
+  earnTasks: { id: string; title: string; lp: number; done: boolean; href: string }[];
+  streakBoard: {
+    milestones: {
+      days: number;
+      lp: number;
+      title: string;
+      blurb: string;
+      claimed: boolean;
+      reached: boolean;
+      status: string;
+    }[];
+    graceHours: number;
+    checkInLp: number;
+    shieldEveryDays: number;
+  };
 };
 
 type Paginated<T> = {
@@ -36,7 +88,7 @@ type Paginated<T> = {
   };
 };
 
-const json = async (res: Response) => {
+const json = async (res: Response): Promise<any> => {
   const data = await parseJsonResponse<{ message?: string }>(res);
   assertApiOk(res, data, `Streaks API failed (HTTP ${res.status})`);
   return data;
@@ -55,6 +107,22 @@ export async function fetchMyStreak() {
   const res = await fetch(`${API_CONFIG.BASE_URL}/streaks/me`, { headers: getAuthHeaders() });
   const data = await json(res);
   return data.streak as TradingStreak;
+}
+
+export async function fetchMyRewardsDashboard() {
+  const res = await fetch(`${API_CONFIG.BASE_URL}/streaks/me/rewards`, { headers: getAuthHeaders() });
+  const data = await json(res);
+  return data as RewardsDashboard & { success: boolean };
+}
+
+export async function claimStreakMilestone(days: number) {
+  const res = await fetch(`${API_CONFIG.BASE_URL}/streaks/me/milestones/claim`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ days }),
+  });
+  const data = await json(res);
+  return { streak: data.streak as TradingStreak, message: data.message as string | undefined };
 }
 
 export async function updateMyStreak(body: {

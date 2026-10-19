@@ -15,6 +15,7 @@ import { hasPermission, isFullAdmin } from '../../utils/adminPermissions';
 import { useLocale } from '../../contexts/LocaleContext';
 import { useSiteLogo } from '../../contexts/SiteConfigContext';
 import { connectChatSocket, fetchAdminChatConversations } from '../../services/chatService';
+import { adminFetchStrategies } from '../../services/strategyService';
 
 const SidebarWrapper = styled.aside<{ $isOpen: boolean }>`
   position: fixed;
@@ -297,6 +298,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
   const [usersOpen, setUsersOpen] = useState(isUsersSection);
   const [kycOpen, setKycOpen] = useState(isKycSection);
   const [chatUnread, setChatUnread] = useState(0);
+  const [strategiesPending, setStrategiesPending] = useState(0);
 
   useEffect(() => {
     if (isUsersSection) setUsersOpen(true);
@@ -309,6 +311,29 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
   const show = (...perms: string[]) => hasPermission(user, ...perms);
   const full = isFullAdmin(user);
   const canLiveChat = show('live_chat');
+  const canStrategies = show('strategies');
+
+  useEffect(() => {
+    if (!canStrategies) {
+      setStrategiesPending(0);
+      return;
+    }
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const data = await adminFetchStrategies(1, 'pending');
+        if (!cancelled) setStrategiesPending(data.pagination?.totalItems ?? data.items?.length ?? 0);
+      } catch {
+        // ignore
+      }
+    };
+    load();
+    const timer = window.setInterval(load, 20000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, [canStrategies, location.pathname]);
 
   useEffect(() => {
     if (!canLiveChat) {
@@ -478,6 +503,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
         <NavSection>
           <SectionTitle>{t("panel.content")}</SectionTitle>
           {show('brokers') && link('/admin-panel/brokers', t("panel.brokers"), FiDatabase)}
+          {show('brokers') && link('/admin-panel/prop-firms', "Prop Firms", FiAward)}
           {show('brokers') && link('/admin-panel/broker-reviews', t("panel.brokerReviews"), FiStar)}
           {show('brokers') && link('/admin-panel/signup-bonuses', "Signup Bonuses", FiDollarSign)}
           {show('analysis') && link('/admin-panel/performing-stocks', "Performing Stocks", FiTrendingUp)}
@@ -507,7 +533,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
           {show('live_accounts') && link('/admin-panel/live-accounts', t("panel.qlLive"), FiLink)}
           {show('rebates') && link('/admin-panel/rebate-credits', t("nav.rebates"), FiDollarSign)}
           {show('traders') && link('/admin-panel/traders', t("nav.traders"), FiUsers)}
-          {show('strategies') && link('/admin-panel/strategies', 'Strategies', FiTrendingUp)}
+          {show('strategies') && link('/admin-panel/strategies', 'Strategies', FiTrendingUp, false, strategiesPending)}
           {show('reports') && link('/admin-panel/reports', t("panel.reports"), FiBarChart2)}
           {link('/admin-panel/security', t("panel.security"), FiShield)}
           {show('settings') && link('/admin-panel/settings', t("panel.settings"), FiSettings)}

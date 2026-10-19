@@ -58,6 +58,7 @@ export type PlatformMetrics = {
   complaintsResolved?: number;
   complaintsLast7d?: number;
   liveChatUnread?: number;
+  strategiesPending?: number;
 };
 
 export type DashboardPreviews = {
@@ -122,6 +123,26 @@ export type DashboardPreviews = {
     status: string;
     createdAt?: string;
     time?: string;
+  }[];
+  recentLiveAccounts?: {
+    id: string;
+    userName?: string;
+    userEmail?: string;
+    brokerName?: string;
+    status?: string;
+    createdAt?: string;
+    time?: string;
+  }[];
+  pendingStrategies?: {
+    id: string;
+    title: string;
+    summary?: string;
+    markets?: string[];
+    timeframe?: string;
+    riskLevel?: string;
+    createdAt?: string;
+    authorName?: string;
+    authorEmail?: string;
   }[];
 };
 

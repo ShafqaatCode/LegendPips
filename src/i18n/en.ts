@@ -27,6 +27,9 @@ export type Messages = {
     complaints: string;
     signals: string;
     rewards: string;
+    leaderboard: string;
+    strategies: string;
+    streaks: string;
     analysis: string;
     news: string;
     support: string;
@@ -133,6 +136,9 @@ export const en: Messages = {
     complaints: "Complaints",
     signals: "Signals",
     rewards: "Rewards",
+    leaderboard: "Leaderboard",
+    strategies: "Strategies",
+    streaks: "Streaks",
     analysis: "Analysis",
     news: "News",
     support: "Support",

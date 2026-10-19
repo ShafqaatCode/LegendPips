@@ -67,6 +67,9 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
   }, []);
 
   const emailVerificationRequired = regConfig?.emailVerificationRequired !== false;
+  const maintenanceMode = regConfig?.maintenanceMode === true;
+  const registrationsClosed = regConfig?.allowRegistrations === false;
+  const registerBlocked = maintenanceMode || registrationsClosed;
 
   useEffect(() => {
     if (otpCooldown <= 0) return;
@@ -77,6 +80,14 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
   }, [otpCooldown]);
 
   const onGoogleClick = async () => {
+    if (registerBlocked) {
+      setError(
+        maintenanceMode
+          ? "The platform is in maintenance mode. Registration is temporarily closed."
+          : "New registrations are currently disabled."
+      );
+      return;
+    }
     setIsLoading(true);
     setError("");
     setSuccess("");
@@ -106,6 +117,14 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
   };
 
   const handleSendOtp = async () => {
+    if (registerBlocked) {
+      setError(
+        maintenanceMode
+          ? "The platform is in maintenance mode. Registration is temporarily closed."
+          : "New registrations are currently disabled."
+      );
+      return;
+    }
     const email = getValues("email") as string | undefined;
     setError("");
     setSuccess("");
@@ -133,6 +152,16 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
     setIsLoading(true);
     setError("");
     setSuccess("");
+
+    if (registerBlocked) {
+      setError(
+        maintenanceMode
+          ? "The platform is in maintenance mode. Registration is temporarily closed."
+          : "New registrations are currently disabled."
+      );
+      setIsLoading(false);
+      return;
+    }
 
     if (data.password !== data.confirmPassword) {
       setError(t("panel.authPassMatch"));
@@ -179,12 +208,49 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
         <FaX size={"16px"} />
       </CloseBtn>
       <Heading>{t("panel.authRegister")}</Heading>
-      {referralFromUrl ? (
+
+      {registerBlocked ? (
+        <div style={{ padding: "0.75rem 0 1.25rem", textAlign: "center" }}>
+          <p
+            style={{
+              margin: "0 0 0.35rem",
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "#FBC113",
+            }}
+          >
+            {maintenanceMode ? "Maintenance mode" : "Registrations closed"}
+          </p>
+          <p
+            style={{
+              margin: 0,
+              padding: "0.95rem 1rem",
+              borderRadius: 12,
+              background: maintenanceMode ? "#fff7ed" : "#fef2f2",
+              border: `1px solid ${maintenanceMode ? "#fed7aa" : "#fecaca"}`,
+              color: maintenanceMode ? "#9a3412" : "#b91c1c",
+              fontSize: 14,
+              lineHeight: 1.55,
+              fontWeight: 600,
+            }}
+          >
+            {maintenanceMode
+              ? "We're doing a quick upgrade. New registrations are temporarily closed — please check back soon."
+              : "New registrations are currently disabled. Please check back later or contact support."}
+          </p>
+        </div>
+      ) : null}
+
+      {referralFromUrl && !registerBlocked ? (
         <p style={{ margin: "0 0 0.75rem", fontSize: 13, color: "#64748b" }}>
           Invite code applied: <strong style={{ color: "#132E58" }}>{referralFromUrl}</strong>
         </p>
       ) : null}
 
+      {!registerBlocked && (
+      <>
       <GoogleButton type="button" onClick={onGoogleClick} disabled={isLoading}>
         {t("panel.authGoogle")} <GoogleIcon src={GLogo} alt="G" />
       </GoogleButton>
@@ -285,6 +351,8 @@ const RegisterForm: React.FC<Props> = ({ onClose }) => {
           {isLoading ? t("panel.authRegistering") : t("panel.authRegister")}
         </RegisterButton>
       </form>
+      </>
+      )}
     </Container>
   );
 };

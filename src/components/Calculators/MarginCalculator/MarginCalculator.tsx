@@ -1,4 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import {
+  calculateRequiredMargin,
+  FX_PAIR_OPTIONS,
+  FX_PAIRS,
+  formatMoney,
+  type FxPair,
+} from "../../../utils/forexCalculators";
 import {
   CalcPage,
   CalcContainer,
@@ -11,24 +18,43 @@ import {
   CalcLabel,
   CalcInput,
   CalcSelect,
-  CalcButtonRow,
-  CalcButton,
-  CalcResult,
+  CalcError,
+  CalcHint,
 } from "../calculatorStyles";
+import CalcOutput from "../CalcOutput";
+
+const LEVERAGE_OPTIONS = ["50", "100", "200", "500", "1000"];
 
 const MarginCalculator: React.FC = () => {
-  const [instrument, setInstrument] = useState("XAU/USD");
-  const [depositCurrency, setDepositCurrency] = useState("USD");
-  const [currentPrice, setCurrentPrice] = useState<number>(3371.59);
-  const [contractSize, setContractSize] = useState<number>(100);
-  const [leverage, setLeverage] = useState("100:1");
-  const [result, setResult] = useState<number>(0);
+  const [pair, setPair] = useState<FxPair>("EUR/USD");
+  const [lots, setLots] = useState("1");
+  const [price, setPrice] = useState(String(FX_PAIRS["EUR/USD"].defaultPrice));
+  const [leverage, setLeverage] = useState("100");
+  const [error, setError] = useState<string | null>(null);
+  const [out, setOut] = useState<{ notionalUsd: number; marginUsd: number } | null>(null);
 
-  const calculateMargin = () => {
-    const lev = parseInt(leverage.split(":")[0], 10) || 1;
-    const margin = (currentPrice * contractSize) / lev;
-    setResult(margin);
-  };
+  useEffect(() => {
+    setPrice(String(FX_PAIRS[pair].defaultPrice));
+  }, [pair]);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      const res = calculateRequiredMargin({
+        pair,
+        lots: parseFloat(lots),
+        leverage: parseFloat(leverage),
+        price: parseFloat(price),
+      });
+      if (!res.ok) {
+        setError(res.error);
+        setOut(null);
+        return;
+      }
+      setError(null);
+      setOut(res);
+    }, 150);
+    return () => window.clearTimeout(id);
+  }, [pair, lots, leverage, price]);
 
   return (
     <CalcPage>
@@ -36,101 +62,100 @@ const MarginCalculator: React.FC = () => {
         <CalcCard>
           <CalcHeader>Margin Calculator</CalcHeader>
           <CalcDescription>
-            Determine the exact margin required to open a position by factoring in your account
-            currency, trading pair, leverage, and trade size — so you can manage risk and avoid
-            margin issues with confidence.
+            See how much margin you need to open a trade. Enter pair, lots, price, and leverage.
+            Results update as you type.
           </CalcDescription>
 
-          <form onSubmit={(e) => e.preventDefault()}>
-            <CalcFormRow>
-              <CalcFormGroup>
-                <CalcField>
-                  <CalcLabel htmlFor="instrument">Instrument</CalcLabel>
-                  <CalcSelect
-                    id="instrument"
-                    value={instrument}
-                    onChange={(e) => setInstrument(e.target.value)}
-                  >
-                    <option>XAU/USD</option>
-                    <option>EUR/USD</option>
-                    <option>GBP/USD</option>
-                  </CalcSelect>
-                </CalcField>
-              </CalcFormGroup>
+          <CalcFormRow>
+            <CalcFormGroup>
+              <CalcField>
+                <CalcLabel htmlFor="m-pair">Currency pair</CalcLabel>
+                <CalcSelect
+                  id="m-pair"
+                  value={pair}
+                  onChange={(e) => setPair(e.target.value as FxPair)}
+                >
+                  {FX_PAIR_OPTIONS.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </CalcSelect>
+              </CalcField>
+            </CalcFormGroup>
+            <CalcFormGroup>
+              <CalcField>
+                <CalcLabel htmlFor="m-lots">Trade size (lots)</CalcLabel>
+                <CalcInput
+                  id="m-lots"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  value={lots}
+                  onChange={(e) => setLots(e.target.value)}
+                />
+              </CalcField>
+            </CalcFormGroup>
+          </CalcFormRow>
 
-              <CalcFormGroup>
-                <CalcField>
-                  <CalcLabel htmlFor="currency">Deposit Currency</CalcLabel>
-                  <CalcSelect
-                    id="currency"
-                    value={depositCurrency}
-                    onChange={(e) => setDepositCurrency(e.target.value)}
-                  >
-                    <option>USD</option>
-                    <option>EUR</option>
-                    <option>GBP</option>
-                  </CalcSelect>
-                </CalcField>
-              </CalcFormGroup>
-            </CalcFormRow>
+          <CalcFormRow>
+            <CalcFormGroup>
+              <CalcField>
+                <CalcLabel htmlFor="m-price">Current price</CalcLabel>
+                <CalcInput
+                  id="m-price"
+                  type="number"
+                  min="0"
+                  step="any"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                />
+              </CalcField>
+            </CalcFormGroup>
+            <CalcFormGroup>
+              <CalcField>
+                <CalcLabel htmlFor="m-lev">Leverage</CalcLabel>
+                <CalcSelect
+                  id="m-lev"
+                  value={leverage}
+                  onChange={(e) => setLeverage(e.target.value)}
+                >
+                  {LEVERAGE_OPTIONS.map((l) => (
+                    <option key={l} value={l}>
+                      {l}:1
+                    </option>
+                  ))}
+                </CalcSelect>
+              </CalcField>
+            </CalcFormGroup>
+          </CalcFormRow>
 
-            <CalcFormRow>
-              <CalcFormGroup>
-                <CalcField>
-                  <CalcLabel htmlFor="price">Current Price</CalcLabel>
-                  <CalcInput
-                    id="price"
-                    type="number"
-                    step="0.00001"
-                    value={currentPrice}
-                    onChange={(e) => setCurrentPrice(parseFloat(e.target.value) || 0)}
-                  />
-                </CalcField>
-              </CalcFormGroup>
+          {error && <CalcError role="alert">{error}</CalcError>}
 
-              <CalcFormGroup>
-                <CalcField>
-                  <CalcLabel htmlFor="contract">Contract Size (Units)</CalcLabel>
-                  <CalcInput
-                    id="contract"
-                    type="number"
-                    step="1"
-                    value={contractSize}
-                    onChange={(e) => setContractSize(parseFloat(e.target.value) || 0)}
-                  />
-                </CalcField>
-              </CalcFormGroup>
-            </CalcFormRow>
+          {out && (
+            <CalcOutput
+              heading="Margin required"
+              metrics={[
+                {
+                  label: "Required margin",
+                  value: formatMoney(out.marginUsd),
+                  tone: "primary",
+                  note: `At ${leverage}:1 leverage`,
+                },
+                {
+                  label: "Notional value",
+                  value: formatMoney(out.notionalUsd),
+                  tone: "accent",
+                  note: "Full position size",
+                },
+              ]}
+            />
+          )}
 
-            <CalcFormRow>
-              <CalcFormGroup>
-                <CalcField>
-                  <CalcLabel htmlFor="leverage">Leverage</CalcLabel>
-                  <CalcSelect
-                    id="leverage"
-                    value={leverage}
-                    onChange={(e) => setLeverage(e.target.value)}
-                  >
-                    <option>50:1</option>
-                    <option>100:1</option>
-                    <option>200:1</option>
-                    <option>500:1</option>
-                  </CalcSelect>
-                </CalcField>
-              </CalcFormGroup>
-            </CalcFormRow>
-
-            <CalcButtonRow>
-              <CalcButton type="button" onClick={calculateMargin}>
-                Calculate
-              </CalcButton>
-              {result > 0 && (
-                <CalcResult>
-                  Result: {result.toFixed(5)} {depositCurrency}
-                </CalcResult>
-              )}
-            </CalcButtonRow>
-          </form>
+          <CalcHint>
+            Formula: margin = (price × contract size × lots) ÷ leverage. Contract size is 100,000
+            for FX and 100 for gold. Educational estimate for a USD account.
+          </CalcHint>
         </CalcCard>
       </CalcContainer>
     </CalcPage>

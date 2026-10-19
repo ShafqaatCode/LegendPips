@@ -25,6 +25,8 @@ export interface User {
   isStaffAdmin?: boolean;
   adminPermissions?: string[];
   totpEnabled?: boolean;
+  premiumSignalsAccess?: boolean;
+  hasPremiumSignals?: boolean;
 }
 
 type LoginResult =

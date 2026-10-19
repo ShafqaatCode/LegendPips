@@ -74,7 +74,11 @@ export type PanelCopy = {
   overview: string;
   thisMonth: string;
   quick: string;
+  essentials: string;
+  exploreMore: string;
   preferences: string;
+  linkAccountCta: string;
+  linkAccountDesc: string;
   qlRebates: string;
   qlRebatesD: string;
   qlLive: string;
@@ -83,6 +87,65 @@ export type PanelCopy = {
   qlInviteD: string;
   qlKyc: string;
   qlKycD: string;
+  qlSignals: string;
+  qlSignalsD: string;
+  qlTickets: string;
+  qlTicketsD: string;
+  qlStrategies: string;
+  qlStrategiesD: string;
+  qlStreak: string;
+  qlStreakD: string;
+  qlIb: string;
+  qlIbD: string;
+  qlBrokers: string;
+  qlBrokersD: string;
+  qlAlerts: string;
+  qlAlertsD: string;
+  qlChat: string;
+  qlChatD: string;
+  qlFindBroker: string;
+  qlFindBrokerD: string;
+  snapshotTitle: string;
+  rebateWallet: string;
+  rebateAvailable: string;
+  rebateMonth: string;
+  rebateLifetime: string;
+  rebateWithdraw: string;
+  streakTitle: string;
+  streakCurrent: string;
+  streakBest: string;
+  streakCheckIn: string;
+  streakCheckedIn: string;
+  streakOpen: string;
+  checklistTitle: string;
+  checkLinkAccount: string;
+  checkKyc: string;
+  checkInvite: string;
+  checkStreak: string;
+  recentActivity: string;
+  viewAllActivity: string;
+  noActivity: string;
+  liveSignals: string;
+  viewAllSignals: string;
+  noSignals: string;
+  learnTools: string;
+  toolCalendar: string;
+  toolCalendarD: string;
+  toolCourses: string;
+  toolCoursesD: string;
+  toolWebinars: string;
+  toolWebinarsD: string;
+  toolVideos: string;
+  toolVideosD: string;
+  toolContests: string;
+  toolContestsD: string;
+  toolAnalysis: string;
+  toolAnalysisD: string;
+  inviteSnapTitle: string;
+  inviteSnapDesc: string;
+  inviteSnapCta: string;
+  accountsLinked: string;
+  unreadAlerts: string;
   statContests: string;
   statSignals: string;
   statWebinars: string;
@@ -222,15 +285,78 @@ const en: PanelCopy = {
   overview: "Overview",
   thisMonth: "this month",
   quick: "Quick actions",
+  essentials: "Start here",
+  exploreMore: "Explore more",
   preferences: "Preferences",
+  linkAccountCta: "Link trading account",
+  linkAccountDesc: "Connect your broker account to start earning rebates — takes a few minutes.",
   qlRebates: "My Rebates",
   qlRebatesD: "Cashback & credits",
-  qlLive: "Live accounts",
-  qlLiveD: "Track setup requests",
+  qlLive: "Link account",
+  qlLiveD: "Submit or track live-account setup",
   qlInvite: "Invite friends",
   qlInviteD: "Earn referral rewards",
   qlKyc: "Verification",
   qlKycD: "KYC status",
+  qlSignals: "Signals",
+  qlSignalsD: "Live trade ideas",
+  qlTickets: "Support tickets",
+  qlTicketsD: "Get help from our team",
+  qlStrategies: "My strategies",
+  qlStrategiesD: "Share & manage setups",
+  qlStreak: "Trading streak",
+  qlStreakD: "Check in daily for points",
+  qlIb: "IB / broker change",
+  qlIbD: "Request an IB or broker switch",
+  qlBrokers: "Browse brokers",
+  qlBrokersD: "Compare rebate partners",
+  qlAlerts: "Price alerts",
+  qlAlertsD: "Get notified on levels",
+  qlChat: "Live chat",
+  qlChatD: "Talk to support now",
+  qlFindBroker: "Find my broker",
+  qlFindBrokerD: "Get a matched toplist",
+  snapshotTitle: "Your snapshot",
+  rebateWallet: "Rebate wallet",
+  rebateAvailable: "Available",
+  rebateMonth: "This month",
+  rebateLifetime: "Lifetime",
+  rebateWithdraw: "Withdraw",
+  streakTitle: "Trading streak",
+  streakCurrent: "Current",
+  streakBest: "Best",
+  streakCheckIn: "Check in today",
+  streakCheckedIn: "Checked in today",
+  streakOpen: "Open streak",
+  checklistTitle: "Getting started",
+  checkLinkAccount: "Link a live trading account",
+  checkKyc: "Complete identity verification",
+  checkInvite: "Invite a friend",
+  checkStreak: "Start your trading streak",
+  recentActivity: "Recent activity",
+  viewAllActivity: "View all",
+  noActivity: "No recent activity yet — explore signals and contests to get started.",
+  liveSignals: "Live signals",
+  viewAllSignals: "All signals",
+  noSignals: "No active signals right now. Check back soon.",
+  learnTools: "Learn & tools",
+  toolCalendar: "Calendar",
+  toolCalendarD: "Events & reminders",
+  toolCourses: "Courses",
+  toolCoursesD: "Structured lessons",
+  toolWebinars: "Webinars",
+  toolWebinarsD: "Live sessions",
+  toolVideos: "Videos",
+  toolVideosD: "Watch & learn",
+  toolContests: "Contests",
+  toolContestsD: "Compete & win",
+  toolAnalysis: "Analysis",
+  toolAnalysisD: "Saved insights",
+  inviteSnapTitle: "Grow with referrals",
+  inviteSnapDesc: "Share your invite link and earn when friends join LegendPips.",
+  inviteSnapCta: "Invite friends",
+  accountsLinked: "{count} linked",
+  unreadAlerts: "{count} unread",
   statContests: "Contests joined",
   statSignals: "Signal activity (logged)",
   statWebinars: "Webinars watched (logged)",
@@ -376,15 +502,37 @@ const ur = fill({
   overview: "جائزہ",
   thisMonth: "اس مہینے",
   quick: "فوری اقدامات",
+  essentials: "یہاں سے شروع کریں",
+  exploreMore: "مزید دیکھیں",
   preferences: "ترجیحات",
+  linkAccountCta: "ٹریڈنگ اکاؤنٹ لنک کریں",
+  linkAccountDesc: "ریبیٹس کمانے کے لیے اپنا بروکر اکاؤنٹ جوڑیں — چند منٹ لگتے ہیں۔",
   qlRebates: "میرے ریبیٹس",
   qlRebatesD: "کیش بیک اور کریڈٹس",
-  qlLive: "لائیو اکاؤنٹس",
-  qlLiveD: "سیٹ اپ درخواستیں ٹریک کریں",
+  qlLive: "اکاؤنٹ لنک کریں",
+  qlLiveD: "لائیو اکاؤنٹ سیٹ اپ جمع یا ٹریک کریں",
   qlInvite: "دوست مدعو کریں",
   qlInviteD: "ریفرل انعامات کمائیں",
   qlKyc: "تصدیق",
   qlKycD: "KYC سٹیٹس",
+  qlSignals: "سگنلز",
+  qlSignalsD: "لائیو ٹریڈ آئیڈیاز",
+  qlTickets: "سپورٹ ٹکٹس",
+  qlTicketsD: "ہماری ٹیم سے مدد لیں",
+  qlStrategies: "میری اسٹریٹجیز",
+  qlStrategiesD: "سیٹ اپس شیئر اور منظم کریں",
+  qlStreak: "ٹریڈنگ سٹریک",
+  qlStreakD: "پوائنٹس کے لیے روزانہ چیک اِن",
+  qlIb: "IB / بروکر تبدیل",
+  qlIbD: "IB یا بروکر تبدیلی کی درخواست",
+  qlBrokers: "بروکرز دیکھیں",
+  qlBrokersD: "ریبیٹ پارٹنرز موازنہ کریں",
+  qlAlerts: "پرائس الرٹس",
+  qlAlertsD: "لیولز پر نوٹیفکیشن",
+  qlChat: "لائیو چیٹ",
+  qlChatD: "ابھی سپورٹ سے بات کریں",
+  qlFindBroker: "میرا بروکر تلاش کریں",
+  qlFindBrokerD: "میچڈ ٹاپ لسٹ حاصل کریں",
   statContests: "شمولیت یافتہ مقابلے",
   statSignals: "سگنل سرگرمی",
   statWebinars: "دیکھے گئے ویبینارز",
@@ -524,15 +672,37 @@ const ar = fill({
   overview: "نظرة عامة",
   thisMonth: "هذا الشهر",
   quick: "إجراءات سريعة",
+  essentials: "ابدأ من هنا",
+  exploreMore: "استكشف المزيد",
   preferences: "التفضيلات",
+  linkAccountCta: "ربط حساب التداول",
+  linkAccountDesc: "اربط حساب الوسيط لبدء كسب الريبيت — يستغرق دقائق.",
   qlRebates: "ريبيتاتي",
   qlRebatesD: "كاش باك وأرصدة",
-  qlLive: "حسابات حية",
-  qlLiveD: "تتبع طلبات الإعداد",
+  qlLive: "ربط الحساب",
+  qlLiveD: "قدّم أو تابع إعداد الحساب الحي",
   qlInvite: "ادعُ أصدقاء",
   qlInviteD: "اكسب مكافآت الإحالة",
   qlKyc: "التحقق",
   qlKycD: "حالة KYC",
+  qlSignals: "الإشارات",
+  qlSignalsD: "أفكار تداول مباشرة",
+  qlTickets: "تذاكر الدعم",
+  qlTicketsD: "احصل على مساعدة الفريق",
+  qlStrategies: "استراتيجياتي",
+  qlStrategiesD: "شارك وأدر الإعدادات",
+  qlStreak: "سلسلة التداول",
+  qlStreakD: "سجّل يوميًا للنقاط",
+  qlIb: "تغيير IB / الوسيط",
+  qlIbD: "اطلب تغيير IB أو الوسيط",
+  qlBrokers: "تصفح الوسطاء",
+  qlBrokersD: "قارن شركاء الريبيت",
+  qlAlerts: "تنبيهات السعر",
+  qlAlertsD: "إشعارات عند المستويات",
+  qlChat: "دردشة مباشرة",
+  qlChatD: "تحدث مع الدعم الآن",
+  qlFindBroker: "ابحث عن وسيط",
+  qlFindBrokerD: "احصل على قائمة مطابقة",
   statContests: "مسابقات منضم إليها",
   statSignals: "نشاط الإشارات",
   statWebinars: "ندوات تمت مشاهدتها",

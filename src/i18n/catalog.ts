@@ -30,6 +30,12 @@ const ar: Messages = {
     complaints: "الشكاوى",
     signals: "الإشارات",
     rewards: "المكافآت",
+
+    leaderboard: "لوحة المتصدرين",
+
+    strategies: "الاستراتيجيات",
+
+    streaks: "السلاسل",
     analysis: "التحليل",
     news: "الأخبار",
     support: "الدعم",
@@ -135,6 +141,12 @@ const es: Messages = {
     complaints: "Quejas",
     signals: "Señales",
     rewards: "Recompensas",
+
+    leaderboard: "Clasificación",
+
+    strategies: "Estrategias",
+
+    streaks: "Rachas",
     analysis: "Análisis",
     news: "Noticias",
     support: "Soporte",
@@ -240,6 +252,12 @@ const pt: Messages = {
     complaints: "Reclamações",
     signals: "Sinais",
     rewards: "Recompensas",
+
+    leaderboard: "Ranking",
+
+    strategies: "Estratégias",
+
+    streaks: "Sequências",
     analysis: "Análise",
     news: "Notícias",
     support: "Suporte",
@@ -345,6 +363,12 @@ const id: Messages = {
     complaints: "Keluhan",
     signals: "Sinyal",
     rewards: "Hadiah",
+
+    leaderboard: "Papan peringkat",
+
+    strategies: "Strategi",
+
+    streaks: "Streak",
     analysis: "Analisis",
     news: "Berita",
     support: "Dukungan",
@@ -450,6 +474,12 @@ const vi: Messages = {
     complaints: "Khiếu nại",
     signals: "Tín hiệu",
     rewards: "Phần thưởng",
+
+    leaderboard: "Bảng xếp hạng",
+
+    strategies: "Chiến lược",
+
+    streaks: "Chuỗi",
     analysis: "Phân tích",
     news: "Tin tức",
     support: "Hỗ trợ",
@@ -555,6 +585,12 @@ const fr: Messages = {
     complaints: "Réclamations",
     signals: "Signaux",
     rewards: "Récompenses",
+
+    leaderboard: "Classement",
+
+    strategies: "Stratégies",
+
+    streaks: "Séries",
     analysis: "Analyse",
     news: "Actualités",
     support: "Support",
@@ -660,6 +696,12 @@ const tr: Messages = {
     complaints: "Şikayetler",
     signals: "Sinyaller",
     rewards: "Ödüller",
+
+    leaderboard: "Liderlik tablosu",
+
+    strategies: "Stratejiler",
+
+    streaks: "Seriler",
     analysis: "Analiz",
     news: "Haberler",
     support: "Destek",
@@ -765,6 +807,12 @@ const ur: Messages = {
     complaints: "شکایات",
     signals: "سگنلز",
     rewards: "انعامات",
+
+    leaderboard: "لیڈر بورڈ",
+
+    strategies: "حکمت عملی",
+
+    streaks: "سٹریکس",
     analysis: "تجزیہ",
     news: "خبریں",
     support: "سپورٹ",

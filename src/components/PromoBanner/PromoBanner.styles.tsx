@@ -2,6 +2,10 @@ import styled from "styled-components";
 import bgImage from "../../assets/banner/hero-bg3.png";
 import { motion } from "framer-motion";
 
+/** Brand gold — matches theme.colors.gold / site-wide accents */
+const GOLD = "#FBC113";
+const GOLD_BTN = "linear-gradient(90deg, #FBC113 0%, #F4B400 100%)";
+
 export const BannerWrapper = styled.section`
   position: relative;
   overflow: hidden;
@@ -19,9 +23,13 @@ export const BannerWrapper = styled.section`
     content: "";
     position: absolute;
     inset: 0;
-    background:
-      linear-gradient(105deg, rgba(8, 20, 40, 0.72) 0%, rgba(19, 46, 88, 0.45) 48%, rgba(19, 46, 88, 0.2) 100%),
-      radial-gradient(ellipse 50% 70% at 85% 40%, rgba(251, 191, 36, 0.12), transparent 55%);
+    /* Navy overlay only — no yellow wash over the hero */
+    background: linear-gradient(
+      105deg,
+      rgba(8, 20, 40, 0.82) 0%,
+      rgba(19, 46, 88, 0.55) 50%,
+      rgba(19, 46, 88, 0.32) 100%
+    );
     z-index: 0;
   }
 
@@ -66,8 +74,8 @@ export const SubheadingWrapper = styled(motion.div)`
   gap: 0.45rem;
   padding: 0.35rem 0.75rem 0.35rem 0.45rem;
   border-radius: 999px;
-  background: rgba(251, 191, 36, 0.1);
-  border: 1px solid rgba(251, 191, 36, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   margin-bottom: 0.85rem;
 
   img {
@@ -82,7 +90,7 @@ export const HeroSubTitle = styled.p`
   font-weight: 700;
   line-height: 1.3;
   letter-spacing: 0.08em;
-  color: ${({ theme }) => theme.colors.gold};
+  color: rgba(255, 255, 255, 0.78);
   text-transform: uppercase;
   margin: 0;
 `;
@@ -97,7 +105,7 @@ export const HeroTitle = styled(motion.h1)`
   color: #fff;
 
   span {
-    color: ${({ theme }) => theme.colors.gold};
+    color: ${GOLD};
   }
 `;
 
@@ -111,7 +119,7 @@ export const HeroLead = styled(motion.p)`
   max-width: 32rem;
 
   strong {
-    color: ${({ theme }) => theme.colors.gold};
+    color: #fff;
     font-weight: 700;
   }
 `;
@@ -159,12 +167,12 @@ const ButtonBase = styled.button`
 `;
 
 export const JoinButton = styled(ButtonBase)`
-  background: ${({ theme }) => theme.colors.Gold};
+  background: ${GOLD_BTN};
   color: ${({ theme }) => theme.colors.primary};
-  box-shadow: 0 12px 28px rgba(251, 191, 36, 0.28);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
 
   &:hover {
-    box-shadow: 0 16px 32px rgba(251, 191, 36, 0.38);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
   }
 `;
 
@@ -207,7 +215,7 @@ export const HeroTrustItem = styled.li`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: ${({ theme }) => theme.colors.gold};
+    color: ${GOLD};
 
     svg {
       width: 14px;
@@ -220,10 +228,13 @@ export const HeroVisual = styled(motion.aside)`
   position: relative;
   border-radius: 22px;
   padding: 1.45rem 1.35rem 1.45rem;
-  background:
-    radial-gradient(ellipse 80% 50% at 100% 0%, rgba(251, 191, 36, 0.18), transparent 55%),
-    linear-gradient(165deg, rgba(15, 36, 72, 0.92) 0%, rgba(19, 46, 88, 0.88) 55%, rgba(10, 24, 48, 0.94) 100%);
-  border: 1px solid rgba(251, 191, 36, 0.28);
+  background: linear-gradient(
+    165deg,
+    rgba(15, 36, 72, 0.94) 0%,
+    rgba(19, 46, 88, 0.9) 55%,
+    rgba(10, 24, 48, 0.95) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.14);
   backdrop-filter: blur(16px);
   box-shadow:
     0 28px 56px rgba(0, 0, 0, 0.35),
@@ -242,7 +253,7 @@ export const VisualEyebrow = styled.p`
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.gold};
+  color: rgba(255, 255, 255, 0.55);
 `;
 
 export const VisualTitle = styled.h2`
@@ -257,41 +268,69 @@ export const VisualTitle = styled.h2`
 export const LogoStack = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 0.85rem;
+  margin-bottom: 1rem;
+  padding: 0.15rem 0.1rem;
 `;
 
 export const LogoBubble = styled.button`
   appearance: none;
-  width: 52px;
-  height: 52px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   padding: 0;
-  margin-left: -12px;
-  border: 2px solid rgba(255, 255, 255, 0.92);
+  margin-left: -8px;
+  border: 2.5px solid #fff;
   background: #fff;
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
-  transition: transform 0.2s ease, z-index 0s;
+  box-shadow:
+    0 0 0 1px rgba(19, 46, 88, 0.12),
+    0 10px 22px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, z-index 0s, box-shadow 0.2s ease;
   position: relative;
   z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 
   &:first-child {
     margin-left: 0;
   }
 
   &:hover {
-    transform: translateY(-4px) scale(1.06);
-    z-index: 5;
+    transform: translateY(-5px) scale(1.08);
+    z-index: 8;
+    box-shadow:
+      0 0 0 2px ${({ theme }) => theme.colors.gold || "#FBC113"},
+      0 14px 28px rgba(0, 0, 0, 0.4);
   }
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    padding: 6px;
+  /* Fill the circle — logos should read clearly at a glance */
+  > span,
+  > img,
+  > span img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover !important;
+    object-position: center center !important;
+    padding: 0 !important;
     box-sizing: border-box;
     display: block;
+    border-radius: 50%;
+  }
+
+  > span {
+    overflow: hidden;
+    border-radius: 50%;
+  }
+
+  @media (max-width: 560px) {
+    width: 52px;
+    height: 52px;
+    margin-left: -6px;
   }
 `;
 
@@ -301,34 +340,46 @@ export const LogoFallback = styled.span`
   justify-content: center;
   width: 100%;
   height: 100%;
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   font-weight: 800;
   color: ${({ theme }) => theme.colors.primary};
-  background: linear-gradient(135deg, #fbbf24, #fef3c7);
+  background: ${GOLD_BTN};
+  border-radius: 50%;
 `;
 
 export const MoreBubble = styled.button`
   appearance: none;
-  margin-left: -12px;
-  width: 52px;
-  height: 52px;
+  margin-left: -8px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  border: 2px solid rgba(251, 191, 36, 0.55);
-  background: rgba(251, 191, 36, 0.18);
-  color: ${({ theme }) => theme.colors.gold};
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   font-weight: 800;
   font-family: inherit;
   cursor: pointer;
   position: relative;
   z-index: 0;
   padding: 0;
+  flex-shrink: 0;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
 
   &:hover {
-    background: rgba(251, 191, 36, 0.28);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(251, 193, 19, 0.7);
+  }
+
+  @media (max-width: 560px) {
+    width: 52px;
+    height: 52px;
+    margin-left: -6px;
+    font-size: 0.75rem;
   }
 `;
 
@@ -341,21 +392,22 @@ export const BrokerNameRow = styled.div`
 
 export const BrokerChip = styled.button`
   appearance: none;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
   font-family: inherit;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  padding: 0.28rem 0.55rem;
+  padding: 0.35rem 0.7rem;
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  letter-spacing: 0.02em;
 
   &:hover {
-    background: rgba(251, 191, 36, 0.16);
-    border-color: rgba(251, 191, 36, 0.4);
-    color: #fff;
+    background: rgba(251, 193, 19, 0.18);
+    border-color: rgba(251, 193, 19, 0.55);
+    transform: translateY(-1px);
   }
 `;
 
@@ -370,14 +422,14 @@ export const StatCell = styled.div`
   padding: 0.75rem 0.45rem;
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(251, 191, 36, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
 
   strong {
     display: block;
     font-size: 1.1rem;
     font-weight: 800;
-    color: ${({ theme }) => theme.colors.gold};
+    color: ${GOLD};
     letter-spacing: -0.02em;
     line-height: 1.15;
   }
@@ -401,18 +453,18 @@ export const VisualCta = styled.button`
   padding: 0.8rem 1rem;
   border: none;
   border-radius: 12px;
-  background: ${({ theme }) => theme.colors.Gold};
+  background: ${GOLD_BTN};
   color: ${({ theme }) => theme.colors.primary};
   font-family: inherit;
   font-size: 0.875rem;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 12px 26px rgba(251, 191, 36, 0.28);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 16px 32px rgba(251, 191, 36, 0.38);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
   }
 `;
 

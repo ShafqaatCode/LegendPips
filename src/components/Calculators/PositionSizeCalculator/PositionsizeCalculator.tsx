@@ -1,4 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import {
+  calculatePositionSize,
+  FX_PAIR_OPTIONS,
+  formatMoney,
+  type FxPair,
+} from "../../../utils/forexCalculators";
 import {
   CalcPage,
   CalcContainer,
@@ -11,38 +17,42 @@ import {
   CalcLabel,
   CalcInput,
   CalcSelect,
-  CalcButtonRow,
-  CalcButton,
-  CalcResult,
-  CalcResultsGrid,
+  CalcError,
+  CalcHint,
 } from "../calculatorStyles";
+import CalcOutput from "../CalcOutput";
 
 const PositionSizeCalculator: React.FC = () => {
-  const [instrument, setInstrument] = useState("XAU/USD");
-  const [currency, setCurrency] = useState("USD");
-  const [accountSize, setAccountSize] = useState<number>(1000);
-  const [stopLoss, setStopLoss] = useState<number>(20);
-  const [contractSize, setContractSize] = useState<number>(100);
-  const [riskMode, setRiskMode] = useState("%");
-  const [riskValue, setRiskValue] = useState<number>(2);
+  const [pair, setPair] = useState<FxPair>("EUR/USD");
+  const [balance, setBalance] = useState("10000");
+  const [riskPct, setRiskPct] = useState("1");
+  const [stopPips, setStopPips] = useState("20");
+  const [error, setError] = useState<string | null>(null);
+  const [out, setOut] = useState<{
+    riskMoney: number;
+    pipValue: number;
+    lots: number;
+    units: number;
+  } | null>(null);
 
-  const [results, setResults] = useState({
-    money: 0,
-    units: 0,
-    lots: 0,
-  });
-
-  const calculate = () => {
-    let moneyRisk = 0;
-    if (riskMode === "%") {
-      moneyRisk = (accountSize * riskValue) / 100;
-    } else {
-      moneyRisk = riskValue;
-    }
-    const units = stopLoss > 0 ? moneyRisk / stopLoss : 0;
-    const lots = contractSize > 0 ? units / contractSize : 0;
-    setResults({ money: moneyRisk, units, lots });
-  };
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      const res = calculatePositionSize({
+        pair,
+        accountBalance: parseFloat(balance),
+        riskPercent: parseFloat(riskPct),
+        stopLossPips: parseFloat(stopPips),
+      });
+      if (!res.ok) {
+        setError(res.error);
+        setOut(null);
+        return;
+      }
+      setError(null);
+      setOut(res);
+    }, 150);
+    return () => window.clearTimeout(id);
+  }, [pair, balance, riskPct, stopPips]);
 
   return (
     <CalcPage>
@@ -50,113 +60,108 @@ const PositionSizeCalculator: React.FC = () => {
         <CalcCard>
           <CalcHeader>Position Size Calculator</CalcHeader>
           <CalcDescription>
-            Determine optimal lot size from your account balance, risk tolerance, and
-            stop-loss — so you can manage risk and size trades with confidence.
+            Find a safe lot size from your account balance, risk %, and stop-loss in pips. Uses
+            standard pip values (≈ $10/pip per lot on EUR/USD). Results update as you type.
           </CalcDescription>
 
-          <form onSubmit={(e) => e.preventDefault()}>
-            <CalcFormRow>
-              <CalcFormGroup>
-                <CalcField>
-                  <CalcLabel>Instrument</CalcLabel>
-                  <CalcSelect
-                    value={instrument}
-                    onChange={(e) => setInstrument(e.target.value)}
-                  >
-                    <option>XAU/USD</option>
-                    <option>EUR/USD</option>
-                    <option>GBP/USD</option>
-                  </CalcSelect>
-                </CalcField>
-              </CalcFormGroup>
+          <CalcFormRow>
+            <CalcFormGroup>
+              <CalcField>
+                <CalcLabel htmlFor="pair">Currency pair</CalcLabel>
+                <CalcSelect
+                  id="pair"
+                  value={pair}
+                  onChange={(e) => setPair(e.target.value as FxPair)}
+                >
+                  {FX_PAIR_OPTIONS.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </CalcSelect>
+              </CalcField>
+            </CalcFormGroup>
+            <CalcFormGroup>
+              <CalcField>
+                <CalcLabel htmlFor="balance">Account balance (USD)</CalcLabel>
+                <CalcInput
+                  id="balance"
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={balance}
+                  onChange={(e) => setBalance(e.target.value)}
+                />
+              </CalcField>
+            </CalcFormGroup>
+          </CalcFormRow>
 
-              <CalcFormGroup>
-                <CalcField>
-                  <CalcLabel>Deposit Currency</CalcLabel>
-                  <CalcSelect value={currency} onChange={(e) => setCurrency(e.target.value)}>
-                    <option>USD</option>
-                    <option>EUR</option>
-                    <option>GBP</option>
-                  </CalcSelect>
-                </CalcField>
-              </CalcFormGroup>
-            </CalcFormRow>
+          <CalcFormRow>
+            <CalcFormGroup>
+              <CalcField>
+                <CalcLabel htmlFor="risk">Risk per trade (%)</CalcLabel>
+                <CalcInput
+                  id="risk"
+                  type="number"
+                  min="0.1"
+                  max="100"
+                  step="0.1"
+                  value={riskPct}
+                  onChange={(e) => setRiskPct(e.target.value)}
+                />
+              </CalcField>
+            </CalcFormGroup>
+            <CalcFormGroup>
+              <CalcField>
+                <CalcLabel htmlFor="sl">Stop-loss (pips)</CalcLabel>
+                <CalcInput
+                  id="sl"
+                  type="number"
+                  min="0.1"
+                  step="0.1"
+                  value={stopPips}
+                  onChange={(e) => setStopPips(e.target.value)}
+                />
+              </CalcField>
+            </CalcFormGroup>
+          </CalcFormRow>
 
-            <CalcFormRow>
-              <CalcFormGroup>
-                <CalcField>
-                  <CalcLabel>Account Size</CalcLabel>
-                  <CalcInput
-                    type="number"
-                    value={accountSize}
-                    onChange={(e) => setAccountSize(parseFloat(e.target.value) || 0)}
-                  />
-                </CalcField>
-              </CalcFormGroup>
+          {error && <CalcError role="alert">{error}</CalcError>}
 
-              <CalcFormGroup>
-                <CalcField>
-                  <CalcLabel>Stop-Loss (Pips)</CalcLabel>
-                  <CalcInput
-                    type="number"
-                    value={stopLoss}
-                    onChange={(e) => setStopLoss(parseFloat(e.target.value) || 0)}
-                  />
-                </CalcField>
-              </CalcFormGroup>
-            </CalcFormRow>
-
-            <CalcFormRow>
-              <CalcFormGroup>
-                <CalcField>
-                  <CalcLabel>Contract Size (Units)</CalcLabel>
-                  <CalcInput
-                    type="number"
-                    value={contractSize}
-                    onChange={(e) => setContractSize(parseFloat(e.target.value) || 0)}
-                  />
-                </CalcField>
-              </CalcFormGroup>
-
-              <CalcFormGroup>
-                <CalcField>
-                  <CalcLabel>Risk Ratio / Money</CalcLabel>
-                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                    <CalcInput
-                      type="number"
-                      value={riskValue}
-                      onChange={(e) => setRiskValue(parseFloat(e.target.value) || 0)}
-                      style={{ width: "5.5rem" }}
-                    />
-                    <CalcSelect
-                      value={riskMode}
-                      onChange={(e) => setRiskMode(e.target.value)}
-                      style={{ width: "4rem" }}
-                    >
-                      <option value="%">%</option>
-                      <option value="$">$</option>
-                    </CalcSelect>
-                  </div>
-                </CalcField>
-              </CalcFormGroup>
-            </CalcFormRow>
-
-            <CalcButtonRow>
-              <CalcButton type="button" onClick={calculate}>
-                Calculate
-              </CalcButton>
-            </CalcButtonRow>
-          </form>
-
-          {results.money > 0 && (
-            <CalcResultsGrid>
-              <CalcResult>
-                Money ({currency}): ${results.money.toFixed(2)}
-              </CalcResult>
-              <CalcResult $muted>Units: {results.units.toFixed(0)}</CalcResult>
-              <CalcResult $muted>Lots: {results.lots.toFixed(3)}</CalcResult>
-            </CalcResultsGrid>
+          {out && (
+            <CalcOutput
+              heading="Recommended position"
+              metrics={[
+                {
+                  label: "Lot size",
+                  value: out.lots.toFixed(2),
+                  tone: "primary",
+                  note: "Trade this size to stay in risk",
+                },
+                {
+                  label: "Risk amount",
+                  value: formatMoney(out.riskMoney),
+                  tone: "accent",
+                  note: `${riskPct}% of balance`,
+                },
+                {
+                  label: "Pip value (1.00 lot)",
+                  value: formatMoney(out.pipValue),
+                  tone: "muted",
+                },
+                {
+                  label: "Units",
+                  value: Math.round(out.units).toLocaleString(),
+                  tone: "muted",
+                },
+              ]}
+            />
           )}
+
+          <CalcHint>
+            Formula: lots = risk $ ÷ (stop pips × pip value per lot). Educational estimate for a USD
+            account — confirm pip value with your broker.
+          </CalcHint>
         </CalcCard>
       </CalcContainer>
     </CalcPage>

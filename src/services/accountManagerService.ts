@@ -93,7 +93,11 @@ export const adminDeleteAccountManager = async (id: string) => {
 
 export const adminAssignUserCare = async (
   userId: string,
-  payload: { assignedManagerId?: string | null; recommendedBrokerId?: string | null }
+  payload: {
+    assignedManagerId?: string | null;
+    recommendedBrokerId?: string | null;
+    premiumSignalsAccess?: boolean;
+  }
 ) => {
   return fetchJson<{ success: boolean; user: unknown; message?: string }>(
     `${API_CONFIG.BASE_URL}/admin/users/${userId}/care`,

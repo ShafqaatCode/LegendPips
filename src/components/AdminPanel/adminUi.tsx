@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 export const adminColors = {
   navy: '#132E58',
   navyLight: '#1a4a7a',
-  gold: '#Fbbf24',
+  gold: '#FBC113',
   bg: '#eef2f7',
   card: '#ffffff',
   border: '#e2e8f0',

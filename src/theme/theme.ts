@@ -10,8 +10,8 @@ export const theme: DefaultTheme = {
     surface: '#F3F4F7', // LIGHT PINK
     text: '#132E58', // DARK BLUE
     muted: '#6b7280',
-    Gold: "linear-gradient(90deg, #FAFC15 0%, #FBBF24 100%)",
-    gold: "#Fbbf24"
+    Gold: "linear-gradient(90deg, #FBC113 0%, #F4B400 100%)",
+    gold: "#FBC113"
   },
   font: {
     family:` 'Poppins', sans-serif`,

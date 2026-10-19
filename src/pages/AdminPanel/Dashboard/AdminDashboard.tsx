@@ -217,7 +217,7 @@ const AlertCard = styled.button<{ $tone: 'warn' | 'info' | 'danger' | 'ok' }>`
 
 const KpiGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 0.75rem;
   margin-bottom: 1.15rem;
 
@@ -591,6 +591,15 @@ const AdminDashboard: React.FC = () => {
           path: '/admin-panel/kyc-records?filter=pending',
         },
         {
+          icon: FiLayers,
+          label: 'Pending strategies',
+          value: n(platform.strategiesPending),
+          meta: 'Member setups awaiting review',
+          color: '#e0e7ff',
+          ink: '#4338ca',
+          path: '/admin-panel/strategies',
+        },
+        {
           icon: FiDollarSign,
           label: 'Rebates (30d)',
           value: `$${n(platform.rebateUsd30d).toFixed(0)}`,
@@ -638,6 +647,14 @@ const AdminDashboard: React.FC = () => {
     { icon: FiUserPlus, title: 'Referrals', sub: 'Invite progress', path: '/admin-panel/referrals' },
     { icon: FiShuffle, title: 'IB change', sub: 'Broker requests', path: '/admin-panel/ib-change' },
     { icon: FiTrendingUp, title: 'Signals', sub: 'Publish setups', path: '/admin-panel/signals' },
+    {
+      icon: FiLayers,
+      title: 'Strategies',
+      sub: n(platform?.strategiesPending)
+        ? `${n(platform?.strategiesPending)} pending review`
+        : 'Moderate community setups',
+      path: '/admin-panel/strategies',
+    },
     { icon: FiAward, title: 'Contests', sub: 'Manage events', path: '/admin-panel/contests' },
     { icon: FiDollarSign, title: 'Rebates', sub: 'Grant credits', path: '/admin-panel/rebate-credits' },
   ];
@@ -690,6 +707,10 @@ const AdminDashboard: React.FC = () => {
             <HeroKpi>
               <div className="v">{loading ? '…' : kycPending}</div>
               <div className="l">KYC queue</div>
+            </HeroKpi>
+            <HeroKpi>
+              <div className="v">{loading ? '…' : n(platform?.strategiesPending)}</div>
+              <div className="l">Strategies</div>
             </HeroKpi>
             <HeroKpi>
               <div className="v">{loading ? '…' : `$${n(platform?.rebateUsd30d).toFixed(0)}`}</div>
@@ -751,6 +772,24 @@ const AdminDashboard: React.FC = () => {
         </AlertCard>
         <AlertCard
           type="button"
+          $tone={loading ? 'info' : insightTone(n(platform?.strategiesPending))}
+          onClick={() => navigate('/admin-panel/strategies')}
+        >
+          <div className="icon"><FiLayers /></div>
+          <div>
+            <div className="count">{loading ? '…' : n(platform?.strategiesPending)}</div>
+            <div className="label">Strategies awaiting review</div>
+            <div className="hint">
+              {loading
+                ? 'Loading…'
+                : n(platform?.strategiesPending)
+                  ? 'Approve or reject member-shared setups'
+                  : 'No strategies pending'}
+            </div>
+          </div>
+        </AlertCard>
+        <AlertCard
+          type="button"
           $tone={loading ? 'info' : n(platform?.blockedUsers) > 0 ? 'danger' : 'ok'}
           onClick={() => navigate('/admin-panel/users')}
         >
@@ -767,7 +806,7 @@ const AdminDashboard: React.FC = () => {
 
       <SectionLabel><h2>Key performance</h2></SectionLabel>
       <KpiGrid>
-        {(loading ? Array.from({ length: 5 }) : primaryKpis).map((kpi: any, i) => (
+        {(loading ? Array.from({ length: 6 }) : primaryKpis).map((kpi: any, i) => (
           <KpiCard
             key={kpi?.label || i}
             type="button"

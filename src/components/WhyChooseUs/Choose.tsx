@@ -155,8 +155,10 @@ const ButtonContainer = styled.div`
 const CtaLink = styled(Link)`
   color: inherit;
   text-decoration: none;
+  cursor: pointer;
+
   &:hover {
-    color: #de992f;
+    color: ${({ theme }) => theme.colors.secondary};
     text-decoration: underline;
   }
 `;
@@ -167,21 +169,23 @@ const ChoosUs: React.FC = () => {
   const [showMore, setShowMore] = useState(false);
   const { t } = useLocale();
 
+  const MAINT = "/under-maintenance";
+
   const POINTS = [
     { title: t("why.p1t"), desc: t("why.p1d"), icon: Icon1, to: "/complaints" },
-    { title: t("why.p2t"), desc: t("why.p2d"), icon: Icon2 },
-    { title: t("why.p3t"), desc: t("why.p3d"), icon: Icon3 },
-    { title: t("why.p4t"), desc: t("why.p4d"), icon: Icon4 },
-    { title: t("why.p5t"), desc: t("why.p5d"), icon: Icon5 },
-    { title: t("why.p6t"), desc: t("why.p6d"), icon: Icon6 },
+    { title: t("why.p2t"), desc: t("why.p2d"), icon: Icon2, to: "/find-broker" },
+    { title: t("why.p3t"), desc: t("why.p3d"), icon: Icon3, to: "/support" },
+    { title: t("why.p4t"), desc: t("why.p4d"), icon: Icon4, to: "/analysis" },
+    { title: t("why.p5t"), desc: t("why.p5d"), icon: Icon5, to: MAINT },
+    { title: t("why.p6t"), desc: t("why.p6d"), icon: Icon6, to: "/calculators" },
   ];
   const UnderPoints = [
-    { title: t("why.u1t"), desc: t("why.u1d"), icon: Icon7 },
-    { title: t("why.u2t"), desc: t("why.u2d"), icon: Icon8 },
-    { title: t("why.u3t"), desc: t("why.u3d"), icon: Icon9 },
-    { title: t("why.u4t"), desc: t("why.u4d"), icon: Icon10 },
-    { title: t("why.u5t"), desc: t("why.u5d"), icon: Icon11 },
-    { title: t("why.u6t"), desc: t("why.u6d"), icon: Icon12 },
+    { title: t("why.u1t"), desc: t("why.u1d"), icon: Icon7, to: "/economic-calendar" },
+    { title: t("why.u2t"), desc: t("why.u2d"), icon: Icon8, to: MAINT },
+    { title: t("why.u3t"), desc: t("why.u3d"), icon: Icon9, to: "/courses" },
+    { title: t("why.u4t"), desc: t("why.u4d"), icon: Icon10, to: "/scam-broker-shield" },
+    { title: t("why.u5t"), desc: t("why.u5d"), icon: Icon11, to: "/traders" },
+    { title: t("why.u6t"), desc: t("why.u6d"), icon: Icon12, to: "/signals" },
   ];
 
   const POINTS_SHOW = showMore ? POINTS : POINTS.slice(0, 3);
@@ -199,14 +203,10 @@ const ChoosUs: React.FC = () => {
           <ContentContainer>
             {POINTS_SHOW.map((point, i) => (
               <PointBox key={i}>
-                <img src={point.icon} alt="Icon" />
+                <img src={point.icon} alt="" />
                 <div>
                   <h2>
-                    {"to" in point && point.to ? (
-                      <CtaLink to={point.to}>{point.title}</CtaLink>
-                    ) : (
-                      point.title
-                    )}
+                    <CtaLink to={point.to}>{point.title}</CtaLink>
                   </h2>
                   <p>{point.desc}</p>
                 </div>
@@ -243,9 +243,11 @@ const ChoosUs: React.FC = () => {
         <UnderContent>
           {UnderPoints.map((point, index) => (
             <PointBox key={index}>
-              <img src={point.icon} alt="Icon" />
+              <img src={point.icon} alt="" />
               <div>
-                <h3>{point.title}</h3>
+                <h3>
+                  <CtaLink to={point.to}>{point.title}</CtaLink>
+                </h3>
                 <p>{point.desc}</p>
               </div>
             </PointBox>

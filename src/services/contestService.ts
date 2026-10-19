@@ -1,5 +1,11 @@
 import { API_CONFIG } from "../utils/apiConfig";
 
+export interface ContestPrize {
+  position: number;
+  prize: string;
+  description?: string;
+}
+
 export interface Competition {
   _id?: string;
   id?: string | number;
@@ -12,9 +18,13 @@ export interface Competition {
   entry: string;
   ends?: string;
   endDate?: string;
+  startDate?: string;
   logo?: string;
   sponsorUrl?: string;
   sponsorText?: string;
+  description?: string;
+  rules?: string[];
+  prizes?: ContestPrize[];
 }
 
 export interface ContestResponse {
@@ -145,9 +155,14 @@ export const fetchCompetitionById = async (id: string | number): Promise<Competi
         participants: contest.participants || 0,
         entry: contest.entry,
         ends: contest.endDate || contest.ends || "",
+        endDate: contest.endDate || contest.ends || "",
+        startDate: contest.startDate || "",
         logo: contest.logo || "",
         sponsorUrl: contest.sponsorUrl,
         sponsorText: contest.sponsorText,
+        description: contest.description || "",
+        rules: Array.isArray(contest.rules) ? contest.rules : [],
+        prizes: Array.isArray(contest.prizes) ? contest.prizes : [],
       };
     }
 

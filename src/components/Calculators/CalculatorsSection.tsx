@@ -1,32 +1,20 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import {
-  FiArrowUpRight,
-  FiBarChart2,
-  FiDollarSign,
-  FiGift,
-  FiGitBranch,
-  FiLayers,
-  FiPercent,
-  FiTrendingUp,
-} from "react-icons/fi";
+import { FiArrowUpRight } from "react-icons/fi";
 import SectionHeadingSet from "../SharedComponents/SectionHeadingSet";
 import ArrowIcon from "../../assets/icons/arrow-narrow-circle-broken-up-right-svgrepo-com 1.svg";
 import { CALCULATORS_CATALOG } from "../../data/calculatorsCatalog";
+import { getCalculatorIcon } from "./calculatorIcons";
 
-const HOME_CALCULATOR_IDS = ["lot-size", "pip", "margin", "rebate", "profit", "risk-of-ruin"] as const;
-
-const ICONS: Record<string, React.ReactNode> = {
-  "lot-size": <FiLayers size={20} />,
-  pip: <FiTrendingUp size={20} />,
-  margin: <FiDollarSign size={20} />,
-  rebate: <FiGift size={20} />,
-  profit: <FiPercent size={20} />,
-  "risk-of-ruin": <FiBarChart2 size={20} />,
-  pivot: <FiBarChart2 size={20} />,
-  fibonacci: <FiGitBranch size={20} />,
-};
+const HOME_CALCULATOR_IDS = [
+  "lot-size",
+  "account-risk",
+  "pip",
+  "margin",
+  "profit",
+  "break-even",
+] as const;
 
 const Section = styled.section`
   background: linear-gradient(180deg, #f7f8fb 0%, #ffffff 55%, #ffffff 100%);
@@ -101,6 +89,16 @@ const IconBadge = styled.div`
   background: linear-gradient(145deg, rgba(251, 191, 36, 0.22) 0%, rgba(251, 191, 36, 0.08) 100%);
   border: 1px solid rgba(251, 191, 36, 0.35);
   flex-shrink: 0;
+
+  svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    flex-shrink: 0;
+  }
 `;
 
 const Tag = styled.span`
@@ -183,7 +181,7 @@ const CalculatorsSection: React.FC = () => {
           {items.map((item) => (
             <Card key={item.id} to={item.path}>
               <CardTop>
-                <IconBadge aria-hidden>{ICONS[item.id] || <FiTrendingUp size={20} />}</IconBadge>
+                <IconBadge aria-hidden>{getCalculatorIcon(item.id, 20)}</IconBadge>
                 <div style={{ minWidth: 0, flex: 1 }}>
                   <Tag>{item.shortLabel}</Tag>
                   <Title>{item.title}</Title>

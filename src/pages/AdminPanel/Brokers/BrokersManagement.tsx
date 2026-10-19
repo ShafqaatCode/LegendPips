@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import {
   FiPlus, FiEdit2, FiTrash2, FiSearch, FiCheck, FiDatabase,
-  FiShield, FiStar, FiDollarSign, FiTrendingUp, FiGlobe, FiCpu, FiAward, FiTarget, FiCreditCard,
+  FiShield, FiStar, FiDollarSign, FiTrendingUp, FiGlobe, FiCpu, FiAward, FiTarget, FiCreditCard, FiEyeOff, FiEye,
 } from "react-icons/fi";
 import SimpleModal from "../../../components/AdminPanel/SimpleModal";
 import { CourseGridSkeleton } from "../../../components/SharedComponents/Shimmer";
@@ -16,6 +16,7 @@ import {
   adminDeleteBroker,
   adminFetchBrokers,
   adminUpdateBroker,
+  adminUploadBrokerLogo,
   type ApiBroker,
   type PropCashbackOffer,
   type PropPromoCode,
@@ -24,7 +25,7 @@ import {
   BROKER_KIND_COLORS,
   BROKER_KIND_DESCRIPTIONS,
   BROKER_KIND_LABELS,
-  BROKER_KIND_ORDER,
+  BROKER_KIND_SHORT,
   brokerKindLabel,
   matchesBrokerKind,
   type BrokerCategoryValue,
@@ -32,6 +33,22 @@ import {
 } from "../../../utils/brokerTypes";
 import { normalizeBrokerLogoUrl } from "../../../utils/brokerLogoUrl";
 import BrokerLogo from "../../../components/Broker/BrokerLogo";
+
+/** Admin “Brokers” panel kinds (prop firms have their own panel). */
+const BROKER_PANEL_KINDS: BrokerKind[] = ["forex", "crypto", "binary", "ewallet"];
+
+export type BrokersPanelMode = "brokers" | "prop";
+
+type VisibilityFilter = "all" | "visible" | "hidden" | "disabled";
+
+type BrokersManagementProps = {
+  /** `brokers` = forex/crypto/binary/ewallet; `prop` = prop firms only */
+  panelMode?: BrokersPanelMode;
+};
+
+function isPropBroker(b: Pick<ApiBroker, "rebateCategory">): boolean {
+  return matchesBrokerKind(b.rebateCategory, "prop");
+}
 
 function brokerRegulationsToInput(b: ApiBroker): string {
   if (Array.isArray(b.regulations) && b.regulations.length) return b.regulations.join(", ");
@@ -472,6 +489,19 @@ const TypeSectionTitle = styled.div`
   margin-bottom: -0.15rem;
 `;
 
+const CompareHint = styled.p`
+  grid-column: 1 / -1;
+  margin: 0 0 0.15rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e3a8a;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.45;
+`;
+
 type ModalMode = "add" | "edit" | "delete";
 
 const defaultBrokerPayload = (): Partial<ApiBroker> => ({
@@ -493,12 +523,16 @@ const defaultBrokerPayload = (): Partial<ApiBroker> => ({
   temporarilyDisabled: false,
 });
 
-const BrokersManagement: React.FC = () => {
+const BrokersManagement: React.FC<BrokersManagementProps> = ({ panelMode = "brokers" }) => {
+  const isPropPanel = panelMode === "prop";
+  const panelKinds = isPropPanel ? (["prop"] as BrokerKind[]) : BROKER_PANEL_KINDS;
+
   const [brokers, setBrokers] = useState<ApiBroker[]>([]);
   const [listLoading, setListLoading] = useState(true);
   const [listError, setListError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [listTypeFilter, setListTypeFilter] = useState<"all" | BrokerKind>("all");
+  const [visibilityFilter, setVisibilityFilter] = useState<VisibilityFilter>("all");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>("add");
@@ -524,6 +558,7 @@ const BrokersManagement: React.FC = () => {
   const [programFilter, setProgramFilter] = useState<"all" | "beginners" | "shield">("all");
   const [formDescription, setFormDescription] = useState("");
   const [formLogoUrl, setFormLogoUrl] = useState("");
+  const [logoUploading, setLogoUploading] = useState(false);
   const [formRebateCategory, setFormRebateCategory] = useState<BrokerCategoryValue>("forex");
   const [formBothTabs, setFormBothTabs] = useState(false);
   const [formRebatesListOrder, setFormRebatesListOrder] = useState("1");
@@ -589,7 +624,7 @@ const BrokersManagement: React.FC = () => {
     setFormCrypto("No");
     setFormDescription("");
     setFormLogoUrl("");
-    setFormRebateCategory("forex");
+    setFormRebateCategory(isPropPanel ? "prop" : "forex");
     setFormBothTabs(false);
     setFormRebatesListOrder("1");
     setFormSetupUrl("");
@@ -671,6 +706,30 @@ const BrokersManagement: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  const onBrokerLogoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setModalError("Logo must be 5 MB or smaller");
+      return;
+    }
+    setLogoUploading(true);
+    setModalError(null);
+    try {
+      const brokerId = modalMode === "edit" ? selectedBrokerId || undefined : undefined;
+      const { url, broker } = await adminUploadBrokerLogo(file, brokerId);
+      setFormLogoUrl(url);
+      if (broker) {
+        setBrokers((prev) => prev.map((b) => (b._id === broker._id ? broker : b)));
+      }
+    } catch (err: any) {
+      setModalError(err.message || "Logo upload failed");
+    } finally {
+      setLogoUploading(false);
+    }
+  };
+
   const submitForm = async () => {
     const name = formName.trim();
     if (!name) {
@@ -691,12 +750,15 @@ const BrokersManagement: React.FC = () => {
     setSaving(true);
     setModalError(null);
     try {
-      const rebateCategory: BrokerCategoryValue =
-        formBothTabs && (formRebateCategory === "forex" || formRebateCategory === "crypto")
+      const rebateCategory: BrokerCategoryValue = isPropPanel
+        ? "prop"
+        : formBothTabs && (formRebateCategory === "forex" || formRebateCategory === "crypto")
           ? "both"
           : formRebateCategory === "both"
             ? "forex"
-            : formRebateCategory;
+            : formRebateCategory === "prop"
+              ? "forex"
+              : formRebateCategory;
 
       const base = {
         name,
@@ -809,103 +871,169 @@ const BrokersManagement: React.FC = () => {
     }
   };
 
-  const filteredBrokers = brokers.filter((broker) => {
-    const matchesSearch = broker.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType =
-      listTypeFilter === "all" || matchesBrokerKind(broker.rebateCategory, listTypeFilter);
-    const matchesProgram =
-      programFilter === "all" ||
-      (programFilter === "beginners" && !!broker.forBeginners) ||
-      (programFilter === "shield" && !!broker.blacklisted);
-    return matchesSearch && matchesType && matchesProgram;
-  });
+  const scopedBrokers = brokers.filter((b) => (isPropPanel ? isPropBroker(b) : !isPropBroker(b)));
 
-  const beginnersCount = brokers.filter((b) => b.forBeginners).length;
-  const shieldCount = brokers.filter((b) => b.blacklisted).length;
+  const filteredBrokers = scopedBrokers
+    .filter((broker) => {
+      const matchesSearch = broker.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesType =
+        isPropPanel ||
+        listTypeFilter === "all" ||
+        matchesBrokerKind(broker.rebateCategory, listTypeFilter);
+      const matchesProgram =
+        programFilter === "all" ||
+        (programFilter === "beginners" && !!broker.forBeginners) ||
+        (programFilter === "shield" && !!broker.blacklisted);
+      const isHidden = broker.published === false;
+      const isDisabled = !!broker.temporarilyDisabled;
+      const matchesVisibility =
+        visibilityFilter === "all" ||
+        (visibilityFilter === "visible" && !isHidden) ||
+        (visibilityFilter === "hidden" && isHidden) ||
+        (visibilityFilter === "disabled" && isDisabled);
+      return matchesSearch && matchesType && matchesProgram && matchesVisibility;
+    })
+    .sort((a, b) => {
+      const ah = a.published === false ? 1 : 0;
+      const bh = b.published === false ? 1 : 0;
+      if (ah !== bh) return ah - bh;
+      return a.name.localeCompare(b.name);
+    });
+
+  const beginnersCount = scopedBrokers.filter((b) => b.forBeginners).length;
+  const shieldCount = scopedBrokers.filter((b) => b.blacklisted).length;
+  const hiddenCount = scopedBrokers.filter((b) => b.published === false).length;
+  const disabledCount = scopedBrokers.filter((b) => b.temporarilyDisabled).length;
+  const visibleCount = scopedBrokers.filter((b) => b.published !== false).length;
 
   const countByKind = (kind: BrokerKind) =>
-    brokers.filter((b) => matchesBrokerKind(b.rebateCategory, kind)).length;
+    scopedBrokers.filter((b) => matchesBrokerKind(b.rebateCategory, kind)).length;
+
+  const entityLabel = isPropPanel ? "prop firm" : "broker";
+  const entityLabelPlural = isPropPanel ? "prop firms" : "brokers";
 
   return (
     <PageWrap>
       <PageHeader>
         <PageTitleGroup>
-          <PageTitle><FiDatabase /> Brokers</PageTitle>
+          <PageTitle>
+            {isPropPanel ? <FiAward /> : <FiDatabase />} {isPropPanel ? "Prop Firms" : "Brokers"}
+          </PageTitle>
           <PageSubtitle>
-            Manage Forex, Crypto, and Prop firms — mark Best for new traders or Scam Broker Shield from the edit form
+            {isPropPanel
+              ? "Manage prop trading firms, challenge cashback tiers, and promo codes — hidden firms stay listed here so you can find them again"
+              : "Manage Forex, Crypto, Binary, and E-wallet listings — hidden brokers stay listed here so you can find them again"}
           </PageSubtitle>
         </PageTitleGroup>
         <PrimaryButton type="button" onClick={openAdd}>
-          <FiPlus /> Add broker
+          <FiPlus /> {isPropPanel ? "Add prop firm" : "Add broker"}
         </PrimaryButton>
       </PageHeader>
 
       <StatsRow>
         <MiniStat>
-          <div className="icon" style={{ background: "#dbeafe", color: "#2563eb" }}><FiDatabase /></div>
+          <div className="icon" style={{ background: "#dbeafe", color: "#2563eb" }}>
+            {isPropPanel ? <FiAward /> : <FiDatabase />}
+          </div>
           <div>
-            <div className="val">{listLoading ? "…" : brokers.length}</div>
+            <div className="val">{listLoading ? "…" : scopedBrokers.length}</div>
             <div className="lbl">Total</div>
           </div>
         </MiniStat>
         <MiniStat>
-          <div className="icon" style={{ background: BROKER_KIND_COLORS.forex.bg, color: BROKER_KIND_COLORS.forex.color }}><FiGlobe /></div>
+          <div className="icon" style={{ background: "#dcfce7", color: "#15803d" }}><FiEye /></div>
           <div>
-            <div className="val">{listLoading ? "…" : countByKind("forex")}</div>
-            <div className="lbl">Forex</div>
+            <div className="val">{listLoading ? "…" : visibleCount}</div>
+            <div className="lbl">On website</div>
           </div>
         </MiniStat>
         <MiniStat>
-          <div className="icon" style={{ background: BROKER_KIND_COLORS.crypto.bg, color: BROKER_KIND_COLORS.crypto.color }}><FiCpu /></div>
+          <div className="icon" style={{ background: "#fef3c7", color: "#b45309" }}><FiEyeOff /></div>
           <div>
-            <div className="val">{listLoading ? "…" : countByKind("crypto")}</div>
-            <div className="lbl">Crypto</div>
+            <div className="val">{listLoading ? "…" : hiddenCount}</div>
+            <div className="lbl">Hidden</div>
           </div>
         </MiniStat>
-        <MiniStat>
-          <div className="icon" style={{ background: BROKER_KIND_COLORS.prop.bg, color: BROKER_KIND_COLORS.prop.color }}><FiAward /></div>
-          <div>
-            <div className="val">{listLoading ? "…" : countByKind("prop")}</div>
-            <div className="lbl">Prop firms</div>
-          </div>
-        </MiniStat>
-        <MiniStat>
-          <div className="icon" style={{ background: BROKER_KIND_COLORS.binary.bg, color: BROKER_KIND_COLORS.binary.color }}><FiTarget /></div>
-          <div>
-            <div className="val">{listLoading ? "…" : countByKind("binary")}</div>
-            <div className="lbl">Binary</div>
-          </div>
-        </MiniStat>
-        <MiniStat>
-          <div className="icon" style={{ background: BROKER_KIND_COLORS.ewallet.bg, color: BROKER_KIND_COLORS.ewallet.color }}><FiCreditCard /></div>
-          <div>
-            <div className="val">{listLoading ? "…" : countByKind("ewallet")}</div>
-            <div className="lbl">E-wallet</div>
-          </div>
-        </MiniStat>
+        {!isPropPanel &&
+          BROKER_PANEL_KINDS.map((kind) => (
+            <MiniStat key={kind}>
+              <div
+                className="icon"
+                style={{ background: BROKER_KIND_COLORS[kind].bg, color: BROKER_KIND_COLORS[kind].color }}
+              >
+                {KIND_ICONS[kind]}
+              </div>
+              <div>
+                <div className="val">{listLoading ? "…" : countByKind(kind)}</div>
+                <div className="lbl">{BROKER_KIND_SHORT[kind]}</div>
+              </div>
+            </MiniStat>
+          ))}
+        {isPropPanel && (
+          <MiniStat>
+            <div className="icon" style={{ background: "#fee2e2", color: "#b91c1c" }}><FiShield /></div>
+            <div>
+              <div className="val">{listLoading ? "…" : disabledCount}</div>
+              <div className="lbl">Disabled</div>
+            </div>
+          </MiniStat>
+        )}
       </StatsRow>
+
+      {!isPropPanel && (
+        <TypeFilterBar>
+          <TypeFilterBtn
+            type="button"
+            $active={listTypeFilter === "all"}
+            onClick={() => setListTypeFilter("all")}
+          >
+            All types
+          </TypeFilterBtn>
+          {panelKinds.map((kind) => (
+            <TypeFilterBtn
+              key={kind}
+              type="button"
+              $active={listTypeFilter === kind}
+              $tone={kind}
+              onClick={() => setListTypeFilter(kind)}
+            >
+              {KIND_ICONS[kind]}
+              {BROKER_KIND_LABELS[kind]}
+              <span style={{ opacity: 0.7 }}>({listLoading ? "…" : countByKind(kind)})</span>
+            </TypeFilterBtn>
+          ))}
+        </TypeFilterBar>
+      )}
 
       <TypeFilterBar>
         <TypeFilterBtn
           type="button"
-          $active={listTypeFilter === "all"}
-          onClick={() => setListTypeFilter("all")}
+          $active={visibilityFilter === "all"}
+          onClick={() => setVisibilityFilter("all")}
         >
-          All types
+          All visibility
         </TypeFilterBtn>
-        {BROKER_KIND_ORDER.map((kind) => (
-          <TypeFilterBtn
-            key={kind}
-            type="button"
-            $active={listTypeFilter === kind}
-            $tone={kind}
-            onClick={() => setListTypeFilter(kind)}
-          >
-            {KIND_ICONS[kind]}
-            {BROKER_KIND_LABELS[kind]}
-            <span style={{ opacity: 0.7 }}>({listLoading ? "…" : countByKind(kind)})</span>
-          </TypeFilterBtn>
-        ))}
+        <TypeFilterBtn
+          type="button"
+          $active={visibilityFilter === "visible"}
+          onClick={() => setVisibilityFilter("visible")}
+        >
+          <FiEye /> On website ({listLoading ? "…" : visibleCount})
+        </TypeFilterBtn>
+        <TypeFilterBtn
+          type="button"
+          $active={visibilityFilter === "hidden"}
+          onClick={() => setVisibilityFilter("hidden")}
+        >
+          <FiEyeOff /> Hidden ({listLoading ? "…" : hiddenCount})
+        </TypeFilterBtn>
+        <TypeFilterBtn
+          type="button"
+          $active={visibilityFilter === "disabled"}
+          onClick={() => setVisibilityFilter("disabled")}
+        >
+          <FiShield /> Disabled ({listLoading ? "…" : disabledCount})
+        </TypeFilterBtn>
       </TypeFilterBar>
 
       <TypeFilterBar>
@@ -933,7 +1061,7 @@ const BrokersManagement: React.FC = () => {
           <FiSearch />
           <input
             type="text"
-            placeholder="Search brokers…"
+            placeholder={`Search ${entityLabelPlural}…`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -951,12 +1079,23 @@ const BrokersManagement: React.FC = () => {
         <BrokersGrid>
           {filteredBrokers.length === 0 ? (
             <EmptyState>
-              <strong>No brokers found</strong>
-              {searchTerm ? "Try a different search." : "Add your first broker to get started."}
+              <strong>No {entityLabelPlural} found</strong>
+              {visibilityFilter === "hidden"
+                ? "No hidden listings — use Hide from website on a listing to move it here."
+                : searchTerm
+                  ? "Try a different search."
+                  : `Add your first ${entityLabel} to get started.`}
             </EmptyState>
           ) : (
             filteredBrokers.map((broker) => (
-              <BrokerCard key={broker._id}>
+              <BrokerCard
+                key={broker._id}
+                style={
+                  broker.published === false
+                    ? { opacity: 0.88, borderStyle: "dashed" }
+                    : undefined
+                }
+              >
                 <CardTop>
                   <LogoBox $img={normalizeBrokerLogoUrl(broker.logoUrl) || undefined}>
                     {!normalizeBrokerLogoUrl(broker.logoUrl) && broker.name.slice(0, 2).toUpperCase()}
@@ -964,23 +1103,29 @@ const BrokersManagement: React.FC = () => {
                   <CardTitle>
                     <h3 title={broker.name}>{broker.name}</h3>
                     <BadgeRow>
-                      <TypeBadge
-                        $kind={
-                          broker.rebateCategory === "both"
-                            ? "both"
-                            : broker.rebateCategory === "crypto" ||
-                                broker.rebateCategory === "prop" ||
-                                broker.rebateCategory === "binary" ||
-                                broker.rebateCategory === "ewallet"
-                              ? broker.rebateCategory
-                              : "forex"
-                        }
-                      >
-                        {brokerKindLabel(broker.rebateCategory)}
-                      </TypeBadge>
+                      {!isPropPanel && (
+                        <TypeBadge
+                          $kind={
+                            broker.rebateCategory === "both"
+                              ? "both"
+                              : broker.rebateCategory === "crypto" ||
+                                  broker.rebateCategory === "prop" ||
+                                  broker.rebateCategory === "binary" ||
+                                  broker.rebateCategory === "ewallet"
+                                ? broker.rebateCategory
+                                : "forex"
+                          }
+                        >
+                          {brokerKindLabel(broker.rebateCategory)}
+                        </TypeBadge>
+                      )}
                       {broker.verified && <Pill $variant="approved">Verified</Pill>}
                       {broker.temporarilyDisabled && <Pill $variant="rejected">Disabled</Pill>}
                       {broker.published === false && <Pill $variant="incomplete">Hidden</Pill>}
+                      {(broker.rebatesListOrder == null || broker.rebatesListOrder <= 0) &&
+                        broker.published !== false && (
+                          <Pill $variant="incomplete">Off rebates</Pill>
+                        )}
                       {broker.topCashback && <Pill $variant="pending">Top cashback</Pill>}
                       {broker.forBeginners && <Pill $variant="admin">New traders</Pill>}
                       {broker.blacklisted && <Pill $variant="rejected">Scam Shield</Pill>}
@@ -1011,8 +1156,12 @@ const BrokersManagement: React.FC = () => {
                     <div className="v">{broker.rebatesListOrder ?? "—"}</div>
                   </Metric>
                   <Metric>
-                    <div className="k">Crypto</div>
-                    <div className="v">{broker.crypto || "No"}</div>
+                    <div className="k">{isPropPanel ? "Tiers" : "Crypto"}</div>
+                    <div className="v">
+                      {isPropPanel
+                        ? `${broker.propOffers?.length || 0} offer(s)`
+                        : broker.crypto || "No"}
+                    </div>
                   </Metric>
                 </CardBody>
 
@@ -1033,7 +1182,19 @@ const BrokersManagement: React.FC = () => {
       <SimpleModal
         isOpen={isModalOpen}
         size="lg"
-        title={modalMode === "add" ? "Add New Broker" : modalMode === "edit" ? "Edit Broker" : "Delete Broker"}
+        title={
+          modalMode === "add"
+            ? isPropPanel
+              ? "Add Prop Firm"
+              : "Add New Broker"
+            : modalMode === "edit"
+              ? isPropPanel
+                ? "Edit Prop Firm"
+                : "Edit Broker"
+              : isPropPanel
+                ? "Delete Prop Firm"
+                : "Delete Broker"
+        }
         onClose={() => !saving && setIsModalOpen(false)}
         footer={
           modalMode === "delete" ? (
@@ -1053,7 +1214,7 @@ const BrokersManagement: React.FC = () => {
               </GhostButton>
               <PrimaryButton type="button" onClick={submitForm} disabled={saving}>
                 <FiCheck />
-                {saving ? "Saving…" : "Save broker"}
+                {saving ? "Saving…" : isPropPanel ? "Save prop firm" : "Save broker"}
               </PrimaryButton>
             </>
           )
@@ -1064,50 +1225,129 @@ const BrokersManagement: React.FC = () => {
         )}
         {modalMode === "delete" ? (
           <div style={{ color: adminColors.muted, fontSize: 14, lineHeight: 1.6 }}>
-            Are you sure you want to permanently delete this broker? This cannot be undone.
+            Are you sure you want to permanently delete this {entityLabel}? This cannot be undone.
           </div>
         ) : (
           <FormGrid>
-            <TypeSectionTitle>Broker type</TypeSectionTitle>
-            <TypePicker>
-              {BROKER_KIND_ORDER.map((kind) => (
-                <TypeCard
-                  key={kind}
-                  type="button"
-                  $kind={kind}
-                  $active={
-                    formBothTabs
-                      ? kind === "forex" || kind === "crypto"
-                      : formRebateCategory === kind
-                  }
-                  onClick={() => setPrimaryType(kind)}
-                >
-                  <span className="icon">{KIND_ICONS[kind]}</span>
-                  <span className="title">{BROKER_KIND_LABELS[kind]}</span>
-                  <span className="desc">{BROKER_KIND_DESCRIPTIONS[kind]}</span>
-                </TypeCard>
-              ))}
-            </TypePicker>
-            {(formRebateCategory === "forex" || formRebateCategory === "crypto") && (
-              <BothOption>
-                <input
-                  type="checkbox"
-                  checked={formBothTabs}
-                  onChange={(e) => setFormBothTabs(e.target.checked)}
-                />
-                Also show on both Forex and Crypto website tabs
-              </BothOption>
+            {!isPropPanel && (
+              <>
+                <TypeSectionTitle>Broker type</TypeSectionTitle>
+                <TypePicker>
+                  {panelKinds.map((kind) => (
+                    <TypeCard
+                      key={kind}
+                      type="button"
+                      $kind={kind}
+                      $active={
+                        formBothTabs
+                          ? kind === "forex" || kind === "crypto"
+                          : formRebateCategory === kind
+                      }
+                      onClick={() => setPrimaryType(kind)}
+                    >
+                      <span className="icon">{KIND_ICONS[kind]}</span>
+                      <span className="title">{BROKER_KIND_LABELS[kind]}</span>
+                      <span className="desc">{BROKER_KIND_DESCRIPTIONS[kind]}</span>
+                    </TypeCard>
+                  ))}
+                </TypePicker>
+                {(formRebateCategory === "forex" || formRebateCategory === "crypto") && (
+                  <BothOption>
+                    <input
+                      type="checkbox"
+                      checked={formBothTabs}
+                      onChange={(e) => setFormBothTabs(e.target.checked)}
+                    />
+                    Also show on both Forex and Crypto website tabs
+                  </BothOption>
+                )}
+              </>
             )}
+            {isPropPanel && <TypeSectionTitle>Prop firm details</TypeSectionTitle>}
             <FormField>
-              Broker Name
+              {isPropPanel ? "Prop firm name" : "Broker Name"}
               <input value={formName} onChange={(e) => setFormName(e.target.value)} />
             </FormField>
             <FormField>
-              Min Deposit (number)
+              Broker icon
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                disabled={logoUploading}
+                onChange={onBrokerLogoFile}
+              />
+              <span style={{ fontSize: "0.7rem", color: "#64748b", marginTop: 4, lineHeight: 1.4 }}>
+                Upload PNG, JPG, WebP, or SVG (max 5 MB). When editing an existing broker, upload saves the icon immediately.
+              </span>
+              <input
+                value={formLogoUrl}
+                onChange={(e) => setFormLogoUrl(e.target.value)}
+                onBlur={() => setFormLogoUrl((v) => normalizeBrokerLogoUrl(v) || v.trim())}
+                placeholder="Or paste image URL"
+                style={{ marginTop: 8 }}
+                disabled={logoUploading}
+              />
+              {logoUploading && (
+                <span style={{ fontSize: "0.75rem", color: adminColors.navy, marginTop: 6 }}>Uploading…</span>
+              )}
+              <div style={{
+                marginTop: 10,
+                width: 72,
+                height: 72,
+                borderRadius: 16,
+                border: `1px solid ${adminColors.border}`,
+                background: "#fff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+                padding: 8,
+              }}>
+                <BrokerLogo
+                  src={formLogoUrl}
+                  name={formName || "Broker"}
+                  alt="Logo preview"
+                  style={{ width: "100%", height: "100%", objectFit: "contain" } as React.CSSProperties}
+                />
+              </div>
+            </FormField>
+
+            <TypeSectionTitle>Broker comparison fields</TypeSectionTitle>
+            <CompareHint>
+              These values appear on the public <strong>/compare</strong> page when traders pick this{" "}
+              {isPropPanel ? "prop firm" : "broker"}. Edit here → save → comparison updates automatically.
+              Star rating below is also used on compare when live review averages are not available.
+            </CompareHint>
+            <FormField>
+              Min deposit (number) — compare
               <input value={formMinDeposit} onChange={(e) => setFormMinDeposit(e.target.value)} />
             </FormField>
+            <FormField>
+              Spread from — compare
+              <input
+                value={formSpreadFrom}
+                onChange={(e) => setFormSpreadFrom(e.target.value)}
+                placeholder="From 0.0 pips"
+              />
+            </FormField>
+            <FormField>
+              Cashback rate — compare
+              <input
+                value={formCashbackRate}
+                onChange={(e) => setFormCashbackRate(e.target.value)}
+                placeholder="0.35 pip / lot"
+              />
+            </FormField>
+            <FormField>
+              Commission — compare
+              <input
+                value={formCommission}
+                onChange={(e) => setFormCommission(e.target.value)}
+                placeholder="$3.5 / lot"
+              />
+            </FormField>
             <FormField $full>
-              Regulation (comma-separated)
+              Regulation (comma-separated) — compare
               <input
                 value={formRegulations}
                 onChange={(e) => setFormRegulations(e.target.value)}
@@ -1115,9 +1355,43 @@ const BrokersManagement: React.FC = () => {
               />
             </FormField>
             <FormField>
-              Country (HQ / primary)
+              Country (HQ / primary) — compare
               <input value={formCountry} onChange={(e) => setFormCountry(e.target.value)} placeholder="Cyprus, St. Vincent…" />
             </FormField>
+            <FormField>
+              Leverage — compare
+              <input value={formLeverage} onChange={(e) => setFormLeverage(e.target.value)} placeholder="1:500" />
+            </FormField>
+            <FormField>
+              Platforms — compare
+              <input value={formPlatforms} onChange={(e) => setFormPlatforms(e.target.value)} placeholder="MT4, MT5, cTrader" />
+            </FormField>
+            <FormField>
+              Crypto instruments — compare
+              <select value={formCrypto} onChange={(e) => setFormCrypto(e.target.value)}>
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </FormField>
+            <FormField>
+              Star rating 1–5 — compare fallback
+              <input
+                type="number"
+                min={1}
+                max={5}
+                value={formRebatesStarRating}
+                onChange={(e) => setFormRebatesStarRating(e.target.value)}
+              />
+            </FormField>
+            <FormField>
+              Reviews label (e.g. 52 traders)
+              <input
+                value={formRebatesReviewsLabel}
+                onChange={(e) => setFormRebatesReviewsLabel(e.target.value)}
+              />
+            </FormField>
+
+            <TypeSectionTitle>More listing details</TypeSectionTitle>
             <FormField $full>
               Served countries (for country matcher — comma-separated)
               <input
@@ -1125,18 +1399,6 @@ const BrokersManagement: React.FC = () => {
                 onChange={(e) => setFormServedCountries(e.target.value)}
                 placeholder="Pakistan, United Kingdom, India…"
               />
-            </FormField>
-            <FormField>
-              Leverage
-              <input value={formLeverage} onChange={(e) => setFormLeverage(e.target.value)} placeholder="1:500" />
-            </FormField>
-            <FormField>
-              Platforms
-              <input value={formPlatforms} onChange={(e) => setFormPlatforms(e.target.value)} placeholder="MT4, MT5, cTrader" />
-            </FormField>
-            <FormField>
-              Commission
-              <input value={formCommission} onChange={(e) => setFormCommission(e.target.value)} placeholder="$3.5 / lot" />
             </FormField>
             <FormField>
               Overnight swap
@@ -1166,21 +1428,6 @@ const BrokersManagement: React.FC = () => {
               LegendScore support 0–10
               <input value={formScoreSup} onChange={(e) => setFormScoreSup(e.target.value)} />
             </FormField>
-            <FormField>
-              Spread From
-              <input value={formSpreadFrom} onChange={(e) => setFormSpreadFrom(e.target.value)} />
-            </FormField>
-            <FormField>
-              Cashback Rate
-              <input value={formCashbackRate} onChange={(e) => setFormCashbackRate(e.target.value)} />
-            </FormField>
-            <FormField>
-              Crypto instruments
-              <select value={formCrypto} onChange={(e) => setFormCrypto(e.target.value)}>
-                <option value="No">No</option>
-                <option value="Yes">Yes</option>
-              </select>
-            </FormField>
             <FormField $full>
               Description
               <textarea value={formDescription} onChange={(e) => setFormDescription(e.target.value)} rows={3} />
@@ -1195,40 +1442,6 @@ const BrokersManagement: React.FC = () => {
               />
             </FormField>
             <FormField>
-              Logo URL (optional)
-              <input
-                value={formLogoUrl}
-                onChange={(e) => setFormLogoUrl(e.target.value)}
-                onBlur={() => setFormLogoUrl((v) => normalizeBrokerLogoUrl(v) || v.trim())}
-                placeholder="https://cdn.brandfetch.io/… or https://brandfetch.com/exness.com"
-              />
-              <span style={{ fontSize: "0.7rem", color: "#64748b", marginTop: 4, lineHeight: 1.4 }}>
-                Paste a direct image URL, or a Brandfetch page like brandfetch.com/exness.com — we’ll convert it to a CDN image automatically.
-              </span>
-              {(normalizeBrokerLogoUrl(formLogoUrl) || formLogoUrl.trim()) && (
-                <div style={{
-                  marginTop: 10,
-                  width: 72,
-                  height: 72,
-                  borderRadius: 16,
-                  border: `1px solid ${adminColors.border}`,
-                  background: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  overflow: "hidden",
-                  padding: 8,
-                }}>
-                  <BrokerLogo
-                    src={formLogoUrl}
-                    name={formName || "Broker"}
-                    alt="Logo preview"
-                    style={{ width: "100%", height: "100%", objectFit: "contain" } as React.CSSProperties}
-                  />
-                </div>
-              )}
-            </FormField>
-            <FormField>
               Challenge / signup URL
               <input
                 value={formSetupUrl}
@@ -1236,27 +1449,10 @@ const BrokersManagement: React.FC = () => {
                 placeholder="https://partner-link…"
               />
             </FormField>
-            <FormField>
-              Star rating (1–5)
-              <input
-                type="number"
-                min={1}
-                max={5}
-                value={formRebatesStarRating}
-                onChange={(e) => setFormRebatesStarRating(e.target.value)}
-              />
-            </FormField>
-            <FormField>
-              Reviews label (e.g. 52 traders)
-              <input
-                value={formRebatesReviewsLabel}
-                onChange={(e) => setFormRebatesReviewsLabel(e.target.value)}
-              />
-            </FormField>
-            {formRebateCategory === "prop" && !formBothTabs && (
+            {(isPropPanel || (formRebateCategory === "prop" && !formBothTabs)) && (
               <PropTiersBox>
                 <div style={{ fontWeight: 800, color: adminColors.navy, fontSize: "0.8125rem", marginBottom: 10 }}>
-                  Prop cashback tiers
+                  Prop cashback tiers (shown on /compare for prop firms)
                 </div>
                 {formPropOffers.map((offer, idx) => (
                   <div
@@ -1557,7 +1753,7 @@ const BrokersManagement: React.FC = () => {
                 checked={formTemporarilyDisabled}
                 onChange={(e) => setFormTemporarilyDisabled(e.target.checked)}
               />
-              <span>Temporarily disable broker</span>
+              <span>{isPropPanel ? "Temporarily disable prop firm" : "Temporarily disable broker"}</span>
             </CheckboxRow>
             {formTemporarilyDisabled && (
               <FormField $full>

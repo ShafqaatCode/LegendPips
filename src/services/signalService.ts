@@ -9,6 +9,7 @@ export type ApiSignal = {
   sl: string;
   status: "active" | "closed" | "pending";
   premium: boolean;
+  locked?: boolean;
   assetClass?: string;
   notes?: string;
   createdAt?: string;
@@ -25,6 +26,7 @@ type Paginated<T> = {
     hasNextPage: boolean;
     hasPreviousPage: boolean;
   };
+  premiumAccess?: boolean;
 };
 
 export async function fetchPublicSignals(params?: {
@@ -38,14 +40,34 @@ export async function fetchPublicSignals(params?: {
   if (params?.limit) qs.set("limit", String(params.limit));
   if (params?.assetClass) qs.set("assetClass", params.assetClass);
   if (params?.tradeStatus) qs.set("tradeStatus", params.tradeStatus);
-  const res = await fetch(`${API_CONFIG.BASE_URL}/signals?${qs.toString()}`);
+  const res = await fetch(`${API_CONFIG.BASE_URL}/signals?${qs.toString()}`, {
+    headers: { ...getAuthHeaders(), Accept: "application/json" },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to load signals");
+  return data;
+}
+
+/** Authenticated member feed — unlocks premium levels when entitled. */
+export async function fetchMemberSignals(params?: {
+  page?: number;
+  limit?: number;
+}): Promise<Paginated<ApiSignal>> {
+  const qs = new URLSearchParams();
+  if (params?.page) qs.set("page", String(params.page));
+  if (params?.limit) qs.set("limit", String(params.limit));
+  const res = await fetch(`${API_CONFIG.BASE_URL}/signals/me?${qs.toString()}`, {
+    headers: getAuthHeaders(),
+  });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Failed to load signals");
   return data;
 }
 
 export async function fetchPublicSignalById(id: string): Promise<ApiSignal> {
-  const res = await fetch(`${API_CONFIG.BASE_URL}/signals/${id}`);
+  const res = await fetch(`${API_CONFIG.BASE_URL}/signals/${id}`, {
+    headers: { ...getAuthHeaders(), Accept: "application/json" },
+  });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Signal not found");
   return data.signal;
@@ -190,6 +212,8 @@ export function toSignalListRow(s: ApiSignal): {
   tp: string;
   sl: string;
   status: "buy" | "sell";
+  premium?: boolean;
+  locked?: boolean;
 } {
   return {
     id: s.id,
@@ -198,5 +222,7 @@ export function toSignalListRow(s: ApiSignal): {
     tp: s.tp,
     sl: s.sl,
     status: s.direction,
+    premium: s.premium,
+    locked: s.locked,
   };
 }

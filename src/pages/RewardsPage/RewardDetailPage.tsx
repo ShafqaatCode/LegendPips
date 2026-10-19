@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import React from "react";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { FiArrowLeft, FiCheck, FiChevronRight } from "react-icons/fi";
 import { getRewardDetail, REWARD_LIST } from "../../data/rewardsDetails";
-import SubscriptionModal from "../../components/Signals/SubscriptionModal";
+import { useAuth } from "../../contexts/AuthContext";
+import { useAuthModal } from "../../contexts/AuthModalContext";
 
 const Page = styled.div`
   max-width: 1120px;
@@ -384,7 +385,17 @@ const BottomText = styled.p`
 const RewardDetailPage: React.FC = () => {
   const { rewardId } = useParams<{ rewardId: string }>();
   const detail = getRewardDetail(rewardId);
-  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { openRegister } = useAuthModal();
+
+  const handleJoin = () => {
+    if (isAuthenticated) {
+      navigate("/user-panel/live-accounts");
+      return;
+    }
+    openRegister({ returnTo: "/user-panel/live-accounts", redirectAfterLogin: true });
+  };
 
   if (!detail) {
     return <Navigate to="/rewards" replace />;
@@ -408,9 +419,12 @@ const RewardDetailPage: React.FC = () => {
         <HeroTitle>{detail.heroTitle}</HeroTitle>
         <HeroSub>{detail.heroSubtitle}</HeroSub>
         <HeroActions>
-          <PrimaryBtn type="button" onClick={() => setShowModal(true)}>
+          <PrimaryBtn type="button" onClick={handleJoin}>
             Join Now
           </PrimaryBtn>
+          <GhostBtn to="/leaderboard">
+            Leaderboard <FiChevronRight />
+          </GhostBtn>
           <GhostBtn to="/rewards">
             All rewards <FiChevronRight />
           </GhostBtn>
@@ -502,12 +516,10 @@ const RewardDetailPage: React.FC = () => {
 
       <BottomCta>
         <BottomText>{detail.ctaLine}</BottomText>
-        <PrimaryBtn type="button" onClick={() => setShowModal(true)}>
+        <PrimaryBtn type="button" onClick={handleJoin}>
           Join Now
         </PrimaryBtn>
       </BottomCta>
-
-      <SubscriptionModal isOpen={showModal} onClose={() => setShowModal(false)} />
     </Page>
   );
 };

@@ -1,30 +1,14 @@
 import React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import {
-  FiArrowUpRight,
-  FiBarChart2,
-  FiDollarSign,
-  FiGift,
-  FiGitBranch,
-  FiLayers,
-  FiTrendingUp,
-} from "react-icons/fi";
+import { FiArrowUpRight } from "react-icons/fi";
 import bannerImg from "../../assets/banner/BannerBg.jpg";
 import {
   CALCULATORS_CATALOG,
   CALCULATORS_INTRO,
   type CalculatorItem,
 } from "../../data/calculatorsCatalog";
-
-const ICONS: Record<string, React.ReactNode> = {
-  "lot-size": <FiLayers size={22} />,
-  pip: <FiTrendingUp size={22} />,
-  margin: <FiDollarSign size={22} />,
-  pivot: <FiBarChart2 size={22} />,
-  fibonacci: <FiGitBranch size={22} />,
-  rebate: <FiGift size={22} />,
-};
+import { getCalculatorIcon } from "../../components/Calculators/calculatorIcons";
 
 const Page = styled.div`
   background: #f3f4f7;
@@ -146,6 +130,16 @@ const IconBadge = styled.div`
   color: ${({ theme }) => theme.colors.primary};
   background: linear-gradient(145deg, rgba(251, 191, 36, 0.2) 0%, rgba(251, 191, 36, 0.08) 100%);
   border: 1px solid rgba(251, 191, 36, 0.35);
+
+  svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    flex-shrink: 0;
+  }
 `;
 
 const CardHead = styled.div`
@@ -210,7 +204,7 @@ function CalculatorCard({ item }: { item: CalculatorItem }) {
   return (
     <Card>
       <CardTop>
-        <IconBadge aria-hidden>{ICONS[item.id]}</IconBadge>
+        <IconBadge aria-hidden>{getCalculatorIcon(item.id, 22)}</IconBadge>
         <CardHead>
           <Tag>{item.shortLabel}</Tag>
           <CardTitle>{item.title}</CardTitle>

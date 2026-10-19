@@ -176,6 +176,10 @@ const AnalysisManagement: React.FC = () => {
   const [formExcerpt, setFormExcerpt] = useState('');
   const [formContent, setFormContent] = useState('');
   const [formFeaturedImage, setFormFeaturedImage] = useState('');
+  const [formChartImage, setFormChartImage] = useState('');
+  const [formChartTitle, setFormChartTitle] = useState('');
+  const [formFeaturedFile, setFormFeaturedFile] = useState<File | null>(null);
+  const [formChartFile, setFormChartFile] = useState<File | null>(null);
   const [formFeatured, setFormFeatured] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -222,6 +226,10 @@ const AnalysisManagement: React.FC = () => {
     setFormExcerpt('');
     setFormContent('');
     setFormFeaturedImage('');
+    setFormChartImage('');
+    setFormChartTitle('');
+    setFormFeaturedFile(null);
+    setFormChartFile(null);
     setFormFeatured(false);
     setIsModalOpen(true);
   };
@@ -241,6 +249,10 @@ const AnalysisManagement: React.FC = () => {
     setFormExcerpt(item.excerpt || '');
     setFormContent(item.content || '');
     setFormFeaturedImage(item.featuredImage || '');
+    setFormChartImage(item.chartImage || '');
+    setFormChartTitle(item.chartTitle || '');
+    setFormFeaturedFile(null);
+    setFormChartFile(null);
     setFormFeatured(Boolean(item.isFeatured));
     setIsModalOpen(true);
   };
@@ -263,6 +275,10 @@ const AnalysisManagement: React.FC = () => {
         content,
         excerpt: formExcerpt.trim() || content.slice(0, 180),
         featuredImage: formFeaturedImage.trim() || undefined,
+        chartImage: formChartImage.trim() || undefined,
+        chartTitle: formChartTitle.trim() || undefined,
+        featuredImageFile: formFeaturedFile,
+        chartImageFile: formChartFile,
         isFeatured: formFeatured,
         publishedAt: formPublishedAt ? new Date(formPublishedAt).toISOString() : new Date().toISOString(),
       };
@@ -410,7 +426,36 @@ const AnalysisManagement: React.FC = () => {
             <FormField>Author<input value={formAuthor} onChange={(e) => setFormAuthor(e.target.value)} /></FormField>
             <FormField>Published date<input type="date" value={formPublishedAt} onChange={(e) => setFormPublishedAt(e.target.value)} /></FormField>
             <FormField>Excerpt<input value={formExcerpt} onChange={(e) => setFormExcerpt(e.target.value)} placeholder="Short summary for cards" /></FormField>
-            <FormField>Featured image URL<input value={formFeaturedImage} onChange={(e) => setFormFeaturedImage(e.target.value)} placeholder="https://…" /></FormField>
+            <FormField>
+              Featured image URL
+              <input value={formFeaturedImage} onChange={(e) => setFormFeaturedImage(e.target.value)} placeholder="https://…" />
+            </FormField>
+            <FormField>
+              Or upload featured image
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(e) => setFormFeaturedFile(e.target.files?.[0] || null)}
+              />
+              {formFeaturedFile ? <small style={{ color: adminColors.muted }}>Selected: {formFeaturedFile.name}</small> : null}
+            </FormField>
+            <FormField>
+              Chart image URL
+              <input value={formChartImage} onChange={(e) => setFormChartImage(e.target.value)} placeholder="https://…" />
+            </FormField>
+            <FormField>
+              Or upload chart image
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(e) => setFormChartFile(e.target.files?.[0] || null)}
+              />
+              {formChartFile ? <small style={{ color: adminColors.muted }}>Selected: {formChartFile.name}</small> : null}
+            </FormField>
+            <FormField>
+              Chart title
+              <input value={formChartTitle} onChange={(e) => setFormChartTitle(e.target.value)} placeholder="Optional chart caption" />
+            </FormField>
             <FormField>
               Full analysis content
               <textarea

@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import RewardsJoinClub from "../../components/Signals/RewardsJoinClub";
 import XMBanner from "../../components/Signals/XMBanner";
 import RewardsCards from "../../components/Signals/RewardsCards";
-import SubscriptionModal from "../../components/Signals/SubscriptionModal";
+import { useAuth } from "../../contexts/AuthContext";
+import { useAuthModal } from "../../contexts/AuthModalContext";
 
 import ParticipationIcon from "../../assets/icons/verified.svg";
 import LockIcon from "../../assets/icons/badge1.svg";
@@ -205,20 +207,36 @@ const RuleIcon = styled.img`
 `;
 
 const RewardsPage: React.FC = () => {
-  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { openRegister } = useAuthModal();
+
+  const handleJoin = () => {
+    if (isAuthenticated) {
+      navigate("/user-panel/live-accounts");
+      return;
+    }
+    openRegister({ returnTo: "/user-panel/live-accounts", redirectAfterLogin: true });
+  };
 
   return (
     <>
-      <RewardsJoinClub onJoinNow={() => setShowModal(true)} />
+      <RewardsJoinClub onJoinNow={handleJoin} />
       <Frame>
         <Inner>
           <XMBanner />
-          <RewardsCards onJoinNow={() => setShowModal(true)} />
+          <RewardsCards onJoinNow={handleJoin} />
 
-        <BottomCta>
+          <BottomCta>
           <BottomText>Start Trading. Start winning.</BottomText>
-          <JoinNowButton type="button" onClick={() => setShowModal(true)}>
+          <JoinNowButton type="button" onClick={handleJoin}>
             Join Now
+          </JoinNowButton>
+        </BottomCta>
+        <BottomCta>
+          <BottomText>Climb the ranks while you earn.</BottomText>
+          <JoinNowButton type="button" onClick={() => navigate("/leaderboard")}>
+            View Leaderboard
           </JoinNowButton>
         </BottomCta>
 
@@ -251,7 +269,7 @@ const RewardsPage: React.FC = () => {
 
         <SectionHeaderRow>
           <SectionHeaderTitle>Your Trades. Your Rewards.</SectionHeaderTitle>
-          <JoinNowButton type="button" onClick={() => setShowModal(true)}>
+          <JoinNowButton type="button" onClick={handleJoin}>
             Join Now
           </JoinNowButton>
         </SectionHeaderRow>
@@ -280,7 +298,7 @@ const RewardsPage: React.FC = () => {
 
         <BottomCta>
           <BottomText>Trade More. Earn More.</BottomText>
-          <JoinNowButton type="button" onClick={() => setShowModal(true)}>
+          <JoinNowButton type="button" onClick={handleJoin}>
             Join Now
           </JoinNowButton>
         </BottomCta>
@@ -313,7 +331,7 @@ const RewardsPage: React.FC = () => {
 
         <BottomCta>
           <BottomText>Start Today. Win Tomorrow.</BottomText>
-          <JoinNowButton type="button" onClick={() => setShowModal(true)}>
+          <JoinNowButton type="button" onClick={handleJoin}>
             Join Now
           </JoinNowButton>
         </BottomCta>
@@ -334,7 +352,7 @@ const RewardsPage: React.FC = () => {
 
         <SectionHeaderRow style={{ marginTop: 6 }}>
           <SectionHeaderTitle>Start Trading. Unlock Rewards.</SectionHeaderTitle>
-          <JoinNowButton type="button" onClick={() => setShowModal(true)}>
+          <JoinNowButton type="button" onClick={handleJoin}>
             Join Now
           </JoinNowButton>
         </SectionHeaderRow>
@@ -406,7 +424,6 @@ const RewardsPage: React.FC = () => {
           </List>
         </SectionCard>
       </Inner>
-      <SubscriptionModal isOpen={showModal} onClose={() => setShowModal(false)} />
     </Frame>
     </>
   );

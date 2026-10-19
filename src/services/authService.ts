@@ -31,6 +31,8 @@ export interface User {
   isFullAdmin?: boolean;
   isStaffAdmin?: boolean;
   adminPermissions?: string[];
+  premiumSignalsAccess?: boolean;
+  hasPremiumSignals?: boolean;
 }
 
 export interface AuthResponse {

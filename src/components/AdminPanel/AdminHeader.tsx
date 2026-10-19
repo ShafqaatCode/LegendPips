@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FiMenu, FiBell, FiSearch, FiLogOut, FiChevronDown } from 'react-icons/fi';
+import { FiMenu, FiSearch, FiLogOut, FiChevronDown, FiMessageSquare } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { adminColors } from './adminUi';
 import { isFullAdmin, hasPermission } from '../../utils/adminPermissions';
@@ -9,6 +9,7 @@ import { useLocale } from '../../contexts/LocaleContext';
 import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher';
 import { fetchAdminChatConversations } from '../../services/chatService';
 import { connectChatSocket } from '../../services/chatService';
+import NotificationBell from '../UserPanel/NotificationBell';
 
 const HeaderWrapper = styled.header`
   background: rgba(255, 255, 255, 0.82);
@@ -396,10 +397,11 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuClick }) => {
             title={chatUnread ? `${chatUnread} unread live chat` : 'Live chat'}
             onClick={() => navigate('/admin-panel/live-chat')}
           >
-            <FiBell />
+            <FiMessageSquare />
             {chatUnread > 0 && <Badge>{chatUnread > 9 ? '9+' : chatUnread}</Badge>}
           </IconButton>
         )}
+        <NotificationBell variant="panel" />
         <UserChipWrap ref={menuRef}>
           <UserChip
             type="button"
@@ -426,7 +428,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuClick }) => {
                   }}
                   style={{ color: adminColors.navy }}
                 >
-                  <FiBell size={15} />
+                  <FiMessageSquare size={15} />
                   Live chat{chatUnread > 0 ? ` (${chatUnread})` : ''}
                 </UserMenuItem>
               )}

@@ -36,7 +36,9 @@ const ComparePage: React.FC = () => {
 
   const [items, setItems] = useState<ApiBroker[]>([]);
   const [pool, setPool] = useState<ApiBroker[]>([]);
+  const [poolLoading, setPoolLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [category, setCategory] = useState<"forex" | "crypto" | "prop" | "binary" | "ewallet" | "">(
     () => (params.get("category") as "forex" | "crypto" | "prop" | "binary" | "ewallet" | "") || ""
   );
@@ -44,6 +46,12 @@ const ComparePage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const { t } = useLocale();
+
+  // Keep typing snappy — only hit the API after a short pause
+  useEffect(() => {
+    const id = window.setTimeout(() => setDebouncedSearch(search.trim()), 280);
+    return () => window.clearTimeout(id);
+  }, [search]);
 
   /** Prefer URL ids; fall back to loaded rows so chips/remove stay correct after SEO slug URLs. */
   const selectedIds = useMemo(() => {
@@ -176,15 +184,28 @@ const ComparePage: React.FC = () => {
   }, [idsFromUrl, category, navigate]);
 
   useEffect(() => {
+    let cancelled = false;
+    setPoolLoading(true);
     fetchBrokersPage({
       page: 1,
-      limit: 50,
+      limit: 60,
+      rebatesPage: true,
       category: category || undefined,
-      search: search || undefined,
+      search: debouncedSearch || undefined,
     })
-      .then((r) => setPool(r.items || []))
-      .catch(() => setPool([]));
-  }, [search, category]);
+      .then((r) => {
+        if (!cancelled) setPool(r.items || []);
+      })
+      .catch(() => {
+        if (!cancelled) setPool([]);
+      })
+      .finally(() => {
+        if (!cancelled) setPoolLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedSearch, category]);
 
   const addId = (id: string) => {
     if (selectedIds.includes(id) || selectedIds.length >= 4) return;
@@ -248,8 +269,13 @@ const ComparePage: React.FC = () => {
               placeholder="Search brokers"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              aria-label="Search brokers"
             />
-            <select value={category} onChange={(e) => setCategory(e.target.value as typeof category)}>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as typeof category)}
+              aria-label="Broker type"
+            >
               <option value="">All types</option>
               <option value="forex">Forex</option>
               <option value="crypto">Crypto</option>
@@ -258,19 +284,61 @@ const ComparePage: React.FC = () => {
               <option value="ewallet">E-wallet</option>
             </select>
           </Filters>
-          <Chips>
-            {pool.slice(0, 16).map((b) => (
-              <Chip
-                key={b._id}
-                type="button"
-                $on={selectedIds.includes(b._id)}
-                disabled={selectedIds.length >= 4 && !selectedIds.includes(b._id)}
-                onClick={() => (selectedIds.includes(b._id) ? removeId(b._id) : addId(b._id))}
-              >
-                {b.name}
-              </Chip>
-            ))}
-          </Chips>
+
+          <ListLabel>
+            Broker list
+            <span>
+              {poolLoading
+                ? "Loading…"
+                : debouncedSearch
+                  ? `${pool.length} match${pool.length === 1 ? "" : "es"}`
+                  : `${pool.length} brokers`}
+            </span>
+          </ListLabel>
+
+          <BrokerList role="list" aria-label="Brokers available to compare">
+            {poolLoading && pool.length === 0 ? (
+              <ListEmpty>Loading broker list…</ListEmpty>
+            ) : pool.length === 0 ? (
+              <ListEmpty>
+                {debouncedSearch
+                  ? `No brokers found for “${debouncedSearch}”.`
+                  : "No brokers available for this filter."}
+              </ListEmpty>
+            ) : (
+              pool.map((b) => {
+                const on = selectedIds.includes(b._id);
+                const full = selectedIds.length >= 4 && !on;
+                return (
+                  <BrokerRow key={b._id} role="listitem" $on={on} $disabled={full}>
+                    <BrokerMain>
+                      {b.logoUrl ? (
+                        <BrokerLogo src={b.logoUrl} alt="" />
+                      ) : (
+                        <BrokerLogoFallback>{b.name.slice(0, 2).toUpperCase()}</BrokerLogoFallback>
+                      )}
+                      <BrokerMeta>
+                        <strong>{b.name}</strong>
+                        <em>
+                          {[b.rebateCategory || "Broker", b.spreadFrom ? `Spread ${b.spreadFrom}` : null]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </em>
+                      </BrokerMeta>
+                    </BrokerMain>
+                    <AddBtn
+                      type="button"
+                      $on={on}
+                      disabled={full}
+                      onClick={() => (on ? removeId(b._id) : addId(b._id))}
+                    >
+                      {on ? "Selected" : full ? "Max 4" : "Compare"}
+                    </AddBtn>
+                  </BrokerRow>
+                );
+              })
+            )}
+          </BrokerList>
           {selectedIds.length > 0 && (
             <Selected>
               Selected: {selectedIds.length}/4
@@ -587,35 +655,154 @@ const Picker = styled.section`
 const Filters = styled.div`
   display: flex;
   gap: 0.5rem;
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.75rem;
   input,
   select {
-    padding: 0.5rem 0.7rem;
+    padding: 0.55rem 0.75rem;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    border-radius: 10px;
     font: inherit;
+    background: #fff;
+    color: #132e58;
   }
   input {
     flex: 1;
     min-width: 160px;
   }
 `;
-const Chips = styled.div`
+
+const ListLabel = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #132e58;
+
+  span {
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #64748b;
+    font-size: 0.8rem;
+  }
 `;
-const Chip = styled.button<{ $on?: boolean }>`
+
+const BrokerList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  max-height: min(420px, 52vh);
+  overflow: auto;
+  padding: 0.35rem;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(19, 46, 88, 0.05);
+`;
+
+const ListEmpty = styled.p`
+  margin: 0;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 600;
+`;
+
+const BrokerRow = styled.div<{ $on?: boolean; $disabled?: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid ${({ $on }) => ($on ? "rgba(19, 46, 88, 0.35)" : "#eef2f7")};
+  background: ${({ $on }) => ($on ? "rgba(19, 46, 88, 0.06)" : "#f8fafc")};
+  opacity: ${({ $disabled }) => ($disabled ? 0.55 : 1)};
+`;
+
+const BrokerMain = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+`;
+
+const BrokerLogo = styled.img`
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid #eef2f7;
+  flex-shrink: 0;
+`;
+
+const BrokerLogoFallback = styled.span`
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #132e58;
+  color: #fbc113;
+  font-size: 0.7rem;
+  font-weight: 800;
+`;
+
+const BrokerMeta = styled.div`
+  min-width: 0;
+
+  strong {
+    display: block;
+    color: #132e58;
+    font-size: 0.9rem;
+    font-weight: 800;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  em {
+    display: block;
+    margin-top: 0.12rem;
+    font-style: normal;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+`;
+
+const AddBtn = styled.button<{ $on?: boolean }>`
+  appearance: none;
+  flex-shrink: 0;
   border: 1px solid ${({ $on }) => ($on ? "#132e58" : "#e2e8f0")};
   background: ${({ $on }) => ($on ? "#132e58" : "#fff")};
   color: ${({ $on }) => ($on ? "#fff" : "#132e58")};
-  border-radius: 99px;
-  padding: 0.3rem 0.7rem;
-  font-size: 0.78rem;
-  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  font-family: inherit;
   cursor: pointer;
+
   &:disabled {
-    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: #132e58;
   }
 `;
 const Selected = styled.div`

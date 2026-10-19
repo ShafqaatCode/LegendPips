@@ -286,7 +286,7 @@ export const SubmenuToggle = styled.div`
   }
 `;
 
-/** Desktop mega-menu — sits fully below the nav row (not under the Tools label). */
+/** Desktop mega-menu — three equal panels below the Tools control. */
 export const ToolsMegaMenu = styled.div`
   position: absolute;
   top: calc(100% + 10px);
@@ -300,20 +300,21 @@ export const ToolsMegaMenu = styled.div`
     inset-inline-start: auto;
   }
   z-index: 3000;
-  width: min(560px, calc(100vw - 2rem));
-  max-height: min(70vh, 480px);
-  overflow: auto;
-  padding: 0.85rem 1.1rem 1.15rem;
+  width: min(740px, calc(100vw - 1.5rem));
+  max-height: none;
+  overflow: visible;
+  padding: 1rem 1.05rem 1.15rem;
   margin-top: 0;
-  border-radius: 12px;
+  border-radius: 14px;
   background: linear-gradient(165deg, #0f2448 0%, #132e58 55%, #0c1f3d 100%);
-  border: 1px solid rgba(251, 191, 36, 0.22);
+  border: 1px solid rgba(251, 193, 19, 0.28);
   box-shadow:
     0 18px 48px rgba(8, 20, 40, 0.45),
     0 0 0 1px rgba(255, 255, 255, 0.04) inset;
   display: grid;
-  grid-template-columns: 168px 1fr;
-  gap: 1rem 1.15rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr) minmax(0, 1.45fr);
+  gap: 0;
+  align-items: start;
   text-align: start;
 
   /* Invisible hover bridge so the menu does not close when moving the pointer down */
@@ -336,55 +337,62 @@ export const ToolsMegaColumn = styled.div`
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.2rem;
+  padding: 0 0.85rem;
+
+  &:first-child {
+    padding-inline-start: 0.15rem;
+  }
+
+  &:last-child {
+    padding-inline-end: 0.15rem;
+  }
 
   & + & {
     border-inline-start: 1px solid rgba(255, 255, 255, 0.1);
-    padding-inline-start: 1.1rem;
   }
 `;
 
 export const ToolsMegaLabel = styled.div`
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(251, 191, 36, 0.9);
-  margin-bottom: 0.35rem;
-  padding-bottom: 0.35rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(251, 193, 19, 0.95);
+  margin: 0 0 0.45rem;
+  padding: 0 0.35rem 0.45rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 export const ToolsMegaGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.15rem 0.75rem;
+  gap: 0.1rem 0.35rem;
 `;
 
 export const ToolsMegaLink = styled(NavLink)`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 0.8125rem;
+  gap: 0.4rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.78rem;
   font-weight: 500;
   text-decoration: none;
-  padding: 0.45rem 0.55rem;
+  padding: 0.38rem 0.4rem;
   border-radius: 8px;
-  line-height: 1.35;
+  line-height: 1.3;
   white-space: normal;
   transition: background 0.15s ease, color 0.15s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: ${activeColor};
+    background: rgba(255, 255, 255, 0.07);
+    color: #fff;
   }
 
   &.active {
-    color: ${activeColor};
-    background: rgba(251, 191, 36, 0.12);
-    font-weight: 650;
+    color: #fbc113;
+    background: rgba(251, 193, 19, 0.1);
   }
 `;
 
@@ -499,9 +507,15 @@ export const DropSectionLabel = styled.div`
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(251, 191, 36, 0.92);
-  padding: 0.35rem 0.7rem 0.45rem;
-  margin-bottom: 0.1rem;
+  color: rgba(251, 193, 19, 0.95);
+  padding: 0.55rem 0.7rem 0.35rem;
+  margin-top: 0.15rem;
+  margin-bottom: 0.05rem;
+
+  &:first-child {
+    margin-top: 0;
+    padding-top: 0.25rem;
+  }
 `;
 
 export const MobileToolsGroup = styled.div`

@@ -180,6 +180,7 @@ const UserDetail: React.FC = () => {
   const [brokers, setBrokers] = useState<ApiBroker[]>([]);
   const [managerId, setManagerId] = useState('');
   const [brokerId, setBrokerId] = useState('');
+  const [premiumAccess, setPremiumAccess] = useState(false);
   const [careSaving, setCareSaving] = useState(false);
   const [careMsg, setCareMsg] = useState('');
 
@@ -202,6 +203,7 @@ const UserDetail: React.FC = () => {
     if (!user) return;
     setManagerId(user.assignedManagerId || '');
     setBrokerId(user.recommendedBrokerId || '');
+    setPremiumAccess(!!user.premiumSignalsAccess);
   }, [user]);
 
   useEffect(() => {
@@ -209,7 +211,7 @@ const UserDetail: React.FC = () => {
     (async () => {
       try {
         const [mgrs, brokerPage] = await Promise.all([
-          adminListAccountManagers(true),
+          adminListAccountManagers(false),
           fetchBrokersPage({ page: 1, limit: 50 }),
         ]);
         if (cancelled) return;
@@ -248,9 +250,20 @@ const UserDetail: React.FC = () => {
       const res = await adminAssignUserCare(id, {
         assignedManagerId: managerId || null,
         recommendedBrokerId: brokerId || null,
+        premiumSignalsAccess: premiumAccess,
       });
-      setUser(res.user);
-      setCareMsg(res.message || 'Assignment saved');
+      const refreshed = await getAdminUserDetail(id).catch(() => res.user);
+      setUser(refreshed);
+      setManagerId((refreshed as { assignedManagerId?: string | null })?.assignedManagerId || managerId || '');
+      setBrokerId((refreshed as { recommendedBrokerId?: string | null })?.recommendedBrokerId || brokerId || '');
+      setPremiumAccess(!!(refreshed as { premiumSignalsAccess?: boolean })?.premiumSignalsAccess);
+      setCareMsg(
+        premiumAccess
+          ? `Premium signals unlocked for ${user?.email || 'this user'}.`
+          : managerId
+            ? `Manager assigned to ${user?.email || "this user"}. Log in (or Impersonate) as that user to see the card in their panel.`
+            : res.message || "Assignment saved"
+      );
     } catch (e: any) {
       setError(e.message || 'Failed to save assignment');
     } finally {
@@ -483,7 +496,9 @@ const UserDetail: React.FC = () => {
               <select value={managerId} onChange={(e) => setManagerId(e.target.value)}>
                 <option value="">— Not assigned —</option>
                 {managers.map((m) => (
-                  <option key={m.id} value={m.id}>{m.name}</option>
+                  <option key={m.id} value={m.id} disabled={m.active === false}>
+                    {m.name}{m.active === false ? " (inactive)" : ""}
+                  </option>
                 ))}
               </select>
             </label>
@@ -497,6 +512,34 @@ const UserDetail: React.FC = () => {
               </select>
             </label>
           </CareGrid>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '0.55rem',
+              marginTop: '0.85rem',
+              padding: '0.75rem 0.85rem',
+              border: '1px solid #e8ecf1',
+              borderRadius: 8,
+              background: premiumAccess ? '#ecfdf5' : '#f8fafc',
+              cursor: 'pointer',
+              fontSize: '0.8125rem',
+              color: '#132E58',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={premiumAccess}
+              onChange={(e) => setPremiumAccess(e.target.checked)}
+              style={{ marginTop: 2 }}
+            />
+            <span>
+              <strong style={{ display: 'block', marginBottom: 2 }}>Premium signals access</strong>
+              <span style={{ color: '#64748b', fontWeight: 500 }}>
+                Unlock full entry / TP / SL for premium signals. Also granted automatically when a live account is approved.
+              </span>
+            </span>
+          </label>
           <div style={{ marginTop: '0.75rem' }}>
             <PrimaryButton type="button" $sm onClick={saveCareAssignment} disabled={careSaving}>
               {careSaving ? 'Saving…' : 'Save assignment'}

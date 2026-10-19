@@ -65,6 +65,7 @@ const FALLBACK_NAV = [
   { to: "/", label: "Home", end: true },
   { to: "/how-it-works", label: "How It Works" },
   { to: "/contests", label: "Contests" },
+  { to: "/leaderboard", label: "Leaderboard" },
   { to: "/signals", label: "Signals" },
   { to: "/rewards", label: "Rewards" },
   { to: "/news", label: "News" },
@@ -78,6 +79,15 @@ const EDUCATION_PATHS = new Set([
   "/courses",
   "/trading-videos",
   "/webinars",
+]);
+
+const MARKET_TOOL_PATHS = new Set([
+  "/spread-comparison",
+  "/swaps-comparison",
+  "/live-charts",
+  "/economic-calendar",
+  "/currency-converter",
+  "/trading-stats",
   "/broker-signup-bonuses",
   "/best-performing-stocks",
 ]);
@@ -114,6 +124,8 @@ const FALLBACK_TOOLS = [
   { to: "/pivot-point-calculator", label: "Pivot Point Calculator" },
   { to: "/fibonacci-calculator", label: "Fibonacci Calculator" },
   { to: "/profit-calculator", label: "Profit Calculator" },
+  { to: "/account-risk-calculator", label: "Risk Calculator" },
+  { to: "/break-even-calculator", label: "Break-Even Calculator" },
   { to: "/risk-reward-calculator", label: "Risk / Reward" },
   { to: "/drawdown-calculator", label: "Drawdown Calculator" },
   { to: "/compound-calculator", label: "Compound Calculator" },
@@ -221,7 +233,10 @@ const Header: React.FC = () => {
     return [...merged, ...restMissing];
   }, [toolsNav, labelForPath]);
   const educationTools = toolsSubmenu.filter((n) => EDUCATION_PATHS.has(n.to));
-  const calculatorTools = toolsSubmenu.filter((n) => !EDUCATION_PATHS.has(n.to));
+  const marketTools = toolsSubmenu.filter((n) => MARKET_TOOL_PATHS.has(n.to));
+  const calculatorTools = toolsSubmenu.filter(
+    (n) => !EDUCATION_PATHS.has(n.to) && !MARKET_TOOL_PATHS.has(n.to)
+  );
   const { src: logoSrc, alt: logoAlt, height: logoHeight, maxWidth: logoMaxWidth } = useSiteLogo();
 
   const portalPath = user?.role === "admin" ? "/admin-panel" : "/user-panel";
@@ -595,10 +610,10 @@ const Header: React.FC = () => {
 
               {submenuOpen && (
                 <ToolsMegaMenu role="menu" aria-label={t("header.tools")}>
-                  {educationTools.length > 0 && (
+                  {marketTools.length > 0 && (
                     <ToolsMegaColumn>
-                      <ToolsMegaLabel>{t("header.education")}</ToolsMegaLabel>
-                      {educationTools.map((tool) => (
+                      <ToolsMegaLabel>Market tools</ToolsMegaLabel>
+                      {marketTools.map((tool) => (
                         <ToolsMegaLink to={tool.to} key={tool.to} role="menuitem">
                           <span>{tool.label}</span>
                           {"badge" in tool && typeof (tool as { badge?: unknown }).badge === "string" ? (
@@ -607,7 +622,7 @@ const Header: React.FC = () => {
                                 marginLeft: 8,
                                 padding: "1px 7px",
                                 borderRadius: 999,
-                                background: "#fbbf24",
+                                background: "#fbc113",
                                 color: "#111",
                                 fontSize: 10,
                                 fontWeight: 800,
@@ -621,15 +636,25 @@ const Header: React.FC = () => {
                       ))}
                     </ToolsMegaColumn>
                   )}
+                  {educationTools.length > 0 && (
+                    <ToolsMegaColumn>
+                      <ToolsMegaLabel>{t("header.education")}</ToolsMegaLabel>
+                      {educationTools.map((tool) => (
+                        <ToolsMegaLink to={tool.to} key={tool.to} role="menuitem">
+                          <span>{tool.label}</span>
+                        </ToolsMegaLink>
+                      ))}
+                    </ToolsMegaColumn>
+                  )}
                   {calculatorTools.length > 0 && (
                     <ToolsMegaColumn>
                       <ToolsMegaLabel>{t("header.calculators")}</ToolsMegaLabel>
                       <ToolsMegaGrid>
                         {calculatorTools.map((tool) => (
                           <ToolsMegaLink to={tool.to} key={tool.to} role="menuitem">
-                      {tool.label}
+                            {tool.label}
                           </ToolsMegaLink>
-                  ))}
+                        ))}
                       </ToolsMegaGrid>
                     </ToolsMegaColumn>
                   )}
@@ -862,10 +887,10 @@ const Header: React.FC = () => {
 
               {mobileSubmenuOpen && (
                 <MobileToolsGroup>
-                  {educationTools.length > 0 && (
+                  {marketTools.length > 0 && (
                     <>
-                      <MobileToolsHeading>{t("header.education")}</MobileToolsHeading>
-                      {educationTools.map((tool) => (
+                      <MobileToolsHeading>Market tools</MobileToolsHeading>
+                      {marketTools.map((tool) => (
                         <NavItem
                           to={tool.to}
                           key={tool.to}
@@ -882,21 +907,38 @@ const Header: React.FC = () => {
                       ))}
                     </>
                   )}
+                  {educationTools.length > 0 && (
+                    <>
+                      <MobileToolsHeading>{t("header.education")}</MobileToolsHeading>
+                      {educationTools.map((tool) => (
+                        <NavItem
+                          to={tool.to}
+                          key={tool.to}
+                          onClick={() => {
+                            setMenuOpen(false);
+                            setMobileSubmenuOpen(false);
+                          }}
+                        >
+                          {tool.label}
+                        </NavItem>
+                      ))}
+                    </>
+                  )}
                   {calculatorTools.length > 0 && (
                     <>
                       <MobileToolsHeading>{t("header.calculators")}</MobileToolsHeading>
                       {calculatorTools.map((tool) => (
-                    <NavItem
-                      to={tool.to}
-                      key={tool.to}
-                      onClick={() => {
-                        setMenuOpen(false);
-                        setMobileSubmenuOpen(false);
-                      }}
-                    >
-                      {tool.label}
-                    </NavItem>
-                  ))}
+                        <NavItem
+                          to={tool.to}
+                          key={tool.to}
+                          onClick={() => {
+                            setMenuOpen(false);
+                            setMobileSubmenuOpen(false);
+                          }}
+                        >
+                          {tool.label}
+                        </NavItem>
+                      ))}
                     </>
                   )}
                 </MobileToolsGroup>

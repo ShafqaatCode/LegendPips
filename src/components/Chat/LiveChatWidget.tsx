@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FiMessageCircle, FiX, FiSend, FiMinimize2, FiLifeBuoy, FiChevronUp, FiHeadphones } from "react-icons/fi";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaTelegramPlane, FaWhatsapp } from "react-icons/fa";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   connectChatSocket,
@@ -17,6 +17,7 @@ import {
 } from "../../services/chatService";
 import { OPEN_LIVE_CHAT_EVENT } from "../../utils/liveChatEvents";
 import { WHATSAPP_SUPPORT_NUMBER_DISPLAY, WHATSAPP_SUPPORT_URL } from "../../utils/whatsappSupport";
+import { TELEGRAM_SUPPORT_URL } from "../../utils/supportChannels";
 import { useAuthModal } from "../../contexts/AuthModalContext";
 
 const pop = keyframes`
@@ -92,7 +93,7 @@ const Fab = styled.button<{ $variant?: "main" | "chat" | "tickets" | "whatsapp" 
   }
 `;
 
-const FabLink = styled.a`
+const FabLink = styled.a<{ $tone?: "whatsapp" | "telegram" }>`
   position: relative;
   width: 48px;
   height: 48px;
@@ -104,8 +105,14 @@ const FabLink = styled.a`
   justify-content: center;
   color: #fff;
   text-decoration: none;
-  background: linear-gradient(135deg, #25d366, #128c7e);
-  box-shadow: 0 10px 24px rgba(37, 211, 102, 0.4);
+  background: ${({ $tone }) =>
+    $tone === "telegram"
+      ? "linear-gradient(135deg, #2aabee, #229ed9)"
+      : "linear-gradient(135deg, #25d366, #128c7e)"};
+  box-shadow: ${({ $tone }) =>
+    $tone === "telegram"
+      ? "0 10px 24px rgba(42, 171, 238, 0.4)"
+      : "0 10px 24px rgba(37, 211, 102, 0.4)"};
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   animation: ${rise} 0.22s ease;
 
@@ -520,6 +527,7 @@ const LiveChatWidget: React.FC = () => {
       <FabStack>
         <MenuActions $open={menuOpen}>
           <FabLink
+            $tone="whatsapp"
             href={WHATSAPP_SUPPORT_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -529,6 +537,18 @@ const LiveChatWidget: React.FC = () => {
           >
             <FabLabel>WhatsApp</FabLabel>
             <FaWhatsapp />
+          </FabLink>
+          <FabLink
+            $tone="telegram"
+            href={TELEGRAM_SUPPORT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Telegram"
+            title="Telegram"
+            onClick={() => setMenuOpen(false)}
+          >
+            <FabLabel>Telegram</FabLabel>
+            <FaTelegramPlane />
           </FabLink>
           <Fab
             type="button"

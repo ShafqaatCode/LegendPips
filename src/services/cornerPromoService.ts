@@ -37,7 +37,7 @@ export type CornerPromoInput = {
   endsAt?: string | null;
 };
 
-const fetchJson = async (url: string, options?: RequestInit) => {
+const fetchJson = async (url: string, options?: RequestInit): Promise<any> => {
   const res = await fetch(url, {
     ...options,
     headers: {

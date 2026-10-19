@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 export const userColors = {
   navy: '#132E58',
   navyLight: '#1a4a7a',
-  gold: '#Fbbf24',
+  gold: '#FBC113',
   goldSoft: '#fde68a',
   bg: '#eef2f7',
   card: '#ffffff',
@@ -120,95 +120,132 @@ export const PageSubtitle = styled.p`
 
 export const StatsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.85rem;
-  margin-bottom: 1.1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0;
 
-  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: 480px) { grid-template-columns: 1fr; }
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 export const StatCard = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 1rem 1.05rem;
-  background: ${userColors.card};
-  border: 1px solid ${userColors.border};
-  border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
   position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.05rem 1.05rem 1rem;
+  background:
+    linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+  border: 1px solid rgba(19, 46, 88, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.045);
   overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
-    inset: 0 auto 0 0;
-    width: 3px;
-    background: linear-gradient(180deg, ${userColors.gold}, transparent);
-    opacity: 0;
-    transition: opacity 0.15s;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: linear-gradient(90deg, ${userColors.gold}, rgba(251, 193, 19, 0));
+    opacity: 0.85;
   }
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 28px rgba(19, 46, 88, 0.1);
-    border-color: rgba(251, 191, 36, 0.45);
-    &::before { opacity: 1; }
+    border-color: rgba(251, 193, 19, 0.4);
+    box-shadow: 0 14px 32px rgba(19, 46, 88, 0.1);
   }
 `;
 
 export const StatIconBox = styled.div<{ $color: string }>`
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: ${({ $color }) => `linear-gradient(145deg, ${$color}22 0%, ${$color}0a 100%)`};
-  color: ${({ $color }) => $color};
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  background: ${({ $color }) =>
+    `linear-gradient(145deg, ${$color} 0%, ${$color}cc 100%)`};
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   flex-shrink: 0;
-  box-shadow: inset 0 0 0 1px ${({ $color }) => `${$color}28`};
+  box-shadow: 0 8px 16px ${({ $color }) => `${$color}33`};
 `;
 
-export const StatBody = styled.div` flex: 1; min-width: 0; `;
+export const StatBody = styled.div`
+  flex: 1;
+  min-width: 0;
+  padding-top: 0.1rem;
+`;
 
 export const StatValue = styled.div`
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: ${userColors.navy};
-  line-height: 1.15;
-  letter-spacing: -0.03em;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
 `;
 
 export const StatLabel = styled.div`
-  font-size: 0.6875rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: ${userColors.muted};
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 0.15rem;
+  letter-spacing: 0.02em;
+  margin-top: 0.28rem;
+  line-height: 1.35;
 `;
 
 export const StatMeta = styled.div<{ $positive?: boolean }>`
-  font-size: 0.6875rem;
-  font-weight: 600;
+  display: inline-flex;
+  margin-top: 0.4rem;
+  padding: 0.18rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: ${({ $positive }) =>
+    $positive !== false ? "rgba(5, 150, 105, 0.1)" : "rgba(220, 38, 38, 0.1)"};
   color: ${({ $positive }) => ($positive !== false ? userColors.success : userColors.danger)};
-  margin-top: 0.15rem;
 `;
 
 export const HintBar = styled.div`
+  position: relative;
   font-size: 0.8125rem;
   color: ${userColors.text};
-  padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
-  border: 1px solid #bfdbfe;
-  border-radius: 12px;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.06);
+  padding: 0.85rem 1.1rem 0.85rem 1.2rem;
+  background: linear-gradient(135deg, #fffdf5 0%, #f8fafc 100%);
+  border: 1px solid rgba(251, 193, 19, 0.35);
+  border-radius: 14px;
+  margin-bottom: 1.1rem;
+  box-shadow: 0 6px 18px rgba(19, 46, 88, 0.04);
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: ${userColors.gold};
+  }
+
   strong { color: ${userColors.navy}; }
+`;
+
+export const WidgetPanel = styled.section`
+  position: relative;
+  margin-bottom: 1.25rem;
+  padding: 1.1rem 1.15rem 1.15rem;
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.92) 100%);
+  border: 1px solid rgba(19, 46, 88, 0.07);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.045);
 `;
 
 export const ErrorBanner = styled.div`
@@ -362,28 +399,43 @@ export const GhostLink = styled.a`
 `;
 
 export const KycStrip = styled.div<{ $variant: string }>`
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.85rem;
-  padding: 0.9rem 1.1rem;
-  border-radius: 14px;
-  margin-bottom: 1rem;
+  gap: 0.95rem;
+  padding: 1rem 1.15rem 1rem 1.25rem;
+  border-radius: 16px;
+  margin-bottom: 1.1rem;
   flex-wrap: wrap;
   font-size: 0.8125rem;
-  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
   border: 1px solid ${({ $variant }) =>
-    $variant === 'approved' ? '#a7f3d0' :
-    $variant === 'pending' ? '#fde68a' :
-    $variant === 'rejected' ? '#fecaca' : '#bfdbfe'};
+    $variant === 'approved' ? 'rgba(16, 185, 129, 0.28)' :
+    $variant === 'pending' ? 'rgba(251, 193, 19, 0.4)' :
+    $variant === 'rejected' ? 'rgba(220, 38, 38, 0.28)' : 'rgba(19, 46, 88, 0.1)'};
   background: ${({ $variant }) =>
     $variant === 'approved' ? 'linear-gradient(135deg, #ecfdf5, #f0fdf4)' :
-    $variant === 'pending' ? 'linear-gradient(135deg, #fffbeb, #fefce8)' :
+    $variant === 'pending' ? 'linear-gradient(135deg, #fffbeb, #fffdf5)' :
     $variant === 'rejected' ? 'linear-gradient(135deg, #fef2f2, #fff1f2)' :
-    'linear-gradient(135deg, #eff6ff, #f0f9ff)'};
+    'linear-gradient(135deg, #f8fafc, #fff)'};
 
-  .label { font-weight: 800; color: ${userColors.navy}; }
-  .desc { font-size: 0.75rem; color: ${userColors.muted}; margin-top: 3px; line-height: 1.4; }
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: ${({ $variant }) =>
+      $variant === 'approved' ? userColors.success :
+      $variant === 'pending' ? userColors.gold :
+      $variant === 'rejected' ? userColors.danger : userColors.navy};
+  }
+
+  .label { font-weight: 800; color: ${userColors.navy}; letter-spacing: -0.01em; }
+  .desc { font-size: 0.75rem; color: ${userColors.muted}; margin-top: 4px; line-height: 1.45; }
 `;
 
 export const InfoGrid = styled.div`
@@ -443,31 +495,160 @@ export const Field = styled.label`
 
 export const QuickLinksGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.75rem;
-  margin-top: 0.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.8rem;
+  margin: 0;
 
-  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: 480px) { grid-template-columns: 1fr; }
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
-export const QuickLinkCard = styled(Link)`
+export const ExploreLinksGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.65rem;
+  margin: 0;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const QuickLinkCard = styled(Link)<{ $featured?: boolean }>`
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  padding: 1rem 1.05rem;
-  background: ${userColors.card};
-  border: 1px solid ${userColors.border};
+  gap: 0.55rem;
+  padding: 1.15rem 1.15rem 1.1rem;
+  min-height: 138px;
+  background: ${({ $featured }) =>
+    $featured
+      ? "linear-gradient(155deg, #fff8e1 0%, #ffffff 48%, #f8fafc 100%)"
+      : "linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%)"};
+  border: 1px solid
+    ${({ $featured }) =>
+      $featured ? "rgba(251, 193, 19, 0.45)" : "rgba(19, 46, 88, 0.08)"};
+  border-radius: 16px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: ${({ $featured }) =>
+    $featured
+      ? "0 10px 28px rgba(251, 193, 19, 0.12)"
+      : "0 8px 22px rgba(15, 23, 42, 0.045)"};
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: auto -20% -40% auto;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: ${({ $featured }) =>
+      $featured ? "rgba(251, 193, 19, 0.12)" : "rgba(19, 46, 88, 0.04)"};
+    pointer-events: none;
+  }
+
+  &::after {
+    content: "→";
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: ${({ $featured }) => ($featured ? userColors.navy : "#94a3b8")};
+    opacity: 0.55;
+    transition: transform 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba(251, 193, 19, 0.55);
+    box-shadow: 0 16px 36px rgba(19, 46, 88, 0.12);
+
+    &::after {
+      opacity: 1;
+      color: ${userColors.gold};
+      transform: translateX(3px);
+    }
+
+    .icon {
+      transform: scale(1.06);
+      background: linear-gradient(145deg, ${userColors.navy} 0%, #1a3d6e 100%);
+      color: ${userColors.gold};
+      box-shadow: 0 8px 18px rgba(19, 46, 88, 0.25);
+    }
+  }
+
+  .icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    background: ${({ $featured }) =>
+      $featured
+        ? `linear-gradient(145deg, ${userColors.navy} 0%, #1a3d6e 100%)`
+        : "linear-gradient(145deg, rgba(251, 193, 19, 0.2) 0%, rgba(251, 193, 19, 0.08) 100%)"};
+    color: ${({ $featured }) => ($featured ? userColors.gold : userColors.navy)};
+    box-shadow: ${({ $featured }) =>
+      $featured
+        ? "0 8px 16px rgba(19, 46, 88, 0.22)"
+        : "inset 0 0 0 1px rgba(251, 193, 19, 0.22)"};
+    transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .title {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: ${userColors.navy};
+    letter-spacing: -0.02em;
+    padding-right: 1.25rem;
+    line-height: 1.25;
+  }
+
+  .desc {
+    margin-top: auto;
+    font-size: 0.74rem;
+    color: ${userColors.muted};
+    line-height: 1.45;
+  }
+`;
+
+export const ExploreLinkCard = styled(Link)`
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 0.95rem;
+  min-height: 72px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+  border: 1px solid rgba(19, 46, 88, 0.08);
   border-radius: 14px;
   text-decoration: none;
   color: inherit;
-  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.035);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 
   &:hover {
-    transform: translateY(-3px);
-    border-color: rgba(251, 191, 36, 0.5);
-    box-shadow: 0 12px 28px rgba(19, 46, 88, 0.1);
+    transform: translateY(-2px);
+    border-color: rgba(251, 193, 19, 0.45);
+    box-shadow: 0 12px 26px rgba(19, 46, 88, 0.1);
+
+    .arrow {
+      color: ${userColors.gold};
+      transform: translateX(2px);
+    }
+
+    .icon {
+      background: linear-gradient(145deg, ${userColors.navy} 0%, #1a3d6e 100%);
+      color: ${userColors.gold};
+    }
   }
 
   .icon {
@@ -477,42 +658,65 @@ export const QuickLinkCard = styled(Link)`
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.05rem;
-    background: linear-gradient(145deg, rgba(251, 191, 36, 0.22) 0%, rgba(251, 191, 36, 0.08) 100%);
+    font-size: 1rem;
+    background: rgba(251, 193, 19, 0.14);
     color: ${userColors.navy};
-    box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.25);
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .copy {
+    min-width: 0;
   }
 
   .title {
-    font-size: 0.8375rem;
+    display: block;
+    font-size: 0.84rem;
     font-weight: 800;
     color: ${userColors.navy};
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
   }
 
   .desc {
-    font-size: 0.72rem;
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.7rem;
     color: ${userColors.muted};
-    line-height: 1.4;
+    line-height: 1.35;
+  }
+
+  .arrow {
+    color: #94a3b8;
+    font-size: 1rem;
+    transition: transform 0.2s ease, color 0.2s ease;
   }
 `;
 
 export const SectionLabel = styled.h2`
-  margin: 0 0 0.75rem;
-  font-size: 0.8125rem;
+  margin: 0 0 0.9rem;
+  font-size: 0.78rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.07em;
   color: ${userColors.navy};
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
+
+  &::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: ${userColors.gold};
+    box-shadow: 0 0 0 3px rgba(251, 193, 19, 0.2);
+  }
 
   &::after {
-    content: '';
+    content: "";
     flex: 1;
     height: 1px;
-    background: linear-gradient(90deg, ${userColors.border}, transparent);
+    background: linear-gradient(90deg, rgba(19, 46, 88, 0.12), transparent);
   }
 `;
 

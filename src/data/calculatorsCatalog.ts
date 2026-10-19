@@ -7,77 +7,59 @@ export type CalculatorItem = {
 };
 
 export const CALCULATORS_INTRO =
-  "Each of our calculators was designed to empower traders with essential tools for effective decision-making and risk management. These calculators are indispensable for both novice and experienced traders, providing valuable insights into risk management, trade sizing, margin requirements, technical analysis, and potential earnings.";
+  "Simple, accurate trading calculators for everyday decisions — position size, margin, pips, profit, and risk. Educational estimates only; always confirm with your broker.";
 
 export const CALCULATORS_CATALOG: CalculatorItem[] = [
   {
     id: "lot-size",
-    title: "Lot Size Calculator",
-    shortLabel: "Position sizing",
+    title: "Position Size Calculator",
+    shortLabel: "Easy lot sizing",
     path: "/position-size-calculator",
     description:
-      "Align trade sizes with your risk tolerance, prevent excessive losses, and optimize profit potential. Determines the appropriate lot size based on your currency pair, account balance, risk percentage, and stop-loss level.",
+      "Enter balance, risk %, and stop-loss pips — get the correct lot size using standard pip values.",
+  },
+  {
+    id: "account-risk",
+    title: "Account Risk Calculator",
+    shortLabel: "Risk $ + lots",
+    path: "/account-risk-calculator",
+    description:
+      "See risk in dollars from your balance and %, plus the lot size for your stop-loss. Updates live.",
   },
   {
     id: "pip",
     title: "Pip Calculator",
     shortLabel: "Pip value",
     path: "/pip-calculator",
-    description:
-      "Evaluate potential profits or losses across standard, mini, and micro accounts based on your lot size. See exactly how much each pip move is worth in your deposit currency for smarter risk management.",
+    description: "See how much a pip move is worth for your lot size and pair.",
   },
   {
     id: "margin",
     title: "Margin Calculator",
     shortLabel: "Required margin",
     path: "/margin-calculator",
-    description:
-      "Determine the margin required to open a trade using your account currency, traded pair, leverage, and position size. Essential for staying within acceptable risk levels and avoiding margin calls.",
-  },
-  {
-    id: "pivot",
-    title: "Pivot Point Calculator",
-    shortLabel: "Support & resistance",
-    path: "/pivot-point-calculator",
-    description:
-      "Calculate Camarilla, Woodie's, Floor, and DeMark pivot points from OHLC data. Generates multiple support and resistance levels to help you plan entries, exits, and stop placements.",
-  },
-  {
-    id: "fibonacci",
-    title: "Fibonacci Calculator",
-    shortLabel: "Retracements & extensions",
-    path: "/fibonacci-calculator",
-    description:
-      "Identify potential Fibonacci retracement and extension levels from a swing high and low. Switch between uptrend and downtrend to map key zones for entries, exits, and profit targets.",
-  },
-  {
-    id: "rebate",
-    title: "Rebate Calculator",
-    shortLabel: "Cashback estimate",
-    path: "/rebate-calculator",
-    description:
-      "Get instant insight into potential cashback earnings. Enter your deposit currency, rebate level, traded pair, and volume in lots to estimate how much you can earn through LegendPips.",
+    description: "Required margin from lots, price, and leverage — clear and accurate.",
   },
   {
     id: "profit",
     title: "Profit Calculator",
     shortLabel: "P/L estimate",
     path: "/profit-calculator",
-    description: "Estimate profit or loss from lots, pip value, and pip distance.",
+    description: "Quick P/L from lots × pip value × pips.",
   },
   {
-    id: "lot",
-    title: "Lot Calculator",
-    shortLabel: "Units to lots",
-    path: "/lot-calculator",
-    description: "Convert units of base currency into standard lots.",
+    id: "break-even",
+    title: "Break-Even Calculator",
+    shortLabel: "Cover costs",
+    path: "/break-even-calculator",
+    description: "Pips needed to cover spread and commission before profit.",
   },
   {
     id: "rr",
     title: "Risk / Reward Calculator",
     shortLabel: "R:R ratio",
     path: "/risk-reward-calculator",
-    description: "Check whether a planned target justifies the stop distance.",
+    description: "Check whether a planned target justifies the stop.",
   },
   {
     id: "drawdown",
@@ -94,6 +76,34 @@ export const CALCULATORS_CATALOG: CalculatorItem[] = [
     description: "Project balance growth from a constant monthly return.",
   },
   {
+    id: "lot",
+    title: "Lot Calculator",
+    shortLabel: "Units to lots",
+    path: "/lot-calculator",
+    description: "Convert units into standard, mini, and micro lots.",
+  },
+  {
+    id: "pivot",
+    title: "Pivot Point Calculator",
+    shortLabel: "Support & resistance",
+    path: "/pivot-point-calculator",
+    description: "Standard, Woodie, Camarilla, and DeMark pivots from OHLC.",
+  },
+  {
+    id: "fibonacci",
+    title: "Fibonacci Calculator",
+    shortLabel: "Retracements & extensions",
+    path: "/fibonacci-calculator",
+    description: "Fibonacci levels from swing high and low.",
+  },
+  {
+    id: "rebate",
+    title: "Rebate Calculator",
+    shortLabel: "Cashback estimate",
+    path: "/rebate-calculator",
+    description: "Estimate LegendPips cashback from traded volume.",
+  },
+  {
     id: "crypto-profit",
     title: "Crypto Profit Calculator",
     shortLabel: "Coin P/L",
@@ -105,14 +115,13 @@ export const CALCULATORS_CATALOG: CalculatorItem[] = [
     title: "Risk of Ruin Calculator",
     shortLabel: "Account survival",
     path: "/risk-of-ruin-calculator",
-    description:
-      "Estimate the chance of losing your account given win rate, risk per trade, and reward-to-risk ratio.",
+    description: "Estimate chance of losing the account given win rate and risk.",
   },
   {
     id: "crypto-exchange-fees",
     title: "Crypto Exchange Fees Calculator",
     shortLabel: "Round-trip fees",
     path: "/crypto-exchange-fees-calculator",
-    description: "Calculate buy and sell fees for a round-trip crypto trade on an exchange.",
+    description: "Buy and sell fees for a round-trip crypto trade.",
   },
 ];

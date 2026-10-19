@@ -1,4 +1,4 @@
-import { API_CONFIG, getAuthHeaders } from "../utils/apiConfig";
+import { API_CONFIG, getAuthHeaders, getAuthHeadersMultipart } from "../utils/apiConfig";
 import type { Analysis, AnalysisResponse } from "../types/analysis.types";
 
 const fetchWithTimeout = (
@@ -189,13 +189,35 @@ export type AnalysisWritePayload = {
   isFeatured?: boolean;
   publishedAt?: string;
   tags?: string[];
+  featuredImageFile?: File | null;
+  chartImageFile?: File | null;
 };
+
+function buildAnalysisFormData(body: Partial<AnalysisWritePayload>): FormData {
+  const fd = new FormData();
+  const skip = new Set(["featuredImageFile", "chartImageFile"]);
+  Object.entries(body).forEach(([key, value]) => {
+    if (skip.has(key) || value === undefined || value === null) return;
+    if (typeof value === "boolean") {
+      fd.append(key, value ? "true" : "false");
+      return;
+    }
+    if (Array.isArray(value)) {
+      fd.append(key, JSON.stringify(value));
+      return;
+    }
+    fd.append(key, String(value));
+  });
+  if (body.featuredImageFile) fd.append("featuredImage", body.featuredImageFile);
+  if (body.chartImageFile) fd.append("chartImage", body.chartImageFile);
+  return fd;
+}
 
 export async function createAnalysisAdmin(body: AnalysisWritePayload): Promise<Analysis> {
   const res = await fetch(`${API_CONFIG.BASE_URL}/analysis`, {
     method: "POST",
-    headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    headers: getAuthHeadersMultipart(),
+    body: buildAnalysisFormData(body),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Failed to create analysis");
@@ -205,8 +227,8 @@ export async function createAnalysisAdmin(body: AnalysisWritePayload): Promise<A
 export async function updateAnalysisAdmin(id: string, body: Partial<AnalysisWritePayload>): Promise<Analysis> {
   const res = await fetch(`${API_CONFIG.BASE_URL}/analysis/${id}`, {
     method: "PUT",
-    headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    headers: getAuthHeadersMultipart(),
+    body: buildAnalysisFormData(body),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Failed to update analysis");

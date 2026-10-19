@@ -279,16 +279,24 @@ const ExtLink = styled.a`
 `;
 
 const Legal = styled.div`
-  padding: 1.15rem 0 0.25rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 0.35rem;
+  padding: 1rem 1.15rem 1.05rem;
+  border: 1px solid rgba(251, 193, 19, 0.28);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 `;
 
 const LegalText = styled.p`
   margin: 0 0 0.55rem;
   font-size: 0.68rem;
   line-height: 1.65;
-  color: rgba(148, 163, 184, 0.9);
+  color: rgba(148, 163, 184, 0.95);
   max-width: 78rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 `;
 
 const BottomBar = styled.div`
@@ -298,8 +306,7 @@ const BottomBar = styled.div`
   justify-content: space-between;
   gap: 0.75rem;
   padding: 1.1rem 0 1.5rem;
-  margin-top: 0.85rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 1rem;
 `;
 
 const Copyright = styled.p`
@@ -411,6 +418,9 @@ const Footer: FC = () => {
               <li><FooterLink to="/compare">Compare</FooterLink></li>
               <li><FooterLink to="/tools">{t("footer.tools")}</FooterLink></li>
               <li><FooterLink to="/signals">Signals</FooterLink></li>
+              <li><FooterLink to="/contests">Contests</FooterLink></li>
+              <li><FooterLink to="/leaderboard">Leaderboard</FooterLink></li>
+              <li><FooterLink to="/rewards">Rewards</FooterLink></li>
               <li><FooterLink to="/strategies">Strategies</FooterLink></li>
               <li><FooterLink to="/streaks">Streaks</FooterLink></li>
             </LinkList>
