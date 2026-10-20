@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { FiLogOut, FiMenu, FiShield } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLocale } from '../../contexts/LocaleContext';
@@ -8,44 +8,59 @@ import { isImpersonating, restoreAdminSession } from '../../services/authService
 import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher';
 import NotificationBell from './NotificationBell';
 
+const TITLE_BY_PATH: Array<{ match: RegExp; title: string; sub: string }> = [
+  { match: /^\/user-panel\/?$/, title: 'Dashboard', sub: 'Your trading overview' },
+  { match: /^\/user-panel\/alerts/, title: 'Alerts', sub: 'Notifications & updates' },
+  { match: /^\/user-panel\/profile/, title: 'Profile', sub: 'Account details' },
+  { match: /^\/user-panel\/verification/, title: 'Verification', sub: 'KYC status' },
+  { match: /^\/user-panel\/rewards/, title: 'Rewards', sub: 'LP points & streak' },
+  { match: /^\/user-panel\/signals/, title: 'Signals', sub: 'Live trading ideas' },
+  { match: /^\/user-panel\/rebates/, title: 'Rebates', sub: 'Cashback wallet' },
+  { match: /^\/user-panel\/live-accounts/, title: 'Live accounts', sub: 'Link your broker' },
+  { match: /^\/user-panel\/strategies/, title: 'Strategies', sub: 'Saved setups' },
+  { match: /^\/user-panel\/tickets/, title: 'Tickets', sub: 'Support requests' },
+  { match: /^\/user-panel\/settings/, title: 'Settings', sub: 'Preferences' },
+  { match: /^\/user-panel\/invite/, title: 'Invite friends', sub: 'Referral rewards' },
+  { match: /^\/user-panel\/calendar/, title: 'Calendar', sub: 'Market events' },
+  { match: /^\/user-panel\/contests/, title: 'Contests', sub: 'Competitions' },
+  { match: /^\/user-panel\/activity/, title: 'Activity', sub: 'Recent actions' },
+];
+
 const HeaderWrapper = styled.header`
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(14px) saturate(1.2);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
-  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px) saturate(1.15);
+  border-bottom: 1px solid rgba(19, 46, 88, 0.08);
+  padding: 0.7rem 1.35rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+`;
 
-  &::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #Fbbf24 0%, rgba(251, 191, 36, 0.15) 35%, transparent 70%);
-  }
+const Left = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
 `;
 
 const MenuButton = styled.button`
   display: none;
-  background: #f8fafc;
+  background: #fff;
   border: 1px solid #e2e8f0;
   font-size: 1.15rem;
-  color: #132E58;
+  color: #132e58;
   cursor: pointer;
-  padding: 0.4rem;
-  border-radius: 10px;
+  padding: 0.45rem;
+  border-radius: 12px;
   transition: background 0.15s, border-color 0.15s;
 
   &:hover {
     background: #fffbeb;
-    border-color: rgba(251, 191, 36, 0.45);
+    border-color: rgba(251, 193, 19, 0.5);
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
@@ -56,43 +71,47 @@ const MenuButton = styled.button`
 `;
 
 const PageHint = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
+  min-width: 0;
 
   .title {
-    font-size: 0.875rem;
+    display: block;
+    font-size: 0.95rem;
     font-weight: 800;
-    color: #132E58;
+    color: #132e58;
     letter-spacing: -0.02em;
+    line-height: 1.2;
   }
 
   .sub {
+    display: block;
+    margin-top: 0.12rem;
     font-size: 0.7rem;
     font-weight: 600;
     color: #94a3b8;
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    .sub { display: none; }
+    .sub {
+      display: none;
+    }
   }
 `;
 
 const RightSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.5rem;
+  flex-shrink: 0;
 `;
 
 const UserChip = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.35rem 0.7rem 0.35rem 0.4rem;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border: 1px solid #e2e8f0;
+  gap: 0.5rem;
+  padding: 0.3rem 0.65rem 0.3rem 0.3rem;
+  background: #fff;
+  border: 1px solid #e8ecf1;
   border-radius: 999px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 `;
 
 const Avatar = styled.div<{ $image?: string }>`
@@ -100,20 +119,19 @@ const Avatar = styled.div<{ $image?: string }>`
   height: 30px;
   border-radius: 50%;
   background: ${({ $image }) =>
-    $image ? `url(${$image}) center/cover no-repeat` : 'linear-gradient(135deg, #Fbbf24 0%, #f4b400 100%)'};
+    $image ? `url(${$image}) center/cover no-repeat` : 'linear-gradient(135deg, #fbc113 0%, #f59e0b 100%)'};
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.6875rem;
   font-weight: 800;
-  color: #132E58;
-  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.35);
+  color: #132e58;
 `;
 
 const UserName = styled.span`
-  font-size: 0.8125rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  color: #132E58;
+  color: #132e58;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     display: none;
@@ -125,7 +143,7 @@ const LogoutBtn = styled.button`
   align-items: center;
   gap: 0.35rem;
   padding: 0.45rem 0.75rem;
-  border-radius: 10px;
+  border-radius: 11px;
   border: 1px solid #fecaca;
   background: #fff;
   color: #b91c1c;
@@ -142,43 +160,40 @@ const LogoutBtn = styled.button`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
     padding: 0.45rem;
-    span { display: none; }
+    span {
+      display: none;
+    }
   }
 `;
 
 const ImpersonationBar = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.55rem;
   flex-wrap: wrap;
-  padding: 0.45rem 0.75rem;
-  margin-right: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  margin-right: 0.25rem;
   border-radius: 10px;
   background: #fff7ed;
   border: 1px solid #fdba74;
   color: #9a3412;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
 `;
 
 const ReturnAdminBtn = styled.button`
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.65rem;
+  gap: 0.3rem;
+  padding: 0.3rem 0.55rem;
   border-radius: 8px;
-  border: 1px solid #132E58;
-  background: #132E58;
+  border: none;
+  background: #132e58;
   color: #fff;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
-  white-space: nowrap;
-
-  &:hover {
-    background: #1a3d6e;
-  }
 `;
 
 interface UserHeaderProps {
@@ -187,9 +202,15 @@ interface UserHeaderProps {
 
 const UserHeader: React.FC<UserHeaderProps> = ({ onMenuClick }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout: authLogout } = useAuth();
   const { t } = useLocale();
   const viewingAsUser = useMemo(() => isImpersonating(), []);
+
+  const pageMeta = useMemo(() => {
+    const hit = TITLE_BY_PATH.find((row) => row.match.test(location.pathname));
+    return hit || { title: t('panel.member'), sub: t('panel.workspace') };
+  }, [location.pathname, t]);
 
   const handleReturnToAdmin = () => {
     if (!restoreAdminSession()) return;
@@ -208,13 +229,15 @@ const UserHeader: React.FC<UserHeaderProps> = ({ onMenuClick }) => {
 
   return (
     <HeaderWrapper>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <MenuButton onClick={onMenuClick} type="button" aria-label={t("panel.openMenu")}><FiMenu /></MenuButton>
+      <Left>
+        <MenuButton onClick={onMenuClick} type="button" aria-label={t('panel.openMenu')}>
+          <FiMenu />
+        </MenuButton>
         <PageHint>
-          <span className="title">{t("panel.member")}</span>
-          <span className="sub">{t("panel.workspace")}</span>
+          <span className="title">{pageMeta.title}</span>
+          <span className="sub">{pageMeta.sub}</span>
         </PageHint>
-      </div>
+      </Left>
 
       <RightSection>
         {viewingAsUser && (
@@ -232,11 +255,15 @@ const UserHeader: React.FC<UserHeaderProps> = ({ onMenuClick }) => {
           <Avatar $image={user?.profileImage}>
             {!user?.profileImage && (user ? `${user.firstName[0]}${user.lastName[0]}` : 'U')}
           </Avatar>
-          <UserName>{user ? `${user.firstName} ${user.lastName}` : t("panel.userFallback")}</UserName>
+          <UserName>{user ? `${user.firstName} ${user.lastName}` : t('panel.userFallback')}</UserName>
         </UserChip>
-        <LogoutBtn type="button" onClick={handleLogout} aria-label={viewingAsUser ? 'Return to admin' : t("panel.logout")}>
+        <LogoutBtn
+          type="button"
+          onClick={handleLogout}
+          aria-label={viewingAsUser ? 'Return to admin' : t('panel.logout')}
+        >
           {viewingAsUser ? <FiShield size={15} /> : <FiLogOut size={15} />}
-          <span>{viewingAsUser ? 'Return to admin' : t("panel.logout")}</span>
+          <span>{viewingAsUser ? 'Return to admin' : t('panel.logout')}</span>
         </LogoutBtn>
       </RightSection>
     </HeaderWrapper>

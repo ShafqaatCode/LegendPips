@@ -10,17 +10,17 @@ const PanelWrapper = styled.div`
   display: flex;
   min-height: 100vh;
   background:
-    radial-gradient(ellipse 70% 45% at 100% -5%, rgba(251, 191, 36, 0.14) 0%, transparent 52%),
-    radial-gradient(ellipse 50% 40% at 0% 100%, rgba(19, 46, 88, 0.08) 0%, transparent 48%),
-    radial-gradient(ellipse 40% 30% at 50% 50%, rgba(255, 255, 255, 0.55) 0%, transparent 60%),
-    linear-gradient(165deg, #e8eef6 0%, #f4f7fb 40%, #eef3f8 100%);
+    radial-gradient(ellipse 55% 40% at 92% -8%, rgba(251, 193, 19, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 35% at 0% 100%, rgba(19, 46, 88, 0.06) 0%, transparent 50%),
+    linear-gradient(180deg, #f3f6fb 0%, #eef2f7 48%, #f7f9fc 100%);
 `;
 
 const Backdrop = styled.div<{ $isOpen: boolean }>`
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.4);
+  background: rgba(10, 22, 40, 0.45);
+  backdrop-filter: blur(2px);
   z-index: 999;
   opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
   pointer-events: ${({ $isOpen }) => ($isOpen ? 'auto' : 'none')};
@@ -33,10 +33,11 @@ const Backdrop = styled.div<{ $isOpen: boolean }>`
 
 const MainContent = styled.main`
   flex: 1;
-  margin-left: 248px;
+  margin-left: 268px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     margin-left: 0;
@@ -45,12 +46,12 @@ const MainContent = styled.main`
 
 const ContentArea = styled.div`
   flex: 1;
-  padding: 1.35rem 1.65rem 2.5rem;
+  padding: 1.25rem 1.5rem 2.75rem;
   display: flex;
   flex-direction: column;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
-    padding: 0.95rem 0.9rem 1.75rem;
+    padding: 0.9rem 0.85rem 2rem;
   }
 `;
 

@@ -22,8 +22,9 @@ const fadeUp = keyframes`
 `;
 
 export const PageWrap = styled.div`
-  max-width: 1140px;
+  max-width: 1180px;
   margin: 0 auto;
+  width: 100%;
   animation: ${fadeUp} 0.4s ease both;
 `;
 
@@ -32,18 +33,19 @@ export const DashboardHero = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.15rem;
-  padding: 1.35rem 1.45rem;
+  gap: 1.25rem;
+  padding: 1.5rem 1.55rem;
   margin-bottom: 1.15rem;
   background:
-    radial-gradient(ellipse 55% 120% at 100% -20%, rgba(251, 191, 36, 0.32) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 80% at 0% 100%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
-    linear-gradient(128deg, #0a1830 0%, ${userColors.navy} 48%, ${userColors.navyLight} 100%);
-  border-radius: 18px;
+    radial-gradient(ellipse 55% 120% at 100% -20%, rgba(251, 193, 19, 0.3) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 80% at 0% 100%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+    linear-gradient(128deg, #081526 0%, ${userColors.navy} 50%, #1a3d6e 100%);
+  border-radius: 22px;
   color: white;
   flex-wrap: wrap;
-  box-shadow: 0 14px 36px rgba(12, 31, 61, 0.22);
+  box-shadow: 0 18px 40px rgba(8, 20, 40, 0.24);
   overflow: hidden;
+  border: 1px solid rgba(251, 193, 19, 0.18);
 
   &::after {
     content: '';
@@ -54,31 +56,31 @@ export const DashboardHero = styled.div`
   }
 
   h1 {
-    margin: 0 0 0.3rem;
-    font-size: clamp(1.15rem, 2vw, 1.4rem);
+    margin: 0 0 0.35rem;
+    font-size: clamp(1.25rem, 2.2vw, 1.55rem);
     font-weight: 800;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.035em;
   }
 
   p {
     margin: 0;
-    font-size: 0.8125rem;
-    opacity: 0.9;
-    line-height: 1.5;
-    max-width: 420px;
+    font-size: 0.84rem;
+    opacity: 0.88;
+    line-height: 1.55;
+    max-width: 440px;
   }
 `;
 
 export const PageHeader = styled.div`
   position: relative;
   margin-bottom: 1.25rem;
-  padding: 1.15rem 1.25rem 1.2rem;
-  border-radius: 16px;
+  padding: 1.2rem 1.3rem 1.25rem;
+  border-radius: 18px;
   background:
-    radial-gradient(ellipse 70% 100% at 100% 0%, rgba(251, 191, 36, 0.1) 0%, transparent 55%),
-    linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-  border: 1px solid ${userColors.border};
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+    radial-gradient(ellipse 70% 100% at 100% 0%, rgba(251, 193, 19, 0.12) 0%, transparent 55%),
+    linear-gradient(145deg, #ffffff 0%, #f7f9fc 100%);
+  border: 1px solid rgba(19, 46, 88, 0.08);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.045);
   overflow: hidden;
 
   &::before {

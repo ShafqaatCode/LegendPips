@@ -16,7 +16,6 @@ import {
   FiLifeBuoy,
   FiMessageCircle,
   FiZap,
-  FiShuffle,
   FiSearch,
   FiBarChart2,
   FiCalendar,
@@ -55,15 +54,12 @@ import {
   StatValue,
   StatLabel,
   StatMeta,
-  HintBar,
   ErrorBanner,
   KycStrip,
   Pill,
   GhostNavLink,
   QuickLinksGrid,
   QuickLinkCard,
-  ExploreLinksGrid,
-  ExploreLinkCard,
   SectionLabel,
   WidgetPanel,
   userColors,
@@ -223,26 +219,13 @@ const Dashboard: React.FC = () => {
     { to: "/user-panel/analysis", title: t("panel.toolAnalysis"), desc: t("panel.toolAnalysisD"), icon: FiActivity },
   ];
 
-  const moreActions: QuickItem[] = [
-    { to: "/user-panel/rewards", title: "Rewards & streak", desc: "LP points, levels & check-ins", icon: FiZap },
-    { to: "/rewards", title: "Rewards", desc: "Gift & cash milestones", icon: FiAward },
-    { to: "/leaderboard", title: "Leaderboard", desc: "Streaks & contest ranks", icon: FiBarChart2 },
-    { to: "/user-panel/signals", title: t("panel.qlSignals"), desc: t("panel.qlSignalsD"), icon: FiTrendingUp },
-    { to: "/user-panel/alerts", title: t("panel.qlAlerts"), desc: t("panel.qlAlertsD"), icon: FiBell },
-    { to: "/user-panel/strategies", title: t("panel.qlStrategies"), desc: t("panel.qlStrategiesD"), icon: FiBarChart2 },
-    { to: "/user-panel/invite", title: t("panel.qlInvite"), desc: t("panel.qlInviteD"), icon: FiUserPlus },
-    { to: "/user-panel/ib-change", title: t("panel.qlIb"), desc: t("panel.qlIbD"), icon: FiShuffle },
-    { to: "/rebates", title: t("panel.qlBrokers"), desc: t("panel.qlBrokersD"), icon: FiUsers },
-    { to: "/user-panel/tickets", title: t("panel.qlTickets"), desc: t("panel.qlTicketsD"), icon: FiLifeBuoy },
-    { to: "/live-chat", title: t("panel.qlChat"), desc: t("panel.qlChatD"), icon: FiMessageCircle },
-  ];
-
   const latestAccount = liveAccounts[0];
 
   return (
     <PageWrap>
       <DashboardHero>
         <div>
+          <HeroEyebrow>Member workspace</HeroEyebrow>
           <h1>{t("panel.welcome", { name: user?.firstName || t("panel.userFallback") })}</h1>
           <p>{t("panel.dashSub")}</p>
           <HeroMeta>
@@ -256,56 +239,53 @@ const Dashboard: React.FC = () => {
                 <FiBell /> {t("panel.unreadAlerts", { count: String(unread) })}
               </Link>
             ) : null}
+            {activitySummary && !loading ? (
+              <span>
+                <FiActivity /> {activitySummary.thisMonth} {t("panel.events")} this month
+              </span>
+            ) : null}
           </HeroMeta>
         </div>
-        <Pill $variant={kycStatus}>{t(KYC_STATUS_KEY[kycStatus])}</Pill>
+        <HeroActions>
+          <Pill $variant={kycStatus}>{t(KYC_STATUS_KEY[kycStatus])}</Pill>
+          <GhostNavLink to="/user-panel/signals" style={{ background: "rgba(255,255,255,0.12)", borderColor: "rgba(255,255,255,0.2)", color: "#fff" }}>
+            {t("panel.signals")} <FiChevronRight />
+          </GhostNavLink>
+        </HeroActions>
       </DashboardHero>
 
       {error && <ErrorBanner>{error}</ErrorBanner>}
 
-      <LinkAccountBanner to="/user-panel/live-accounts">
-        <span className="badge-icon" aria-hidden>
-          <FiLink />
-        </span>
-        <div className="copy">
-          <span className="kicker">Most important</span>
-          <strong>{t("panel.linkAccountCta")}</strong>
-          <p>
-            {latestAccount
-              ? `${latestAccount.brokerName} · ${liveAccountStatusLabel(latestAccount.status)}`
-              : t("panel.linkAccountDesc")}
-          </p>
-        </div>
-        <span className="cta">
-          Open <FiChevronRight />
-        </span>
-      </LinkAccountBanner>
-
-      <KycStrip $variant={kycStatus}>
-        <div>
-          <div className="label">{t("panel.kycTitle")}</div>
-          <div className="desc">{t(KYC_HINT_KEY[kycStatus])}</div>
-        </div>
-        <GhostNavLink to="/user-panel/verification">
-          {kycStatus === "approved" ? t("panel.viewStatus") : t("panel.manageKyc")}
-          <FiChevronRight />
-        </GhostNavLink>
-      </KycStrip>
-
-      {activitySummary && !loading && (
-        <HintBar>
-          <strong>{t("panel.activityMonth")}</strong> {activitySummary.thisMonth} {t("panel.events")}
-          <span
-            style={{
-              color: activitySummary.positive ? "#059669" : "#dc2626",
-              marginLeft: 6,
-              fontWeight: 600,
-            }}
-          >
-            ({activitySummary.changeText} {t("panel.vsLast")})
+      <PriorityRow>
+        <LinkAccountBanner to="/user-panel/live-accounts">
+          <span className="badge-icon" aria-hidden>
+            <FiLink />
           </span>
-        </HintBar>
-      )}
+          <div className="copy">
+            <span className="kicker">Start here</span>
+            <strong>{t("panel.linkAccountCta")}</strong>
+            <p>
+              {latestAccount
+                ? `${latestAccount.brokerName} · ${liveAccountStatusLabel(latestAccount.status)}`
+                : t("panel.linkAccountDesc")}
+            </p>
+          </div>
+          <span className="cta">
+            Open <FiChevronRight />
+          </span>
+        </LinkAccountBanner>
+
+        <KycStrip $variant={kycStatus}>
+          <div>
+            <div className="label">{t("panel.kycTitle")}</div>
+            <div className="desc">{t(KYC_HINT_KEY[kycStatus])}</div>
+          </div>
+          <GhostNavLink to="/user-panel/verification">
+            {kycStatus === "approved" ? t("panel.viewStatus") : t("panel.manageKyc")}
+            <FiChevronRight />
+          </GhostNavLink>
+        </KycStrip>
+      </PriorityRow>
 
       <WidgetPanel>
         <SectionLabel>{t("panel.snapshotTitle")}</SectionLabel>
@@ -412,44 +392,46 @@ const Dashboard: React.FC = () => {
         </QuickLinksGrid>
       </WidgetPanel>
 
-      <WidgetPanel>
-        <SectionLabel>{t("panel.overview")}</SectionLabel>
-        <StatsGrid>
-          {loading
-            ? Array.from({ length: 6 }).map((_, i) => (
-                <StatCard key={i}>
-                  <StatIconBox $color="#e2e8f0">
-                    <FiAward />
-                  </StatIconBox>
-                  <StatBody>
-                    <StatValue>
-                      <ShimmerBar $h="18px" $w="40px" />
-                    </StatValue>
-                    <StatLabel>
-                      <ShimmerBar $h="10px" $w="70px" />
-                    </StatLabel>
-                  </StatBody>
-                </StatCard>
-              ))
-            : stats.map((stat) => {
-                const Icon = iconByKey[stat.key] || FiTrendingUp;
-                return (
-                  <StatCard key={stat.key}>
-                    <StatIconBox $color={stat.color}>
-                      <Icon />
+      {(loading || stats.length > 0) && (
+        <WidgetPanel>
+          <SectionLabel>{t("panel.overview")}</SectionLabel>
+          <StatsGrid>
+            {loading
+              ? Array.from({ length: 3 }).map((_, i) => (
+                  <StatCard key={i}>
+                    <StatIconBox $color="#e2e8f0">
+                      <FiAward />
                     </StatIconBox>
                     <StatBody>
-                      <StatValue>{stat.value}</StatValue>
-                      <StatLabel>{STAT_I18N[stat.key] ? t(STAT_I18N[stat.key]) : stat.label}</StatLabel>
-                      <StatMeta $positive={stat.positive}>
-                        {stat.changeText} {t("panel.thisMonth")}
-                      </StatMeta>
+                      <StatValue>
+                        <ShimmerBar $h="18px" $w="40px" />
+                      </StatValue>
+                      <StatLabel>
+                        <ShimmerBar $h="10px" $w="70px" />
+                      </StatLabel>
                     </StatBody>
                   </StatCard>
-                );
-              })}
-        </StatsGrid>
-      </WidgetPanel>
+                ))
+              : stats.slice(0, 3).map((stat) => {
+                  const Icon = iconByKey[stat.key] || FiTrendingUp;
+                  return (
+                    <StatCard key={stat.key}>
+                      <StatIconBox $color={stat.color}>
+                        <Icon />
+                      </StatIconBox>
+                      <StatBody>
+                        <StatValue>{stat.value}</StatValue>
+                        <StatLabel>{STAT_I18N[stat.key] ? t(STAT_I18N[stat.key]) : stat.label}</StatLabel>
+                        <StatMeta $positive={stat.positive}>
+                          {stat.changeText} {t("panel.thisMonth")}
+                        </StatMeta>
+                      </StatBody>
+                    </StatCard>
+                  );
+                })}
+          </StatsGrid>
+        </WidgetPanel>
+      )}
 
       <SplitGrid>
         <WidgetPanel>
@@ -522,27 +504,6 @@ const Dashboard: React.FC = () => {
         </ToolsGrid>
       </WidgetPanel>
 
-      <WidgetPanel>
-        <SectionLabel>{t("panel.exploreMore")}</SectionLabel>
-        <ExploreLinksGrid>
-          {moreActions.map((item) => {
-            const Icon = item.icon;
-            return (
-              <ExploreLinkCard key={item.to} to={item.to}>
-                <span className="icon">
-                  <Icon />
-                </span>
-                <span className="copy">
-                  <span className="title">{item.title}</span>
-                  <span className="desc">{item.desc}</span>
-                </span>
-                <FiChevronRight className="arrow" aria-hidden />
-              </ExploreLinkCard>
-            );
-          })}
-        </ExploreLinksGrid>
-      </WidgetPanel>
-
       {(care?.manager || care?.recommendedBroker) && (
         <CareSection className="notranslate" data-no-auto-translate>
           <SectionLabel>Your support team</SectionLabel>
@@ -553,11 +514,17 @@ const Dashboard: React.FC = () => {
         </CareSection>
       )}
 
-      <div style={{ marginTop: "0.25rem", display: "flex", justifyContent: "flex-end" }}>
+      <FooterActions>
+        <GhostNavLink to="/live-chat">
+          <FiMessageCircle /> {t("panel.qlChat")}
+        </GhostNavLink>
+        <GhostNavLink to="/user-panel/tickets">
+          <FiLifeBuoy /> {t("panel.qlTickets")}
+        </GhostNavLink>
         <GhostNavLink to="/user-panel/settings">
           <FiSettings /> {t("panel.preferences")}
         </GhostNavLink>
-      </div>
+      </FooterActions>
     </PageWrap>
   );
 };
@@ -577,6 +544,59 @@ const CareCards = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 380px));
   gap: 0.9rem;
+`;
+
+const HeroEyebrow = styled.div`
+  display: inline-flex;
+  margin-bottom: 0.45rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(251, 193, 19, 0.18);
+  border: 1px solid rgba(251, 193, 19, 0.35);
+  color: #fbc113;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+`;
+
+const HeroActions = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.55rem;
+
+  @media (max-width: 640px) {
+    width: 100%;
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+`;
+
+const PriorityRow = styled.div`
+  display: grid;
+  grid-template-columns: 1.35fr 0.9fr;
+  gap: 0.9rem;
+  margin-bottom: 1.1rem;
+
+  > a,
+  > div {
+    margin-bottom: 0 !important;
+    height: 100%;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const FooterActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
 `;
 
 const HeroMeta = styled.div`
